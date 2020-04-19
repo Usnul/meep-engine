@@ -1,4 +1,4 @@
-import EmptyView from "../../../../../view/ui/elements/EmptyView.js";
+import EmptyView from "../../../../view/elements/EmptyView.js";
 import Vector2 from "../../../../core/geom/Vector2.js";
 
 /**

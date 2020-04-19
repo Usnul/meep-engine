@@ -1,5 +1,5 @@
 import { ViewEntity } from "./ViewEntity.js";
-import { LocalizedLabelView } from "../../../../../view/ui/common/LocalizedLabelView.js";
+import { LocalizedLabelView } from "../../../../view/common/LocalizedLabelView.js";
 
 export class LocalizedLabelViewEntity extends ViewEntity {
     constructor() {

@@ -5,7 +5,7 @@ import ViewEmitter from "../notification/ViewEmitter.js";
 import AnimationTrack from "../../animation/keyed2/AnimationTrack.js";
 import TransitionFunctions from "../../animation/TransitionFunctions.js";
 import { assert } from "../../../core/assert.js";
-import NotificationView from "../../../../view/ui/elements/notify/NotificationView.js";
+import NotificationView from "../../../view/elements/notify/NotificationView.js";
 import { NotificationAreaKind } from "../GUIEngine.js";
 
 /**

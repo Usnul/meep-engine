@@ -1,13 +1,13 @@
 import { Sampler2D } from "../../../../graphics/texture/sampler/Sampler2D.js";
 import convertSampler2D2Canvas from "../../../../graphics/texture/sampler/Sampler2D2Canvas.js";
-import { CanvasView } from "../../../../../../view/ui/elements/CanvasView.js";
-import EmptyView from "../../../../../../view/ui/elements/EmptyView.js";
+import { CanvasView } from "../../../../../view/elements/CanvasView.js";
+import EmptyView from "../../../../../view/elements/EmptyView.js";
 import { scaleSampler2D } from "../../../../graphics/texture/sampler/scaleSampler2D.js";
 import { arrayPickBestElement } from "../../../../../core/collection/ArrayUtils.js";
 import { passThrough } from "../../../../../core/function/Functions.js";
 import AABB2 from "../../../../../core/geom/AABB2.js";
-import View from "../../../../../../view/View.js";
-import SVG from "../../../../../../view/SVG.js";
+import View from "../../../../../view/View.js";
+import SVG from "../../../../../view/SVG.js";
 import Vector2 from "../../../../../core/geom/Vector2.js";
 import Vector4 from "../../../../../core/geom/Vector4.js";
 import { MersenneTwister } from "../../../../../core/math/MersenneTwister.js";

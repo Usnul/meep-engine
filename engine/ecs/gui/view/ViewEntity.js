@@ -1,4 +1,4 @@
-import View from "../../../../../view/View.js";
+import View from "../../../../view/View.js";
 
 export class ViewEntity extends View {
     constructor() {

@@ -4,9 +4,9 @@
 
 import { System } from '../System.js';
 import GUIElement, { GUIElementFlag } from './GUIElement.js';
-import EmptyView from "../../../../view/ui/elements/EmptyView.js";
-import domify from "../../../../view/DOM.js";
-import View from "../../../../view/View.js";
+import EmptyView from "../../../view/elements/EmptyView.js";
+import domify from "../../../view/DOM.js";
+import View from "../../../view/View.js";
 import { GUIElementEvent } from "./GUIElementEvent.js";
 
 /**

@@ -1,5 +1,5 @@
 import { ViewEntity } from "./ViewEntity.js";
-import { LocalizedLabelView } from "../../../../../view/ui/common/LocalizedLabelView.js";
+import { LocalizedLabelView } from "../../../../view/common/LocalizedLabelView.js";
 import { StoryAction } from "../../../../../model/game/story/action/StoryAction.js";
 import { MouseEvents } from "../../../input/devices/events/MouseEvents.js";
 import { TouchEvents } from "../../../input/devices/events/TouchEvents.js";

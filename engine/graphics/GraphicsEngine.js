@@ -28,8 +28,8 @@ import Postprocess from "./postprocess/Postprocess.js";
 
 import LayerCompositer from './composit/LayerCompositer.js';
 import { Camera } from "./ecs/camera/Camera.js";
-import View from "../../../view/View.js";
-import EmptyView from "../../../view/ui/elements/EmptyView.js";
+import View from "../../view/View.js";
+import EmptyView from "../../view/elements/EmptyView.js";
 import { assert } from "../../core/assert.js";
 import Vector2 from "../../core/geom/Vector2.js";
 import { RenderLayerManager } from "./render/RenderLayerManager.js";

@@ -10,23 +10,23 @@ import ViewportPosition from '../ecs/gui/ViewportPosition.js';
 
 import EntityBuilder from '../ecs/EntityBuilder.js';
 
-import ConfirmationDialogView from '../../../view/ui/elements/ConfirmationDialogView.js';
-import SimpleWindowView from '../../../view/ui/elements/SimpleWindow.js';
+import ConfirmationDialogView from '../../view/elements/ConfirmationDialogView.js';
+import SimpleWindowView from '../../view/elements/SimpleWindow.js';
 
-import View from '../../../view/View.js';
+import View from '../../view/View.js';
 import TransitionFunctions from "../animation/TransitionFunctions.js";
 import AnimationTrack from "../animation/keyed2/AnimationTrack.js";
 import AnimationTrackPlayback from "../animation/keyed2/AnimationTrackPlayback.js";
 import { playTrackRealTime } from "../animation/AnimationUtils.js";
-import { TooltipManager } from "../../../view/ui/tooltip/TooltipManager.js";
-import { DomTooltipManager } from "../../../view/ui/tooltip/DomTooltipManager.js";
+import { TooltipManager } from "../../view/tooltip/TooltipManager.js";
+import { DomTooltipManager } from "../../view/tooltip/DomTooltipManager.js";
 import Ticker from "../simulation/Ticker.js";
 import { SimpleLifecycle, SimpleLifecycleStateType } from "../../core/process/SimpleLifecycle.js";
 import { OverlayPageGUI } from "../../../model/game/scenes/strategy/gui/OverlayPageGUI.js";
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
-import EmptyView from "../../../view/ui/elements/EmptyView.js";
+import EmptyView from "../../view/elements/EmptyView.js";
 import LinearModifier from "../../core/model/stat/LinearModifier.js";
-import { GMLEngine } from "../../../view/ui/tooltip/GMLEngine.js";
+import { GMLEngine } from "../../view/tooltip/GMLEngine.js";
 import ObservedString from "../../core/model/ObservedString.js";
 import { CursorType } from "./cursor/CursorType.js";
 import { noop } from "../../core/function/Functions.js";

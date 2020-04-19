@@ -5,7 +5,7 @@
 
 import List from '../core/collection/List.js';
 import ToolEngine from './tools/engine/ToolEngine.js';
-import EditorView from '../../view/editor/EditorView.js';
+import EditorView from './view/EditorView.js';
 import ActionProcessor from './actions/ActionProcessor.js';
 import { KeyCodes } from "../engine/input/devices/KeyCodes.js";
 import EntityCreateAction from "./actions/concrete/EntityCreateAction.js";
@@ -28,7 +28,7 @@ import { downloadAsFile } from "../core/binary/ByteArrayTools.js";
 import BinaryBufferSerialization from "../engine/ecs/storage/BinaryBufferSerializer.js";
 import { EncodingBinaryBuffer } from "../core/binary/EncodingBinaryBuffer.js";
 import { EntityComponentDataset } from "../engine/ecs/EntityComponentDataset.js";
-import { resetMusicTracks } from "../../view/ui/game/options/OptionsView.js";
+import { resetMusicTracks } from "../../view/game/options/OptionsView.js";
 import InputControllerSystem from "../engine/input/ecs/systems/InputControllerSystem.js";
 
 

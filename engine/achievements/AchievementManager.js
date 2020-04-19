@@ -3,7 +3,7 @@ import { Achievement } from "./Achievement.js";
 import { ReactiveAnd } from "../../core/model/reactive/model/logic/ReactiveAnd.js";
 import { ReactiveReference } from "../../core/model/reactive/model/terminal/ReactiveReference.js";
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
-import { AchievementNotificationView } from "../../../view/ui/game/achievements/AchievementNotificationView.js";
+import { AchievementNotificationView } from "../../../view/game/achievements/AchievementNotificationView.js";
 import ViewportPosition from "../ecs/gui/ViewportPosition.js";
 import Vector2 from "../../core/geom/Vector2.js";
 import EntityBuilder from "../ecs/EntityBuilder.js";

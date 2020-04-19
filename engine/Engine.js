@@ -18,7 +18,7 @@ import Preloader from "./asset/preloader/Preloader.js";
 import SceneManager from "./scene/SceneManager.js";
 
 import { StrategyScene } from "../../model/game/scenes/strategy/StrategyScene.js";
-import TaskProgressView from '../../view/ui/common/TaskProgressView.js';
+import TaskProgressView from '../view/common/TaskProgressView.js';
 import CompressionService from "./compression/CompressionService.js";
 
 import GameStateLoader from './save/GameStateLoader.js';
@@ -28,13 +28,13 @@ import GUIEngine from './ui/GUIEngine.js';
 import dat from 'dat.gui'
 import { EntityManager } from "./ecs/EntityManager.js";
 import { initAssetManager } from "./asset/GameAssetManager.js";
-import { AssetLoaderStatusView } from "../../view/ui/asset/AssetLoaderStatusView.js";
+import { AssetLoaderStatusView } from "../view/asset/AssetLoaderStatusView.js";
 import ObservedBoolean from "../core/model/ObservedBoolean.js";
 import Vector1 from "../core/geom/Vector1.js";
-import { ViewStack } from "../../view/ui/elements/navigation/ViewStack.js";
-import EmptyView from "../../view/ui/elements/EmptyView.js";
+import { ViewStack } from "../view/elements/navigation/ViewStack.js";
+import EmptyView from "../view/elements/EmptyView.js";
 import { assert } from "../core/assert.js";
-import { makeEngineOptionsModel } from "../../view/ui/game/options/OptionsView.js";
+import { makeEngineOptionsModel } from "../../view/game/options/OptionsView.js";
 import { StaticKnowledgeDatabase } from "../../model/game/database/StaticKnowledgeDatabase.js";
 import Ticker from "./simulation/Ticker.js";
 import { Localization } from "../core/Localization.js";
@@ -49,7 +49,7 @@ import { HelpManager } from "../../model/game/help/HelpManager.js";
 import { EffectManager } from "../../model/game/util/effects/script/EffectManager.js";
 import { ClassRegistry } from "../core/model/ClassRegistry.js";
 import { StoryManager } from "../../model/game/story/dialogue/StoryManager.js";
-import { GameSaveStateManager } from "../../view/ui/game/save/GameSaveStateManager.js";
+import { GameSaveStateManager } from "../../view/game/save/GameSaveStateManager.js";
 import { BinarySerializationRegistry } from "./ecs/storage/binary/BinarySerializationRegistry.js";
 
 

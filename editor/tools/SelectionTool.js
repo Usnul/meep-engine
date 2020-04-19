@@ -7,7 +7,7 @@ import Tool from './engine/Tool.js';
 import Vector2 from '../../core/geom/Vector2.js';
 import AABB2 from '../../core/geom/AABB2.js';
 import { Camera } from '../../engine/graphics/ecs/camera/Camera.js';
-import View from '../../../view/View.js';
+import View from '../../view/View.js';
 
 import SelectionAddAction from '../actions/concrete/SelectionAddAction.js';
 import SelectionClearAction from '../actions/concrete/SelectionClearAction.js';
