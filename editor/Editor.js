@@ -374,6 +374,7 @@ function Editor() {
             resetMusicTracks(dataset);
 
             const serializer = new BinaryBufferSerialization();
+            serializer.registry = engine.binarySerializationRegistry;
 
             const state = new EncodingBinaryBuffer();
 

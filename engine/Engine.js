@@ -50,6 +50,7 @@ import { EffectManager } from "../../model/game/util/effects/script/EffectManage
 import { ClassRegistry } from "../core/model/ClassRegistry.js";
 import { StoryManager } from "../../model/game/story/dialogue/StoryManager.js";
 import { GameSaveStateManager } from "../../view/ui/game/save/GameSaveStateManager.js";
+import { BinarySerializationRegistry } from "./ecs/storage/binary/BinarySerializationRegistry.js";
 
 
 //gui
@@ -122,6 +123,11 @@ Engine.prototype.initialize = function () {
      */
     this.classRegistry = new ClassRegistry();
 
+    /**
+     * @readonly
+     * @type {BinarySerializationRegistry}
+     */
+    this.binarySerializationRegistry = new BinarySerializationRegistry();
 
     this.settings = new EngineSettings();
 
@@ -235,7 +241,7 @@ Engine.prototype.initialize = function () {
      * @type {GameSaveStateManager}
      */
     this.gameSaves = new GameSaveStateManager();
-    this.gameSaves.initialize({ storage: this.storage });
+    this.gameSaves.initialize({ storage: this.storage, registry: this.binarySerializationRegistry });
 
     //
     this.grid = new Grid(this);

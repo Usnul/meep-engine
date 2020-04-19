@@ -38,6 +38,8 @@ export class SerializedScene extends Scene {
 
 
                 const deSerializer = new BinaryBufferDeSerializer();
+                deSerializer.registry = engine.binarySerializationRegistry;
+
                 const binaryBuffer = new EncodingBinaryBuffer();
 
                 binaryBuffer.fromArrayBuffer(buffer);
