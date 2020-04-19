@@ -5,8 +5,8 @@
  */
 
 /**
- * @type {Function}
  * No-operation function. Does nothing. Useful when a callback is required to avoid checks for a missing function.
+ * @param {*..} arguments
  */
 export function noop() {
 }

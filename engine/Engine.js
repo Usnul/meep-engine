@@ -25,8 +25,6 @@ import GameStateLoader from './save/GameStateLoader.js';
 
 import GUIEngine from './ui/GUIEngine.js';
 
-import Editor from '../../model/editor/Editor.js';
-
 import dat from 'dat.gui'
 import { EntityManager } from "./ecs/EntityManager.js";
 import { initAssetManager } from "./asset/GameAssetManager.js";
@@ -276,10 +274,6 @@ Engine.prototype.initialize = function () {
      * @type {boolean}
      */
     this.renderingEnabled = true;
-
-    if (!ENV_PRODUCTION) {
-        this.enableEditor();
-    }
 };
 
 Engine.prototype.initializeViews = function () {
@@ -527,63 +521,6 @@ Engine.prototype.loadSlowTask = function (task) {
 
         engine.makeLoadingScreen(task);
     });
-};
-
-Engine.prototype.enableEditor = function () {
-
-    const self = this;
-    let editor = null;
-
-
-    let enabled = false;
-
-    function attachEditor() {
-        console.log('Enabling editor');
-        if (editor === null) {
-            editor = new Editor();
-            editor.initialize();
-        }
-        editor.attach(self);
-        enabled = true;
-    }
-
-    function detachEditor() {
-        console.log('Disabling editor');
-        if (editor !== null) {
-            editor.detach();
-        }
-        enabled = false;
-    }
-
-    function toggleEditor() {
-        if (!enabled) {
-            attachEditor();
-        } else {
-            detachEditor();
-        }
-
-        return editor;
-    }
-
-    gui.add({ a: toggleEditor }, "a").name("Toggle Editor");
-
-    //bind key for toggling editor
-    this.inputEngine.mapKey(144, {
-        on: function () {
-            toggleEditor();
-        },
-        off: function () {
-
-        }
-    });
-
-    /**
-     *
-     * @type {function():Editor}
-     */
-    this.toggleEditor = toggleEditor;
-
-    console.warn('Editor mode enabled, use NumLock key to toggle editor mode');
 };
 
 /**
