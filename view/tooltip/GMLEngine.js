@@ -4,13 +4,13 @@ import LabelView from "../common/LabelView.js";
 import EmptyView from "../elements/EmptyView.js";
 import { assert } from "../../core/assert.js";
 import UnitAffliction from "../../../model/game/logic/combat/unit/afflictions/UnitAffliction.js";
-import AfflictionView from "../units/affliction/AfflictionView.js";
-import { AfflictionDescriptionView } from "../units/affliction/AfflictionDescriptionView.js";
+import AfflictionView from "../../../view/units/affliction/AfflictionView.js";
+import { AfflictionDescriptionView } from "../../../view/units/affliction/AfflictionDescriptionView.js";
 import ItemView from "../../../view/game/items/ItemView.js";
 import Item from "../../../model/game/ecs/component/Item.js";
 import { LocalizedLabelView } from "../common/LocalizedLabelView.js";
-import { AfflictionTooltipView } from "../units/affliction/AfflictionTooltipView.js";
-import { TalentLevelDescriptionView } from "../units/talent/TalentLevelDescriptionView.js";
+import { AfflictionTooltipView } from "../../../view/units/affliction/AfflictionTooltipView.js";
+import { TalentLevelDescriptionView } from "../../../view/units/talent/TalentLevelDescriptionView.js";
 import { prettyPrint } from "../../core/NumberFormat.js";
 
 /**

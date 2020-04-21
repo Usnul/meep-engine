@@ -1,7 +1,7 @@
 import View from "../View.js";
 import dom from "../DOM.js";
 import Vector2 from "../../core/geom/Vector2.js";
-import { forceIntoBox, pullBoxTowardsPoint, resolveAABB2Overlap } from "../../../model/diagram/graph/BoxLayouter.js";
+import { forceIntoBox, pullBoxTowardsPoint, resolveAABB2Overlap } from "../../core/graph/layout/BoxLayouter.js";
 import AABB2 from "../../core/geom/AABB2.js";
 import { CompassArrowView } from "../elements/CompassArrowView.js";
 import EmptyView from "../elements/EmptyView.js";
