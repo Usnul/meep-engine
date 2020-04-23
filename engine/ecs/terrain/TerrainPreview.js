@@ -1,7 +1,12 @@
 import Vector2 from "../../../core/geom/Vector2.js";
 
 export function TerrainPreview() {
-    this.url = null;
+    /**
+     *
+     * @type {String}
+     */
+    this.url = "";
+
     /**
      *
      * @type {Vector2}

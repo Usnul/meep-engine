@@ -6,6 +6,7 @@ import { Sampler2D } from "../../../../graphics/texture/sampler/Sampler2D.js";
 import { SplatMapOptimizer } from "./SplatMapOptimizer.js";
 import { assert } from "../../../../../core/assert.js";
 import { max2, min2 } from "../../../../../core/math/MathUtils.js";
+import { scaleSampler2D } from "../../../../graphics/texture/sampler/scaleSampler2D.js";
 
 
 /**
@@ -35,8 +36,9 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
 
                 const image = asset.create();
 
-                const width = image.width;
-                const height = image.height;
+                // FIXME texture array in three.js doesn't work when texture size is less than 2x2
+                const width = max2(image.width, 2);
+                const height = max2(image.height, 2);
 
                 mapping.resize(width, height, 4);
 
@@ -446,9 +448,16 @@ export class SplatMapping {
 
             const materialImage = this.materialTexture.image;
 
+            const oldMaterialData = materialImage.data;
+
             materialImage.width = width;
             materialImage.height = height;
             materialImage.data = new Uint8ClampedArray(width * height * 4);
+
+            const source = new Sampler2D(oldMaterialData, 4, oldWidth, oldHeight);
+            const target = new Sampler2D(materialImage.data, 4, width, height);
+
+            scaleSampler2D(source, target);
 
             this.materialTexture.needsUpdate = true;
         }
@@ -457,10 +466,23 @@ export class SplatMapping {
 
             const weightImage = this.weightTexture.image;
 
+            const oldWeightData = weightImage.data;
+
+            const oldLayerSize = oldWidth * oldHeight;
+            const newLayerSize = width * height;
+
             weightImage.width = width;
             weightImage.height = height;
             weightImage.depth = depth;
-            weightImage.data = new Uint8ClampedArray(width * height * depth);
+            weightImage.data = new Uint8ClampedArray(newLayerSize * depth);
+
+            for (let d = 0; d < min2(depth, oldDepth); d++) {
+
+                const source = new Sampler2D(oldWeightData.subarray(d * oldLayerSize, (d + 1) * oldLayerSize), 1, oldWidth, oldHeight);
+                const target = new Sampler2D(weightImage.data.subarray(d * newLayerSize, (d + 1) * newLayerSize), 1, width, height);
+
+                scaleSampler2D(source, target);
+            }
 
             this.weightTexture.needsUpdate = true;
         }

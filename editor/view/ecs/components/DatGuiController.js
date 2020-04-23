@@ -91,10 +91,13 @@ class DatGuiController extends GuiControl {
             throw new Error(`Property '${property}' is undefined`);
         }
 
+        if (prop === null) {
+            throw new Error(`Property '${property}' is null`);
+        }
+
         let c;
 
         if (prop.isObservedBoolean || prop.isObservedInteger || prop.isVector1 || prop.isObservedString) {
-
 
             const proxy = { v: prop.getValue() };
 

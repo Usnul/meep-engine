@@ -174,14 +174,33 @@ export class TerrainController extends View {
                 controller.add(model, 'gridScale').step(1).name('Gird Size');
 
                 const proxy = {
-                    heightResolution: new Vector2(model.samplerHeight.width, model.samplerHeight.height)
+                    heightResolution: new Vector2(model.samplerHeight.width, model.samplerHeight.height),
+                    weightResolution: new Vector2(model.splat.size.x, model.splat.size.y),
+                    layerResolution: new Vector2(model.layers.resolution.x, model.layers.resolution.y),
                 };
 
                 proxy.heightResolution.onChanged.add((x, y) => {
                     model.samplerHeight.resize(x, y);
                 });
 
+                proxy.weightResolution.onChanged.add((x, y) => {
+                    model.splat.resize(x, y, model.splat.depth);
+                });
+
+                proxy.layerResolution.onChanged.add((x, y) => {
+                    model.layers.resolution.set(x, y);
+
+                    model.layers.buildTexture();
+                    model.layers.writeAllLayersDataIntoTexture();
+                });
+
                 controller.add(proxy, 'heightResolution', { step: 1 });
+                controller.add(proxy, 'weightResolution', { step: 1 });
+                controller.add(proxy, 'layerResolution', { step: 1 });
+
+                if (model.preview.url === null) {
+                    model.preview.url = '';
+                }
 
                 controller.add(model.preview, 'url').name('preview url');
                 controller.add(model.preview, 'offset');
