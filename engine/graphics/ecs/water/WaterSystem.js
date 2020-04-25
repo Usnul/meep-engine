@@ -17,7 +17,7 @@ import { RenderPassType } from "../../render/RenderPassType.js";
 import { obtainTerrain } from "../../../../../model/game/scenes/SceneUtils.js";
 import sampler2D2Texture from "../../texture/sampler/Sampler2D2Texture.js";
 
-const WATER_SIZE = 400;
+const WATER_SIZE = 800;
 
 class WaterSystem extends System {
     /**

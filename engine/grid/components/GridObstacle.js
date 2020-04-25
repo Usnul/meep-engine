@@ -7,6 +7,7 @@ import Vector2 from '../../../core/geom/Vector2.js';
 import { computeHashIntegerArray } from "../../../core/math/MathUtils.js";
 import { assert } from "../../../core/assert.js";
 import { BinaryClassSerializationAdapter } from "../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import { computeIntegerArrayHash } from "../../../core/primitives/array/computeIntegerArrayHash.js";
 
 class GridObstacle {
     constructor() {
@@ -208,7 +209,7 @@ class GridObstacle {
     hash() {
         return computeHashIntegerArray(
             this.size.hashCode(),
-            computeHashIntegerArray.apply(null, this.data)
+            computeIntegerArrayHash(this.data, 0, this.data.length)
         );
     }
 
@@ -253,10 +254,13 @@ export class GridObstacleSerializationAdapter extends BinaryClassSerializationAd
      */
     serialize(buffer, value) {
 
-        buffer.writeUint16(value.size.x);
-        buffer.writeUint16(value.size.y);
+        const w = value.size.x;
+        const h = value.size.y;
 
-        buffer.writeBytes(value.data);
+        buffer.writeUint16(w);
+        buffer.writeUint16(h);
+
+        buffer.writeBytes(value.data, 0, w * h);
     }
 
     /**

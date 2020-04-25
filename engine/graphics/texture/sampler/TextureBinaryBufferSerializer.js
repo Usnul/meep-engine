@@ -114,9 +114,13 @@ function readTypedArray(buffer, type, length) {
  * @param {Sampler2D} texture
  */
 export function serializeTexture(buffer, texture) {
-    buffer.writeUint32(texture.width);
-    buffer.writeUint32(texture.height);
-    buffer.writeUint8(texture.itemSize); //number of channels
+    const width = texture.width;
+    const height = texture.height;
+    const itemSize = texture.itemSize;
+
+    buffer.writeUint32(width);
+    buffer.writeUint32(height);
+    buffer.writeUint8(itemSize); //number of channels
 
     const type = dataTypeFromTypedArray(texture.data);
     buffer.writeUint8(DataTypeIndices[type]);
@@ -128,7 +132,9 @@ export function serializeTexture(buffer, texture) {
         throw new TypeError(`No buffer found on data array, only TypedArrays are supported. It appears that data array is not a TypedArray`);
     }
 
-    buffer.writeBytes(new Uint8Array(byteBuffer));
+    const byteSize = width * height * itemSize;
+
+    buffer.writeBytes(new Uint8Array(byteBuffer), 0, byteSize);
 }
 
 

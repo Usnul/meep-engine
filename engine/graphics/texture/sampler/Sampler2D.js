@@ -1216,17 +1216,24 @@ Sampler2D.prototype.resize = function (x, y, preserveData = true) {
  * @param {BinaryBuffer} buffer
  */
 Sampler2D.prototype.toBinaryBuffer = function (buffer) {
-    buffer.writeUint16(this.width);
-    buffer.writeUint16(this.height);
+    const width = this.width;
+    const height = this.height;
 
-    buffer.writeUint8(this.itemSize);
+    const itemSize = this.itemSize;
+
+    buffer.writeUint16(width);
+    buffer.writeUint16(height);
+
+    buffer.writeUint8(itemSize);
 
     if (this.data instanceof Uint8Array) {
         //data type
         buffer.writeUint8(0);
 
 
-        buffer.writeBytes(this.data);
+        const byteSize = width * height * itemSize;
+
+        buffer.writeBytes(this.data, 0, byteSize);
 
     } else {
         throw new TypeError(`Unsupported data type`);

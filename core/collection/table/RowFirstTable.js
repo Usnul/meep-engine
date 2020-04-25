@@ -302,7 +302,7 @@ function serializeRowFirstTable(buffer, table) {
 
     //write data
     const numDataBytes = table.length * table.bytesPerRecord;
-    buffer.writeBytes(new Uint8Array(table.data).subarray(0, numDataBytes));
+    buffer.writeBytes(new Uint8Array(table.data), 0, numDataBytes);
 }
 
 /**

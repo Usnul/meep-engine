@@ -65,7 +65,7 @@ function promiseSamplerHeight(zRange, heightMapURL, assetManager) {
             //
             // binaryBuffer.writeUint8(6);
 
-            binaryBuffer.writeBytes(new Uint8Array(array));
+            binaryBuffer.writeBytes(new Uint8Array(array), 0, array.length);
 
             binaryBuffer.position = 0;
 

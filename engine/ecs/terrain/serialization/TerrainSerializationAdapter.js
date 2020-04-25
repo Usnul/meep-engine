@@ -59,7 +59,7 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         assert.equal(heightBytes.length, value.samplerHeight.width * value.samplerHeight.height * 4, `Incorrect height data size`);
 
-        buffer.writeBytes(heightBytes);
+        buffer.writeBytes(heightBytes, 0, heightBytes.length);
 
         const layerCount = value.layers.count();
 
@@ -70,8 +70,11 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
         buffer.writeUint16(value.splat.size.x);
         buffer.writeUint16(value.splat.size.y);
 
-        buffer.writeBytes(value.splat.weightData);
-        buffer.writeBytes(value.splat.materialData);
+        const weightData = value.splat.weightData;
+        const materialData = value.splat.materialData;
+
+        buffer.writeBytes(weightData, 0, weightData.length);
+        buffer.writeBytes(materialData, 0, materialData.length);
 
         //layers
         buffer.writeUint16(value.layers.resolution.x);

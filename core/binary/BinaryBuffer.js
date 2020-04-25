@@ -529,15 +529,26 @@ BinaryBuffer.prototype.writeUint32LE = function (value) {
 /**
  *
  * @param {Uint8Array|Uint8ClampedArray|number[]} array
+ * @param {number} sourceOffset
+ * @param {number} length
  */
-BinaryBuffer.prototype.writeBytes = function (array) {
-    const length = array.length;
-    const end = this.position + length;
+BinaryBuffer.prototype.writeBytes = function (array, sourceOffset, length) {
+    assert.greaterThanOrEqual(array.length, sourceOffset + length, 'source array underflow');
+
+    const targetAddress = this.position;
+
+    const end = targetAddress + length;
 
     this.ensureCapacity(end);
 
     const target = new Uint8Array(this.data);
-    target.set(array, this.position);
+
+    for (let i = 0; i < length; i++) {
+        const iT = targetAddress + i;
+        const iS = sourceOffset + i;
+
+        target[iT] = array[iS];
+    }
 
     this.position = end;
 };

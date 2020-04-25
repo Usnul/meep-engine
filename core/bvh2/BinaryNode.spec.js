@@ -214,7 +214,7 @@ test("serialization deserialization consistency", () => {
         const byteArray = jsonToStringToByteArray(value);
         const numBytes = byteArray.length;
         buffer.writeUint32(numBytes);
-        buffer.writeBytes(byteArray);
+        buffer.writeBytes(byteArray, 0, numBytes);
     });
 
     //reset position for reading
@@ -251,7 +251,7 @@ test("serialization deserialization consistency via to/fromBinaryBuffer", () => 
         const byteArray = jsonToStringToByteArray(value);
         const numBytes = byteArray.length;
         buffer.writeUint32(numBytes);
-        buffer.writeBytes(byteArray);
+        buffer.writeBytes(byteArray, 0, numBytes);
     });
 
     //reset position for reading
