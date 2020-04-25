@@ -36,6 +36,7 @@ import { LineView } from "./components/common/LineView.js";
 import { ComponentControlView } from "./ComponentControlView.js";
 import { HeadsUpDisplayController } from "./components/HeadsUpDisplayController.js";
 import { BlackboardController } from "./components/BlackboardController.js";
+import { GridObstacleController } from "./components/GridObstacleController.js";
 
 /**
  *
@@ -61,6 +62,7 @@ function prepareComponentFactory(factory, editor) {
         .register('MinimapMarker', datify)
         .register('Camera', datify)
         .register('FacingDirection', datify)
+        .register('GridObstacle',()=> new GridObstacleController())
         .register('Terrain', () => new TerrainController(editor.engine.assetManager))
         .register('TopDownCameraController', datify)
         .register('Light', datify)

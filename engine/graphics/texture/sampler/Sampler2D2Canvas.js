@@ -44,7 +44,7 @@ function convertSampler2D2Canvas(sampler, scale, offset, canvas, fillDD) {
         const n = width * height * 4;
 
         for (let i = 3; i < n; i += 4) {
-            array[i] = 1;
+            array[i] = 255;
         }
 
     }

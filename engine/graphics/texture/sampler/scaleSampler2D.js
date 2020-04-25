@@ -19,18 +19,37 @@ export function scaleSampler2D(source, target) {
 
     const sample = new Vector4();
 
-    for (let y = 0; y < targetHeight; y++) {
+    if(source.itemSize === 1){
 
-        const v = y / targetHeight;
+        for (let y = 0; y < targetHeight; y++) {
 
-        for (let x = 0; x < targetWidth; x++) {
+            const v = y / targetHeight;
 
-            const u = x / targetWidth;
+            for (let x = 0; x < targetWidth; x++) {
 
-            source.sample(u, v, sample);
+                const u = x / targetWidth;
 
-            target.set(x, y, [sample.x, sample.y, sample.z, sample.w]);
+                const value = source.sample(u, v, sample);
 
+                target.set(x, y, [value]);
+
+            }
+        }
+    }else {
+
+        for (let y = 0; y < targetHeight; y++) {
+
+            const v = y / targetHeight;
+
+            for (let x = 0; x < targetWidth; x++) {
+
+                const u = x / targetWidth;
+
+                source.sample(u, v, sample);
+
+                target.set(x, y, [sample.x, sample.y, sample.z, sample.w]);
+
+            }
         }
     }
 }
