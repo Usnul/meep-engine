@@ -50,9 +50,6 @@ class TerrainSystem extends System {
          * @type {BinaryNode}
          */
         this.bvh = null;
-
-        const self = this;
-
     }
 
     mapPointGrid2World(x, y, v3) {
@@ -99,16 +96,19 @@ class TerrainSystem extends System {
         const gridSize = component.size;
         const gridScale = component.gridScale;
 
-        this.gridScaleX = gridSize.x * gridScale / (gridSize.x - 1);
-        this.gridScaleY = gridSize.y * gridScale / (gridSize.y - 1);
+        const g_w = gridSize.x;
+        const g_h = gridSize.y;
+
+        this.gridScaleX = g_w * gridScale / (g_w - 1);
+        this.gridScaleY = g_h * gridScale / (g_h - 1);
 
         //resize pathing grid to terrain's size
-        this.grid.resize(gridSize.x, gridSize.y);
+        this.grid.resize(g_w, g_h);
 
-        const buildWorker = component.buildWorker;
-        buildWorker.start();
+        component.startBuildService();
 
         const bvh = component.tiles.bvh;
+
 
         //record entity for editor
         bvh.entity = entity;
@@ -117,8 +117,13 @@ class TerrainSystem extends System {
         this.renderLayer.bvh = bvh;
     }
 
+    /**
+     *
+     * @param {Terrain} component
+     * @param entity
+     */
     unlink(component, entity) {
-        component.buildWorker.stop();
+        component.stopBuildService();
     }
 
     update(timeDelta) {

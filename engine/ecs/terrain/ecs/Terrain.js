@@ -766,7 +766,16 @@ class Terrain {
             this.buildWorker.setHeightSampler(s.data, s.itemSize, s.width, s.height);
         });
 
+    }
 
+    startBuildService() {
+        this.buildWorker.start();
+        const s = this.samplerHeight;
+        this.buildWorker.setHeightSampler(s.data, s.itemSize, s.width, s.height);
+    }
+
+    stopBuildService() {
+        this.buildWorker.stop();
     }
 
     /**

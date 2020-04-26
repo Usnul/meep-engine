@@ -68,7 +68,8 @@ function generateAPI(target, methods) {
                     if (!trySendMessage(target.__worker, message)) {
                         //failed to send message
                         //drop pending request
-                        pending.splice(pending.indexOf(request), 1);
+                        const i = pending.indexOf(request);
+                        pending.splice(i, 1);
                     }
                 }
             });
@@ -86,7 +87,7 @@ const WorkerProxy = function (url, methods) {
     this.url = url;
     this.methods = methods;
 
-    this.__pending = [];
+    this.__pending = {};
     this.__isRunning = false;
     this.__worker = null;
     //
@@ -128,8 +129,11 @@ WorkerProxy.prototype.stop = function () {
 WorkerProxy.prototype.sendPendingRequests = function () {
     for (let methodName in this.__pending) {
         if (this.__pending.hasOwnProperty(methodName)) {
+
             const pending = this.__pending[methodName];
-            for (let i = 0; i < pending.length; i++) {
+            const n = pending.length;
+
+            for (let i = 0; i < n; i++) {
                 const request = pending[i];
                 const message = {
                     methodName: methodName,
