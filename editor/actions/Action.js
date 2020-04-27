@@ -10,6 +10,14 @@
  */
 export class Action {
     /**
+     * How much memory does this action require, used by the ActionProcessor in order to decide how much history to keep
+     * @return {number}
+     */
+    computeByteSize() {
+        return 1;
+    }
+
+    /**
      * Apply action
      * @param {C} context
      */

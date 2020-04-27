@@ -1210,6 +1210,22 @@ Sampler2D.prototype.resize = function (x, y, preserveData = true) {
     this.initialize();
 };
 
+/**
+ * Estimate memory requirement of the object
+ * @return {number}
+ */
+Sampler2D.prototype.computeByteSize = function () {
+    let dataSize;
+
+    if (Array.isArray(this.data)) {
+        dataSize = 8 * this.data.length;
+    } else {
+        dataSize = this.data.buffer.byteLength;
+    }
+
+    return dataSize + 280;
+};
+
 
 /**
  *

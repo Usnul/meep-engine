@@ -31,6 +31,10 @@ export class PatchTerrainHeightAction extends Action {
         this.__oldPatch = Sampler2D.float32(1, width, height);
     }
 
+    computeByteSize() {
+        return this.patch.computeByteSize() + this.__oldPatch.computeByteSize() + 280;
+    }
+
     updateTerrain() {
         /**
          *

@@ -6,6 +6,7 @@
 
 import List from '../../core/collection/List.js';
 import { assert } from "../../core/assert.js";
+import { min2 } from "../../core/math/MathUtils.js";
 
 /**
  * @template D
@@ -26,6 +27,12 @@ function Mark(index, description) {
      * @type {D}
      */
     this.description = description;
+
+    /**
+     *
+     * @type {number}
+     */
+    this.memoryUsage = 0;
 }
 
 /**
@@ -56,10 +63,21 @@ function ActionProcessor(context) {
     this.cursor = 0;
 
     /**
+     *
+     * @type {number}
+     */
+    this.historyMemoryUsage = 0;
+
+    /**
      * History beyond this limit will be dropped when a new mark is added
      * @type {number}
      */
     this.historyMarkLimit = 10000;
+    /**
+     * Maximum amount of memory allowed for the history
+     * @type {number}
+     */
+    this.historyMemoryLimit = 268435456;
 }
 
 /**
@@ -123,11 +141,29 @@ ActionProcessor.prototype.mark = function (description) {
     }
 
     const mark = new Mark(this.cursor, description);
+    mark.memoryUsage = this.historyMemoryUsage;
 
     marks.push(mark);
 
-    if (marks.length > this.historyMarkLimit) {
-        const marksToDrop = marks.length - this.historyMarkLimit;
+    this.cleanupHistory();
+};
+
+ActionProcessor.prototype.cleanupHistory = function () {
+    const marks = this.marks;
+
+    let lastMark = min2(this.marks.length, this.historyMemoryLimit) - 1;
+
+    if (this.historyMemoryUsage >= this.historyMemoryLimit) {
+
+
+        for (; lastMark > 0 && this.marks[lastMark].memoryUsage > this.historyMemoryUsage; lastMark--) {
+        }
+
+
+    }
+
+    if (lastMark + 1 < this.marks.length) {
+        const marksToDrop = lastMark - this.historyMarkLimit;
 
         //get first mark to keep
         const newFirstMark = marks[marksToDrop];
@@ -138,30 +174,40 @@ ActionProcessor.prototype.mark = function (description) {
         assert.equal(newFirstMark.index, 0, "New First Mark's index must be 0");
     }
 
+
 };
 
 ActionProcessor.prototype.undo = function () {
-    let mark = 0;
+    let markAddress = 0;
+    /**
+     *
+     * @type {Mark}
+     */
+    let mark = null;
 
     //find mark
     for (let i = this.marks.length - 1; i >= 0; i--) {
-        const m = this.marks[i];
-        mark = m.index;
-        if (mark < this.cursor) {
+        mark = this.marks[i];
+        markAddress = m.index;
+        if (markAddress < this.cursor) {
             break;
         }
     }
 
-    if (this.cursor === mark) {
+    if (this.cursor === markAddress) {
         //this only happens when cursor sits on the last mark
-        mark = 0;
+        markAddress = 0;
     }
 
     //keep rewinding until we hit mark
-    while (this.cursor > mark && this.cursor > 0) {
+    while (this.cursor > markAddress && this.cursor > 0) {
         this.cursor--;
         const action = this.history.get(this.cursor);
         action.revert(this.context);
+    }
+
+    if (mark !== null) {
+        this.historyMemoryUsage = mark.memoryUsage;
     }
 };
 
@@ -185,7 +231,11 @@ ActionProcessor.prototype.redo = function () {
     //keep apply action until we hit the mark
     while (this.cursor < mark) {
         const action = this.history.get(this.cursor);
+
         action.apply(this.context);
+
+        this.historyMemoryUsage += action.computeByteSize();
+
         this.cursor++;
     }
 };
@@ -197,6 +247,8 @@ ActionProcessor.prototype.redo = function () {
  */
 ActionProcessor.prototype.do = function (action) {
     action.apply(this.context);
+
+    this.historyMemoryUsage += action.computeByteSize();
 
     //doing action invalidates "future" branch of history, we need to clear all actions beyond cursor
     if (this.cursor < this.history.length) {
