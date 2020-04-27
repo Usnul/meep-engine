@@ -2,7 +2,7 @@
  * Created by Alex on 18/12/2014.
  */
 import { System } from '../System.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import Renderable from '../components/Renderable.js';
 import GeometryBVH from '../components/GeometryBVH.js';
 import ViewportMeshProjection from '../components/ViewportMeshProjection.js';

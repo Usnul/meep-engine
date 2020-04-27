@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import AlignToVelocity from '../components/AlignToVelocity.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import Motion from '../components/Motion.js';
 import Vector3 from "../../../core/geom/Vector3.js";
 

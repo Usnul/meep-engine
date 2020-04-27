@@ -2,7 +2,7 @@
  * Created by Alex on 20/01/2015.
  */
 import { System } from '../../ecs/System.js';
-import Transform from '../../ecs/components/Transform.js';
+import { Transform } from '../../ecs/components/Transform.js';
 import AlignTransform2Grid from '../components/AlignTransform2Grid.js';
 import Vector3 from "../../../core/geom/Vector3.js";
 import Vector2 from "../../../core/geom/Vector2.js";

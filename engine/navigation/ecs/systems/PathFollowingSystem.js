@@ -8,7 +8,7 @@
 import { System } from '../../../ecs/System.js';
 import PathFollower, { PathFollowerEventType, PathFollowerFlags } from '../components/PathFollower.js';
 import Path from '../components/Path.js';
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import Vector3 from "../../../../core/geom/Vector3.js";
 
 const v3_forward = new Vector3();

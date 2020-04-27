@@ -445,6 +445,26 @@ export class QuadTreeNode extends AABB2 {
     }
 
     /**
+     *
+     * @param {QuadTreeDatum<D>[]} result
+     * @param {number} x0
+     * @param {number} y0
+     * @param {number} x1
+     * @param {number} y1
+     * @returns {number} number of intersecting objects added to the result
+     */
+    requestDatumIntersectionsRectangle(result, x0, y0, x1, y1) {
+        let count = 0;
+
+        //TODO optimize closures out, to avoid GC
+        this.traverseRectangleIntersections(x0, y0, x1, y1, (d) => {
+            result[count++] = d;
+        });
+
+        return count;
+    }
+
+    /**
      * NOTE: touching is not counted as intersection
      * @param {number} x0
      * @param {number} y0

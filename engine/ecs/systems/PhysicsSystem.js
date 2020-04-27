@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import PhysicalBody from '../components/PhysicalBody.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import PhysicsWorld from '../../physics/ammo/World.js';
 
 

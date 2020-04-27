@@ -31,6 +31,33 @@ export class PatchTerrainHeightAction extends Action {
         this.__oldPatch = Sampler2D.float32(1, width, height);
     }
 
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {number}
+     */
+    computeDelta(x, y) {
+
+        const _x = x - this.x;
+
+        if (_x < 0 || _x > this.patch.width - 1) {
+            return 0;
+        }
+
+        const _y = y - this.y;
+
+        if (_y < 0 || _y > this.patch.height - 1) {
+            return 0;
+        }
+
+        const sourceValue = this.__oldPatch.get(_x, _y);
+        const targetValue = this.patch.get(_x, _y);
+
+
+        return targetValue - sourceValue;
+    }
+
     computeByteSize() {
         return this.patch.computeByteSize() + this.__oldPatch.computeByteSize() + 280;
     }

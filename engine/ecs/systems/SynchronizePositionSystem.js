@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import SynchronizePosition from '../components/SynchronizePosition.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 
 
 class SynchronizePositionSystem extends System {

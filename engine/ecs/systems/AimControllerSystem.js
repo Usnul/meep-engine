@@ -6,7 +6,7 @@
 import { System } from '../System.js';
 import AimController from '../components/AimController.js';
 import CharacterController from '../components/CharacterController.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 
 
 class AimControllerSystem extends System {

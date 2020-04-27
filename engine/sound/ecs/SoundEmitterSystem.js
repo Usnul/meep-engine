@@ -7,7 +7,7 @@
 
 import { System } from '../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
-import Transform from '../../ecs/components/Transform.js';
+import { Transform } from '../../ecs/components/Transform.js';
 import { Asset } from "../../asset/Asset.js";
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
 

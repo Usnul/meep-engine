@@ -1,5 +1,5 @@
 import { EntityObserver } from "./EntityObserver.js";
-import Transform from "./components/Transform.js";
+import { Transform } from "./components/Transform.js";
 import GridPosition from "../grid/components/GridPosition.js";
 import EntityBuilder from "./EntityBuilder.js";
 import { EntityComponentDataset } from "./EntityComponentDataset.js";

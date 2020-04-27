@@ -1,5 +1,5 @@
 import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
-import Transform from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/components/Transform.js";
 import { BoxBufferGeometry, DodecahedronBufferGeometry, Group, Mesh, MeshBasicMaterial } from "three";
 import { EmissionShapeType } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleLayer.js";
 import { buildThreeJSHelperEntity } from "./buildThreeJSHelperEntity.js";

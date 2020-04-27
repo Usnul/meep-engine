@@ -3,7 +3,7 @@
  */
 
 
-import { max2, min2 } from "../math/MathUtils.js";
+import { intersects1D, max2, min2 } from "../math/MathUtils.js";
 
 /**
  * Float ABS, from standard C lib
@@ -85,6 +85,27 @@ function intersectSegment(x0, y0, z0, x1, y1, z1, startX, startY, startZ, endX, 
     return true;
 }
 
+/**
+ *
+ * @param {number} ax0
+ * @param {number} ay0
+ * @param {number} az0
+ * @param {number} ax1
+ * @param {number} ay1
+ * @param {number} az1
+ * @param {number} bx0
+ * @param {number} by0
+ * @param {number} bz0
+ * @param {number} bx1
+ * @param {number} by1
+ * @param {number} bz1
+ * @returns {boolean}
+ */
+export function aabb3_intersect_aabb3(ax0, ay0, az0, ax1, ay1, az1, bx0, by0, bz0, bx1, by1, bz1) {
+    return intersects1D(ax0, ax1, bx0, bx1)
+        && intersects1D(ay0, ay1, by0, by1)
+        && intersects1D(az0, az1, bz0, bz1);
+}
 
 /**
  * see: https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/

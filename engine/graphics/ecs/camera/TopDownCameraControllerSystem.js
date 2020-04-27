@@ -5,7 +5,7 @@
 
 import Vector3 from "../../../../core/geom/Vector3.js";
 import ObservedValue from "../../../../core/model/ObservedValue.js";
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import { System } from '../../../ecs/System.js';
 
 

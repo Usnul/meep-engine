@@ -2,7 +2,7 @@
  * Created by Alex on 12/08/2014.
  */
 import { System } from '../System.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import MonsterAI from '../components/MonsterAI.js';
 import Tag from '../components/Tag.js';
 import PathFollower from '../../navigation/ecs/components/PathFollower.js';

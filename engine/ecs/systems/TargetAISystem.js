@@ -4,7 +4,7 @@
 import { System } from '../System.js';
 import TargetAI from '../components/TargetAI.js';
 import Attacker from '../components/Attacker.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import Tag from '../components/Tag.js';
 
 

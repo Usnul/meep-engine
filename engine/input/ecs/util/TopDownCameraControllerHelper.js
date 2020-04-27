@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 22/08/2015.
  */
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import Renderable from '../../../ecs/components/Renderable.js';
 import Vector3 from '../../../../core/geom/Vector3.js';
 import EntityBuilder from '../../../ecs/EntityBuilder.js';

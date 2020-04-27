@@ -6,7 +6,7 @@
 import { Node } from './Node.js';
 import { deserializeLeafNode, isLeaf, LeafNode, serializeLeafNode } from './LeafNode.js';
 import { deserializeAABB3, deserializeAABB3Encoded_v0, serializeAABB3, serializeAABB3Encoded_v0 } from "./AABB3.js";
-import { boxSurfaceArea, boxSurfaceArea2, scoreBoxesSAH } from "./AABB3Math.js";
+import { aabb3_intersect_aabb3, boxSurfaceArea, boxSurfaceArea2, scoreBoxesSAH } from "./AABB3Math.js";
 import { BottomUpOptimizingRebuilder } from "./transform/BottomUpOptimizingRebuilder.js";
 import { assert } from "../assert.js";
 import { max2, min2 } from "../math/MathUtils.js";
@@ -667,6 +667,64 @@ BinaryNode.prototype.insertManyBoxes2 = function (leafFactory, numNodes) {
         n = nodes[i];
         this.insertNode(n);
     }
+};
+
+
+let stackPointer = 0;
+/**
+ *
+ * @type {Node[]}
+ */
+const stack = [];
+
+/**
+ *
+ * @param {LeafNode[]} result destination
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} z0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} z1
+ * @returns {number} number of objects added to the result
+ */
+BinaryNode.prototype.requestLeafIntersectionsAABB3 = function (result, x0, y0, z0, x1, y1, z1) {
+    const startOffset = stackPointer;
+
+    stack[stackPointer++] = this;
+
+    let count = 0;
+
+    while (stackPointer > startOffset) {
+        stackPointer--;
+        const node = stack[stackPointer];
+
+        if (!aabb3_intersect_aabb3(
+            x0, y0, z0, x1, y1, z1,
+            node.x0, node.y0, node.z0, node.x1, node.y1, node.z1
+        )) {
+            //no overlap
+            continue;
+        }
+
+        if (node.isLeafNode) {
+            result[count++] = node;
+
+            count++;
+        } else {
+            const left = node.left;
+            if (left !== null) {
+                stack[stackPointer++] = left;
+            }
+
+            const right = node.right;
+            if (right !== null) {
+                stack[stackPointer++] = right;
+            }
+        }
+    }
+
+    return count;
 };
 
 BinaryNode.prototype.traverseSegmentLeafIntersections = function (startX, startY, startZ, endX, endY, endZ, visitor) {

@@ -2,6 +2,9 @@ import { TerrainPaintTool } from "./TerrainPaintTool.js";
 import Vector4 from "../../../core/geom/Vector4.js";
 import { clamp, inverseLerp, lerp } from "../../../core/math/MathUtils.js";
 import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHeightAction.js";
+import { QuadTreeNode } from "../../../core/geom/2d/quad-tree/QuadTreeNode.js";
+import { Transform } from "../../../engine/ecs/components/Transform.js";
+import TransformModifyAction from "../../actions/concrete/TransformModifyAction.js";
 
 const LIMIT_VALUE = 1000;
 
@@ -12,6 +15,69 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
         this.settings.limitMin = -LIMIT_VALUE;
         this.settings.limitMax = LIMIT_VALUE;
+
+        /**
+         *
+         * @type {QuadTreeNode<number>}
+         */
+        this.transform_index = new QuadTreeNode();
+    }
+
+    buildTransformIndex() {
+        /**
+         *
+         * @type {Engine}
+         */
+        const engine = this.engine;
+
+        /**
+         *
+         * @type {EntityManager}
+         */
+        const entityManager = engine.entityManager;
+
+        /**
+         *
+         * @type {EntityComponentDataset}
+         */
+        const dataset = entityManager.dataset;
+
+        //purge existing data
+        this.transform_index.clear();
+
+        /**
+         *
+         * @type {number}
+         */
+        const gridScale = this.terrain.gridScale;
+
+        const uS = 1 / (this.terrain.size.x * gridScale);
+        const vS = 1 / (this.terrain.size.y * gridScale);
+
+        dataset.traverseComponents(Transform, (transform, entity) => {
+            const position = transform.position;
+
+            const x = position.x;
+            const z = position.z;
+
+            const u = x * uS;
+            const v = z * vS;
+
+            const datum = this.transform_index.add(transform, u, v, u, v);
+
+            datum.entity = entity;
+        });
+    }
+
+    initialize() {
+        super.initialize();
+
+        this.buildTransformIndex();
+
+    }
+
+    shutdown() {
+        super.shutdown();
     }
 
     /**
@@ -121,7 +187,12 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
         }
 
+
         this.editor.actions.do(action);
+
+        const objectMoveActions = this.createObjectMoveActions(action);
+
+        this.editor.actions.doMany(objectMoveActions);
     }
 
     /**
@@ -131,6 +202,66 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
      */
     createObjectMoveActions(action) {
 
+        const heightSampler = this.terrain.samplerHeight;
+
+        const x0 = action.x;
+        const y0 = action.y;
+
+        const patch = action.patch;
+
+        const patch_width = patch.width;
+        const patch_height = patch.height;
+
+        const x1 = x0 + patch_width;
+        const y1 = y0 + patch_height;
+
+
+        const u0 = x0 / heightSampler.width;
+        const v0 = y0 / heightSampler.height;
+
+        const u1 = x1 / heightSampler.width;
+        const v1 = y1 / heightSampler.height;
+
+        /**
+         *
+         * @type {QuadTreeDatum<Transform>[]}
+         */
+        const leaves = [];
+
+        /**
+         *
+         * @type {Action[]}
+         */
+        const result = [];
+
+        const overlaps = this.transform_index.requestDatumIntersectionsRectangle(leaves, u0, v0, u1, v1);
+
+        for (let i = 0; i < overlaps; i++) {
+            const leaf = leaves[i];
+
+            /**
+             *
+             * @type {Transform}
+             */
+            const transform = leaf.data;
+
+            const tX = leaf.x0 * heightSampler.width;
+            const tY = leaf.y0 * heightSampler.height;
+
+            const delta = action.computeDelta(tX, tY);
+
+            if (delta === 0) {
+                continue;
+            }
+
+            const tM = new Transform();
+            tM.copy(transform);
+            tM.position._add(0, delta, 0);
+            const a = new TransformModifyAction(leaf.entity, tM);
+            result.push(a);
+        }
+
+        return result;
     }
 
     start() {

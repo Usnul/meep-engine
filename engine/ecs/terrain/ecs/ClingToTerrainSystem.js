@@ -2,7 +2,7 @@
  * Created by Alex on 13/05/2016.
  */
 import { System } from '../../System.js';
-import Transform from '../../components/Transform.js';
+import { Transform } from '../../components/Transform.js';
 
 import ClingToTerrain from './ClingToTerrain.js';
 import Terrain from './Terrain.js';

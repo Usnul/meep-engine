@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import Renderable from '../components/Renderable.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
 import { rootObject3DFastMatrixUpdate, updateNodeByTransformAndBBB } from "../../graphics/ecs/mesh/MeshSystem.js";
 import { Box3 } from "three";

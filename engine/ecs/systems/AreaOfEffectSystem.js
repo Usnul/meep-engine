@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import Tag from '../components/Tag.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import AreaOfEffect from '../components/AreaOfEffect.js';
 
 

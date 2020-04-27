@@ -5,7 +5,7 @@
  */
 import { System } from '../System.js';
 import CharacterController from '../components/CharacterController.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import PhysicalBody from '../components/PhysicalBody.js';
 import Vector3 from "../../../core/geom/Vector3.js";
 

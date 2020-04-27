@@ -2,7 +2,7 @@
  * Created by Alex on 11/08/2014.
  */
 import { System } from '../../../ecs/System.js';
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import PathFinder from '../components/PathFinder.js';
 import Navigator from '../../PathFinder.js';
 import Vector3 from "../../../../core/geom/Vector3.js";

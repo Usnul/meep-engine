@@ -5,7 +5,7 @@
 
 import { System } from '../../../ecs/System.js';
 import Mesh, { MeshFlags } from './Mesh.js';
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 
 import Vector3 from '../../../../core/geom/Vector3.js';
 

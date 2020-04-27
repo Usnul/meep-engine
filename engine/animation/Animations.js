@@ -3,7 +3,7 @@
  */
 
 
-import Transform from "../ecs/components/Transform.js";
+import { Transform } from "../ecs/components/Transform.js";
 import Mesh from "../graphics/ecs/mesh/Mesh.js";
 import Tween from "./Tween.js";
 import GUIElement from "../ecs/gui/GUIElement.js";

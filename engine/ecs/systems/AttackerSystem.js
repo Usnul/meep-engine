@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import Attacker from '../components/Attacker.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 
 
 class AttackerSystem extends System {

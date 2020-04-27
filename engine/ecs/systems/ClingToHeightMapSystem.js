@@ -5,7 +5,7 @@
  */
 import { System } from '../System.js';
 import ClingToHeightMap from '../components/ClingToHeightMap.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import { Euler as ThreeEuler, Matrix4 as ThreeMatrix4, Vector2 as ThreeVector2, Vector3 as ThreeVector3 } from 'three';
 
 class ClingToHeightMapSystem extends System {

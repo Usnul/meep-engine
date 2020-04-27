@@ -6,7 +6,7 @@ import {
     Quaternion as ThreeQuaternion,
     SphereBufferGeometry
 } from "three";
-import Transform from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/components/Transform.js";
 import { Attachment } from "../../../engine/ecs/attachment/Attachment.js";
 import { BoneAttachmentSocket } from "../../../engine/ecs/sockets/BoneAttachmentSocket.js";
 import { BoneAttachmentBinding } from "../../../engine/ecs/attachment/BoneAttachmentBinding.js";

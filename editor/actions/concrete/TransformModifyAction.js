@@ -1,10 +1,4 @@
-/**
- *
- * @param entity
- * @param {Transform} modified
- * @constructor
- */
-import Transform from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/components/Transform.js";
 import { Action } from "../Action.js";
 
 class TransformModifyAction extends Action {
@@ -20,6 +14,10 @@ class TransformModifyAction extends Action {
         this.oldState = null;
         this.modified = modified;
         this.entity = entity;
+    }
+
+    computeByteSize() {
+        return 280;
     }
 
     /**

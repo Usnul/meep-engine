@@ -22,7 +22,7 @@ import { Camera } from "../engine/graphics/ecs/camera/Camera.js";
 import EditorEntitySystem from "./ecs/EditorEntitySystem.js";
 import EditorEntity from "./ecs/EditorEntity.js";
 import TopDownCameraController from "../engine/graphics/ecs/camera/TopDownCameraController.js";
-import Transform from "../engine/ecs/components/Transform.js";
+import { Transform } from "../engine/ecs/components/Transform.js";
 import TopDownCameraControllerSystem, { setCameraControllerFromTransform } from "../engine/graphics/ecs/camera/TopDownCameraControllerSystem.js";
 import { downloadAsFile } from "../core/binary/ByteArrayTools.js";
 import BinaryBufferSerialization from "../engine/ecs/storage/BinaryBufferSerializer.js";

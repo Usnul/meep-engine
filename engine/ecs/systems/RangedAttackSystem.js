@@ -2,7 +2,7 @@
  * Created by Alex on 13/08/2014.
  */
 import { System } from '../System.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 import RangedAttack from '../components/RangedAttack.js';
 import PhysicalBody from '../components/PhysicalBody.js';
 import Motion from '../components/Motion.js';

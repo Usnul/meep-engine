@@ -4,7 +4,7 @@
 
 
 import { System } from '../../../ecs/System.js';
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import { Light, LightType } from './Light.js';
 import { Camera } from '../camera/Camera.js';
 

@@ -7,7 +7,7 @@ import { ParticleEmitterFlag } from "../graphics/particles/particular/engine/emi
 import AnimationTrack from "./keyed2/AnimationTrack.js";
 import TransitionFunctions from "./TransitionFunctions.js";
 import AnimationTrackPlayback from "./keyed2/AnimationTrackPlayback.js";
-import Transform from "../ecs/components/Transform.js";
+import { Transform } from "../ecs/components/Transform.js";
 import { createSound, createTimer } from "../EntityCreator.js";
 import { whenAllEntitiesDestroyed, whenEntityDestroyed } from "../ecs/EntityBuilderUtils.js";
 import { removeComponentsExcept, stopEntityAndNotifyWhenStopped } from "../../../model/game/util/AnimatedActions.js";

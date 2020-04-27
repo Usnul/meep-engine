@@ -158,9 +158,6 @@ Transform.adjustRotation = function (sourceQuaternion, targetVector, limit) {
     sourceQuaternion.lookRotation(targetVector, Vector3.up);
 };
 
-export default Transform;
-
-
 export class TransformSerializationAdapter extends BinaryClassSerializationAdapter {
     constructor() {
         super();

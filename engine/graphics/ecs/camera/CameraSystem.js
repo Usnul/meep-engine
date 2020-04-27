@@ -5,7 +5,7 @@
 
 import { System } from '../../../ecs/System.js';
 import { Camera } from './Camera.js';
-import Transform from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import {
     Frustum as ThreeFrustum,
     Matrix4 as ThreeMatrix4,

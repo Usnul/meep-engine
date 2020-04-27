@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 02/04/2014.
  */
-import Transform from './ecs/components/Transform.js';
+import { Transform } from './ecs/components/Transform.js';
 import { SoundEmitter } from './sound/ecs/SoundEmitter.js';
 import Timer from './ecs/components/Timer.js';
 import EntityBuilder from './ecs/EntityBuilder.js';

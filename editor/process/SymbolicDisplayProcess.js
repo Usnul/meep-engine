@@ -1,6 +1,6 @@
 import { EditorProcess } from "./EditorProcess.js";
 import { ParticleEmitter } from "../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
-import Transform from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/components/Transform.js";
 import EntityBuilder from "../../engine/ecs/EntityBuilder.js";
 import Renderable from "../../engine/ecs/components/Renderable.js";
 import {

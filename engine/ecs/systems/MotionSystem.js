@@ -5,7 +5,7 @@
  */
 import { System } from '../System.js';
 import Motion from '../components/Motion.js';
-import Transform from '../components/Transform.js';
+import { Transform } from '../components/Transform.js';
 
 
 class MotionSystem extends System {
