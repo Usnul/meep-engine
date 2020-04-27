@@ -43,7 +43,6 @@ export class NodeWaterShader {
 
         this.heightTexture = heightTextureNode;
 
-        this.heightRange = new FloatNode(1);
         this.level = new FloatNode(0);
 
         const textureRepeat = new Vector2Node(40, 40);
@@ -134,13 +133,9 @@ export class NodeWaterShader {
             )
         ]);
 
-        const terrainHeight = new OperatorNode(
-            new SwitchNode(
+        const terrainHeight = new SwitchNode(
                 smoothHeight
-                , 'x'),
-            this.heightRange,
-            OperatorNode.MUL
-        );
+                , 'x');
 
         mtl.color = new MathNode(
             mainColor,

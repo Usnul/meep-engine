@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 17/02/2017.
  */
-import { BackSide, LinearFilter, Plane, PlaneBufferGeometry, Vector3 as ThreeVector3 } from 'three';
+import { BackSide, Plane, PlaneBufferGeometry, Vector3 as ThreeVector3 } from 'three';
 import { System } from '../../../ecs/System.js';
 import Water from './Water.js';
 import { Light } from '../light/Light.js';
@@ -15,7 +15,6 @@ import { NodeFrame } from "three/examples/jsm/nodes/core/NodeFrame.js";
 import { StandardFrameBuffers } from "../../GraphicsEngine.js";
 import { RenderPassType } from "../../render/RenderPassType.js";
 import { obtainTerrain } from "../../../../../model/game/scenes/SceneUtils.js";
-import sampler2D2Texture from "../../texture/sampler/Sampler2D2Texture.js";
 
 const WATER_SIZE = 800;
 
@@ -252,7 +251,9 @@ class WaterSystem extends System {
     processUpdateQueue() {
 
         //do updates
-        let l = this.updateQueue.length;
+        const updateQueue = this.updateQueue;
+
+        let l = updateQueue.length;
 
         if (l === 0) {
             return;
@@ -271,33 +272,11 @@ class WaterSystem extends System {
         }
 
         for (let i = 0; i < l; i++) {
-            const water = this.updateQueue[i];
-            const shader = water.__shader;
+            const water = updateQueue[i];
 
-            const zRange = terrain.heightRange;
+            water.updateShaderForTerrain(terrain, WATER_SIZE);
 
-            const heightTexture = sampler2D2Texture(terrain.samplerHeight, 255 / zRange, zRange / 2);
-
-            heightTexture.magFilter = LinearFilter;
-            heightTexture.minFilter = LinearFilter;
-            heightTexture.flipY = false;
-
-            shader.heightTexture.value = heightTexture;
-
-            const tW = terrain.size.x * terrain.gridScale;
-            const tH = terrain.size.y * terrain.gridScale;
-
-            shader.heightUv.value.set(
-                -0.25,
-                -0.25,
-                (WATER_SIZE / tW),
-                (WATER_SIZE / tH)
-            );
-
-            shader.heightRange.value = zRange;
-
-
-            this.updateQueue.splice(i, 1);
+            updateQueue.splice(i, 1);
             i--;
             l--;
         }

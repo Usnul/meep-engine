@@ -33,7 +33,32 @@ class Water {
         this.color.onChanged.add(this.writeColorToShader, this);
     }
 
-    writeColorToShader(){
+    /**
+     *
+     * @param {Terrain} terrain
+     * @param {number} waterSize
+     */
+    updateShaderForTerrain(terrain, waterSize) {
+        const shader = this.__shader;
+
+        if (shader === null) {
+            return;
+        }
+
+        const tW = terrain.size.x * terrain.gridScale;
+        const tH = terrain.size.y * terrain.gridScale;
+
+        shader.heightTexture.value = terrain.heightTexture;
+
+        shader.heightUv.value.set(
+            -0.25,
+            -0.25,
+            (waterSize / tW),
+            (waterSize / tH)
+        );
+    }
+
+    writeColorToShader() {
         const r = this.color.x;
         const g = this.color.y;
         const b = this.color.z;

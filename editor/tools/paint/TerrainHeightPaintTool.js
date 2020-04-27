@@ -3,7 +3,16 @@ import Vector4 from "../../../core/geom/Vector4.js";
 import { clamp, inverseLerp } from "../../../core/math/MathUtils.js";
 import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHeightAction.js";
 
+const LIMIT_VALUE = 1000;
+
 export class TerrainHeightPaintTool extends TerrainPaintTool {
+
+    constructor() {
+        super();
+
+        this.settings.limitMin = -LIMIT_VALUE;
+        this.settings.limitMax = LIMIT_VALUE;
+    }
 
     /**
      *
@@ -57,13 +66,14 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
         const marker = this.settings.marker;
 
-        const heightRange = terrain.heightRange;
-
         const direction = this.modifiers.shift ? -1 : 1;
 
-        const speed = power * direction * heightRange / 3;
+        const speed = power * direction;
 
         const action = new PatchTerrainHeightAction(terrain, x0, y0, (x1 - x0), (y1 - y0));
+
+        const limitMin = this.settings.limitMin;
+        const limitMax = this.settings.limitMax;
 
         for (let y = y0; y < y1; y++) {
 
@@ -82,11 +92,9 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
                 const address = y * heightMap.width + x;
 
-                const halfHeightRange = heightRange / 2;
-
                 const base = heightMap.data[address];
 
-                const value = clamp(base + p * speed, -halfHeightRange, halfHeightRange);
+                const value = clamp(base + p * speed, limitMin, limitMax);
 
                 const patchAddress = (y - y0) * action.patch.width + (x - x0);
 
@@ -111,4 +119,5 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
         this.editor.actions.mark('terrain height paint');
     }
+
 }

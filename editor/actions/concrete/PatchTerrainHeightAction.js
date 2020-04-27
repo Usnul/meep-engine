@@ -42,7 +42,7 @@ export class PatchTerrainHeightAction extends Action {
          *
          * @type {Sampler2D}
          */
-        const heightMap = terrain.heightMap;
+        const heightMap = terrain.samplerHeight;
 
         /**
          *
@@ -54,11 +54,14 @@ export class PatchTerrainHeightAction extends Action {
 
         const terrainSize = terrain.size;
 
-        const u0 = this.x / heightMap.width;
-        const u1 = (this.x + this.patch.width) / heightMap.height;
+        const x = this.x;
+        const y = this.y;
 
-        const v0 = this.y / heightMap.height;
-        const v1 = (this.y + this.patch.height) / heightMap.height;
+        const u0 = x / heightMap.width;
+        const u1 = (x + this.patch.width) / heightMap.height;
+
+        const v0 = y / heightMap.height;
+        const v1 = (y + this.patch.height) / heightMap.height;
 
         const tx0 = u0 * terrainSize.x;
         const tx1 = u1 * terrainSize.x;
@@ -71,6 +74,8 @@ export class PatchTerrainHeightAction extends Action {
         dirtyTiles.forEach(tile => {
             tile.isBuilt = false;
         });
+
+        terrain.heightTexture.needsUpdate = true;
     }
 
     apply(context) {

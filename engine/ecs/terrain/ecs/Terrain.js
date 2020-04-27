@@ -3,7 +3,15 @@
  */
 
 
-import { DataTexture, LinearFilter, Vector2 as ThreeVector2 } from 'three';
+import {
+    ClampToEdgeWrapping,
+    DataTexture,
+    FloatType,
+    LinearFilter,
+    NearestFilter,
+    RedFormat,
+    Vector2 as ThreeVector2
+} from 'three';
 import { Sampler2D } from '../../../graphics/texture/sampler/Sampler2D.js';
 import sampler2D2Texture from '../../../graphics/texture/sampler/Sampler2D2Texture.js';
 import heightMap2NormalMap from '../../grid/HeightMap2NormalMap.js';
@@ -282,6 +290,12 @@ class Terrain {
         this.heightMapURL = null;
 
         /**
+         * @deprecated
+         * @type {number}
+         */
+        this.heightRange = 0;
+
+        /**
          *
          * @type {SplatMapping}
          */
@@ -292,6 +306,25 @@ class Terrain {
          * @type {Sampler2D}
          */
         this.samplerHeight = Sampler2D.float32(1, 1, 1);
+
+        /**
+         *
+         * @type {DataTexture}
+         */
+        this.heightTexture = new DataTexture(this.samplerHeight.data, this.samplerHeight.width, this.samplerHeight, RedFormat, FloatType);
+
+        this.heightTexture.wrapS = ClampToEdgeWrapping;
+        this.heightTexture.wrapT = ClampToEdgeWrapping;
+
+        this.heightTexture.generateMipmaps = false;
+
+        this.heightTexture.minFilter = LinearFilter;
+        this.heightTexture.magFilter = NearestFilter;
+
+        this.heightTexture.flipY = false;
+
+        this.heightTexture.internalFormat = 'R32F';
+
 
         /**
          *
@@ -716,6 +749,9 @@ class Terrain {
      */
     set heightMap(v) {
         this.samplerHeight = v;
+        this.updateHeightTexture();
+
+        console.warn('Deprecated');
     }
 
     /**
@@ -741,6 +777,17 @@ class Terrain {
         this.layers.updateLayerScales(this.size.x * this.gridScale, this.size.y * this.gridScale);
     }
 
+    updateHeightTexture() {
+        const sampler = this.samplerHeight;
+        const texture = this.heightTexture;
+
+        const image = texture.image;
+
+        image.data = sampler.data;
+        image.width = sampler.width;
+        image.height = sampler.height;
+    }
+
     /**
      *
      * @param {AssetManager} assetManager
@@ -760,6 +807,7 @@ class Terrain {
 
         pSamplerHeight.then((sampler) => {
             this.samplerHeight = sampler;
+            this.updateHeightTexture();
 
             const s = this.samplerHeight;
 
@@ -808,7 +856,9 @@ class Terrain {
         if (this.__legacyMaterialSpec !== null) {
             this.buildFromLegacy(assetManager);
         } else {
-            //TODO modern build path
+            //modern build path
+            this.updateHeightTexture();
+
             const samplerHeight = this.samplerHeight;
 
             this.buildWorker.setHeightSampler(samplerHeight.data, samplerHeight.itemSize, samplerHeight.width, samplerHeight.height);
