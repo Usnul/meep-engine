@@ -188,7 +188,7 @@ ActionProcessor.prototype.undo = function () {
     //find mark
     for (let i = this.marks.length - 1; i >= 0; i--) {
         mark = this.marks[i];
-        markAddress = m.index;
+        markAddress = mark.index;
         if (markAddress < this.cursor) {
             break;
         }
@@ -237,6 +237,22 @@ ActionProcessor.prototype.redo = function () {
         this.historyMemoryUsage += action.computeByteSize();
 
         this.cursor++;
+    }
+};
+
+/**
+ *
+ * @param {Action[]} actions
+ */
+ActionProcessor.prototype.doMany = function (actions) {
+    const n = actions.length;
+
+    for (let i = 0; i < n; i++) {
+
+        const action = actions[i];
+
+        this.do(action);
+
     }
 };
 
