@@ -1,6 +1,6 @@
 import { TerrainPaintTool } from "./TerrainPaintTool.js";
 import Vector4 from "../../../core/geom/Vector4.js";
-import { clamp, inverseLerp } from "../../../core/math/MathUtils.js";
+import { clamp, inverseLerp, lerp } from "../../../core/math/MathUtils.js";
 import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHeightAction.js";
 
 const LIMIT_VALUE = 1000;
@@ -56,11 +56,11 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
         const h_y0 = uv_y0 * heightMap.height;
         const h_y1 = uv_y1 * heightMap.height;
 
-        const x0 = Math.floor(h_x0);
-        const x1 = Math.ceil(h_x1);
+        const x0 = Math.ceil(h_x0);
+        const x1 = Math.floor(h_x1);
 
-        const y0 = Math.floor(h_y0);
-        const y1 = Math.ceil(h_y1);
+        const y0 = Math.ceil(h_y0);
+        const y1 = Math.floor(h_y1);
 
         const markerSample = new Vector4();
 
@@ -94,24 +94,43 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
                 const base = heightMap.data[address];
 
-                const value = clamp(base + p * speed, limitMin, limitMax);
-
                 const patchAddress = (y - y0) * action.patch.width + (x - x0);
 
-                if (Number.isNaN(value)) {
+                const targetValue = clamp(base + speed, limitMin, limitMax);
+
+                if (markerValue === 0) {
 
                     action.patch.data[patchAddress] = base;
 
                 } else {
 
-                    action.patch.data[patchAddress] = value;
+                    const value = lerp(base, targetValue, p);
 
+                    if (Number.isNaN(value)) {
+                        console.warn('.');
+
+                        action.patch.data[patchAddress] = base;
+
+                    } else {
+
+                        action.patch.data[patchAddress] = value;
+
+                    }
                 }
             }
 
         }
 
         this.editor.actions.do(action);
+    }
+
+    /**
+     *
+     * @param {PatchTerrainHeightAction} action
+     * @returns {Action[]}
+     */
+    createObjectMoveActions(action) {
+
     }
 
     start() {
