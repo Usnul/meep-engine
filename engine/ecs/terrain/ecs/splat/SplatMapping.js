@@ -36,28 +36,35 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
 
                 const image = asset.create();
 
-                // FIXME texture array in three.js doesn't work when texture size is less than 2x2
-                const width = max2(image.width, 2);
-                const height = max2(image.height, 2);
+                // FIXME texture array in three.js doesn't work when texture size is less than 4x4
+                const width = max2(image.width, 4);
+                const height = max2(image.height, 4);
+
+                //create a sampler
+                const source = new Sampler2D(image.data, 4, image.width, image.height);
 
                 mapping.resize(width, height, 4);
 
 
                 const weightData = mapping.weightData;
 
-                const sourceData = image.data;
-
                 const dataOffset = index * width * height;
 
+                const sample = new Vector4();
+
                 for (let y = 0; y < height; y++) {
+                    const v = y / height;
+
                     for (let x = 0; x < width; x++) {
-                        const sourceIndex = y * width + x;
-                        const sourceAddress = sourceIndex * 4;
+
+                        const u = x / width;
 
                         const targetIndex = y * width + x;
                         const targetAddress = dataOffset + targetIndex;
 
-                        weightData[targetAddress] = sourceData[sourceAddress];
+                        source.sample(u, v, sample);
+
+                        weightData[targetAddress] = sample.x;
                     }
                 }
 
