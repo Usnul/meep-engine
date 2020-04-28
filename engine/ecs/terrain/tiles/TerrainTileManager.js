@@ -413,7 +413,7 @@ class TerrainTileManager {
             });
 
             if (!tile.isBuildInProgress) {
-                this.build(x, y);
+                this.build(x, y, noop, noop);
             }
 
             return promise;
@@ -599,7 +599,18 @@ class TerrainTileManager {
         return false;
     }
 
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {function} resolve
+     * @param {function} reject
+     */
     build(x, y, resolve, reject) {
+
+        assert.typeOf(resolve, 'function', 'resolve');
+        assert.typeOf(reject, 'function', 'reject');
+
         const processName = 'building tile x = ' + x + ", y = " + y;
         const self = this;
 
@@ -618,11 +629,24 @@ class TerrainTileManager {
             tile.resolution.getValue()
         ).then(function (tileData) {
 
+            //check that the tile under index is still the same tile
+            if (self.tiles[tileIndex] !== tile) {
+                //the original tile was destroyed
+                reject('Original tile was destroyed during build process');
+                return;
+            }
+
+            if (!tile.isBuildInProgress) {
+                reject('Build request has been cancelled');
+                return;
+            }
+
             // console.time(processName);
 
             tile.build(tileData);
 
             self.stitchTile(x, y, tile);
+
             //refit the bvh
             tile.boundingBox.parentNode.bubbleRefit();
 

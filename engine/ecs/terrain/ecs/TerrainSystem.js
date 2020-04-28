@@ -2,6 +2,7 @@ import { System } from '../../System.js';
 import Terrain from './Terrain.js';
 import { CameraSystem } from '../../../graphics/ecs/camera/CameraSystem.js';
 import { assert } from "../../../../core/assert.js";
+import { noop } from "../../../../core/function/Functions.js";
 
 class TerrainSystem extends System {
     /**
@@ -140,7 +141,7 @@ class TerrainSystem extends System {
             if (terrain.frustumCulled) {
                 TerrainSystem.traverseVisibleTiles(dataset, terrain, function (tile, tileManager) {
                     if (!tile.isBuilt && !tile.isBuildInProgress) {
-                        tileManager.build(tile.gridPosition.x, tile.gridPosition.y);
+                        tileManager.build(tile.gridPosition.x, tile.gridPosition.y, noop, noop);
                     }
                 });
             }
