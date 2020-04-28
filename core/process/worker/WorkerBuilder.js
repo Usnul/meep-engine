@@ -126,18 +126,20 @@ WorkerBuilder.prototype.build = function () {
         '}',
 
         'globalScope.onmessage = function(event){',
-        '   var methodName = event.data.methodName;',
-        '   var parameters = event.data.parameters;',
+        '   var eventData = event.data;',
+        '   var requestId = eventData.id',
+        '   var methodName = eventData.methodName;',
+        '   var parameters = eventData.parameters;',
         '   var method = api[methodName];',
 
         '   function sendResult(result){',
         '       var transferables = [];',
         '       extractTransferables(result, transferables);',
-        '       globalScope.postMessage({methodName: methodName, result: result}, transferables);',
+        '       globalScope.postMessage({methodName: methodName, id: requestId, result: result}, transferables);',
         '   }',
 
         '   function sendError(error){',
-        '       globalScope.postMessage({methodName: methodName, error: {message: error.message, stack: error.stack.split("\\n") }});',
+        '       globalScope.postMessage({methodName: methodName, id: requestId, error: {message: error.message, stack: error.stack.split("\\n") }});',
         '   }',
 
         '   if(method === undefined){',

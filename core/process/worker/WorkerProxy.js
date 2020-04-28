@@ -36,6 +36,8 @@ function generateAPI(target, methods) {
     function makeMethod(name) {
         const pending = target.__pending[name] = [];
         target[name] = function () {
+            let idCounter = 0;
+
             const argumentCount = arguments.length;
 
             const parameters = new Array(argumentCount);
@@ -53,6 +55,7 @@ function generateAPI(target, methods) {
             return new Promise(function (resolve, reject) {
                 const request = {
                     parameters: parameters,
+                    id: idCounter,
                     resolve: resolve,
                     reject: reject
                 };
@@ -62,6 +65,7 @@ function generateAPI(target, methods) {
                 if (target.isRunning()) {
                     const message = {
                         methodName: name,
+                        id: request.id,
                         parameters: parameters
                     };
 
@@ -97,18 +101,38 @@ const WorkerProxy = function (url, methods) {
 
     this.__handleMessage = function (event) {
         const data = event.data;
+
+        const requestId = data.id;
+
         const methodName = data.methodName;
         //find pending request queue for method
         const requestQueue = pending[methodName];
+
         if (requestQueue === undefined) {
             throw new Error('Unexpected method \'' + methodName + '\'');
         } else {
-            const response = requestQueue.shift();
-            if (data.hasOwnProperty('error')) {
-                response.reject(data.error);
-            } else {
-                response.resolve(data.result);
+
+            const n = requestQueue.length;
+
+            for (let i = 0; i < n; i++) {
+                const request = requestQueue[i];
+
+                if (request.id === requestId) {
+                    //found the right one
+
+                    requestQueue.splice(i, 1);
+
+                    if (data.hasOwnProperty('error')) {
+                        request.reject(data.error);
+                    } else {
+                        request.resolve(data.result);
+                    }
+
+                    return;
+                }
             }
+
+            throw new Error(`Request ${requestId} not found in the request queue`);
         }
     };
 };
@@ -126,6 +150,44 @@ WorkerProxy.prototype.stop = function () {
     this.__isRunning = false;
 };
 
+/**
+ *
+ * @param {number} id
+ * @param {string} methodName
+ * @returns {boolean}
+ */
+WorkerProxy.prototype.cancelRequest = function (id, methodName) {
+    //find request
+    const requestQueue = this.__pending[methodName];
+
+    if (requestQueue === undefined) {
+        throw new Error(`No request queue for method name '${methodName}'`);
+    }
+
+    const n = requestQueue.length;
+
+    for (let i = 0; i < n; i++) {
+        const request = requestQueue[i];
+
+        if (request.id === id) {
+
+
+            if (!this.__isRunning) {
+                //not running, simply cut from the queue
+
+                requestQueue.splice(i, 1);
+
+                return true;
+            } else {
+                //worker is running, send termination request for this ID
+                throw new Error('Ability to cancel pending requests while worker is running is not implemented yet');
+            }
+
+        }
+    }
+
+};
+
 WorkerProxy.prototype.sendPendingRequests = function () {
     for (let methodName in this.__pending) {
         if (this.__pending.hasOwnProperty(methodName)) {
@@ -137,6 +199,7 @@ WorkerProxy.prototype.sendPendingRequests = function () {
                 const request = pending[i];
                 const message = {
                     methodName: methodName,
+                    id: request.id,
                     parameters: request.parameters
                 };
 
