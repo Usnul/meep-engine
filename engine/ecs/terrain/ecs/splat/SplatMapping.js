@@ -316,7 +316,7 @@ export class SplatMapping {
 
         optimizer.initialize();
 
-        optimizer.removePatchesSmallerThan(100);
+        // optimizer.removePatchesSmallerThan(100);
 
         while (optimizer.mergeRedundantPatches() > 0) {
             //keep going

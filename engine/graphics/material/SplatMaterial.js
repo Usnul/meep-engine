@@ -149,6 +149,8 @@ export function SplatMaterial(
 
             "gridResolution": { type: "v2", value: new Vector2(1, 1) },
             "gridBorderWidth": { type: "f", value: 0.1 },
+            "gridScale": { type: 'f', value: 1 },
+
             "materialScalesMap": { type: "t", value: null },
             "diffuseMaps": { type: "t", value: null },
             "diffuseGridOverlayMap": { type: "t", value: null },

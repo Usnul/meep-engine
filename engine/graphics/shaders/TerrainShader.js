@@ -11,6 +11,7 @@ function vertex() {
     #define PHYSICAL
     #define STANDARD
     
+    uniform float gridScale;
     uniform vec2 gridResolution;
     
     varying vec3 vViewPosition;
@@ -44,8 +45,7 @@ function vertex() {
         vUv2 = uv;
         #endif
         
-        vUvGrid = position.xz / (gridResolution*2.0);
-        vUvGrid = vec2(vUvGrid.x, vUvGrid.y);
+        vUvGrid = position.xz / ( gridResolution * gridScale );
         
         #include <color_vertex>
         #include <beginnormal_vertex>

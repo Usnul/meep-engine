@@ -774,6 +774,8 @@ class Terrain {
         this.material.uniforms.splatResolution.value.set(this.splat.size.x, this.splat.size.y);
         this.material.uniforms.gridResolution.value.set(this.size.x, this.size.y);
 
+        this.material.uniforms.gridScale.value = this.gridScale;
+
         this.layers.updateLayerScales(this.size.x * this.gridScale, this.size.y * this.gridScale);
     }
 

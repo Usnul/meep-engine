@@ -1134,7 +1134,7 @@ Sampler2D.prototype.traverseCircle = function (centerX, centerY, radius, visitor
     }
 };
 
-function arrayConstructorByInstance(a) {
+export function arrayConstructorByInstance(a) {
     if (a instanceof Int8Array) {
         return Int8Array;
     } else if (a instanceof Int16Array) {
