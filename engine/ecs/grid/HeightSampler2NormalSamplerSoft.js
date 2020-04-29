@@ -24,7 +24,6 @@ export function convertHeightMap2NormalMap(heightSampler) {
 
     const maxY = height - 1;
     const maxX = width - 1;
-
     for (let y = 0; y < height; y++) {
         const rowIndex = y * width;
         const rowIndexTop = max2(y - 1, 0) * width;
@@ -51,14 +50,13 @@ export function convertHeightMap2NormalMap(heightSampler) {
             //
             const dX = (topRight + 2.0 * right + bottomRight) - (topLeft + 2.0 * left + bottomLeft);
             const dY = (bottomLeft + 2.0 * bottom + bottomRight) - (topLeft + 2.0 * top + topRight);
-            const dZ = 0.5;
 
             //normalize vector
-            const magnitude = Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+            const magnitude = Math.sqrt(dX * dX + dY * dY + 0.25);
 
             const _x = dX / magnitude;
             const _y = dY / magnitude;
-            const _z = dZ / magnitude;
+            const _z = 0.5 / magnitude;
 
             data[j] = _x;
             data[j + 1] = _y;
