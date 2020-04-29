@@ -419,6 +419,27 @@ export class SplatMapping {
         return true;
     }
 
+    /**
+     *
+     * @param {number} layerIndex
+     * @param {number} value
+     */
+    fillLayerWeights(layerIndex, value) {
+        const w = this.size.x;
+        const h = this.size.y;
+
+        const layerSize = w * h;
+
+        const startAddress = layerSize * layerIndex;
+        const endAddress = startAddress + layerSize;
+
+        const weightData = this.weightData;
+
+        for (let i = startAddress; i < endAddress; i++) {
+            weightData[i] = value;
+        }
+    }
+
     addWeightLayer() {
 
         const layerByteSize = this.size.x * this.size.y;
