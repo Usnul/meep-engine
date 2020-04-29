@@ -1,67 +1,70 @@
 /**
  * Created by Alex on 15/11/2014.
  */
-import * as THREE from 'three';
 import { Sampler2D } from '../../graphics/texture/sampler/Sampler2D.js';
-
+import { max2, min2 } from "../../../core/math/MathUtils.js";
 
 const sqrt2 = 1.41421356237;
 
-function convert(heightSampler) {
-    function getValue(x, y) {
-        const h = heightSampler.get(x, y);
-        if (h === void 0) {
-            return 0;
-        }
-        return h;
-    }
-
-    function setNormal(x, y, result) {
-        const current = getValue(x, y);
-        //
-        const top = getValue(x, y - 1);
-        const bottom = getValue(x, y + 1);
-        const left = getValue(x - 1, y);
-        const right = getValue(x + 1, y);
-        //
-        const topLeft = getValue(x - 1, y - 1);
-        const topRight = getValue(x + 1, y - 1);
-        const bottomLeft = getValue(x - 1, y + 1);
-        const bottomRight = getValue(x + 1, y + 1);
-        //
-        let xm = (right - current) + (current - left) + (topRight - current) / sqrt2 + (current - topLeft) / sqrt2 + (bottomRight - current) / sqrt2 + (current - bottomLeft) / sqrt2;
-        let ym = (bottom - current) + (current - top) + (bottomLeft - current) / sqrt2 + (bottomRight - current) / sqrt2 + (current - topLeft) / sqrt2 + (current - topRight) / sqrt2;
-        if (Number.isNaN(xm)) {
-            xm = 0;
-        }
-        if (Number.isNaN(ym)) {
-            ym = 0;
-        }
-        xm /= 6;
-        ym /= 6;
-        const f = Math.sqrt(xm * xm + ym * ym);
-        const a = Math.acos(f % 1);
-        const d = Math.sin(a);
-        result.set(xm, ym, d);
-        result.normalize();
-    }
+/**
+ * Uses sobel filter to compute normals for a given height map
+ * @param {Sampler2D} heightSampler
+ * @return {Sampler2D}
+ */
+export function convertHeightMap2NormalMap(heightSampler) {
 
     //
     const height = heightSampler.height;
     const width = heightSampler.width;
+
+    const heightData = heightSampler.data;
+
     const data = new Float32Array(width * height * 3);
-    const v3 = new THREE.Vector3();
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            const i = (x + y * width);
+
+
+    const maxY = height - 1;
+    const maxX = width - 1;
+
+    for (let y = 0; y < height; y++) {
+        const rowIndex = y * width;
+        const rowIndexTop = max2(y - 1, 0) * width;
+        const rowIndexBottom = min2(y + 1, maxY) * width
+
+        for (let x = 0; x < width; x++) {
+            const i = rowIndex + x;
+
             const j = i * 3;
-            setNormal(x, y, v3);
-            data[j] = v3.x;
-            data[j + 1] = v3.y;
-            data[j + 2] = v3.z;
+
+            const columnLeft = max2(x - 1, 0);
+            const columnRight = min2(x + 1, maxX);
+
+            //
+            const top = heightData[rowIndexTop + x];
+            const bottom = heightData[rowIndexBottom + x];
+            const left = heightData[rowIndex + columnLeft];
+            const right = heightData[rowIndex + columnRight];
+            //
+            const topLeft = heightData[rowIndexTop + columnLeft];
+            const topRight = heightData[rowIndexTop + columnRight];
+            const bottomLeft = heightData[rowIndexBottom + columnLeft];
+            const bottomRight = heightData[rowIndexBottom + columnRight];
+            //
+            const dX = (topRight + 2.0 * right + bottomRight) - (topLeft + 2.0 * left + bottomLeft);
+            const dY = (bottomLeft + 2.0 * bottom + bottomRight) - (topLeft + 2.0 * top + topRight);
+            const dZ = 0.5;
+
+            //normalize vector
+            const magnitude = Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+
+            const _x = dX / magnitude;
+            const _y = dY / magnitude;
+            const _z = dZ / magnitude;
+
+            data[j] = _x;
+            data[j + 1] = _y;
+            data[j + 2] = _z;
         }
     }
+
     return new Sampler2D(data, 3, width, height);
 }
-
-export default convert;
