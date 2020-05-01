@@ -4,8 +4,6 @@
 import { Sampler2D } from '../../graphics/texture/sampler/Sampler2D.js';
 import { max2, min2 } from "../../../core/math/MathUtils.js";
 
-const sqrt2 = 1.41421356237;
-
 /**
  * Uses sobel filter to compute normals for a given height map
  * @param {Sampler2D} heightSampler
@@ -27,7 +25,7 @@ export function convertHeightMap2NormalMap(heightSampler) {
     for (let y = 0; y < height; y++) {
         const rowIndex = y * width;
         const rowIndexTop = max2(y - 1, 0) * width;
-        const rowIndexBottom = min2(y + 1, maxY) * width
+        const rowIndexBottom = min2(y + 1, maxY) * width;
 
         for (let x = 0; x < width; x++) {
             const i = rowIndex + x;

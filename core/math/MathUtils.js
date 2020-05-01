@@ -551,6 +551,31 @@ export function computeObjectHash(value, depth = 3) {
 
 /**
  *
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */
+export function computeGreatestCommonDivisor(a, b) {
+    assert.typeOf(a, 'number', 'a');
+    assert.typeOf(b, 'number', 'b');
+
+    const start = min2(a, b);
+
+    let result = start;
+
+    while (result > 1) {
+        if (a % result === 0 && b % result === 0) {
+            break;
+        }
+
+        result--;
+    }
+
+    return result;
+}
+
+/**
+ *
  * @param {number} v
  * @returns {number} +1 if v>0, 0 if v == 0, -1 if v<0
  */
