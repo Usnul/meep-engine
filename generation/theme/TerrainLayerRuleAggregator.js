@@ -25,7 +25,7 @@ export class TerrainLayerRuleAggregator {
         this.powers[layer] += power;
     }
 
-    normalize() {
+    normalize(m) {
         let magnitude = 0;
 
         const layerCount = this.layerCount;
@@ -39,10 +39,12 @@ export class TerrainLayerRuleAggregator {
 
         const d = Math.sqrt(magnitude);
 
+        const multiplier = m / d;
+
         for (let i = 0; i < layerCount; i++) {
             const power = powers[i];
 
-            powers[i] = power / d;
+            powers[i] = power * multiplier;
         }
 
     }

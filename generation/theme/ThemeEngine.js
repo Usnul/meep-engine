@@ -5,6 +5,7 @@ import { seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
 import { countTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
+import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 
 export class ThemeEngine {
     constructor() {
@@ -88,6 +89,7 @@ export class ThemeEngine {
         const areas = this.areas;
 
         //splat map size can vary from the terrain size, for that reason we write splat weights into an intermediate storage so we can re-sample it to splat map after
+        const weights = Sampler2D.uint8(layerCount, width, height);
 
         const tApplyThemes = countTask(0, width * height, (index) => {
             const y = (index / width) | 0;
@@ -183,42 +185,47 @@ export class ThemeEngine {
                 }
             }
 
-            aggregator.normalize();
+            aggregator.normalize(255);
+
+            weights.set(x, y, aggregator.powers);
+
+        });
+
+
+        //re-sample weights
+        const weightSample = [];
+
+        const tResample = countTask(0, splatWidth * splatHeight, index => {
+            const y = (index / splatWidth) | 0;
+            const x = index % splatWidth;
+
+            const v = y / splatHeight;
+            const u = x / splatWidth;
+
+            const source_y = v * weights.height;
+            const source_x = u * weights.width;
+
+
+            weights.sampleBilinear(source_x, source_y, weightSample);
 
             for (let i = 0; i < layerCount; i++) {
-
-                const splatLayerAddress = splatLayerSize * i;
-
-                const power = aggregator.powers[i];
-
-                const splatValue = power * 255;
-
-                for (let s_y = splat_y0; s_y <= splat_y1; s_y++) {
-
-                    const rowIndex = s_y * splatWidth;
-
-                    for (let s_x = splat_x0; s_x <= splat_x1; s_x++) {
-
-                        const splatCellAddress = rowIndex + s_x + splatLayerAddress;
-
-
-                        splatWeightData[splatCellAddress] = splatValue;
-
-                    }
-
-                }
-
+                const targetAddress = (y * splatWidth + x) + i * splatLayerSize;
+                splatWeightData[targetAddress] = weightSample[i];
             }
+
         });
+
+        tResample.addDependency(tApplyThemes);
+
 
         const optimizer = new SplatMapOptimizer();
         optimizer.mapping = terrain.splat;
 
         const tasks = optimizer.optimize();
 
-        tasks.forEach(t => t.addDependency(tApplyThemes));
+        tasks.forEach(t => t.addDependency(tResample));
 
-        return tasks.concat(tApplyThemes);
+        return [tApplyThemes, tResample].concat(tasks);
     }
 
     /**

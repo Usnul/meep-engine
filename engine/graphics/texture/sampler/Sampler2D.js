@@ -957,18 +957,18 @@ Sampler2D.prototype.copy_sameItemSize = function (source, sourceX, sourceY, dest
 
 /**
  *
- * @param {Vector4} source
- * @param {Vector4} destination
+ * @param {number[]} source
+ * @param {number[]} destination
  * @param {Array} result
  */
 function blendFunctionNormal(source, destination, result) {
 
-    const a1 = source.w / 255;
-    const a0 = destination.w / 255;
+    const a1 = source[3] / 255;
+    const a0 = destination[3] / 255;
 
-    result[0] = source.x * a1 + destination.x * (1 - a1);
-    result[1] = source.y * a1 + destination.y * (1 - a1);
-    result[2] = source.z * a1 + destination.z * (1 - a1);
+    result[0] = source[0] * a1 + destination[0] * (1 - a1);
+    result[1] = source[1] * a1 + destination[1] * (1 - a1);
+    result[2] = source[2] * a1 + destination[2] * (1 - a1);
     result[3] = (a1 + a0 * (1 - a1)) * 255;
 }
 
@@ -995,8 +995,8 @@ Sampler2D.prototype.paint = function (source, sourceX, sourceY, destinationX, de
     const _h = Math.min(height, source.height - sourceY, this.height - destinationY);
 
 
-    const c0 = new Vector4(0, 0, 0, 255);
-    const c1 = new Vector4(0, 0, 0, 255);
+    const c0 = [0, 0, 0, 255];
+    const c1 = [0, 0, 0, 255];
 
     const c3 = [];
 
@@ -1004,8 +1004,8 @@ Sampler2D.prototype.paint = function (source, sourceX, sourceY, destinationX, de
 
     for (y = 0; y < _h; y++) {
         for (x = 0; x < _w; x++) {
-            this.get(x + destinationX, y + destinationY, c0);
-            source.get(x + sourceY, y + sourceY, c1);
+            this.read(x + destinationX, y + destinationY, c0);
+            source.read(x + sourceY, y + sourceY, c1);
 
             blendFunction(c1, c0, c3);
 
@@ -1088,6 +1088,21 @@ Sampler2D.prototype.fill = function (x, y, width, height, value) {
 
         }
     }
+};
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} channel
+ * @param {number} value
+ */
+Sampler2D.prototype.writeChannel = function (x, y, channel, value) {
+    const pointIndex = y * this.width + x;
+    const pointAddress = pointIndex * this.itemSize;
+    const channelAddress = pointAddress + channel;
+
+    this.data[channelAddress] = value;
 };
 
 /**
