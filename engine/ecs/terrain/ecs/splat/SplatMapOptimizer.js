@@ -4,7 +4,10 @@ import { BitSet } from "../../../../../core/binary/BitSet.js";
 import { SplatMapMaterialPatch } from "./SplatMapMaterialPatch.js";
 import { colorizeGraphGreedyWeight } from "../../../../../core/graph/coloring/colorizeGraphGreedyWeight.js";
 import { validateGraphColoring } from "../../../../../core/graph/coloring/validateGraphColoring.js";
-
+import ConcurrentExecutor from "../../../../../core/process/executor/ConcurrentExecutor.js";
+import Task from "../../../../../core/process/task/Task.js";
+import { actionTask, countTask } from "../../../../../core/process/task/TaskUtils.js";
+import TaskSignal from "../../../../../core/process/task/TaskSignal.js";
 
 /**
  * We convert splat mapping into a graph of connecting material patches and solve the overlaps as a "Graph Coloring" problem
@@ -41,6 +44,68 @@ export class SplatMapOptimizer {
          */
         this.marks = new BitSet();
 
+    }
+
+    /**
+     *
+     * @param {SplatMapping} mapping
+     * @return {Promise}
+     */
+    static optimizeSynchronous(mapping) {
+
+        const optimizer = new SplatMapOptimizer();
+
+        optimizer.mapping = mapping;
+
+        const tasks = optimizer.optimize();
+
+        const executor = new ConcurrentExecutor(0, Number.POSITIVE_INFINITY);
+
+        executor.runMany(tasks);
+
+        return Task.promiseAll(tasks);
+    }
+
+    /**
+     * @returns {Task[]}
+     */
+    optimize() {
+
+        const result = [];
+
+        const tInitialize = this.initialize();
+
+        Array.prototype.push.apply(result, tInitialize);
+
+        // optimizer.removePatchesSmallerThan(100);
+
+        const self = this;
+
+        const tMergePatches = new Task({
+            name: 'Merge redundant patches',
+            cycleFunction() {
+                const removedPatchCount = self.mergeRedundantPatches();
+
+                if (removedPatchCount === 0) {
+                    return TaskSignal.EndSuccess;
+                }
+
+                return TaskSignal.Continue;
+            }
+        });
+
+        tMergePatches.addDependencies(tInitialize);
+
+        result.push(tMergePatches);
+
+        const tSolve = actionTask(() => this.solve());
+
+        tSolve.addDependency(tMergePatches);
+        tSolve.addDependencies(tInitialize);
+
+        result.push(tSolve);
+
+        return result;
     }
 
 
@@ -418,6 +483,10 @@ export class SplatMapOptimizer {
 
     }
 
+    /**
+     *
+     * @return {Task[]}
+     */
     initialize() {
         this.graph.clear();
 
@@ -434,46 +503,45 @@ export class SplatMapOptimizer {
         this.ranking = new Uint8Array(width * height * depth);
 
         //build ranking map
-        mapping.computeWeightRankingMap(this.ranking);
+        const tComputeRankings = mapping.computeWeightRankingMap(this.ranking);
 
         const marks = this.marks;
         marks.reset();
 
-        for (let d = 0; d < depth; d++) {
+        const layerSize = width * height;
 
-            const layerSize = width * height;
-            const layerAddress = layerSize * d;
+        const tBuildPatches = countTask(0, layerSize * depth, address => {
 
-            for (let y = 0; y < height; y++) {
-
-                for (let x = 0; x < width; x++) {
-
-                    const index = y * width + x;
-                    const address = layerAddress + index;
-
-
-                    if (marks.get(address)) {
-                        //already processed, skip
-                        continue;
-                    }
-
-                    if (weightData[address] === 0) {
-                        //tile has 0 weight, don't make a patch for it
-                        continue;
-                    }
-
-                    const patch = this.buildPatch(d, x, y);
-
-                    if (patch.area === 0) {
-                        continue;
-                    }
-
-                    this.insertPatch(patch);
-                }
-
-
+            if (marks.get(address)) {
+                //already processed, skip
+                return;
             }
-        }
+
+            if (weightData[address] === 0) {
+                //tile has 0 weight, don't make a patch for it
+                return;
+            }
+
+            const d = (address / layerSize) | 0;
+            const layerIndex = address % layerSize;
+
+
+            const y = (layerIndex / width) | 0;
+            const x = layerIndex % width;
+
+            const patch = this.buildPatch(d, x, y);
+
+            if (patch.area === 0) {
+                return;
+            }
+
+            this.insertPatch(patch);
+
+        });
+
+        tBuildPatches.addDependency(tComputeRankings);
+
+        return [tComputeRankings, tBuildPatches];
     }
 
     solve() {

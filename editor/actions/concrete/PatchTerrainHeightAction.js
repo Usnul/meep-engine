@@ -51,8 +51,8 @@ export class PatchTerrainHeightAction extends Action {
             return 0;
         }
 
-        const sourceValue = this.__oldPatch.get(_x, _y);
-        const targetValue = this.patch.get(_x, _y);
+        const sourceValue = this.__oldPatch.sampleChannelBilinear(_x, _y, 0);
+        const targetValue = this.patch.sampleChannelBilinear(_x, _y, 0);
 
 
         return targetValue - sourceValue;

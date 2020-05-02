@@ -10,22 +10,6 @@ import { clamp, min2, mix } from "../../../../core/math/MathUtils.js";
 import { BlendingType } from "./BlendingType.js";
 import { assert } from "../../../../core/assert.js";
 
-function makeVector1() {
-    return 0;
-}
-
-function makeVector2() {
-    return new Vector2();
-}
-
-function makeVector3() {
-    return new Vector3();
-}
-
-function makeVector4() {
-    return new Vector4();
-}
-
 function v2CrossMag(ax, ay, bx, by) {
     return ax * by - ay * bx;
 }
@@ -40,28 +24,28 @@ function sampleTriangleM2(f2_x, f2_y, f3_x, f3_y, f1_x, f1_y, p1, p2, p3) {
 }
 
 function interpolateVectors1(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd, result) {
-    return filterFunction(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd);
+    return filterFunctionBilinear(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd);
 }
 
 //
 function interpolateVectors2(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd, result) {
-    result.x = filterFunction(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
-    result.y = filterFunction(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
+    result.x = filterFunctionBilinear(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
+    result.y = filterFunctionBilinear(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
     return result;
 }
 
 function interpolateVectors3(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd, result) {
-    result.x = filterFunction(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
-    result.y = filterFunction(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
-    result.z = filterFunction(v_0_0.z, v_1_0.z, v_0_1.z, v_1_1.z, xd, yd);
+    result.x = filterFunctionBilinear(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
+    result.y = filterFunctionBilinear(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
+    result.z = filterFunctionBilinear(v_0_0.z, v_1_0.z, v_0_1.z, v_1_1.z, xd, yd);
     return result;
 }
 
 function interpolateVectors4(v_0_0, v_1_0, v_0_1, v_1_1, xd, yd, result) {
-    result.x = filterFunction(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
-    result.y = filterFunction(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
-    result.z = filterFunction(v_0_0.z, v_1_0.z, v_0_1.z, v_1_1.z, xd, yd);
-    result.w = filterFunction(v_0_0.w, v_1_0.w, v_0_1.w, v_1_1.w, xd, yd);
+    result.x = filterFunctionBilinear(v_0_0.x, v_1_0.x, v_0_1.x, v_1_1.x, xd, yd);
+    result.y = filterFunctionBilinear(v_0_0.y, v_1_0.y, v_0_1.y, v_1_1.y, xd, yd);
+    result.z = filterFunctionBilinear(v_0_0.z, v_1_0.z, v_0_1.z, v_1_1.z, xd, yd);
+    result.w = filterFunctionBilinear(v_0_0.w, v_1_0.w, v_0_1.w, v_1_1.w, xd, yd);
     return result;
 }
 
@@ -100,7 +84,7 @@ function filterFunction_(q0, q1, p0, p1, xd, yd) {
  * @param yd
  * @returns {*}
  */
-function filterFunction(q0, q1, p0, p1, xd, yd) {
+function filterFunctionBilinear(q0, q1, p0, p1, xd, yd) {
 
     const s0 = mix(q0, q1, xd);
     const s1 = mix(p0, p1, xd);
@@ -189,9 +173,6 @@ export function Sampler2D(data, itemSize, width, height) {
      * @type {Array<number>|Uint8Array|Uint16Array|Int8Array|Float32Array|Float64Array}
      */
     this.data = data;
-
-    //
-    this.initialize();
 }
 
 /**
@@ -470,124 +451,150 @@ Sampler2D.prototype.computeMin = function (channel = 0) {
 };
 
 Sampler2D.prototype.initialize = function () {
-    const width = this.width;
-    const height = this.height;
+};
+
+/**
+ *
+ * @deprecated
+ * @param {number} x
+ * @param {number}y
+ * @param {Vector1|Vector2|Vector3|Vector4} result
+ * @returns {number}
+ */
+Sampler2D.prototype.get = function (x, y, result) {
+    console.warn('Deprecated method, use sampleBilinear instead');
+
+    const t = [];
+
+    this.sampleBilinear(x, y, t);
+
+    if (result !== undefined) {
+        result.readFromArray(t, 0);
+        return result;
+    } else {
+        return t[0];
+    }
+};
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number[]} result
+ */
+Sampler2D.prototype.sampleBilinear = function (x, y, result) {
+
     const itemSize = this.itemSize;
-    const data = this.data;
 
-    const rowSize = width * itemSize;
+    for (let i = 0; i < itemSize; i++) {
+        //TODO this can be optimized greatly
+        result[i] = this.sampleChannelBilinear(x, y, i);
 
-    let makeVector;
-    let readVector;
-    let interpolateVectors;
+    }
+};
 
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} channel
+ * @returns {number}
+ */
+Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
+    const itemSize = this.itemSize;
 
-    function readVector1(address) {
-        return data[address];
+    const rowSize = this.width * itemSize;
+
+    //sample 4 points
+    const x0 = x | 0;
+    const y0 = y | 0;
+    //
+    const row0 = y0 * rowSize;
+    const i0 = row0 + x0 * itemSize + channel;
+
+    if (x === x0 && y === y0) {
+        //return early when coordinates are exact
+        return this.data[i0];
     }
 
-    function readVector2(address, result) {
-        result.x = data[address];
-        result.y = data[address + 1];
-        return result;
+    const q0 = this.data[i0];
+    //
+    const x1 = x === x0 ? x0 : x0 + 1;
+    const y1 = y === y0 ? y0 : y0 + 1;
+    //
+    const xd = x - x0;
+    const yd = y - y0;
+
+    const i1 = row0 + x1 * itemSize + channel;
+
+    const row1 = y1 * rowSize;
+
+    const j0 = row1 + x0 * itemSize + channel;
+    const j1 = row1 + x1 * itemSize + channel;
+
+    const q1 = this.data[i1];
+    const p0 = this.data[j0];
+    const p1 = this.data[j1];
+
+    return filterFunctionBilinear(q0, q1, p0, p1, xd, yd);
+};
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} channel
+ * @returns {number}
+ */
+Sampler2D.prototype.readChannel = function (x, y, channel) {
+    assert.typeOf(x, 'number', 'x');
+    assert.typeOf(y, 'number', 'y');
+    assert.typeOf(channel, 'number', 'channel');
+
+    const index = (y * this.width + x) * this.itemSize + channel;
+
+    return this.data[index];
+};
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number[]} result
+ */
+Sampler2D.prototype.read = function (x, y, result) {
+
+    const width = this.width;
+
+    const itemSize = this.itemSize;
+
+    const i0 = (y * width + x) * itemSize;
+
+    for (let i = 0; i < itemSize; i++) {
+        const v = this.data[i0 + i];
+
+        result[i] = v;
     }
-
-    function readVector3(address, result) {
-        result.x = data[address];
-        result.y = data[address + 1];
-        result.z = data[address + 2];
-        return result;
-    }
-
-    function readVector4(address, result) {
-        result.x = data[address];
-        result.y = data[address + 1];
-        result.z = data[address + 2];
-        result.w = data[address + 3];
-        return result;
-    }
-
-    switch (itemSize) {
-        case 1:
-            makeVector = makeVector1;
-            readVector = readVector1;
-            interpolateVectors = interpolateVectors1;
-            break;
-        case 2:
-            makeVector = makeVector2;
-            readVector = readVector2;
-            interpolateVectors = interpolateVectors2;
-            break;
-        case 3:
-            makeVector = makeVector3;
-            readVector = readVector3;
-            interpolateVectors = interpolateVectors3;
-            break;
-        case 4:
-            makeVector = makeVector4;
-            readVector = readVector4;
-            interpolateVectors = interpolateVectors4;
-            break;
-        default:
-            throw  new Error("invalid item size (" + itemSize + ")");
-    }
-    const _v0 = makeVector(),
-        _v1 = makeVector(),
-        _v2 = makeVector(),
-        _v3 = makeVector();
+};
 
 
-    function get(x, y, result) {
-        //sample 4 points
-        const x0 = x | 0;
-        const y0 = y | 0;
-        //
-        const row0 = y0 * rowSize;
-        const i0 = row0 + x0 * itemSize;
-        if (x === x0 && y === y0) {
-            //return early when coordinates are exact
-            return readVector(i0, result);
-        }
-        const q0 = readVector(i0, _v0);
-        //
-        const x1 = x === x0 ? x0 : x0 + 1;
-        const y1 = y === y0 ? y0 : y0 + 1;
-        //
-        const xd = x - x0;
-        const yd = y - y0;
+/**
+ *
+ * @param {number} u
+ * @param {number} v
+ * @param {Vector4|Vector3|Vector2} [result]
+ * @deprecated
+ */
+Sampler2D.prototype.sample = function (u, v, result) {
+    console.warn('Deprecated method, use sampleBilinear instead');
 
-        const i1 = row0 + x1 * itemSize;
-        const row1 = y1 * rowSize;
-        const j0 = row1 + x0 * itemSize;
-        const j1 = row1 + x1 * itemSize;
-        const q1 = readVector(i1, _v1);
-        const p0 = readVector(j0, _v2);
-        const p1 = readVector(j1, _v3);
+    const temp = [];
 
-        return interpolateVectors(q0, q1, p0, p1, xd, yd, result);
-    }
+    this.sampleBilinear(u * (this.width - 1), v * (this.height - 1), temp);
 
-    function getNearest(x, y, result) {
-        const x0 = x | 0;
-        const y0 = y | 0;
-        //
-        const row0 = y0 * rowSize;
-        const i0 = row0 + x0 * itemSize;
-        return readVector(i0, result);
-    }
+    result.readFromArray(temp);
 
-    this.getNearest = getNearest;
-    this.get = get;
-
-    /**
-     *
-     * @param {number} u
-     * @param {number} v
-     * @param {Vector4|Vector3|Vector2} [result]
-     */
-    this.sample = function (u, v, result) {
-        return get(u * (width - 1), v * (height - 1), result);
-    }
+    return temp[0];
 };
 
 /**
@@ -650,11 +657,11 @@ Sampler2D.prototype.makeArrayFiller = function (scale, offset) {
     offset = offset || 0;
 
     const sampler = this;
-    const v4 = new Vector4(1 / scale, 1 / scale, 1 / scale, 1 / scale);
+    const v4 = [1 / scale, 1 / scale, 1 / scale, 1 / scale];
 
     //
     function fillDD1(index, array, x, y) {
-        const val = (sampler.get(x, y) + offset) * scale | 0;
+        const val = (sampler.sampleChannelBilinear(x, y, 0) + offset) * scale | 0;
         array[index] = val;
         array[index + 1] = val;
         array[index + 2] = val;
@@ -662,26 +669,26 @@ Sampler2D.prototype.makeArrayFiller = function (scale, offset) {
     }
 
     function fillDD2(index, array, x, y) {
-        sampler.get(x, y, v4);
-        const val = (v4.x + offset) * scale | 0;
+        sampler.sampleBilinear(x, y, v4);
+        const val = (v4[0] + offset) * scale | 0;
         array.fill(val, index, index + 3);
-        array[index + 3] = (v4.y + offset) * scale | 0;
+        array[index + 3] = (v4[1] + offset) * scale | 0;
     }
 
     function fillDD3(index, array, x, y) {
         sampler.get(x, y, v4);
-        array[index] = (v4.x + offset) * scale | 0;
-        array[index + 1] = (v4.y + offset) * scale | 0;
-        array[index + 2] = (v4.z + offset) * scale | 0;
+        array[index] = (v4[0] + offset) * scale | 0;
+        array[index + 1] = (v4[1] + offset) * scale | 0;
+        array[index + 2] = (v4[2] + offset) * scale | 0;
         array[index + 3] = 255;
     }
 
     function fillDD4(index, array, x, y) {
         sampler.get(x, y, v4);
-        array[index] = (v4.x + offset) * scale | 0;
-        array[index + 1] = (v4.y + offset) * scale | 0;
-        array[index + 2] = (v4.z + offset) * scale | 0;
-        array[index + 3] = (v4.w + offset) * scale | 0;
+        array[index] = (v4[0] + offset) * scale | 0;
+        array[index + 1] = (v4[1] + offset) * scale | 0;
+        array[index + 2] = (v4[2] + offset) * scale | 0;
+        array[index + 3] = (v4[3] + offset) * scale | 0;
     }
 
     let fillDD;
@@ -1205,9 +1212,6 @@ Sampler2D.prototype.resize = function (x, y, preserveData = true) {
     this.width = x;
     this.height = y;
     this.data = newData;
-
-    //Re-initialization is necessary to re-create getters and setters
-    this.initialize();
 };
 
 /**

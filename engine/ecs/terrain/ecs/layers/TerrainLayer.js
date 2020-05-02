@@ -25,6 +25,21 @@ export class TerrainLayer {
 
     /**
      *
+     * @param {string} url
+     * @param {number} width
+     * @param {number} height
+     */
+    static from(url, width, height) {
+        const r = new TerrainLayer();
+
+        r.textureDiffuseURL = url;
+        r.size.set(width, height);
+
+        return r;
+    }
+
+    /**
+     *
      * @param {AssetManager} assetManager
      * @returns {Promise}
      */

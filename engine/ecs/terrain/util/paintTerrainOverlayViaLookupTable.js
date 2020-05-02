@@ -31,9 +31,9 @@ export function paintTerrainOverlayViaLookupTable({ overlay, sampler, lut = heat
 
     const buffer = Sampler2D.uint8(4, w, h);
 
-    for (i = 0; i < w; i++) {
-        for (j = 0; j < h; j++) {
-            const p = sampler.get(i, j);
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w; i++) {
+            const p = sampler.readChannel(i, j, 0);
 
             const position = clamp(range.normalizeValue(p), 0, 1);
 

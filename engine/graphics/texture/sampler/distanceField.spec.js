@@ -16,7 +16,7 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(255);
+        expect(target.readChannel(0,0,0)).toBe(255);
     });
 
     test('1 pixel filled source', () => {
@@ -27,7 +27,7 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(0);
+        expect(target.readChannel(0,0,0)).toBe(0);
     });
 
     test('3x3 pixel source with filled middle', () => {
@@ -38,17 +38,17 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(1);
-        expect(target.getNearest(1, 0)).toBe(1);
-        expect(target.getNearest(2, 0)).toBe(1);
+        expect(target.readChannel(0, 0,0)).toBe(1);
+        expect(target.readChannel(1, 0,0)).toBe(1);
+        expect(target.readChannel(2,0,0)).toBe(1);
 
-        expect(target.getNearest(0, 1)).toBe(1);
-        expect(target.getNearest(1, 1)).toBe(0);
-        expect(target.getNearest(2, 1)).toBe(1);
+        expect(target.readChannel(0,1,0)).toBe(1);
+        expect(target.readChannel(1,1,0)).toBe(0);
+        expect(target.readChannel(2,1,0)).toBe(1);
 
-        expect(target.getNearest(0, 2)).toBe(1);
-        expect(target.getNearest(1, 2)).toBe(1);
-        expect(target.getNearest(2, 2)).toBe(1);
+        expect(target.readChannel(0,2,0)).toBe(1);
+        expect(target.readChannel(1,2,0)).toBe(1);
+        expect(target.readChannel(2,2,0)).toBe(1);
     });
 
     test('3x3 pixel source with empty middle', () => {
@@ -60,17 +60,17 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(0);
-        expect(target.getNearest(1, 0)).toBe(0);
-        expect(target.getNearest(2, 0)).toBe(0);
+        expect(target.readChannel(0,0,0)).toBe(0);
+        expect(target.readChannel(1,0,0)).toBe(0);
+        expect(target.readChannel(2,0,0)).toBe(0);
 
-        expect(target.getNearest(0, 1)).toBe(0);
-        expect(target.getNearest(1, 1)).toBe(1);
-        expect(target.getNearest(2, 1)).toBe(0);
+        expect(target.readChannel(0,1,0)).toBe(0);
+        expect(target.readChannel(1,1,0)).toBe(1);
+        expect(target.readChannel(2,1,0)).toBe(0);
 
-        expect(target.getNearest(0, 2)).toBe(0);
-        expect(target.getNearest(1, 2)).toBe(0);
-        expect(target.getNearest(2, 2)).toBe(0);
+        expect(target.readChannel(0,2,0)).toBe(0);
+        expect(target.readChannel(1,2,0)).toBe(0);
+        expect(target.readChannel(2,2,0)).toBe(0);
     });
 
     test('3x3 pixel source with empty corners', () => {
@@ -85,17 +85,17 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(1);
-        expect(target.getNearest(1, 0)).toBe(0);
-        expect(target.getNearest(2, 0)).toBe(1);
+        expect(target.readChannel(0,0,0)).toBe(1);
+        expect(target.readChannel(1,0,0)).toBe(0);
+        expect(target.readChannel(2,0,0)).toBe(1);
 
-        expect(target.getNearest(0, 1)).toBe(0);
-        expect(target.getNearest(1, 1)).toBe(0);
-        expect(target.getNearest(2, 1)).toBe(0);
+        expect(target.readChannel(0,1,0)).toBe(0);
+        expect(target.readChannel(1,1,0)).toBe(0);
+        expect(target.readChannel(2,1,0)).toBe(0);
 
-        expect(target.getNearest(0, 2)).toBe(1);
-        expect(target.getNearest(1, 2)).toBe(0);
-        expect(target.getNearest(2, 2)).toBe(1);
+        expect(target.readChannel(0,2,0)).toBe(1);
+        expect(target.readChannel(1,2,0)).toBe(0);
+        expect(target.readChannel(2,2,0)).toBe(1);
     });
 
     test('3x3 pixel source with filled corners', () => {
@@ -110,17 +110,17 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(0);
-        expect(target.getNearest(1, 0)).toBe(1);
-        expect(target.getNearest(2, 0)).toBe(0);
+        expect(target.readChannel(0,0,0)).toBe(0);
+        expect(target.readChannel(1,0,0)).toBe(1);
+        expect(target.readChannel(2,0,0)).toBe(0);
 
-        expect(target.getNearest(0, 1)).toBe(1);
-        expect(target.getNearest(1, 1)).toBe(1);
-        expect(target.getNearest(2, 1)).toBe(1);
+        expect(target.readChannel(0,1,0)).toBe(1);
+        expect(target.readChannel(1,1,0)).toBe(1);
+        expect(target.readChannel(2,1,0)).toBe(1);
 
-        expect(target.getNearest(0, 2)).toBe(0);
-        expect(target.getNearest(1, 2)).toBe(1);
-        expect(target.getNearest(2, 2)).toBe(0);
+        expect(target.readChannel(0,2,0)).toBe(0);
+        expect(target.readChannel(1,2,0)).toBe(1);
+        expect(target.readChannel(2,2,0)).toBe(0);
     });
 
     test('3x1 pixel source with 1 filled corner', () => {
@@ -132,9 +132,9 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(0);
-        expect(target.getNearest(1, 0)).toBe(1);
-        expect(target.getNearest(2, 0)).toBe(2);
+        expect(target.readChannel(0,0,0)).toBe(0);
+        expect(target.readChannel(1,0,0)).toBe(1);
+        expect(target.readChannel(2,0,0)).toBe(2);
     });
 
     test('3x3 pixel source with 1 filled corner', () => {
@@ -146,17 +146,17 @@ describe('computeUnsignedDistanceField', () => {
 
         computeUnsignedDistanceField(source, target, 0);
 
-        expect(target.getNearest(0, 0)).toBe(0);
-        expect(target.getNearest(1, 0)).toBe(1);
-        expect(target.getNearest(2, 0)).toBe(2);
+        expect(target.readChannel(0,0,0)).toBe(0);
+        expect(target.readChannel(1,0,0)).toBe(1);
+        expect(target.readChannel(2,0,0)).toBe(2);
 
-        expect(target.getNearest(0, 1)).toBe(1);
-        expect(target.getNearest(1, 1)).toBe(1);
-        expect(target.getNearest(2, 1)).toBe(2);
+        expect(target.readChannel(0,1,0)).toBe(1);
+        expect(target.readChannel(1,1,0)).toBe(1);
+        expect(target.readChannel(2,1,0)).toBe(2);
 
-        expect(target.getNearest(0, 2)).toBe(2);
-        expect(target.getNearest(1, 2)).toBe(2);
-        expect(target.getNearest(2, 2)).toBe(2);
+        expect(target.readChannel(0,2,0)).toBe(2);
+        expect(target.readChannel(1,2,0)).toBe(2);
+        expect(target.readChannel(2,2,0)).toBe(2);
     });
 
     test('performance', () => {

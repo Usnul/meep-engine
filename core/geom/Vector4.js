@@ -70,6 +70,32 @@ function Vector4(x, y, z, w) {
 
 /**
  *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector4.prototype.readFromArray = function (array, offset) {
+    this.set(
+        array[offset],
+        array[offset + 1],
+        array[offset + 2],
+        array[offset + 3],
+    );
+};
+
+/**
+ *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector4.prototype.writeToArray = function (array, offset) {
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    array[offset + 2] = this.z;
+    array[offset + 3] = this.w;
+};
+
+/**
+ *
  * @param {Number} x
  * @param {Number} y
  * @param {Number} z

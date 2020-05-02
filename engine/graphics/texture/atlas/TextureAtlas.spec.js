@@ -1,6 +1,5 @@
 import { TextureAtlas } from "./TextureAtlas.js";
 import { Sampler2D } from "../sampler/Sampler2D.js";
-import Vector4 from "../../../../core/geom/Vector4.js";
 import { AtlasPatchFlag } from "./AtlasPatchFlag.js";
 import { AtlasPatch } from "./AtlasPatch.js";
 import { aabb2_overlapExists } from "../../../../core/geom/AABB2.js";
@@ -74,14 +73,14 @@ test("build writes 2 patches into atlas", () => {
 
     const sampler = atlas.sampler;
 
-    const result = new Vector4();
-    sampler.get(patchA.position.x, patchA.position.y, result);
+    const result = [];
+    sampler.read(patchA.position.x, patchA.position.y, result);
 
-    expect(result.toJSON()).toEqual({ x: 1, y: 2, z: 3, w: 4 });
+    expect(result).toEqual([1, 2, 3, 4]);
 
-    sampler.get(patchB.position.x, patchB.position.y, result);
+    sampler.read(patchB.position.x, patchB.position.y, result);
 
-    expect(result.toJSON()).toEqual({ x: 5, y: 6, z: 7, w: 8 });
+    expect(result).toEqual([5, 6, 7, 8]);
 });
 
 
@@ -145,9 +144,9 @@ function isPatchDataPainted(patch, atlas) {
     for (let i = 0; i < patch.size.x; i++) {
         for (let j = 0; j < patch.size.y; j++) {
 
-            atlas.sampler.get(patch.position.x + i, patch.position.y + j, atlasSample);
+            atlas.sampler.read(patch.position.x + i, patch.position.y + j, atlasSample);
 
-            patch.sampler.get(i, j, patchSample);
+            patch.sampler.read(i, j, patchSample);
 
             for (let k = 0; k < patchSample.length; k++) {
                 if (patchSample[k] !== atlasSample[k]) {

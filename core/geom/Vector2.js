@@ -80,6 +80,28 @@ Vector2.prototype.isVector2 = true;
 
 /**
  *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector2.prototype.readFromArray = function (array, offset) {
+    this.set(
+        array[offset],
+        array[offset + 1]
+    );
+};
+
+/**
+ *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector2.prototype.writeToArray = function (array, offset) {
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+};
+
+/**
+ *
  * @param {number} x
  * @param {number} y
  * @returns {Vector2}

@@ -6,6 +6,7 @@
 import Signal from "../events/signal/Signal.js";
 import { clamp, computeHashFloat } from "../math/MathUtils.js";
 import { assert } from "../assert.js";
+import Vector2 from "./Vector2.js";
 
 
 /**
@@ -73,8 +74,8 @@ Vector1.prototype.compareTo = function (other) {
  * @param {Vector1} b
  * @return {number}
  */
-Vector1.compare = function(a,b){
-    return a.x -b.x;
+Vector1.compare = function (a, b) {
+    return a.x - b.x;
 };
 
 /**
@@ -224,6 +225,24 @@ Vector1.prototype.toJSON = function () {
 
 Vector1.prototype.fromJSON = function (val) {
     this.set(val);
+};
+
+/**
+ *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector1.prototype.readFromArray = function (array, offset) {
+    this.set(array[offset]);
+};
+
+/**
+ *
+ * @param {number[]} array
+ * @param {number} offset
+ */
+Vector1.prototype.writeToArray = function (array, offset) {
+    array[offset] = this.x;
 };
 
 /**

@@ -7,6 +7,7 @@ import { SplatMapOptimizer } from "./SplatMapOptimizer.js";
 import { assert } from "../../../../../core/assert.js";
 import { max2, min2 } from "../../../../../core/math/MathUtils.js";
 import { scaleSampler2D } from "../../../../graphics/texture/sampler/scaleSampler2D.js";
+import { countTask } from "../../../../../core/process/task/TaskUtils.js";
 
 
 /**
@@ -309,27 +310,21 @@ export class SplatMapping {
         return new Sampler2D(this.materialData, 4, this.size.x, this.size.y);
     }
 
+    /**
+     *
+     * @return {Task[]}
+     */
     optimize() {
         const optimizer = new SplatMapOptimizer();
 
-        optimizer.mapping = this;
 
-        optimizer.initialize();
-
-        // optimizer.removePatchesSmallerThan(100);
-
-        while (optimizer.mergeRedundantPatches() > 0) {
-            //keep going
-        }
-
-        optimizer.solve();
-
-        return optimizer;
+        return [];
     }
 
     /**
      * Computes a making map, where each texel of each layer is given a rank based on it's weight relative to other layers
      * @param {Uint8Array} result
+     * @returns {Task}
      */
     computeWeightRankingMap(result) {
         const w = this.size.x;
@@ -350,34 +345,36 @@ export class SplatMapping {
 
         const layerSize = w * h;
 
-        for (let y = 0; y < h; y++) {
-            const y_index = y * w;
 
-            for (let x = 0; x < w; x++) {
-                const index = y_index + x;
+        return countTask(0, w * h, index => {
 
-                //read sample for all layers
-                for (let d = 0; d < depth; d++) {
+            //read sample for all layers
+            for (let d = 0; d < depth; d++) {
 
-                    const address = index + d * layerSize;
+                const layerOffset = d * layerSize;
 
-                    sample_materials[d] = d;
-                    sample_weights[d] = weightData[address];
-                }
+                const address = index + layerOffset;
 
-                //sort the layers
-                sample_materials.sort(compareSampleWeights);
-
-                //write ranking
-                for (let rank = 0; rank < depth; rank++) {
-                    const material = sample_materials[rank];
-
-                    const address = index + material * layerSize;
-
-                    result[address] = rank;
-                }
+                sample_materials[d] = d;
+                sample_weights[d] = weightData[address];
             }
-        }
+
+            //sort the layers
+            sample_materials.sort(compareSampleWeights);
+
+            //write ranking
+            for (let rank = 0; rank < depth; rank++) {
+                const material = sample_materials[rank];
+
+                const layerOffset = material * layerSize;
+
+                const address = index + layerOffset;
+
+                result[address] = rank;
+            }
+
+        });
+
     }
 
     /**

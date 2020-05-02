@@ -1,5 +1,4 @@
 import { TerrainPaintTool } from "./TerrainPaintTool.js";
-import Vector4 from "../../../core/geom/Vector4.js";
 import { clamp, inverseLerp, lerp } from "../../../core/math/MathUtils.js";
 import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHeightAction.js";
 import { QuadTreeNode } from "../../../core/geom/2d/quad-tree/QuadTreeNode.js";
@@ -128,8 +127,6 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
         const y0 = Math.ceil(h_y0);
         const y1 = Math.floor(h_y1);
 
-        const markerSample = new Vector4();
-
         const marker = this.settings.marker;
 
         const direction = this.modifiers.shift ? -1 : 1;
@@ -150,9 +147,8 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
 
                 const u = inverseLerp(h_x0, h_x1, x);
 
-                marker.sample(u, v, markerSample);
-
-                const markerValue = markerSample.w;
+                //Get alpha
+                const markerValue = marker.sampleChannelBilinear(u, v, 3);
 
                 const p = markerValue / 256;
 

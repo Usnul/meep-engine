@@ -117,6 +117,10 @@ class Task {
      * @param {Task[]} tasks
      */
     addDependencies(tasks) {
+        if (!Array.isArray(tasks)) {
+            throw new Error(`argument 'tasks' is not an Array`);
+        }
+
         tasks.forEach(t => this.addDependency(t));
     }
 
@@ -152,6 +156,17 @@ class Task {
         }
 
         return s;
+    }
+
+    /**
+     *
+     * @param {(Task|TaskGroup)[]} tasks
+     * @return {Promise}
+     */
+    static promiseAll(tasks) {
+        const promises = tasks.map(Task.promise);
+
+        return Promise.all(promises);
     }
 
     /**

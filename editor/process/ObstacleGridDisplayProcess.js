@@ -2,7 +2,6 @@ import { EditorProcess } from "./EditorProcess.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import GridObstacle from "../../engine/grid/components/GridObstacle.js";
 import GridPosition from "../../engine/grid/components/GridPosition.js";
-import Vector4 from "../../core/geom/Vector4.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 
 class ObstacleGridDisplayProcess extends EditorProcess {
@@ -59,7 +58,7 @@ class ObstacleGridDisplayProcess extends EditorProcess {
 
         const em = this.editor.engine.entityManager;
 
-        const color = new Vector4(0, 0, 0, 0);
+        const color = [];
 
         /**
          *
@@ -68,22 +67,29 @@ class ObstacleGridDisplayProcess extends EditorProcess {
          * @param {number} value
          */
         function paintPoint(x, y, value) {
-            drawBuffer.get(x, y, color);
+            drawBuffer.read(x, y, color);
 
             if (value === 0) {
-                if (color.w !== 0) {
+                if (color[3] !== 0) {
                     return;
                 }
-                color.set(2, 256, 0, 13);
+                color[0] = 2;
+                color[1] = 256;
+                color[2] = 0;
+                color[3] = 13;
             } else {
-                if (color.w !== 0) {
+                if (color[3] !== 0) {
                     drawBuffer.set(x, y, [0, 0, 0, 0]);
                 }
-                color.set(0, 0, 0, 54);
+
+                color[0] = 0;
+                color[1] = 0;
+                color[2] = 0;
+                color[3] = 54;
             }
 
 
-            drawBuffer.set(x, y, [color.x, color.y, color.z, color.w])
+            drawBuffer.set(x, y, color);
         }
 
         /**

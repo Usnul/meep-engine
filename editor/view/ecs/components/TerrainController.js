@@ -14,6 +14,7 @@ import Vector2Control from "../../../../view/controller/controls/Vector2Control.
 import GroupView from "../../../../view/elements/Group.js";
 import LabelView from "../../../../view/common/LabelView.js";
 import ObservedValue from "../../../../core/model/ObservedValue.js";
+import { SplatMapOptimizer } from "../../../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 
 class LayersController extends View {
     /**
@@ -166,7 +167,9 @@ export class TerrainController extends View {
                 }, 'Rebuild');
 
                 controller.addAction(() => {
-                    model.splat.optimize();
+
+                    SplatMapOptimizer.optimizeSynchronous(model.splat)
+
                 }, 'Optimize Textures');
 
                 controller.add(model, 'size', { step: 1 });

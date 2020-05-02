@@ -207,7 +207,7 @@ export class FogOfWar {
         this.textureNeedsUpdate = true;
     }
 
-    revealAll(){
+    revealAll() {
         this.fadeMask.clear();
 
         this.sampler.data.fill(0);
@@ -487,7 +487,7 @@ export class FogOfWar {
             const sX = clamp(sampleX, 0, this.size.x - 1);
             const sY = clamp(sampleY, 0, this.size.y - 1);
 
-            const distance = distanceSampler.getNearest(sX, sY);
+            const distance = distanceSampler.readChannel(sX | 0, sY | 0, 0);
 
             //Check if cell is visible
             if (distance <= clearance) {
@@ -513,7 +513,7 @@ export class FogOfWar {
         const sMidX = sx0 + shExtX;
         const sMidY = sy0 + shExtY;
 
-        const centerOcclusionDistance = distanceSampler.getNearest(sMidX, sMidY);
+        const centerOcclusionDistance = distanceSampler.readChannel(sMidX | 0, sMidY | 0, 0);
 
         const maxDistanceFromCenter = max2(shExtX, shExtY);
 
@@ -539,7 +539,7 @@ export class FogOfWar {
         const sampleX = samplePosition[0];
         const sampleY = samplePosition[1];
 
-        return this.distanceSampler.getNearest(sampleX, sampleY);
+        return this.distanceSampler.readChannel(sampleX|0, sampleY|0, 0);
     }
 
     rebuildDistanceField() {
@@ -556,8 +556,6 @@ export class FogOfWar {
         this.distanceSampler.data = array;
         this.distanceSampler.width = this.sampler.width;
         this.distanceSampler.height = this.sampler.height;
-
-        this.distanceSampler.initialize();
 
         this.rebuildDistanceField();
     }
@@ -579,8 +577,6 @@ export class FogOfWar {
         this.sampler.data = sampler.data;
         this.sampler.width = sampler.width;
         this.sampler.height = sampler.height;
-
-        this.sampler.initialize();
 
         //rebuild distance sampler
         this.rebuildDistanceSampler();

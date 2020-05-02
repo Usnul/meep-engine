@@ -25,6 +25,30 @@ class Vector3 {
 
     /**
      *
+     * @param {number[]} array
+     * @param {number} offset
+     */
+    readFromArray(array, offset) {
+        this.set(
+            array[offset],
+            array[offset + 1],
+            array[offset + 2]
+        );
+    }
+
+    /**
+     *
+     * @param {number[]} array
+     * @param {number} offset
+     */
+    writeToArray(array, offset) {
+        array[offset] = this.x;
+        array[offset + 1] = this.y;
+        array[offset + 2] = this.z;
+    }
+
+    /**
+     *
      * @param {Number} x
      * @param {Number} y
      * @param {Number} z
