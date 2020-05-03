@@ -51,7 +51,8 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
 
                 const dataOffset = index * width * height;
 
-                const sample = new Vector4();
+                const sourceWidth = source.width;
+                const sourceHeight = source.height;
 
                 for (let y = 0; y < height; y++) {
                     const v = y / height;
@@ -63,9 +64,9 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
                         const targetIndex = y * width + x;
                         const targetAddress = dataOffset + targetIndex;
 
-                        source.sample(u, v, sample);
+                        const value = source.sampleChannelBilinear(u * sourceWidth, v * sourceHeight, sample, 0);
 
-                        weightData[targetAddress] = sample.x;
+                        weightData[targetAddress] = value;
                     }
                 }
 
