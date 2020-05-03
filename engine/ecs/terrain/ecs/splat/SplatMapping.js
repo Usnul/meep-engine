@@ -64,7 +64,7 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
                         const targetIndex = y * width + x;
                         const targetAddress = dataOffset + targetIndex;
 
-                        const value = source.sampleChannelBilinear(u * sourceWidth, v * sourceHeight, sample, 0);
+                        const value = source.sampleChannelBilinear(u * sourceWidth, v * sourceHeight, 0);
 
                         weightData[targetAddress] = value;
                     }
@@ -249,44 +249,20 @@ export class SplatMapping {
      */
     sampleWeight(u, v, materialIndex) {
 
-        const v4_material = new Vector4();
-        const v4_weight = new Vector4();
+        const width = this.size.x;
+        const height = this.size.y;
 
-        this.sample(u, v, v4_weight, v4_material);
+        const layerSize = width * height;
 
-        if (v4_material.x === materialIndex) {
-            return v4_weight.x;
-        } else if (v4_material.y === materialIndex) {
-            return v4_weight.y;
-        } else if (v4_material.z === materialIndex) {
-            return v4_weight.z;
-        } else if (v4_material.w === materialIndex) {
-            return v4_weight.w;
-        } else {
-            return 0;
-        }
+        const startAddress = layerSize * materialIndex;
+        const endAddress = startAddress + layerSize;
 
-    }
+        //build a sampler for the layer
+        const sampler = new Sampler2D(this.weightData.subarray(startAddress, endAddress), 1, width, height);
 
-    /**
-     *
-     * @param {number} u
-     * @param {number} v
-     * @param {Vector4} weight
-     * @param {Vector4} material
-     */
-    sample(u, v, weight, material) {
-        const weightImage = this.weightTexture.image;
+        const result = sampler.sampleChannelBilinear(u * width, v * height, 0);
 
-        const weightSampler = new Sampler2D(weightImage.data, 4, weightImage.width, weightImage.height);
-
-        weightSampler.sample(u, v, weight);
-
-        const materialImage = this.materialTexture.image;
-
-        const materialSampler = new Sampler2D(materialImage.data, 4, materialImage.width, materialImage.height);
-
-        materialSampler.sample(u, v, material);
+        return result;
     }
 
     /**

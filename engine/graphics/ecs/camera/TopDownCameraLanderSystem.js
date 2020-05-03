@@ -63,7 +63,7 @@ function land(lander, controller, terrain, samplerCache) {
 
     v2.divide(terrain.size);
 
-    const value = sampler.sample(v2.x, v2.y);
+    const value = sampler.sampleChannelBilinear(v2.x * sampler.width, v2.y * sampler.height, 0);
 
     target.setY(value);
 }
