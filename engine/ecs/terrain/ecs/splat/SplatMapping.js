@@ -1,6 +1,5 @@
 import { DataTexture, DataTexture2DArray, LinearFilter, NearestFilter, RedFormat, UnsignedByteType } from "three";
 import Vector2 from "../../../../../core/geom/Vector2.js";
-import Vector4 from "../../../../../core/geom/Vector4.js";
 import { GameAssetType } from "../../../../asset/GameAssetType.js";
 import { Sampler2D } from "../../../../graphics/texture/sampler/Sampler2D.js";
 import { SplatMapOptimizer } from "./SplatMapOptimizer.js";
@@ -54,6 +53,9 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
                 const sourceWidth = source.width;
                 const sourceHeight = source.height;
 
+                const source_max_y = sourceHeight - 1;
+                const source_max_x = sourceWidth - 1;
+
                 for (let y = 0; y < height; y++) {
                     const v = y / height;
 
@@ -64,7 +66,7 @@ export function loadLegacyTerrainSplats(description, mapping, am) {
                         const targetIndex = y * width + x;
                         const targetAddress = dataOffset + targetIndex;
 
-                        const value = source.sampleChannelBilinear(u * sourceWidth, v * sourceHeight, 0);
+                        const value = source.sampleChannelBilinear(u * source_max_x, v * source_max_y, 0);
 
                         weightData[targetAddress] = value;
                     }
