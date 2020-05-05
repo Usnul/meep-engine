@@ -35,6 +35,10 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
         this.onChanged.dispatch(result);
     }
 
+    /**
+     *
+     * @returns {T|boolean|number}
+     */
     transform(left, right) {
         throw new Error('ReactiveBinaryExpression.transform is not overridden');
     }

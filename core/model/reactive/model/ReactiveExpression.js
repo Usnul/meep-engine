@@ -18,7 +18,7 @@ export class ReactiveExpression {
     }
 
     /**
-     * @returns {T}
+     * @returns {T|boolean|number}
      */
     getValue() {
         throw new Error('ReactiveExpression.getValue not overridden');
