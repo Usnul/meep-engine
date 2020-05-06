@@ -1,8 +1,17 @@
 export class GraphGenerationRule {
     constructor() {
 
-        this.left = null;
-        this.right = null;
+        /**
+         * What to match
+         * @type {Graph}
+         */
+        this.pattern = null;
+
+        /**
+         * What to replace the match with
+         * @type {Graph}
+         */
+        this.production = null;
 
     }
 }

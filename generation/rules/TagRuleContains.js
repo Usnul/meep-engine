@@ -14,4 +14,17 @@ export class TagRuleContains extends TagRule {
     match(tags) {
         return (tags & this.tags) === this.tags;
     }
+
+    /**
+     *
+     * @param {number} mask
+     * @return {TagRuleContains}
+     */
+    static from(mask) {
+        const r = new TagRuleContains();
+
+        r.tags = mask;
+
+        return r;
+    }
 }
