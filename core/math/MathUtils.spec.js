@@ -14,6 +14,7 @@ import {
     max3,
     min2,
     min3,
+    overlap1D,
     quadraticCurve,
     sign,
     solveQuadratic
@@ -43,7 +44,7 @@ test('max2', () => {
     expect(max2(1, -1)).toBe(1);
 });
 
-test("max3", ()=>{
+test("max3", () => {
     expect(max3(-1, -3, 1)).toBe(1);
 
     expect(max3(-3, -1, 1)).toBe(1);
@@ -69,7 +70,7 @@ test("max3", ()=>{
     expect(max3(3, 4, 3)).toBe(4);
 });
 
-test("min3", ()=>{
+test("min3", () => {
     expect(min3(-1, -3, 1)).toBe(-3);
 
     expect(min3(-3, -1, 1)).toBe(-3);
@@ -95,7 +96,7 @@ test("min3", ()=>{
     expect(min3(3, 4, 3)).toBe(3);
 });
 
-test("quadratiCurve", ()=>{
+test("quadratiCurve", () => {
     expect(quadraticCurve(2, 0.1, 0.2, 3)).toBe(11.3);
 
     expect(quadraticCurve(1, -1, -2, -3)).toBe(-3);
@@ -107,42 +108,39 @@ test("quadratiCurve", ()=>{
     expect(quadraticCurve(-1, 0, 0, 0)).toBe(0);
 });
 
-test("cubicCurve", ()=>{
+test("cubicCurve", () => {
     expect(cubicCurve(0, 1, 2, 3, 4)).toBe(1);
 
     expect(cubicCurve(0, 2, 3, 4, 5)).toBe(2);
 
-    expect(cubicCurve(1,2,3,4,5)).toBe(5);
+    expect(cubicCurve(1, 2, 3, 4, 5)).toBe(5);
 
-    expect(cubicCurve(1, 3, 4,5,6)).toBe(6);
+    expect(cubicCurve(1, 3, 4, 5, 6)).toBe(6);
 
     expect(cubicCurve(2, 2, 2, 2, 3)).toBe(10);
 });
 
-test("makeCubicCurve", ()=>{
+test("makeCubicCurve", () => {
     const f = makeCubicCurve(1, 2, 3, 4);
     expect(f(0)).toBe(1);
 
     expect(f(1)).toBe(4);
 });
 
-test("computeHashFloat", ()=>{
+test("computeHashFloat", () => {
     expect(computeHashFloat(500)).toEqual(computeHashFloat(500));
 
     expect(computeHashFloat(500)).not.toEqual(computeHashFloat(400))
 });
 
-test("computeHashFloatArray", ()=>{
-    expect(computeHashFloatArray([1, 2, 1.5], 1, 2)).
-            toEqual(computeHashFloatArray([1,2,1.5], 1, 2));
+test("computeHashFloatArray", () => {
+    expect(computeHashFloatArray([1, 2, 1.5], 1, 2)).toEqual(computeHashFloatArray([1, 2, 1.5], 1, 2));
 
     expect(computeHashFloatArray([1, 2, 1.5], 1, 3)).not.toEqual(computeHashFloatArray([1, 2, 1.5], 1, 2));
 
-    expect(computeHashFloatArray([1, 2, 1.5], 2, 3)).not.
-            toEqual(computeHashFloatArray([1, 2, 1.5], 1, 3));
+    expect(computeHashFloatArray([1, 2, 1.5], 2, 3)).not.toEqual(computeHashFloatArray([1, 2, 1.5], 1, 3));
 
-    expect(computeHashFloatArray([1, 2, 3], 1, 3)).not.
-            toEqual(computeHashFloatArray([1, 2, 1.5], 1, 3));
+    expect(computeHashFloatArray([1, 2, 3], 1, 3)).not.toEqual(computeHashFloatArray([1, 2, 1.5], 1, 3));
 });
 
 
@@ -218,37 +216,46 @@ test('computeWholeDivisorLow 16/5', () => {
     expect(computeWholeDivisorLow(16, 5)).toEqual(4);
 });
 
-test("isValueBetween", ()=>{
-    expect(isValueBetween(0,1,2)).toBe(false);
-} );
+test("isValueBetween", () => {
+    expect(isValueBetween(0, 1, 2)).toBe(false);
+});
 
-test("isValueBetween",() =>{
+test("isValueBetween", () => {
     expect(isValueBetween(1, -1, 2)).toBe(true);
 
     expect(isValueBetween(1, 2, -1)).toBe(true);
 });
 
-test("isValueBetweenInclusive", ()=>{
-    expect(isValueBetweenInclusive(1,1,2)).toBe(true);
+test("isValueBetweenInclusive", () => {
+    expect(isValueBetweenInclusive(1, 1, 2)).toBe(true);
 
-    expect(isValueBetweenInclusive(2,1,2)).toBe(true);
+    expect(isValueBetweenInclusive(2, 1, 2)).toBe(true);
 
-    expect(isValueBetweenInclusive(1.5,1,2)).toBe(true);
+    expect(isValueBetweenInclusive(1.5, 1, 2)).toBe(true);
 
-    expect(isValueBetweenInclusive(0.5,1,2)).toBe(false);
+    expect(isValueBetweenInclusive(0.5, 1, 2)).toBe(false);
 
-    expect(isValueBetweenInclusive(3,1,2)).toBe(false);
+    expect(isValueBetweenInclusive(3, 1, 2)).toBe(false);
 });
 
 
-test("solveQuadratic", ()=>{
-    expect(solveQuadratic(0,0,0)).toStrictEqual([0, 0]);
+test("solveQuadratic", () => {
+    expect(solveQuadratic(0, 0, 0)).toStrictEqual([0, 0]);
 
-    expect(solveQuadratic(0,0,1)).toStrictEqual(null);
+    expect(solveQuadratic(0, 0, 1)).toStrictEqual(null);
 
-    expect(solveQuadratic(0,2,3)).toStrictEqual([-1.5, -1.5]);
+    expect(solveQuadratic(0, 2, 3)).toStrictEqual([-1.5, -1.5]);
 
-    expect(solveQuadratic(1,-2,-3)).toStrictEqual([-1, 3]);
+    expect(solveQuadratic(1, -2, -3)).toStrictEqual([-1, 3]);
 
-    expect(solveQuadratic(1,-2,3)).toBe(null);
+    expect(solveQuadratic(1, -2, 3)).toBe(null);
+});
+
+test('overlap1D', () => {
+    expect(overlap1D(0, 0, 0, 0)).toBe(false);
+    expect(overlap1D(-3, -1, -2, -0.5)).toBe(true);
+    expect(overlap1D(-1, 2, 1, 1)).toBe(true);
+    expect(overlap1D(1, 1, -1, 2)).toBe(true);
+
+    expect(overlap1D(1, 2, 2, 3)).toBe(false);
 });

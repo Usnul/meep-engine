@@ -4,7 +4,7 @@
  */
 
 
-import { clamp, intersects1D, max2, min2 } from '../math/MathUtils.js';
+import { clamp, max2, min2 } from '../math/MathUtils.js';
 import LineSegment2 from "./LineSegment2.js";
 import Vector2 from "./Vector2.js";
 import { assert } from "../assert.js";
@@ -470,8 +470,8 @@ AABB2.computeLineBetweenTwoBoxes = computeLineBetweenTwoBoxes;
  * @returns {boolean} true if overlap exists, false if no overlap
  */
 export function aabb2_overlapExists(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1) {
-    return intersects1D(ax0, ax1, bx0, bx1)
-        && intersects1D(ay0, ay1, by0, by1);
+    return overlap1D(ax0, ax1, bx0, bx1)
+        && overlap1D(ay0, ay1, by0, by1);
 }
 
 /**
