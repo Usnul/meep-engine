@@ -376,6 +376,26 @@ export class QuadTreeNode extends AABB2 {
 
     /**
      *
+     * @param {function(QuadTreeDatum<D>)} visitor
+     * @param {*} [thisArg]
+     */
+    traverseData(visitor, thisArg) {
+        this.traversePreOrder((node) => {
+
+            const data = node.data;
+            const n = data.length;
+
+            for (let i = 0; i < n; i++) {
+                const treeDatum = data[i];
+
+                visitor.call(thisArg, treeDatum);
+            }
+
+        });
+    }
+
+    /**
+     *
      * @param {function(QuadTreeNode):boolean} visitor
      * @param {*} [thisArg]
      */
