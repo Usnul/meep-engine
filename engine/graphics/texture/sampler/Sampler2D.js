@@ -221,6 +221,19 @@ Sampler2D.uint16 = function (itemSize, width, height) {
  * @param {int} height
  * @return {Sampler2D}
  */
+Sampler2D.uint32 = function (itemSize, width, height) {
+    const data = new Uint32Array(width * height * itemSize);
+    const sampler = new Sampler2D(data, itemSize, width, height);
+    return sampler;
+};
+
+/**
+ *
+ * @param {int} itemSize
+ * @param {int} width
+ * @param {int} height
+ * @return {Sampler2D}
+ */
 Sampler2D.int8 = function (itemSize, width, height) {
     const data = new Int8Array(width * height * itemSize);
     const sampler = new Sampler2D(data, itemSize, width, height);
@@ -495,6 +508,20 @@ Sampler2D.prototype.sampleBilinear = function (x, y, result) {
 
 /**
  *
+ * @param {number} u
+ * @param {number} v
+ * @param {number} channel
+ * @return {number}
+ */
+Sampler2D.prototype.sampleChannelBilinearUV = function (u, v, channel) {
+    const x = u * (this.width - 1);
+    const y = v * (this.height - 1);
+
+    return this.sampleChannelBilinear(x, y, channel);
+};
+
+/**
+ *
  * @param {number} x
  * @param {number} y
  * @param {number} channel
@@ -503,7 +530,9 @@ Sampler2D.prototype.sampleBilinear = function (x, y, result) {
 Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
     const itemSize = this.itemSize;
 
-    const rowSize = this.width * itemSize;
+    const width = this.width;
+
+    const rowSize = width * itemSize;
 
     //sample 4 points
     const x0 = x | 0;
@@ -512,15 +541,29 @@ Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
     const row0 = y0 * rowSize;
     const i0 = row0 + x0 * itemSize + channel;
 
-    if (x === x0 && y === y0) {
-        //return early when coordinates are exact
-        return this.data[i0];
+    //
+    let x1, y1;
+
+    if (x === x0 || x0 >= width - 1) {
+        x1 = x0;
+    } else {
+        x1 = x0 + 1;
+    }
+
+    const height = this.height;
+
+    if (y === y0 || y0 >= height) {
+        y1 = y0;
+    } else {
+        y1 = y0 + 1;
     }
 
     const q0 = this.data[i0];
-    //
-    const x1 = x === x0 ? x0 : x0 + 1;
-    const y1 = y === y0 ? y0 : y0 + 1;
+
+    if (x0 === x1 && y0 === y1) {
+        return q0;
+    }
+
     //
     const xd = x - x0;
     const yd = y - y0;
@@ -1098,6 +1141,14 @@ Sampler2D.prototype.fill = function (x, y, width, height, value) {
  * @param {number} value
  */
 Sampler2D.prototype.writeChannel = function (x, y, channel, value) {
+    assert.typeOf(x, 'number', 'x');
+    assert.typeOf(y, 'number', 'y');
+
+    assert.greaterThanOrEqual(x, 0);
+    assert.greaterThanOrEqual(y, 0);
+    assert.lessThan(x, this.width);
+    assert.lessThan(y, this.height);
+
     const pointIndex = y * this.width + x;
     const pointAddress = pointIndex * this.itemSize;
     const channelAddress = pointAddress + channel;

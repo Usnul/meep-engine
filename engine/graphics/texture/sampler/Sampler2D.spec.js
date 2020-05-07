@@ -157,6 +157,50 @@ test('computeMax itemSize=2, 2x2', () => {
     expect(ut.computeMax(1)).toEqual({ value: 13, x: 1, y: 0, index: 3 });
 });
 
+test('sampleChannelBilinear 1x1 exact', () => {
+    const s = Sampler2D.uint8(1, 1, 1);
+
+    s.data[0] = 7;
+
+    const value = s.sampleChannelBilinear(0, 0, 0);
+
+    expect(value).toBe(7);
+});
+
+test('sampleChannelBilinear 1x1 outside, positive', () => {
+    const s = Sampler2D.uint8(1, 1, 1);
+
+    s.data[0] = 7;
+
+    expect(s.sampleChannelBilinear(1, 0, 0)).toBe(7);
+    expect(s.sampleChannelBilinear(0, 1, 0)).toBe(7);
+
+    expect(s.sampleChannelBilinear(1, 1, 0)).toBe(7);
+});
+
+test('sampleChannelBilinear 2x2', () => {
+    const s = Sampler2D.uint8(1, 2, 2);
+
+    s.writeChannel(0, 0, 0, 1);
+    s.writeChannel(1, 0, 0, 5);
+    s.writeChannel(0, 1, 0, 7);
+    s.writeChannel(1, 1, 0, 11);
+
+    expect(s.sampleChannelBilinear(0, 0, 0)).toBe(1);
+    expect(s.sampleChannelBilinear(1, 0, 0)).toBe(5);
+    expect(s.sampleChannelBilinear(0, 1, 0)).toBe(7);
+    expect(s.sampleChannelBilinear(1, 1, 0)).toBe(11);
+
+
+    expect(s.sampleChannelBilinear(0.5, 0, 0)).toBe(3);
+    expect(s.sampleChannelBilinear(0, 0.5, 0)).toBe(4);
+    expect(s.sampleChannelBilinear(0.5, 0.5, 0)).toBe(6);
+    expect(s.sampleChannelBilinear(1, 0.5, 0)).toBe(8);
+    expect(s.sampleChannelBilinear(0.5, 1, 0)).toBe(9);
+
+
+});
+
 test('Sampler2.combine ADD', () => {
     const s0 = new Sampler2D([
         1, 2,

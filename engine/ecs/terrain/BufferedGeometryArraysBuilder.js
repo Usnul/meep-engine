@@ -46,24 +46,8 @@ function buildBufferGeometry(samplerHeight, position, size, scale, totalSize, re
     const vConst = position.y / totalSize.y;
     const uConst = position.x / totalSize.x;
 
-    const jitterU = (totalSize.x < samplerHeight.width) ? 0.5 * uMultiplier : 0.5 / samplerHeight.width;
-    const jitterV = (totalSize.y < samplerHeight.height) ? 0.5 * vMultiplier : 0.5 / samplerHeight.height;
-
     const totalScaledSizeX = totalSize.x * scale.x;
     const totalScaledSizeY = totalSize.y * scale.y;
-
-    function sample(u, v) {
-        return samplerHeight.sample(u, v);
-    }
-
-    function getHeightValue(u, v) {
-        //TODO do Gaussian convolution filter( or box-blur ), with 1/2 pixel offset
-        let val = sample(u, v);
-
-        const jitter = sample(u + jitterU, v) + sample(u - jitterU, v) + sample(u, v + jitterV) + sample(u, v - jitterV);
-
-        return (val + jitter) / 5;
-    }
 
     //fill vertices
     let px, py, pz;
@@ -76,8 +60,9 @@ function buildBufferGeometry(samplerHeight, position, size, scale, totalSize, re
         for (x = 0; x < gridX1; x++) {
 
             const u = x * uMultiplier + uConst;
-            //get sample
-            const val = sample(u, v);
+
+            //get height sample
+            const val = samplerHeight.sampleChannelBilinearUV(u, v, 0);
 
             px = u * totalScaledSizeX;
             py = val;
