@@ -70,6 +70,9 @@ export class GridCellPattern {
         const sin = Math.sin(rotation);
         const cos = Math.cos(rotation);
 
+        const width = grid.width;
+        const height = grid.height;
+
         for (let i = 0; i < n; i++) {
             const tagRule = rules[i];
 
@@ -82,10 +85,16 @@ export class GridCellPattern {
             const rotated_local_x = local_x * cos - local_y * sin
             const rotated_local_y = local_x * sin - local_y * cos;
 
-            const target_x = x + rotated_local_x;
-            const target_y = y + rotated_local_y;
+            const target_x = Math.round(x + rotated_local_x);
+            const target_y = Math.round(y + rotated_local_y);
 
-            const tags = grid.readTags(target_x, target_y);
+            let tags;
+
+            if (target_x < 0 || target_x >= width || target_y < 0 || target_y >= height) {
+                tags = 0;
+            } else {
+                tags = grid.readTags(target_x, target_y);
+            }
 
             const match = tagRule.rule.match(tags);
 

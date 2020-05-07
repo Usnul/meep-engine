@@ -1,4 +1,5 @@
 import { assert } from "../core/assert.js";
+import { QuadTreeNode } from "../core/geom/2d/quad-tree/QuadTreeNode.js";
 
 export class GridData {
     constructor() {
@@ -10,6 +11,22 @@ export class GridData {
          * @type {Uint32Array}
          */
         this.tags = new Uint32Array();
+
+        /**
+         *
+         * @type {QuadTreeNode<MarkerNode>}
+         */
+        this.markers = new QuadTreeNode();
+    }
+
+    /**
+     *
+     * @param {MarkerNode} node
+     */
+    addMarker(node) {
+        const p = node.position;
+
+        this.markers.add(node, p.x, p.y, p.x, p.y);
     }
 
     /**

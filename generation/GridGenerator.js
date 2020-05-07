@@ -2,6 +2,8 @@ import { Sampler2D } from "../engine/graphics/texture/sampler/Sampler2D.js";
 import { seededRandom } from "../core/math/MathUtils.js";
 import { CaveGeneratorCellularAutomata } from "./automata/CaveGeneratorCellularAutomata.js";
 import { GridTags } from "./GridTags.js";
+import { actionTask } from "../core/process/task/TaskUtils.js";
+import TaskGroup from "../core/process/task/TaskGroup.js";
 
 export class GridGenerator {
     constructor() {
@@ -26,7 +28,7 @@ export class GridGenerator {
 
         const field = Sampler2D.uint8(1, width, height);
 
-        const random = seededRandom(1);
+        const random = seededRandom(config.seed);
 
         const fieldData = field.data;
 
@@ -79,7 +81,14 @@ export class GridGenerator {
         const height = grid.height;
         const width = grid.width;
 
-        this.generateEmptyTags(config);
+        const tMakeEmpty = actionTask(() => {
+            this.generateEmptyTags(config);
+        });
 
+        const tActions = config.cellActionRules.process(grid, config.seed);
+
+        tActions.addDependency(tMakeEmpty);
+
+        return new TaskGroup([tMakeEmpty, tActions], 'Generation');
     }
 }
