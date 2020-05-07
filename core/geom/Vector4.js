@@ -78,7 +78,7 @@ Vector4.prototype.readFromArray = function (array, offset) {
         array[offset],
         array[offset + 1],
         array[offset + 2],
-        array[offset + 3],
+        array[offset + 3]
     );
 };
 
