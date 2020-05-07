@@ -25,6 +25,10 @@ export class AsynchronousAction {
         this.__failureReason = null;
     }
 
+    isRunning() {
+        return this.status === TaskState.RUNNING;
+    }
+
     /**
      *
      * @return {Promise}
