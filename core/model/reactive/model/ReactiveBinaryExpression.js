@@ -19,6 +19,13 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
          */
         this.right = null;
 
+        /**
+         *
+         * @type {undefined}
+         * @private
+         */
+        this.__oldValue = undefined;
+
     }
 
     copy(other) {
@@ -32,7 +39,13 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
     update() {
         const result = this.getValue();
 
+        if (result === this.__oldValue) {
+            return;
+        }
+
         this.onChanged.dispatch(result);
+
+        this.__oldValue = result;
     }
 
     /**
@@ -70,6 +83,9 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
 
         left.onChanged.add(this.update, this);
         right.onChanged.add(this.update, this);
+
+        //reset the old value
+        this.__oldValue = undefined;
     }
 
     disconnect() {
