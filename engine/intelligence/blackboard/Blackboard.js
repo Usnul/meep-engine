@@ -150,6 +150,7 @@ export class Blackboard {
      * @param {string} name
      */
     release(name) {
+        assert.typeOf(name, 'string', 'name');
         assert.ok(this.data.hasOwnProperty(name), `Attempting to release a value '${name}' that doesn't exist`);
 
         const datum = this.data[name];
