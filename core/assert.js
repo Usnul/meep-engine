@@ -48,6 +48,28 @@ function greaterThan(a, b, m) {
         throw new Error(message);
     }
 }
+/**
+ *
+ * @param {number} a
+ * @param {number} b
+ * @param {string} [m]
+ */
+function lessThan(a, b, m) {
+    assert.equal(typeof a, 'number');
+    assert.equal(typeof b, 'number');
+
+    if (!(a < b)) {
+        let message = '';
+
+        if (m !== undefined) {
+            message += m + '. ';
+        }
+
+        message += `Expected ${a} < ${b}.`;
+
+        throw new Error(message);
+    }
+}
 
 /**
  *
@@ -130,6 +152,7 @@ assert.equal = equal;
 assert.logicalyEqual = logicalEquals;
 assert.ok = assert;
 assert.greaterThan = greaterThan;
+assert.lessThan = lessThan;
 assert.greaterThanOrEqual = greaterThanOrEqual;
 assert.typeOf = typeOf;
 assert.arrayHas = arrayHas;
