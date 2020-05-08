@@ -1,4 +1,4 @@
-import Signal from "../events/signal/Signal.js";
+import Signal from "../../events/signal/Signal.js";
 
 /**
  * @template T
