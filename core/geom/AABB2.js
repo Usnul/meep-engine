@@ -4,7 +4,7 @@
  */
 
 
-import { clamp, max2, min2 } from '../math/MathUtils.js';
+import { clamp, max2, min2, overlap1D } from '../math/MathUtils.js';
 import LineSegment2 from "./LineSegment2.js";
 import Vector2 from "./Vector2.js";
 import { assert } from "../assert.js";
