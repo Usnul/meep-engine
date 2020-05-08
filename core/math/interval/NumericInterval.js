@@ -106,6 +106,14 @@ export class NumericInterval {
 
     /**
      *
+     * @returns {number}
+     */
+    computeAverage() {
+        return (this.min + this.max) / 2;
+    }
+
+    /**
+     *
      * @param {function} random Random number generator function, must return values between 0 and 1
      * @returns {number}
      */
