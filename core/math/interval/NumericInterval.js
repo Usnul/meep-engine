@@ -44,8 +44,8 @@ export class NumericInterval {
      * @param {number} max
      */
     set(min, max) {
-        assert.ok(typeof min === "number", `min must be a number, instead was "${typeof min}"`);
-        assert.ok(typeof max === "number", `min must be a number, instead was "${typeof max}"`);
+        assert.isNumber(min, 'min');
+        assert.isNumber(max, 'max');
 
         assert.ok(max >= min, `max(${max}) must be >= than min(${min})`);
 
