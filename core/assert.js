@@ -48,6 +48,7 @@ function greaterThan(a, b, m) {
         throw new Error(message);
     }
 }
+
 /**
  *
  * @param {number} a
@@ -95,6 +96,7 @@ function greaterThanOrEqual(a, b, m) {
 }
 
 const typeOfTypes = ['string', 'boolean', 'number', 'object', 'undefined', 'function', 'symbol'];
+const stringListOfTypes = typeOfTypes.join(', ');
 
 /**
  *
@@ -104,10 +106,15 @@ const typeOfTypes = ['string', 'boolean', 'number', 'object', 'undefined', 'func
  */
 function typeOf(value, type, valueName = 'value') {
 
-    assert.notEqual(typeOfTypes.indexOf(type), -1, `type must be one of [${typeOfTypes.join(', ')}], instead was '${type}'`);
-    assert.equal(typeof valueName, 'string', `valueName must be a string, instead was '${typeof valueName}'`);
+    assert.notEqual(typeOfTypes.indexOf(type), -1, `type must be one of [${stringListOfTypes}], instead was '${type}'`);
 
-    assert.equal(typeof value, type, `expected ${valueName} to be ${type}, instead was '${typeof value}'(=${value})`);
+    const typeofValueName = typeof valueName;
+
+    assert.equal(typeofValueName, 'string', `valueName must be a string, instead was '${typeofValueName}'`);
+
+    const typeofValue = typeof value;
+
+    assert.equal(typeofValue, type, `expected ${valueName} to be ${type}, instead was '${typeofValue}'(=${value})`);
 }
 
 /**
@@ -157,6 +164,20 @@ assert.greaterThanOrEqual = greaterThanOrEqual;
 assert.typeOf = typeOf;
 assert.arrayHas = arrayHas;
 assert.arrayHasNo = arrayHasNo;
+
+
+/**
+ *
+ * @param {number|*} value
+ * @param {string} name
+ */
+assert.isNumber = function (value, name = 'value') {
+    const typeofValue = typeof value;
+
+    if (typeofValue !== 'number') {
+        throw new Error(`expected ${name} to be a number, instead was '${typeofValue}'(=${value})`);
+    }
+};
 
 
 /**

@@ -590,9 +590,9 @@ Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
  * @returns {number}
  */
 Sampler2D.prototype.readChannel = function (x, y, channel) {
-    assert.typeOf(x, 'number', 'x');
-    assert.typeOf(y, 'number', 'y');
-    assert.typeOf(channel, 'number', 'channel');
+    assert.isNumber(x, 'x');
+    assert.isNumber(y, 'y');
+    assert.isNumber(channel, 'channel');
 
     const index = (y * this.width + x) * this.itemSize + channel;
 
