@@ -29,6 +29,15 @@ class LayersController extends View {
         this.el = document.createElement('div');
         this.addClass('ui-terrain-layers-controller-view');
 
+
+        function updateLayers() {
+
+            terrain.layers.buildTexture();
+            terrain.layers.writeAllLayersDataIntoTexture();
+
+            terrain.updateMaterial();
+        }
+
         const updateBus = new Signal();
 
         this.bindSignal(layers.layers.on.added, () => {
@@ -37,6 +46,7 @@ class LayersController extends View {
 
         this.bindSignal(layers.layers.on.removed, (layer, index) => {
             terrain.splat.removeWeightLayer(index);
+            updateLayers();
         });
 
         this.addChild(
@@ -51,10 +61,7 @@ class LayersController extends View {
                     layer.loadTextureData(assetManager)
                         .then(() => {
 
-                            layers.buildTexture();
-                            layers.writeAllLayersDataIntoTexture();
-
-                            terrain.updateMaterial();
+                            updateLayers();
 
                             updateBus.send1(layer);
                         });

@@ -30,6 +30,7 @@ import { EncodingBinaryBuffer } from "../core/binary/EncodingBinaryBuffer.js";
 import { EntityComponentDataset } from "../engine/ecs/EntityComponentDataset.js";
 import { resetMusicTracks } from "../../view/game/options/OptionsView.js";
 import InputControllerSystem from "../engine/input/ecs/systems/InputControllerSystem.js";
+import { assert } from "../core/assert.js";
 
 
 /**
@@ -549,7 +550,10 @@ Editor.prototype.focusEntity = function (entity) {
  * @param {Engine} engine
  */
 Editor.prototype.attach = function (engine) {
-    const editor = this;
+    assert.defined(engine, 'engine');
+    assert.ok(engine.isEngine, 'engine.isEngine');
+
+
     this.engine = engine;
 
     //validate selection

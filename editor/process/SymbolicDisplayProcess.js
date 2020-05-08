@@ -36,6 +36,7 @@ import { buildThreeJSHelperEntity } from "./symbolic/buildThreeJSHelperEntity.js
 import { makeSocketsSymbolicDisplay } from "./symbolic/makeSocketsSymbolicDisplay.js";
 import { makeParticleEmitterSymbolicDisplay } from "./symbolic/makeParticleEmitterSymbolicDisplay.js";
 import { ProcessState } from "../../core/process/ProcessState.js";
+import { assert } from "../../core/assert.js";
 
 
 /**
@@ -95,6 +96,9 @@ function synchronizeTransform(source, target, bindings, syncPosition = true, syn
  * @returns {ComponentSymbolicDisplay}
  */
 function makePositionedIconDisplaySymbol(engine, iconURL, ComponentClass) {
+    assert.defined(engine, 'engine');
+    assert.ok(engine.isEngine, 'engine.isEngine');
+
     const entityManager = engine.entityManager;
 
     const assetManager = engine.assetManager;
@@ -510,6 +514,8 @@ class SymbolicDisplayProcess extends EditorProcess {
         super.initialize(editor);
 
         const engine = editor.engine;
+
+        assert.defined(engine, 'engine');
 
         /**
          *

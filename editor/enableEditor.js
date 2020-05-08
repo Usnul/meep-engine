@@ -15,6 +15,8 @@ export function enableEditor(engine, initialization = noop) {
         console.log('Enabling editor');
         if (editor === null) {
             editor = new Editor();
+            editor.engine = engine;
+
             editor.initialize();
 
             initialization(editor);

@@ -1,4 +1,5 @@
 import { BaseProcess } from "../../core/process/BaseProcess.js";
+import { assert } from "../../core/assert.js";
 
 
 class EditorProcess extends BaseProcess {
@@ -23,6 +24,8 @@ class EditorProcess extends BaseProcess {
      * @param {Editor} editor
      */
     initialize(editor) {
+        assert.defined(editor,'editor');
+
         this.editor = editor;
 
         super.initialize();

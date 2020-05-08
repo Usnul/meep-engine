@@ -41,6 +41,11 @@ class GridPickCoordinateView extends View {
 
         const terrain = obtainTerrain(ecd);
 
+        if (terrain === null) {
+            //no terrain
+            return;
+        }
+
         pick(x - vp.x, y - vp.y, engine.graphics, terrain, function (v2, v3, normal) {
             v2.floor();
             $el.text(`x: ${v2.x}, y: ${v2.y}`);
