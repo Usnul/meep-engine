@@ -25,6 +25,8 @@ function seedTemplate(template, seed) {
     return result;
 }
 
+const FAILURE_MESSAGE_CACHE = {};
+
 export class Localization {
     constructor() {
         /**
@@ -123,22 +125,37 @@ export class Localization {
         if (value === undefined) {
 
             if (!ENV_PRODUCTION) {
-                //try to find similar keys
-                const similarities = Object.keys(this.json).map(function (key) {
-                    const distance = levenshtein.get(key, id);
-                    return {
-                        key,
-                        distance
-                    };
-                });
+                const locale = this.locale.getValue();
 
-                similarities.sort(function (a, b) {
-                    return a.distance - b.distance;
-                });
+                if (FAILURE_MESSAGE_CACHE[locale] === undefined) {
+                    FAILURE_MESSAGE_CACHE[locale] = {};
+                }
 
-                const suggestions = similarities.slice(0, 3).map(p => p.key);
+                if (FAILURE_MESSAGE_CACHE[locale][id] === undefined) {
 
-                console.warn(`No localization value for id='${id}', seed=${JSON.stringify(seed)}, approximate matches: ${suggestions.join(', ')}`);
+                    //try to find similar keys
+                    const similarities = Object.keys(this.json).map(function (key) {
+                        const distance = levenshtein.get(key, id);
+                        return {
+                            key,
+                            distance
+                        };
+                    });
+
+                    similarities.sort(function (a, b) {
+                        return a.distance - b.distance;
+                    });
+
+                    const suggestions = similarities.slice(0, 3).map(p => p.key);
+
+                    const message = `No localization value for id='${id}', seed=${JSON.stringify(seed)}, approximate matches: ${suggestions.join(', ')}`;
+
+                    FAILURE_MESSAGE_CACHE[locale][id] = message;
+
+                }
+
+                console.warn(FAILURE_MESSAGE_CACHE[locale][id]);
+
             }
 
             //no value
