@@ -50,6 +50,8 @@ export class EngineBootstrapper {
             frameRunner.shutdown();
 
             this.rootNode.removeChild(v.el);
+
+            v.unlink();
         });
 
 
