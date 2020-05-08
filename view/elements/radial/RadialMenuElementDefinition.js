@@ -166,6 +166,7 @@ export class RadialMenuElementDefinition {
      * @param {String} [name]
      * @param {number} [nameRadiusOffset]
      * @param {String|number} [nameFill] CSS color for name label
+     * @returns {RadialMenuElementDefinition}
      */
     static from({
                     share,
