@@ -1,11 +1,41 @@
 import { QuadTreeNode } from "../../core/geom/2d/quad-tree/QuadTreeNode.js";
 import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
-import { seededRandom } from "../../core/math/MathUtils.js";
+import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
 import { countTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
+import Task from "../../core/process/task/Task.js";
+import TaskSignal from "../../core/process/task/TaskSignal.js";
+import { binarySearchLowIndex } from "../../core/collection/ArrayUtils.js";
+import { compareNumbers } from "../../core/primitives/numbers/compareNumbers.js";
+
+/**
+ *
+ * @param {number[]} data
+ */
+function normalizeVectorArray(data) {
+    const n = data.length;
+
+    let magnitude2 = 0;
+
+    for (let i = 0; i < n; i++) {
+        const value = data[i];
+
+        const value2 = value * value;
+
+        magnitude2 += value2;
+    }
+
+
+    const magnitude = Math.sqrt(magnitude2);
+
+    for (let i = 0; i < n; i++) {
+        data[i] /= magnitude;
+    }
+
+}
 
 export class ThemeEngine {
     constructor() {
@@ -35,6 +65,43 @@ export class ThemeEngine {
 
         this.areas.add(theme, bounds.x0, bounds.y0, bounds.x1, bounds.y1);
 
+    }
+
+    /**
+     *
+     * @param {AreaTheme} result
+     * @param {number} x
+     * @param {number} y
+     * @returns {number}
+     */
+    getThemesByPosition(result, x, y) {
+
+        const areaNodes = [];
+
+        const intersections = this.areas.requestDatumIntersectionsPoint(areaNodes, x, y);
+
+        let matches = 0;
+
+        for (let i = 0; i < intersections; i++) {
+            const areaNode = areaNodes[i];
+
+            /**
+             *
+             * @type {AreaTheme}
+             */
+            const areaTheme = areaNode.data;
+
+            const filled = areaTheme.mask.mask.readChannel(x, y, 0);
+
+            if (filled === 0) {
+                continue;
+            }
+
+            result[matches++] = areaTheme;
+        }
+
+
+        return matches;
     }
 
     /**
@@ -83,11 +150,6 @@ export class ThemeEngine {
 
         const splatLayerSize = splatWidth * splatHeight;
 
-        const splat_step_x = splatWidth / width;
-        const splat_step_y = splatHeight / height;
-
-        const areas = this.areas;
-
         //splat map size can vary from the terrain size, for that reason we write splat weights into an intermediate storage so we can re-sample it to splat map after
         const weights = Sampler2D.uint8(layerCount, width, height);
 
@@ -95,42 +157,9 @@ export class ThemeEngine {
             const y = (index / width) | 0;
             const x = index % width;
 
-            const v = y / height;
-
-            const splat_y = v * splatHeight;
-
-            const splat_y0 = Math.floor(splat_y);
-            const splat_y1 = Math.ceil(splat_y + splat_step_y);
-            const u = x / width;
-
-            const splat_x = u * splatWidth;
-            const splat_x0 = Math.floor(splat_x);
-            const splat_x1 = Math.ceil(splat_x + splat_step_x);
-
-
             const tags = grid.readTags(x, y);
 
-            const intersections = areas.requestDatumIntersectionsRectangle(areaNodes, x - 0.1, y - 0.1, x + 0.1, y + 0.1);
-
-            matchingThemeCount = 0;
-
-            for (let i = 0; i < intersections; i++) {
-                const areaNode = areaNodes[i];
-
-                /**
-                 *
-                 * @type {AreaTheme}
-                 */
-                const areaTheme = areaNode.data;
-
-                const filled = areaTheme.mask.mask.readChannel(x, y, 0);
-
-                if (filled === 0) {
-                    continue;
-                }
-
-                matchingThemes[matchingThemeCount++] = areaTheme;
-            }
+            matchingThemeCount = this.getThemesByPosition(matchingThemes, x, y);
 
             aggregator.clear();
 
@@ -232,11 +261,123 @@ export class ThemeEngine {
      *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
+     * @param {number} seed
+     */
+    applyNodes(grid, ecd, seed) {
+        /**
+         *
+         * @type {MarkerNode[]}
+         */
+        const nodes = [];
+
+        let i = 0;
+
+        /**
+         *
+         * @type {AreaTheme[]}
+         */
+        const themeAreas = [];
+
+        /**
+         *
+         * @type {number[]}
+         */
+        const themeInfluence = [];
+
+        const random = seededRandom(seed);
+
+        const cycleFunction = () => {
+            if (i >= nodes.length) {
+                return TaskSignal.EndSuccess;
+            }
+
+            const node = nodes[i];
+
+            const nodePosition = node.position;
+
+            const x = nodePosition.x;
+            const y = nodePosition.y;
+
+            const matchingThemeCount = this.getThemesByPosition(themeAreas, x, y);
+
+            let influenceSum = 0;
+
+            //compute influences of active themes
+            for (let j = 0; j < matchingThemeCount; j++) {
+
+                /**
+                 *
+                 * @type {AreaTheme}
+                 */
+                const theme = themeAreas[j];
+
+                const areaMask = theme.mask;
+
+                const distance = areaMask.distanceField.readChannel(x, y, 0);
+                const influence = distance / matchingThemeCount;
+
+                themeInfluence[j] = influenceSum;
+
+                influenceSum += influence;
+            }
+
+            //select a theme
+            const t = randomFloatBetween(random, 0, influenceSum);
+
+            const themeIndex = binarySearchLowIndex(themeInfluence, t, compareNumbers);
+
+            const themeArea = themeAreas[themeIndex];
+
+            /**
+             *
+             * @type {Theme}
+             */
+            const theme = themeArea.theme;
+
+            /**
+             *
+             * @type {MarkerNodeProcessingRuleSet}
+             */
+            const ruleSet = theme.nodes;
+
+            ruleSet.processNode(ecd, node);
+
+            i++;
+
+            return TaskSignal.Continue;
+        }
+
+        return new Task({
+            initializer() {
+                grid.markers.getRawData(nodes);
+            },
+            cycleFunction
+        });
+    }
+
+    /**
+     *
+     * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @returns {Task[]}
      */
     apply(grid, ecd) {
         const terrain = obtainTerrain(ecd);
 
-        return this.applyTerrainThemes(grid, terrain);
+        /**
+         *
+         * @type {Task[]}
+         */
+        const result = [];
+
+        const tTerrain = this.applyTerrainThemes(grid, terrain);
+
+        Array.prototype.push.apply(result, tTerrain);
+
+        const tNodes = this.applyNodes(grid, ecd);
+
+        result.push(tNodes);
+
+        return result;
     }
 }

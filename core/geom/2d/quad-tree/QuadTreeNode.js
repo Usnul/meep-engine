@@ -375,6 +375,19 @@ export class QuadTreeNode extends AABB2 {
     }
 
     /**
+     * @param {D[]} result
+     */
+    getRawData(result) {
+
+        this.traverseData(n => {
+            const data = n.data;
+
+            result.push(data);
+        });
+
+    }
+
+    /**
      *
      * @param {function(QuadTreeDatum<D>)} visitor
      * @param {*} [thisArg]
@@ -462,6 +475,25 @@ export class QuadTreeNode extends AABB2 {
             }
 
         }
+    }
+
+    /**
+     *
+     * @param {QuadTreeDatum<D>[]} result
+     * @param {number} x
+     * @param {number} y
+     * @returns {number} number of intersecting objects added to the result
+     */
+    requestDatumIntersectionsPoint(result, x, y) {
+        //TODO optimize closures out to avoid GC
+
+        let count = 0;
+
+        this.traversePointIntersections(x, y, (d) => {
+            result[count++] = d;
+        });
+
+        return count;
     }
 
     /**

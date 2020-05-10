@@ -1,10 +1,17 @@
 import { assert } from "../core/assert.js";
 import { QuadTreeNode } from "../core/geom/2d/quad-tree/QuadTreeNode.js";
+import Vector2 from "../core/geom/Vector2.js";
 
 export class GridData {
     constructor() {
         this.width = 0;
         this.height = 0;
+
+        /**
+         *
+         * @type {Vector2}
+         */
+        this.scale = new Vector2(1, 1);
 
         /**
          *

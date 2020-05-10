@@ -14,6 +14,19 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         this.entity = new EntityBlueprint();
     }
 
+    /**
+     *
+     * @param {EntityBlueprint} blueprint
+     * @returns {MarkerNodeActionEntityPlacement}
+     */
+    static from(blueprint) {
+        const r = new MarkerNodeActionEntityPlacement();
+
+        r.entity = blueprint;
+
+        return r;
+    }
+
     execute(ecd, node) {
         const blueprint = this.entity;
 
@@ -31,5 +44,6 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
             t.copy(node.transofrm);
         }
 
+        entityBuilder.build(ecd);
     }
 }

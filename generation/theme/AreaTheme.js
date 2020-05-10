@@ -4,6 +4,10 @@ export class AreaTheme {
     constructor() {
         this.mask = new AreaMask();
 
+        /**
+         *
+         * @type {Theme}
+         */
         this.theme = null;
     }
 }
