@@ -157,8 +157,6 @@ export class ThemeEngine {
             const y = (index / width) | 0;
             const x = index % width;
 
-            const tags = grid.readTags(x, y);
-
             matchingThemeCount = this.getThemesByPosition(matchingThemes, x, y);
 
             aggregator.clear();
@@ -185,7 +183,7 @@ export class ThemeEngine {
                 for (let j = 0; j < ruleCount; j++) {
                     const terrainLayerRule = rules[j];
 
-                    const ruleMatch = terrainLayerRule.rule.match(tags);
+                    const ruleMatch = terrainLayerRule.rule.match(grid, x, y);
 
                     if (!ruleMatch) {
                         //terrain doesn't match the rule, skip

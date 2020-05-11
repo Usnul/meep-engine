@@ -1,7 +1,7 @@
-import { TagRuleAnd } from "../TagRuleAnd.js";
+import { GridCellRuleAnd } from "../GridCellRuleAnd.js";
 import { CellTagRule } from "./CellTagRule.js";
 
-export class GridCellPattern {
+export class GridCellMatcher {
     constructor() {
         /**
          * NOTE: All rules have local coordinates
@@ -20,7 +20,7 @@ export class GridCellPattern {
         const existingRule = this.getRuleByPosition(x, y);
         if (existingRule !== undefined) {
             //rule already exists, modify it
-            existingRule.rule = TagRuleAnd.from(existingRule.rule, rule);
+            existingRule.rule = GridCellRuleAnd.from(existingRule.rule, rule);
         } else {
             const cellTagRule = new CellTagRule();
 
@@ -70,9 +70,6 @@ export class GridCellPattern {
         const sin = Math.sin(rotation);
         const cos = Math.cos(rotation);
 
-        const width = grid.width;
-        const height = grid.height;
-
         for (let i = 0; i < n; i++) {
             const tagRule = rules[i];
 
@@ -88,15 +85,7 @@ export class GridCellPattern {
             const target_x = Math.round(x + rotated_local_x);
             const target_y = Math.round(y + rotated_local_y);
 
-            let tags;
-
-            if (target_x < 0 || target_x >= width || target_y < 0 || target_y >= height) {
-                tags = 0;
-            } else {
-                tags = grid.readTags(target_x, target_y);
-            }
-
-            const match = tagRule.rule.match(tags);
+            const match = tagRule.rule.match(grid, target_x, target_y);
 
             if (!match) {
                 //rule failed

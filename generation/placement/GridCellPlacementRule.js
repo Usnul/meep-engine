@@ -2,7 +2,7 @@ export class GridCellPlacementRule {
     constructor() {
         /**
          *
-         * @type {GridCellPattern}
+         * @type {GridCellMatcher}
          */
         this.pattern = null;
 

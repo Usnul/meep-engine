@@ -1,18 +1,18 @@
-import { TagRule } from "./TagRule.js";
+import { GridCellRule } from "./GridCellRule.js";
 
-export class TagRuleBinary extends TagRule {
+export class GridCellRuleBinary extends GridCellRule {
 
     constructor() {
         super();
 
         /**
          *
-         * @type {TagRule}
+         * @type {GridCellRule}
          */
         this.left = null;
         /**
          *
-         * @type {TagRule}
+         * @type {GridCellRule}
          */
         this.right = null;
     }

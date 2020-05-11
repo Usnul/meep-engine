@@ -1,9 +1,9 @@
 import { Theme } from "../Theme.js";
 import { TerrainTheme } from "../TerrainTheme.js";
 import { TerrainLayerRule } from "../TerrainLayerRule.js";
-import { TagRuleContains } from "../../rules/TagRuleContains.js";
+import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
 import { GridTags } from "../../GridTags.js";
-import { TagRuleNot } from "../../rules/TagRuleNot.js";
+import { GridCellRuleNot } from "../../rules/GridCellRuleNot.js";
 import { MarkerProcessingRule } from "../../markers/actions/MarkerProcessingRule.js";
 import { TypeMarkerNodeMatcher } from "../../markers/matcher/TypeMarkerNodeMatcher.js";
 import { MarkerNodeActionEntityPlacement } from "../../markers/actions/MarkerNodeActionEntityPlacement.js";
@@ -19,13 +19,13 @@ const terrainTheme = new TerrainTheme();
 const tlrGround = new TerrainLayerRule();
 
 tlrGround.layer = 0;
-tlrGround.rule = new TagRuleContains();
+tlrGround.rule = new GridCellRuleContainsTag();
 tlrGround.rule.tags = GridTags.Empty;
 
 const tlrRock = new TerrainLayerRule();
 tlrRock.layer = 1;
-const rockRule = new TagRuleNot();
-rockRule.source = new TagRuleContains();
+const rockRule = new GridCellRuleNot();
+rockRule.source = new GridCellRuleContainsTag();
 rockRule.source.tags = GridTags.Empty;
 
 tlrRock.rule = rockRule;
