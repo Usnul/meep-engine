@@ -12,17 +12,28 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
          * @type {EntityBlueprint}
          */
         this.entity = new EntityBlueprint();
+
+        /**
+         *
+         * @type {Transform}
+         */
+        this.transform = new Transform();
     }
 
     /**
      *
      * @param {EntityBlueprint} blueprint
+     * @param {Transform} [transform]
      * @returns {MarkerNodeActionEntityPlacement}
      */
-    static from(blueprint) {
+    static from(blueprint, transform = undefined) {
         const r = new MarkerNodeActionEntityPlacement();
 
         r.entity = blueprint;
+
+        if (transform !== undefined) {
+            r.transform.copy(transform);
+        }
 
         return r;
     }
@@ -41,7 +52,7 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         const t = entityBuilder.getComponent(Transform);
 
         if (t !== null) {
-            t.copy(node.transofrm);
+            t.multiplyTransforms(node.transofrm, this.transform);
         }
 
         entityBuilder.build(ecd);

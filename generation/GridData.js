@@ -34,6 +34,18 @@ export class GridData {
 
     /**
      *
+     * @param tileSize
+     */
+    computeScale(tileSize) {
+
+        const sx = (this.width * tileSize) / (this.width - 1);
+        const sy = (this.height * tileSize) / (this.height - 1);
+
+        this.scale.set(sx, sy);
+    }
+
+    /**
+     *
      * @param {MarkerNode} node
      */
     addMarker(node) {

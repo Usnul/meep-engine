@@ -33,13 +33,17 @@ pattern.addRule(0, 1, MATCH_NOT_EMPTY);
 pattern.addRule(0, 0, MATCH_EMPTY);
 
 chestPlacementRule.pattern = pattern;
-chestPlacementRule.probability = 1;
+chestPlacementRule.probability = 0.1;
 chestPlacementRule.actions.push(GridCellActionPlaceMarker.from('Treasure'));
+
+const prStartingPoint = GridCellPlacementRule.from(MATCH_STARTING_POINT, [
+    GridCellActionPlaceMarker.from('Starting Point')
+]);
 
 
 const gMakeEmpty = GridTaskCellularAutomata.from(GridTags.Empty, 1);
-const gRuleSet1 = GridTaskActionRuleSet.from(GridActionRuleSet.from([chestPlacementRule]));
-gRuleSet1.addDependency(gMakeEmpty);
+
+const gRuleSet1 = GridTaskActionRuleSet.from(GridActionRuleSet.from([chestPlacementRule, prStartingPoint]));
 
 // Place starting point tag
 const gPlaceStartingPoint = GridTaskExecuteRuleTimes.from(
@@ -58,6 +62,8 @@ gPlaceStartingPoint.addDependency(gMakeEmpty);
 const gBuildDistanceMap = GridTaskBuildSourceDistanceMap.from(MATCH_STARTING_POINT, MATCH_EMPTY);
 
 gBuildDistanceMap.addDependency(gPlaceStartingPoint);
+
+gRuleSet1.addDependency(gBuildDistanceMap);
 
 SampleGenerator0.addGenerator(gMakeEmpty);
 SampleGenerator0.addGenerator(gRuleSet1);

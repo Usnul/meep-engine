@@ -45,6 +45,28 @@ const nrTreasure = new MarkerProcessingRule();
 
 nrTreasure.consume = true;
 nrTreasure.matcher = TypeMarkerNodeMatcher.from('Treasure');
-nrTreasure.actions.push(MarkerNodeActionEntityPlacement.from(ebpTreasure));
 
-SampleTheme0.nodes.add(nrTreasure)
+nrTreasure.actions.push(MarkerNodeActionEntityPlacement.from(ebpTreasure, Transform.fromJSON({
+    scale: { x: 0.25, y: 0.25, z: 0.5 },
+    position: { x: 0, y: 0.25, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrTreasure);
+
+
+const ebpStartingPoint = new EntityBlueprint();
+ebpStartingPoint.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_green.gltf' }));
+ebpStartingPoint.add(Transform.fromJSON({}));
+ebpStartingPoint.add(GridPosition.fromJSON({}));
+
+const nrStartingPoint = new MarkerProcessingRule();
+
+nrStartingPoint.consume = true;
+nrStartingPoint.matcher = TypeMarkerNodeMatcher.from('Starting Point');
+
+nrStartingPoint.actions.push(MarkerNodeActionEntityPlacement.from(ebpStartingPoint, Transform.fromJSON({
+    scale: { x: 0.5, y: 0.5, z: 0.5 },
+    position: { x: 0, y: 0.5, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrStartingPoint);

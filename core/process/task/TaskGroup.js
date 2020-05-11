@@ -149,8 +149,22 @@ TaskGroup.prototype.getEstimatedDuration = function () {
 
     }, 0);
 };
+
+/**
+ *
+ * @param resolve
+ * @param reject
+ */
 TaskGroup.prototype.join = function (resolve, reject) {
     Task.join(this, resolve, reject);
+};
+
+/**
+ *
+ * @returns {Promise<unknown>}
+ */
+TaskGroup.prototype.promise = function () {
+    return Task.promise(this);
 };
 
 export default TaskGroup;
