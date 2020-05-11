@@ -3,15 +3,14 @@
  * @param {Array.<Circle>} input
  * @param {Graph} graph
  */
-import Vector2 from "../../geom/Vector2.js";
+import Vector2, { v2_distance } from "../../geom/Vector2.js";
 import { assert } from "../../assert.js";
 import AABB2 from "../../geom/AABB2.js";
-import Circle from "../../geom/Circle.js";
+import Circle from "../../geom/2d/circle/Circle.js";
 import { max2, min2 } from "../../math/MathUtils.js";
 import { Connection } from "./Connection.js";
 import { applyCentralGravityAABB2, resolveAABB2Overlap } from "./BoxLayouter.js";
 import { line2SegmentsIntersect } from "../../geom/LineSegment2.js";
-import { v2_distance } from "../../geom/Vector2.js";
 import { computeDisconnectedSubGraphs } from "./computeDisconnectedSubGraphs.js";
 
 

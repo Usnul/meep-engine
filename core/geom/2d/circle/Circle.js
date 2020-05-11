@@ -1,5 +1,4 @@
-import Vector2 from "./Vector2.js";
-
+import Vector2 from "../../Vector2.js";
 
 /**
  * A circle or a 2-dimensional sphere. Represented as a position (x,y) and radius (r)
