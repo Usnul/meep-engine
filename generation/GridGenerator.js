@@ -1,8 +1,3 @@
-import { Sampler2D } from "../engine/graphics/texture/sampler/Sampler2D.js";
-import { seededRandom } from "../core/math/MathUtils.js";
-import { CaveGeneratorCellularAutomata } from "./automata/CaveGeneratorCellularAutomata.js";
-import { GridTags } from "./GridTags.js";
-import { actionTask } from "../core/process/task/TaskUtils.js";
 import TaskGroup from "../core/process/task/TaskGroup.js";
 
 export class GridGenerator {
@@ -10,85 +5,67 @@ export class GridGenerator {
 
         /**
          *
-         * @type {GridData}
+         * @type {GridTaskGenerator[]}
          */
-        this.grid = null;
+        this.generators = [];
 
     }
 
     /**
      *
-     * @param {GridGeneratorConfig} config
+     * @param {GridTaskGenerator} generator
      */
-    generateEmptyTags(config) {
-
-        const grid = this.grid;
-        const height = grid.height;
-        const width = grid.width;
-
-        const field = Sampler2D.uint8(1, width, height);
-
-        const random = seededRandom(config.seed);
-
-        const fieldData = field.data;
-
-        const y0 = config.edgeWidth;
-        const y1 = height - config.edgeWidth;
-
-        const x0 = config.edgeWidth;
-        const x1 = width - config.edgeWidth;
-
-        for (let y = y0; y < y1; y++) {
-            for (let x = x0; x < x1; x++) {
-                const index = y * width + x;
-
-                fieldData[index] = (random() < 0.6) ? 1 : 0;
-            }
-        }
-
-        const automata = new CaveGeneratorCellularAutomata();
-
-        for (let i = 0; i < 50; i++) {
-
-            automata.step(field.data, field.width, field.height);
-        }
-
-        //tag empty areas
-
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-
-                const cellValue = field.data[y * width + x];
-
-
-                if (cellValue !== 0) {
-                    grid.setTags(x, y, GridTags.Empty);
-                }
-
-            }
-        }
+    addGenerator(generator) {
+        this.generators.push(generator);
     }
 
     /**
      *
      * @param {EntityComponentDataset} ecd
-     * @param {GridGeneratorConfig} config
+     * @param {GridData} grid
+     * @returns {TaskGroup}
      */
-    generate(ecd, config) {
+    generate(ecd, grid) {
 
-        //generate empty areas
-        const grid = this.grid;
-        const height = grid.height;
-        const width = grid.width;
+        const tasks = [];
 
-        const tMakeEmpty = actionTask(() => {
-            this.generateEmptyTags(config);
-        });
+        const n = this.generators.length;
 
-        const tActions = config.cellActionRules.process(grid, config.seed);
+        //generate tasks
+        for (let i = 0; i < n; i++) {
+            const generator = this.generators[i];
 
-        tActions.addDependency(tMakeEmpty);
+            const task = generator.build(grid, ecd);
 
-        return new TaskGroup([tMakeEmpty, tActions], 'Generation');
+            tasks[i] = task;
+        }
+
+        //assign dependencies
+        for (let i = 0; i < n; i++) {
+            const generator = this.generators[i];
+
+            const task = tasks[i];
+
+            const dependencies = generator.dependencies;
+
+            const dependencyCount = dependencies.length;
+
+            for (let j = 0; j < dependencyCount; j++) {
+
+                const dependency = dependencies[j];
+
+                const dependencyIndex = this.generators.indexOf(dependency);
+
+                if (dependencyIndex === -1) {
+                    throw new Error(`Dependency ${j} of task generator [${i}] is not found`);
+                }
+
+                const dependencyTask = tasks[dependencyIndex];
+
+                task.addDependency(dependencyTask);
+            }
+        }
+
+        return new TaskGroup(tasks, 'Grid Generator');
     }
 }

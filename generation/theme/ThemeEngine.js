@@ -10,6 +10,7 @@ import Task from "../../core/process/task/Task.js";
 import TaskSignal from "../../core/process/task/TaskSignal.js";
 import { binarySearchLowIndex } from "../../core/collection/ArrayUtils.js";
 import { compareNumbers } from "../../core/primitives/numbers/compareNumbers.js";
+import TaskGroup from "../../core/process/task/TaskGroup.js";
 
 /**
  *
@@ -108,7 +109,7 @@ export class ThemeEngine {
      *
      * @param {GridData} grid
      * @param {Terrain} terrain
-     * @returns {Task[]}
+     * @returns {TaskGroup}
      */
     applyTerrainThemes(grid, terrain) {
 
@@ -252,7 +253,7 @@ export class ThemeEngine {
 
         tasks.forEach(t => t.addDependency(tResample));
 
-        return [tApplyThemes, tResample].concat(tasks);
+        return new TaskGroup([tApplyThemes, tResample].concat(tasks), 'Applying a level generation theme');
     }
 
     /**
@@ -260,6 +261,7 @@ export class ThemeEngine {
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
      * @param {number} seed
+     * @returns {Task|TaskGroup}
      */
     applyNodes(grid, ecd, seed) {
         /**
@@ -357,25 +359,15 @@ export class ThemeEngine {
      *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
-     * @returns {Task[]}
+     * @returns {TaskGroup}
      */
     apply(grid, ecd) {
         const terrain = obtainTerrain(ecd);
 
-        /**
-         *
-         * @type {Task[]}
-         */
-        const result = [];
-
         const tTerrain = this.applyTerrainThemes(grid, terrain);
-
-        Array.prototype.push.apply(result, tTerrain);
 
         const tNodes = this.applyNodes(grid, ecd);
 
-        result.push(tNodes);
-
-        return result;
+        return new TaskGroup([tTerrain, tNodes]);
     }
 }

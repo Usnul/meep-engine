@@ -1,3 +1,5 @@
+import { assert } from "../../core/assert.js";
+
 export class GridCellPlacementRule {
     constructor() {
         /**
@@ -18,6 +20,24 @@ export class GridCellPlacementRule {
          * @type {GridCellAction[]}
          */
         this.actions = [];
+    }
+
+    /**
+     *
+     * @param {GridCellMatcher} matcher
+     * @param {GridCellAction[]} actions
+     */
+    static from(matcher, actions) {
+
+        assert.defined(matcher);
+        assert.defined(actions);
+
+        const r = new GridCellPlacementRule();
+
+        r.pattern = matcher;
+        r.actions = actions;
+
+        return r;
     }
 
 

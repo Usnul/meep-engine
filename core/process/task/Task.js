@@ -108,7 +108,23 @@ class Task {
         assert.notEqual(task, undefined, 'task is undefined');
         assert.notEqual(task, null, 'task is null');
 
-        this.dependencies.push(task);
+
+        if (task.isTaskGroup) {
+
+            //is a task group, add all children instead
+            this.addDependencies(task.children);
+
+        } else {
+
+            //check that the dependency is not registered yet
+            if (this.dependencies.indexOf(task) === -1) {
+
+                this.dependencies.push(task);
+
+            }
+
+        }
+
         return this;
     }
 

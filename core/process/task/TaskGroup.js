@@ -10,12 +10,22 @@ import ObservedInteger from "../../model/ObservedInteger.js";
 /**
  *
  * @param {Task[]} subtasks
- * @param {string} name
+ * @param {string} [name]
  * @constructor
  */
-function TaskGroup(subtasks, name) {
+function TaskGroup(subtasks, name = 'Unnamed') {
+    assert.ok(Array.isArray(subtasks));
+
+    /**
+     *
+     * @type {string}
+     */
     this.name = name;
 
+    /**
+     *
+     * @type {(Task|TaskGroup)[]}
+     */
     this.children = subtasks;
 
 
@@ -59,6 +69,73 @@ function TaskGroup(subtasks, name) {
 
     this.state = new ObservedInteger(TaskState.INITIAL);
 }
+
+/**
+ *
+ * @param {Task|TaskGroup} child
+ * @returns {boolean}
+ */
+TaskGroup.prototype.addChild = function (child) {
+    if (this.children.indexOf(child) !== -1) {
+        return false;
+    }
+
+    this.children.push(child);
+
+    return true;
+};
+
+/**
+ *
+ * @param {(Task|TaskGroup)[]} children
+ */
+TaskGroup.prototype.addChildren = function (children) {
+    const n = children.length;
+    for (let i = 0; i < n; i++) {
+        const child = children[i];
+        this.addChild(child);
+    }
+};
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+TaskGroup.prototype.isTaskGroup = true;
+
+/**
+ *
+ * @param {Task|TaskGroup} dependency
+ */
+TaskGroup.prototype.addDependency = function (dependency) {
+
+    if (dependency.isTaskGroup) {
+        this.addDependencies(dependency.children);
+    } else {
+        const children = this.children;
+
+        const n = children.length;
+
+        for (let i = 0; i < n; i++) {
+            const child = children[i];
+
+            child.addDependency(dependency);
+        }
+    }
+
+};
+
+TaskGroup.prototype.addDependencies = function (dependencies) {
+
+    const n = dependencies.length;
+
+    for (let i = 0; i < n; i++) {
+        const dependency = dependencies[i];
+
+        this.addDependency(dependency);
+    }
+
+};
 
 TaskGroup.prototype.getEstimatedDuration = function () {
     return this.children.reduce(function (s, child) {

@@ -1,6 +1,6 @@
-import { Theme } from "../Theme.js";
-import { TerrainTheme } from "../TerrainTheme.js";
-import { TerrainLayerRule } from "../TerrainLayerRule.js";
+import { Theme } from "../../theme/Theme.js";
+import { TerrainTheme } from "../../theme/TerrainTheme.js";
+import { TerrainLayerRule } from "../../theme/TerrainLayerRule.js";
 import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
 import { GridTags } from "../../GridTags.js";
 import { GridCellRuleNot } from "../../rules/GridCellRuleNot.js";

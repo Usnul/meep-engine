@@ -13,6 +13,19 @@ export class GridActionRuleSet {
 
     /**
      *
+     * @param {GridCellPlacementRule[]} rules
+     * @returns {GridActionRuleSet}
+     */
+    static from(rules) {
+        const r = new GridActionRuleSet();
+
+        rules.forEach(r.add, r);
+
+        return r;
+    }
+
+    /**
+     *
      * @param {GridCellPlacementRule} rule
      */
     add(rule) {

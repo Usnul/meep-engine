@@ -1,5 +1,6 @@
 import { GridCellAction } from "./GridCellAction.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
+import { assert } from "../../core/assert.js";
 
 export class GridCellActionPlaceTags extends GridCellAction {
     constructor() {
@@ -12,11 +13,28 @@ export class GridCellActionPlaceTags extends GridCellAction {
          */
         this.tags = Sampler2D.uint32(1, 1, 1);
     }
+
+    /**
+     *
+     * @param {number} value
+     * @returns {GridCellActionPlaceTags}
+     */
+    static from(value) {
+        const r = new GridCellActionPlaceTags();
+
+        r.resize(1, 1);
+        r.fill(value);
+
+        return r;
+    }
+
     /**
      *
      * @param {number} tags
      */
     fill(tags) {
+        assert.isNumber(tags);
+
         this.tags.data.fill(tags);
     }
 
@@ -28,6 +46,7 @@ export class GridCellActionPlaceTags extends GridCellAction {
     resize(x, y) {
         this.tags.resize(x, y);
     }
+
     /**
      * Write placement tags into the grid at a given position, the tag pattern will be rotated as specified
      */

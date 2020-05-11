@@ -24,6 +24,12 @@ export class GridData {
          * @type {QuadTreeNode<MarkerNode>}
          */
         this.markers = new QuadTreeNode();
+
+        /**
+         * Distance to a cell from the nearest starting position
+         * @type {Uint16Array}
+         */
+        this.startDistances = new Uint16Array();
     }
 
     /**
@@ -58,7 +64,10 @@ export class GridData {
         this.width = width;
         this.height = height;
 
-        this.tags = new Uint32Array(width * height);
+        const gridSize = width * height;
+
+        this.tags = new Uint32Array(gridSize);
+        this.startDistances = new Uint16Array(gridSize);
     }
 
     /**
