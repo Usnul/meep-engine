@@ -6,8 +6,12 @@ import Vector3 from "../../../core/geom/Vector3.js";
 import Quaternion from "../../../core/geom/Quaternion.js";
 import { BinaryClassSerializationAdapter } from "../storage/binary/BinaryClassSerializationAdapter.js";
 import { BinaryClassUpgrader } from "../storage/binary/BinaryClassUpgrader.js";
+import { Matrix4 } from "../../../core/geom/Matrix4.js";
 
 const delta = new Vector3();
+
+const m4_0 = new Matrix4();
+const m4_1 = new Matrix4();
 
 export class Transform {
     /**
@@ -137,6 +141,20 @@ export class Transform {
         result.fromJSON(json);
 
         return result;
+    }
+
+    /**
+     * Multiply two transforms, result it written into this one
+     * @param {Transform} a
+     * @param {Transform} b
+     */
+    multiplyTransforms(a, b) {
+        m4_0.compose(a.position, a.rotation, a.scale);
+        m4_1.compose(b.position, b.rotation, b.scale);
+
+        m4_0.multiplyMatrices(m4_0, m4_1);
+
+        m4_0.decompose(this.position, this.rotation, this.scale);
     }
 }
 

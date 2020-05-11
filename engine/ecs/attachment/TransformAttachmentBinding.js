@@ -20,6 +20,9 @@ export class TransformAttachmentBinding extends AttachmentBinding {
 
     }
 
+    /**
+     * TODO make use of Transform.multiplyTransforms for better readability and performance
+     */
     update() {
         const socketTransform = this.socket.transform;
 
