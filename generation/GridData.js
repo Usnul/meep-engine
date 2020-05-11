@@ -33,7 +33,12 @@ export class GridData {
     addMarker(node) {
         const p = node.position;
 
-        this.markers.add(node, p.x, p.y, p.x, p.y);
+        const x = p.x;
+        const y = p.y;
+
+        const r = node.size;
+
+        this.markers.add(node, x - r, y - r, x + r, y + r);
     }
 
     /**

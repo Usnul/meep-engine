@@ -12,5 +12,32 @@ export class MarkerNode {
         this.position = new Vector2();
 
         this.transofrm = new Transform();
+
+        /**
+         * Treated as a radius
+         * Used for spatial resolution, to allow spacing markers
+         * @type {number}
+         */
+        this.size = 0;
     }
+
+    /**
+     *
+     * @param {MarkerNode} other
+     * @returns {boolean}
+     */
+    overlaps(other) {
+
+        const penetrationDistance = computeCircleCirclePenetrationDistance(
+            this.position.x,
+            this.position.y,
+            this.size,
+            other.position.x,
+            other.position.y,
+            other.size
+        );
+
+        return penetrationDistance > 0;
+    }
+
 }
