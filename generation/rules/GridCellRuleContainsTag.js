@@ -1,6 +1,6 @@
-import { GridCellRule } from "./GridCellRule.js";
+import { CellMatcher } from "./CellMatcher.js";
 
-export class GridCellRuleContainsTag extends GridCellRule {
+export class GridCellRuleContainsTag extends CellMatcher {
     constructor() {
         super();
 

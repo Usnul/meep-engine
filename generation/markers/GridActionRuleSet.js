@@ -58,11 +58,17 @@ export class GridActionRuleSet {
             rule_loop: for (let i = 0; i < n; i++) {
                 const element = elements[i];
 
+                const matcher = element.pattern;
+
                 for (let j = 0; j < 4; j++) {
+
+                    if (j > 0 && !element.allowRotation) {
+                        break;
+                    }
 
                     const rotation = j * PI_HALF;
 
-                    const match = element.pattern.match(grid, x, y, rotation);
+                    const match = matcher.match(grid, x, y, rotation);
 
                     if (!match) {
                         continue;

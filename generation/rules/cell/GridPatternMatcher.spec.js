@@ -1,4 +1,4 @@
-import { GridCellMatcher } from "./GridCellMatcher.js";
+import { GridPatternMatcher } from "./GridPatternMatcher.js";
 import { GridData } from "../../GridData.js";
 import { GridCellRuleContainsTag } from "../TagRuleContains.js";
 
@@ -8,11 +8,11 @@ const R_270 = Math.PI * (3 / 2);
 
 
 test('constructor does not throw', () => {
-    new GridCellMatcher();
+    new GridPatternMatcher();
 });
 
 test('always matches empty rule set', () => {
-    const pattern = new GridCellMatcher();
+    const pattern = new GridPatternMatcher();
 
     const data = new GridData();
 
@@ -25,7 +25,7 @@ test('always matches empty rule set', () => {
 });
 
 test('exact single point match', () => {
-    const pattern = new GridCellMatcher();
+    const pattern = new GridPatternMatcher();
 
     pattern.addRule(0, 0, GridCellRuleContainsTag.from(1));
 

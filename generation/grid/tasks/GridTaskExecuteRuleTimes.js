@@ -2,7 +2,7 @@ import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import Task from "../../../core/process/task/Task.js";
 import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import { BitSet } from "../../../core/binary/BitSet.js";
-import { randomIntegerBetween, seededRandom } from "../../../core/math/MathUtils.js";
+import { PI_HALF, randomIntegerBetween, seededRandom } from "../../../core/math/MathUtils.js";
 
 export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
     constructor() {
@@ -78,13 +78,26 @@ export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
                 const y = (index / width) | 0;
                 const x = index % width;
 
-                const isMatch = rule.pattern.match(grid, x, y, 0);
+                for (let j = 0; j < 4; j++) {
 
-                if (isMatch) {
-                    rule.execute(grid, x, y, 0);
+                    if (j > 0 && !rule.allowRotation) {
+                        break;
+                    }
 
-                    completed++;
+                    const rotation = j * PI_HALF;
+
+                    const isMatch = rule.pattern.match(grid, x, y, rotation);
+
+                    if (isMatch) {
+                        rule.execute(grid, x, y, rotation);
+
+                        completed++;
+
+                        break;
+                    }
+
                 }
+
 
                 return TaskSignal.Continue;
             }

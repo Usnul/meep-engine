@@ -1,13 +1,13 @@
-import { GridCellRuleAnd } from "../GridCellRuleAnd.js";
-import { CellTagRule } from "./CellTagRule.js";
-import { AbstractGridCellMatcher } from "./AbstractGridCellMatcher.js";
+import { CellMatcherAnd } from "../CellMatcherAnd.js";
+import { GridPatternMatcherCell } from "./GridPatternMatcherCell.js";
+import { CellMatcher } from "../CellMatcher.js";
 
-export class GridCellMatcher extends AbstractGridCellMatcher{
+export class GridPatternMatcher extends CellMatcher {
     constructor() {
         super();
         /**
          * NOTE: All rules have local coordinates
-         * @type {CellTagRule[]}
+         * @type {GridPatternMatcherCell[]}
          */
         this.rules = [];
     }
@@ -16,15 +16,15 @@ export class GridCellMatcher extends AbstractGridCellMatcher{
      *
      * @param {number} x
      * @param {number} y
-     * @param {GridCellRule} rule
+     * @param {CellMatcher} rule
      */
     addRule(x, y, rule) {
         const existingRule = this.getRuleByPosition(x, y);
         if (existingRule !== undefined) {
             //rule already exists, modify it
-            existingRule.rule = GridCellRuleAnd.from(existingRule.rule, rule);
+            existingRule.rule = CellMatcherAnd.from(existingRule.rule, rule);
         } else {
-            const cellTagRule = new CellTagRule();
+            const cellTagRule = new GridPatternMatcherCell();
 
             cellTagRule.position.set(x, y);
             cellTagRule.rule = rule;
@@ -37,7 +37,7 @@ export class GridCellMatcher extends AbstractGridCellMatcher{
      *
      * @param {number} x
      * @param {number} y
-     * @return {undefined|CellTagRule}
+     * @return {undefined|GridPatternMatcherCell}
      */
     getRuleByPosition(x, y) {
         const rules = this.rules;
@@ -64,7 +64,7 @@ export class GridCellMatcher extends AbstractGridCellMatcher{
     match(grid, x, y, rotation) {
         /**
          *
-         * @type {CellTagRule[]}
+         * @type {GridPatternMatcherCell[]}
          */
         const rules = this.rules;
         const n = rules.length;
@@ -87,7 +87,7 @@ export class GridCellMatcher extends AbstractGridCellMatcher{
             const target_x = Math.round(x + rotated_local_x);
             const target_y = Math.round(y + rotated_local_y);
 
-            const match = tagRule.rule.match(grid, target_x, target_y);
+            const match = tagRule.rule.match(grid, target_x, target_y, rotation);
 
             if (!match) {
                 //rule failed

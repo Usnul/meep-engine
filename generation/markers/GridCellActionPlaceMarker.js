@@ -1,6 +1,7 @@
-import { passThrough, returnTrue } from "../../core/function/Functions.js";
+import { returnTrue } from "../../core/function/Functions.js";
 import { GridCellAction } from "../placement/GridCellAction.js";
 import { MarkerNode } from "./MarkerNode.js";
+import { Transform } from "../../engine/ecs/components/Transform.js";
 
 export class GridCellActionPlaceMarker extends GridCellAction {
     constructor() {
@@ -20,9 +21,9 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         /**
          *
-         * @type {function(Transform)}
+         * @type {Transform}
          */
-        this.transform = passThrough;
+        this.transform = new Transform();
     }
 
     /**
@@ -46,6 +47,8 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         node.transofrm.position.set(x * data.scale.x, 0, y * data.scale.y);
         node.transofrm.rotation.__setFromEuler(0, rotation, 0);
+
+        node.transofrm.multiplyTransforms(node.transofrm, this.transform);
 
         data.addMarker(node);
     }

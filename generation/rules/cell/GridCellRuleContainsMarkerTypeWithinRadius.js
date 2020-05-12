@@ -1,7 +1,7 @@
-import { GridCellRule } from "../GridCellRule.js";
+import { CellMatcher } from "../CellMatcher.js";
 import { assert } from "../../../core/assert.js";
 
-export class GridCellRuleContainsMarkerTypeWithinRadius extends GridCellRule {
+export class GridCellRuleContainsMarkerTypeWithinRadius extends CellMatcher {
     constructor() {
         super();
 

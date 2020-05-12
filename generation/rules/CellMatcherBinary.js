@@ -1,18 +1,18 @@
-import { GridCellRule } from "./GridCellRule.js";
+import { CellMatcher } from "./CellMatcher.js";
 
-export class GridCellRuleBinary extends GridCellRule {
+export class CellMatcherBinary extends CellMatcher {
 
     constructor() {
         super();
 
         /**
          *
-         * @type {GridCellRule}
+         * @type {CellMatcher}
          */
         this.left = null;
         /**
          *
-         * @type {GridCellRule}
+         * @type {CellMatcher}
          */
         this.right = null;
     }

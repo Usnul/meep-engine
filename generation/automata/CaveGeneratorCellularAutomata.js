@@ -35,7 +35,6 @@ export class CaveGeneratorCellularAutomata extends CellularAutomata {
                 const neighbourSum = top + bottom + left + right + topLeft + topRight + bottomLeft + bottomRight;
                 const cellValue = data[cellIndex];
 
-
                 if (cellValue > 0) {
                     //cell is alive
                     if (neighbourSum < 4) {

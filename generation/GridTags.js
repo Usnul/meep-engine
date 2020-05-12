@@ -3,9 +3,10 @@
  * @enum {number}
  */
 export const GridTags = {
-    Empty: 1,
+    Traversable: 1,
     Enemy: 2,
     Base: 4,
     Treasure: 8,
-    StartingPoint: 16
+    StartingPoint: 16,
+    Occupied: 32
 };
