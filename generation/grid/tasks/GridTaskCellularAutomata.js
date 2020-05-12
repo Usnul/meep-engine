@@ -47,7 +47,8 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
     build(grid, ecd) {
 
-        const field = Sampler2D.uint8(1, grid.width, grid.height);
+        const width = grid.width;
+        const field = Sampler2D.uint8(1, width, grid.height);
 
         const automata = new CaveGeneratorCellularAutomata();
 
@@ -56,7 +57,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
         const mask_x0 = this.marginLeft;
         const mask_y0 = this.marginTop;
 
-        const mask_x1 = grid.width - this.marginRight;
+        const mask_x1 = width - this.marginRight;
         const mask_y1 = grid.height - this.marginBottom;
 
         const mask_width = mask_x1 - mask_x0;
@@ -70,7 +71,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
             const x = index % mask_width + mask_x0;
             const y = ((index / mask_width) | 0) + mask_y0;
 
-            const field_index = y * mask_width + x;
+            const field_index = y * width + x;
 
             field.data[field_index] = (random() < 0.6) ? 1 : 0;
         });
@@ -81,7 +82,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
         tAutomata.addDependency(tSeed);
 
-        const tWriteTags = countTask(0, grid.width * grid.height, index => {
+        const tWriteTags = countTask(0, width * grid.height, index => {
             const cellValue = field.data[index];
 
             if (cellValue !== 0) {

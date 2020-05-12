@@ -4,7 +4,7 @@ export class CellTagRule {
     constructor() {
         /**
          *
-         * @type {TagRule}
+         * @type {GridCellRule}
          */
         this.rule = null;
 

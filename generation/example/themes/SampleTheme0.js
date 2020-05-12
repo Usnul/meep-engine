@@ -70,3 +70,20 @@ nrStartingPoint.actions.push(MarkerNodeActionEntityPlacement.from(ebpStartingPoi
 })));
 
 SampleTheme0.nodes.add(nrStartingPoint);
+
+const ebpEnemy = new EntityBlueprint();
+ebpEnemy.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_red.gltf' }));
+ebpEnemy.add(Transform.fromJSON({}));
+ebpEnemy.add(GridPosition.fromJSON({}));
+
+const nrEnemy = new MarkerProcessingRule();
+
+nrEnemy.consume = true;
+nrEnemy.matcher = TypeMarkerNodeMatcher.from('Enemy');
+
+nrEnemy.actions.push(MarkerNodeActionEntityPlacement.from(ebpEnemy, Transform.fromJSON({
+    scale: { x: 0.3, y: 0.5, z: 0.3 },
+    position: { x: 0, y: 0.5, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrEnemy);

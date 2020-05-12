@@ -12,6 +12,9 @@ import { GridTaskExecuteRuleTimes } from "../grid/tasks/GridTaskExecuteRuleTimes
 import { GridTaskBuildSourceDistanceMap } from "../grid/tasks/GridTaskBuildSourceDistanceMap.js";
 import { GridCellRuleAnd } from "../rules/GridCellRuleAnd.js";
 import { GridCellActionPlaceTags } from "../placement/GridCellActionPlaceTags.js";
+import { GridCellMatcherOr } from "../rules/cell/GridCellMatcherOr.js";
+import { GridCellRuleContainsMarkerTypeWithinRadius } from "../rules/cell/GridCellRuleContainsMarkerTypeWithinRadius.js";
+import { GridCellMatcherAnd } from "../rules/cell/GridCellMatcherAnd.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -19,20 +22,19 @@ export const SampleGenerator0 = new GridGenerator();
 
 const chestPlacementRule = new GridCellPlacementRule();
 
-const pattern = new GridCellMatcher();
+const pEmptyCorner = new GridCellMatcher();
 
 const MATCH_EMPTY = GridCellRuleContainsTag.from(GridTags.Empty);
 const MATCH_NOT_EMPTY = GridCellRuleNot.from(MATCH_EMPTY);
 const MATCH_STARTING_POINT = GridCellRuleContainsTag.from(GridTags.StartingPoint);
 
 
-// pattern.addRule(-1, 0, MATCH_NOT_EMPTY);
-pattern.addRule(1, 0, MATCH_NOT_EMPTY);
-pattern.addRule(0, 1, MATCH_NOT_EMPTY);
+pEmptyCorner.addRule(1, 0, MATCH_NOT_EMPTY);
+pEmptyCorner.addRule(0, 1, MATCH_NOT_EMPTY);
 
-pattern.addRule(0, 0, MATCH_EMPTY);
+pEmptyCorner.addRule(0, 0, MATCH_EMPTY);
 
-chestPlacementRule.pattern = pattern;
+chestPlacementRule.pattern = pEmptyCorner;
 chestPlacementRule.probability = 0.1;
 chestPlacementRule.actions.push(GridCellActionPlaceMarker.from('Treasure'));
 
@@ -41,9 +43,51 @@ const prStartingPoint = GridCellPlacementRule.from(MATCH_STARTING_POINT, [
 ]);
 
 
-const gMakeEmpty = GridTaskCellularAutomata.from(GridTags.Empty, 1);
+const gMakeEmpty = GridTaskCellularAutomata.from(GridTags.Empty, 3);
 
 const gRuleSet1 = GridTaskActionRuleSet.from(GridActionRuleSet.from([chestPlacementRule, prStartingPoint]));
+
+const pCorridor0 = new GridCellMatcher();
+
+pCorridor0.addRule(0, 0, MATCH_EMPTY);
+
+pCorridor0.addRule(0, -1, MATCH_EMPTY);
+pCorridor0.addRule(0, 1, MATCH_EMPTY);
+
+pCorridor0.addRule(-1, 0, MATCH_NOT_EMPTY);
+pCorridor0.addRule(1, 0, MATCH_NOT_EMPTY);
+
+const pCorridor1 = new GridCellMatcher();
+
+pCorridor1.addRule(0, 0, MATCH_EMPTY);
+
+pCorridor1.addRule(0, -1, MATCH_EMPTY);
+pCorridor1.addRule(0, 1, MATCH_EMPTY);
+
+pCorridor1.addRule(-2, 0, MATCH_NOT_EMPTY);
+pCorridor1.addRule(2, 0, MATCH_NOT_EMPTY);
+
+const MATCH_ENEMY_IN_3 = GridCellRuleContainsMarkerTypeWithinRadius.from('Enemy', 3);
+
+const MATCH_NO_ENEMY_IN_3 = GridCellRuleNot.from(MATCH_ENEMY_IN_3);
+
+const pNoEnemyIn3 = new GridCellMatcher();
+
+pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
+
+const prEnemy = GridCellPlacementRule.from(
+    GridCellMatcherAnd.from(
+        GridCellMatcherOr.from(pCorridor0, pCorridor1),
+        pNoEnemyIn3
+    ),
+    [
+        GridCellActionPlaceMarker.from('Enemy')
+    ]
+);
+
+const gRuleSet2 = GridTaskActionRuleSet.from(GridActionRuleSet.from([prEnemy]));
+
+gRuleSet2.addDependency(gRuleSet1);
 
 // Place starting point tag
 const gPlaceStartingPoint = GridTaskExecuteRuleTimes.from(
@@ -67,5 +111,6 @@ gRuleSet1.addDependency(gBuildDistanceMap);
 
 SampleGenerator0.addGenerator(gMakeEmpty);
 SampleGenerator0.addGenerator(gRuleSet1);
+SampleGenerator0.addGenerator(gRuleSet2);
 SampleGenerator0.addGenerator(gPlaceStartingPoint);
 SampleGenerator0.addGenerator(gBuildDistanceMap);

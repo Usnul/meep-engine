@@ -4,7 +4,7 @@ export class GridCellPlacementRule {
     constructor() {
         /**
          *
-         * @type {GridCellMatcher}
+         * @type {AbstractGridCellMatcher}
          */
         this.pattern = null;
 
@@ -24,7 +24,7 @@ export class GridCellPlacementRule {
 
     /**
      *
-     * @param {GridCellMatcher} matcher
+     * @param {AbstractGridCellMatcher} matcher
      * @param {GridCellAction[]} actions
      */
     static from(matcher, actions) {

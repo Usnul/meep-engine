@@ -576,6 +576,10 @@ export class QuadTreeNode extends AABB2 {
      * @param {*} [thisArg]
      */
     traverseCircleIntersections(x, y, radius, visitor, thisArg) {
+        assert.isNumber(x,'x');
+        assert.isNumber(y,'y');
+        assert.isNumber(radius,'radius');
+
         const radius2 = radius * radius;
 
         const data = this.data;

@@ -1,8 +1,10 @@
 import { GridCellRuleAnd } from "../GridCellRuleAnd.js";
 import { CellTagRule } from "./CellTagRule.js";
+import { AbstractGridCellMatcher } from "./AbstractGridCellMatcher.js";
 
-export class GridCellMatcher {
+export class GridCellMatcher extends AbstractGridCellMatcher{
     constructor() {
+        super();
         /**
          * NOTE: All rules have local coordinates
          * @type {CellTagRule[]}
@@ -14,7 +16,7 @@ export class GridCellMatcher {
      *
      * @param {number} x
      * @param {number} y
-     * @param {TagRule} rule
+     * @param {GridCellRule} rule
      */
     addRule(x, y, rule) {
         const existingRule = this.getRuleByPosition(x, y);

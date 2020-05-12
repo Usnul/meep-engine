@@ -34,6 +34,34 @@ export class GridData {
 
     /**
      *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
+     * @param {String} type
+     * @returns {boolean}
+     */
+    containsMarkerInCircleByType(x, y, radius, type) {
+        let result = false;
+        this.markers.traverseCircleIntersections(x, y, radius, data => {
+            /**
+             *
+             * @type {MarkerNode}
+             */
+            const marker = data.data;
+
+            if (marker.type === type) {
+                result = true;
+
+                //stop traversal
+                return false;
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     *
      * @param tileSize
      */
     computeScale(tileSize) {
