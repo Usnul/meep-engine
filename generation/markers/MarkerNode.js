@@ -19,6 +19,12 @@ export class MarkerNode {
          * @type {number}
          */
         this.size = 0;
+
+        /**
+         *
+         * @type {Object}
+         */
+        this.properties = {};
     }
 
     /**
@@ -41,3 +47,9 @@ export class MarkerNode {
     }
 
 }
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+MarkerNode.prototype.isMarkerNode = true;

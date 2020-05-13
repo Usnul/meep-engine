@@ -30,7 +30,7 @@ export class Graph {
         this.nodes = [];
         /**
          *
-         * @type {Array<Edge<N>>}
+         * @type {Edge<N>[]}
          */
         this.edges = [];
         this.onChange = new Signal();

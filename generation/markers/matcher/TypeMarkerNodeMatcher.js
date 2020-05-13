@@ -29,6 +29,7 @@ export class TypeMarkerNodeMatcher extends MarkerNodeMatcher {
 
     match(node) {
         assert.defined(node, 'node');
+        assert.ok(node.isMarkerNode, 'node.isMarkerNode !== true');
 
         return node.type === this.type;
     }

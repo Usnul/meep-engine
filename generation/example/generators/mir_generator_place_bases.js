@@ -37,11 +37,14 @@ const placeMarker = GridCellActionPlaceMarker.from('Base');
 
 placeMarker.transform.position.set(0.5, 0.1, -0.5);
 
+const placeRoadConnector = GridCellActionPlaceMarker.from('Road Connector');
+placeRoadConnector.offset.set(-1, 0);
 
 const rule = GridCellPlacementRule.from(pMatcher, [
     placeTags,
     clearTags,
-    placeMarker
+    placeMarker,
+    placeRoadConnector
 ], 0.1);
 
 rule.allowRotation = false;

@@ -126,12 +126,6 @@ export class ThemeEngine {
 
         /**
          *
-         * @type {QuadTreeDatum<AreaTheme>[]}
-         */
-        const areaNodes = [];
-
-        /**
-         *
          * @type {AreaTheme[]}
          */
         const matchingThemes = [];
@@ -197,6 +191,7 @@ export class ThemeEngine {
                      */
                     const layerIndex = terrainLayerRule.layer;
 
+                    //TODO replace with sampling from a perlin noise function instead. To preserve continuity
                     let power = terrainLayerRule.intensity.sampleRandom(random);
 
 

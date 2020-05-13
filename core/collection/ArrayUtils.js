@@ -7,7 +7,29 @@
 import { assert } from "../assert.js";
 import { HashMap } from "./HashMap.js";
 import { returnZero } from "../function/Functions.js";
+import { randomIntegerBetween } from "../math/MathUtils.js";
 
+
+/**
+ * @template T
+ * @param {T[]} array
+ * @param {function} random
+ */
+export function randomizeArrayElementOrder(array, random) {
+    const n = array.length;
+
+    const lastValidIndex = n - 1;
+
+    for (let i = 0; i < n; i++) {
+        const t = randomIntegerBetween(random, 0, lastValidIndex);
+
+        if (t === i) {
+            continue;
+        }
+
+        arraySwapElements(array, i, t);
+    }
+}
 
 /**
  * @template T

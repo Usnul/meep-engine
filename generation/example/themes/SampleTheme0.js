@@ -12,14 +12,20 @@ import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversabl
 import { matcher_tag_traversable } from "../rules/matcher_tag_traversable.js";
 import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
 import { GridTags } from "../../GridTags.js";
+import { CellMatcherAnd } from "../../rules/CellMatcherAnd.js";
+import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
+import { NumericInterval } from "../../../core/math/interval/NumericInterval.js";
 
 export const SampleTheme0 = new Theme();
 
 const terrainTheme = new TerrainTheme();
 
-terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_traversable, 0));
+const matcher_tag_road = GridCellRuleContainsTag.from(GridTags.Road);
+terrainTheme.rules.push(TerrainLayerRule.from(CellMatcherAnd.from(matcher_tag_traversable, CellMatcherNot.from(matcher_tag_road)), 0));
 terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_not_traversable, 1));
-terrainTheme.rules.push(TerrainLayerRule.from(GridCellRuleContainsTag.from(GridTags.Occupied), 2));
+// terrainTheme.rules.push(TerrainLayerRule.from(GridCellRuleContainsTag.from(GridTags.Occupied), 2));
+terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 2, new NumericInterval(0.3, 1)));
+terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 0, new NumericInterval(0.5, 0.7)));
 
 SampleTheme0.terrain = terrainTheme;
 

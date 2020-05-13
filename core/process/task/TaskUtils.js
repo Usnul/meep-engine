@@ -24,17 +24,19 @@ export function actionTask(action, name = "unnamed") {
 
 /**
  *
- * @param {int} initial
- * @param {int} limit
+ * @param {number|function(*):number} initial
+ * @param {number|function(*):number} limit
  * @param {function(index:int)} callback
  * @returns {Task}
  */
 export function countTask(initial, limit, callback) {
-    let i = initial;
-    const l = limit;
+    let initialValue = 0;
+    let limitValue = 0;
+
+    let i = initialValue;
 
     function cycle() {
-        if (i >= l) {
+        if (i >= limitValue) {
             return TaskSignal.EndSuccess;
         }
         callback(i);
@@ -43,11 +45,39 @@ export function countTask(initial, limit, callback) {
         return TaskSignal.Continue;
     }
 
+    const initialType = typeof initial;
+    const limitType = typeof limit;
+
+    const name = "count (from " + ((initialType === 'number') ? initial : 'variable') + " to " + ((limitType === 'number') ? limit : 'variable') + ")";
+
     return new Task({
-        name: "count (from " + initial + " to " + limit + ")",
+        name: name,
+        initializer() {
+
+            if (initialType === "number") {
+                initialValue = initial;
+            } else if (initialType === "function") {
+                initialValue = initial();
+            }
+
+            if (limitType === "number") {
+                limitValue = limit;
+            } else if (limitType === "function") {
+                limitValue = limit();
+            }
+
+            i = initialValue;
+
+        },
         cycleFunction: cycle,
         computeProgress: function () {
-            return (i - initial) / (limit - initial);
+            const span = limitValue - initialValue;
+
+            if (span === 0) {
+                return 0;
+            }
+
+            return (i - initialValue) / span;
         }
     });
 }

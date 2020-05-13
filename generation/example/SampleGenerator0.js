@@ -15,10 +15,10 @@ import { GridCellRuleContainsMarkerTypeWithinRadius } from "../rules/cell/GridCe
 import { mir_matcher_attack_corridor } from "./rules/mir_matcher_attack_corridor.js";
 import { mir_generator_place_bases } from "./generators/mir_generator_place_bases.js";
 import { matcher_tag_traversable_unoccupied } from "./rules/matcher_tag_traversable_unoccupied.js";
-import { CellMatcherOr } from "../rules/CellMatcherOr.js";
 import { mir_generator_place_starting_point } from "./generators/mir_generator_place_starting_point.js";
 import { GridTaskConnectRooms } from "../grid/tasks/GridTaskConnectRooms.js";
 import { matcher_tag_traversable } from "./rules/matcher_tag_traversable.js";
+import { GridTaskGenerateRoads } from "../grid/tasks/GridTaskGenerateRoads.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -88,11 +88,10 @@ const prTreasureGuards = GridCellPlacementRule.from(
 const gRuleSetTreasureGuards = GridTaskActionRuleSet.from(GridActionRuleSet.from([prTreasureGuards]));
 gRuleSetTreasureGuards.addDependency(gRuleSet1);
 
-const prEnemy = GridCellPlacementRule.from(
+
+const prEnemyTreasureGuard = GridCellPlacementRule.from(
     CellMatcherAnd.from(
-        CellMatcherOr.from(pNearTreasure,
-            mir_matcher_attack_corridor
-        ),
+        pNearTreasure,
         pNoEnemyIn3
     ),
     [
@@ -101,7 +100,21 @@ const prEnemy = GridCellPlacementRule.from(
     ]
 );
 
-const gRuleSet2 = GridTaskActionRuleSet.from(GridActionRuleSet.from([prEnemy]));
+
+const prEnemyCorridorGuard = GridCellPlacementRule.from(
+    CellMatcherAnd.from(
+        mir_matcher_attack_corridor,
+        pNoEnemyIn3
+    ),
+    [
+        ACTION_PLACE_ENEMY_MARKER,
+        ACTION_PLACE_ENEMY_TAG
+    ]
+);
+
+prEnemyCorridorGuard.probability = 0.5;
+
+const gRuleSet2 = GridTaskActionRuleSet.from(GridActionRuleSet.from([prEnemyTreasureGuard, prEnemyCorridorGuard]));
 
 gRuleSet2.addDependency(gRuleSetTreasureGuards);
 
@@ -124,8 +137,14 @@ gPlaceStartingPoint.addDependency(gBases);
 
 gRuleSet1.addDependency(gBases);
 
+
+const gRoads = new GridTaskGenerateRoads();
+
+gRoads.addDependency(gBases);
+
 SampleGenerator0.addGenerator(gMakeEmpty);
 SampleGenerator0.addGenerator(gConnectRooms);
+SampleGenerator0.addGenerator(gRoads);
 SampleGenerator0.addGenerator(gBases);
 SampleGenerator0.addGenerator(gPlaceStartingPoint);
 SampleGenerator0.addGenerator(gBuildDistanceMap);

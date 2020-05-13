@@ -575,6 +575,20 @@ Vector2.prototype.hashCode = function () {
 
 /**
  *
+ * @param {number} angle in radians
+ */
+Vector2.prototype.rotate = function (angle) {
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+
+    const x = this.x * cos - this.y * sin
+    const y = this.x * sin - this.y * cos;
+
+    this.set(x, y);
+};
+
+/**
+ *
  * @param {function} processor
  * @returns {Vector2}
  */
