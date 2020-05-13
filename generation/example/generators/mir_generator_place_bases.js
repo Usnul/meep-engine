@@ -8,6 +8,7 @@ import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMark
 import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
 import { GridCellRuleContainsMarkerTypeWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerTypeWithinRadius.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
+import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 
 const pMatcher = new GridPatternMatcher();
 
@@ -25,6 +26,13 @@ const placeTags = new GridCellActionPlaceTags();
 placeTags.resize(2, 2);
 placeTags.fill(GridTags.Base | GridTags.Occupied);
 
+
+const clearTags = new GridCellActionPlaceTags();
+
+clearTags.resize(2, 2);
+clearTags.fill(~GridTags.Traversable);
+clearTags.operation = bitwiseAnd;
+
 const placeMarker = GridCellActionPlaceMarker.from('Base');
 
 placeMarker.transform.position.set(0.5, 0.1, -0.5);
@@ -32,6 +40,7 @@ placeMarker.transform.position.set(0.5, 0.1, -0.5);
 
 const rule = GridCellPlacementRule.from(pMatcher, [
     placeTags,
+    clearTags,
     placeMarker
 ], 0.1);
 

@@ -1,11 +1,17 @@
 import { GridCellAction } from "./GridCellAction.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import { assert } from "../../core/assert.js";
+import { bitwiseOr } from "../../core/binary/operations/bitwiseOr.js";
 
 export class GridCellActionPlaceTags extends GridCellAction {
     constructor() {
         super();
 
+        /**
+         *
+         * @type {function(number, number): number}
+         */
+        this.operation = bitwiseOr;
 
         /**
          *
@@ -73,7 +79,11 @@ export class GridCellActionPlaceTags extends GridCellAction {
                 const target_x = Math.round(rotated_local_x + x);
                 const target_y = Math.round(rotated_local_y + y);
 
-                grid.setTags(target_x, target_y, cell_tags);
+                const source = grid.readTags(target_x, target_y);
+
+                const result = this.operation(source, cell_tags);
+
+                grid.writeTags(target_x, target_y, result);
             }
         }
     }

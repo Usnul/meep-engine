@@ -131,6 +131,18 @@ export class GridData {
      *
      * @param {number} x
      * @param {number} y
+     * @param {number} tags
+     */
+    writeTags(x, y, tags) {
+        const cellIndex = y * this.width + x;
+
+        this.tags[cellIndex] = tags;
+    }
+
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
      * @param {number} mask
      */
     setTags(x, y, mask) {

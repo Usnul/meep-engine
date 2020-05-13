@@ -73,7 +73,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
             const field_index = y * width + x;
 
-            field.data[field_index] = (random() < 0.6) ? 1 : 0;
+            field.data[field_index] = (random() < 0.57) ? 1 : 0;
         });
 
         const tAutomata = countTask(0, this.steps, index => {

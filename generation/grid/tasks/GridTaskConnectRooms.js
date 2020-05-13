@@ -2,12 +2,17 @@ import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import { BitSet } from "../../../core/binary/BitSet.js";
 import Task from "../../../core/process/task/Task.js";
 import TaskSignal from "../../../core/process/task/TaskSignal.js";
-import Vector2 from "../../../core/geom/Vector2.js";
+import Vector2, { v2_distance } from "../../../core/geom/Vector2.js";
 import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
 import { passThrough } from "../../../core/function/Functions.js";
 import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import TaskGroup from "../../../core/process/task/TaskGroup.js";
+import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
+import { bitSet2Sampler2D } from "../../../engine/graphics/texture/sampler/util/bitSet2Sampler2D.js";
+import { min2 } from "../../../core/math/MathUtils.js";
+import { drawSamplerHTML } from "../../../engine/graphics/texture/sampler/util/drawSamplerHTML.js";
+import { matcher_tag_unoccupied } from "../../example/rules/matcher_tag_unoccupied.js";
 
 /**
  * Algorithm works in the following steps:
@@ -28,6 +33,12 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         this.matcher = null;
 
         /**
+         * Matches tiles that can be tunneled through
+         * @type {CellMatcher}
+         */
+        this.modifiable = matcher_tag_unoccupied;
+
+        /**
          *
          * @type {number[]}
          */
@@ -37,6 +48,8 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             1, 0,
             0, 1
         ];
+
+        this.thickness = 2;
 
         /**
          * Actions to perform on created corridors
@@ -221,13 +234,21 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
                 const neighbour_index = n_x + n_y * width;
 
-                if (closed.get(neighbour_index)) {
+                if (connected.get(neighbour_index)) {
+                    //not part of the outside
                     continue;
                 }
 
                 const isMatch = this.matcher.match(grid, n_x, n_y, 0);
 
                 if (isMatch) {
+                    continue;
+                }
+
+                //check if the neighbour can be tunneled through
+                const canTunnel = this.modifiable.match(grid, n_x, n_y, 0);
+
+                if (!canTunnel) {
                     continue;
                 }
 
@@ -248,8 +269,6 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             const current = open.pop();
 
             closed.set(current, true);
-
-            connected.set(current, true);
 
             const c_x = current % width;
             const c_y = (current / width) | 0;
@@ -274,6 +293,12 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
                 const neighbour_index = n_x + n_y * width;
 
                 if (closed.get(neighbour_index)) {
+                    continue;
+                }
+
+                //check if the cell can be tunneled
+                if (!this.modifiable.match(grid, n_x, n_y, 0)) {
+                    //not modifiable
                     continue;
                 }
 
@@ -328,7 +353,8 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         const neighbourhoodMask = this.neighbourhoodMask;
         const neighbourhoodMaskSize = neighbourhoodMask.length;
 
-        const thickness_2 = Math.floor(thickness / 2);
+        const thickness_0 = Math.floor(thickness / 2);
+        const thickness_1 = Math.ceil(thickness / 2);
 
         const path = [];
 
@@ -340,14 +366,14 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             const c_y = (index / width) | 0;
 
             //paint a section of tunnel
-            for (let _y = -thickness_2; _y < thickness_2; _y++) {
+            for (let _y = -thickness_0; _y < thickness_1; _y++) {
                 const t_y = c_y + _y;
 
                 if (t_y < 0 || t_y >= height) {
                     continue;
                 }
 
-                for (let _x = -thickness_2; _x < thickness_2; _x++) {
+                for (let _x = -thickness_0; _x < thickness_1; _x++) {
                     const t_x = c_x + _x;
 
                     if (t_x < 0 || t_x >= width) {
@@ -358,6 +384,11 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
                     if (connected.get(t_index)) {
                         //already connected
+                        continue;
+                    }
+
+                    //check if we can actually dig through
+                    if (!this.modifiable.match(grid, t_x, t_y, 0)) {
                         continue;
                     }
 
@@ -375,6 +406,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
             let bestNext = -1;
             let bestDistance = distances[index];
+            let bestDistanceFromStart = Number.POSITIVE_INFINITY;
 
             for (let i = 0; i < neighbourhoodMaskSize; i += 2) {
 
@@ -397,21 +429,80 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
                 const distance = distances[neighbour_index];
 
-                if (distance < bestDistance) {
+                //compute straight-line distance from the start
+                const distanceFromStart = v2_distance(x, y, n_x, n_y);
+
+                if (distance < bestDistance && distanceFromStart < bestDistanceFromStart) {
                     bestNext = neighbour_index;
+
                     bestDistance = distance;
+                    bestDistanceFromStart = distanceFromStart;
                 }
             }
 
             index = bestNext;
         }
 
-        console.log('Path: ', path.map(i => {
-            return [
-                i % width,
-                (i / width) | 0
-            ];
-        }).join(', '));
+        // console.log('Path: ', path.map(i => {
+        //     return [
+        //         i % width,
+        //         (i / width) | 0
+        //     ];
+        // }).join(', '));
+    }
+
+    /**
+     *
+     * @param {GridData} grid
+     * @param {number[]} points
+     * @param {BitSet} connected
+     * @param {number[]} distances
+     * @returns {Sampler2D}
+     */
+    debugState(grid, points, connected, distances) {
+        const result = Sampler2D.uint8(3, grid.width, grid.height);
+
+        //first write connectedness
+        bitSet2Sampler2D(connected, result, [255, 0, 0], [0, 0, 0]);
+
+        //write points into blue channel
+        for (let i = 0; i < points.length; i += 2) {
+            const x = points[i];
+            const y = points[i + 1];
+
+            result.writeChannel(x, y, 1, 255);
+        }
+
+        //write distances into green channel
+        const gridSize = result.width * result.height;
+        for (let i = 0; i < gridSize; i++) {
+            const distance = distances[i];
+
+            const v = min2(distance * 10, 255);
+
+            result.data[i * result.itemSize + 2] = v;
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param {number} iteration
+     * @param {GridData} grid
+     * @param {number[]} points
+     * @param {BitSet} connected
+     * @param {number[]} distances
+     */
+    drawDebugState(iteration, grid, points, connected, distances) {
+
+        const d = this.debugState(grid, points, connected, distances);
+
+        const y = (iteration / 4) | 0;
+        const x = iteration % 4;
+
+        drawSamplerHTML(document.body, d, x * 260 + 5, y * 260 + 5, 1, 0, 256);
+
     }
 
     build(grid, ecd) {
@@ -426,9 +517,12 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         //find a first empty tile
         const tFindStart = this.findEmptyTile(grid, start);
 
+        const thickness = this.thickness;
+        let i = 0;
 
         const tMain = new Task({
             cycleFunction: () => {
+
                 this.fillConnectedArea(start.x, start.y, grid, connected);
 
                 const found = this.findNearestUnconnectedRoom(start, distances, grid, connected);
@@ -437,7 +531,11 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
                     return TaskSignal.EndSuccess;
                 }
 
-                this.connectPoint(start.x, start.y, 5, grid, distances, connected);
+                this.connectPoint(start.x, start.y, thickness, grid, distances, connected);
+
+                // this.drawDebugState(i, grid, [start.x, start.y], connected, distances);
+
+                i++;
 
                 return TaskSignal.Continue;
             }

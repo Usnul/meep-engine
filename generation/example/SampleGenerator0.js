@@ -117,8 +117,9 @@ gBuildDistanceMap.addDependency(gPlaceStartingPoint);
 gRuleSet1.addDependency(gBuildDistanceMap);
 
 const gBases = mir_generator_place_bases();
-gBases.addDependency(gConnectRooms);
+gBases.addDependency(gMakeEmpty);
 
+gConnectRooms.addDependency(gBases);
 gPlaceStartingPoint.addDependency(gBases);
 
 gRuleSet1.addDependency(gBases);

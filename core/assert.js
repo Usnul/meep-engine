@@ -169,7 +169,7 @@ assert.arrayHasNo = arrayHasNo;
 /**
  *
  * @param {number|*} value
- * @param {string} name
+ * @param {string} [name]
  */
 assert.isNumber = function (value, name = 'value') {
     const typeofValue = typeof value;
@@ -178,6 +178,18 @@ assert.isNumber = function (value, name = 'value') {
         throw new Error(`expected ${name} to be a number, instead was '${typeofValue}'(=${value})`);
     }
 };
+
+/**
+ * @template T
+ * @param {T[]} value
+ * @param {string} name
+ */
+assert.isArray = function (value, name = 'value') {
+
+    if (!Array.isArray(value)) {
+        throw new Error(`expected ${name} to be an array, instead was something else (typeof ='${typeof value}')`);
+    }
+}
 
 
 /**
