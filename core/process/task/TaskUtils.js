@@ -264,6 +264,10 @@ export function wrapTaskIgnoreFailure(task) {
         },
         estimatedDuration: task.estimatedDuration,
         cycleFunction() {
+
+            task.__executedCpuTime = this.__executedCpuTime;
+            task.__executedCycleCount = this.__executedCycleCount;
+
             if (initializationFailed) {
                 //initializer failed, don't execute the source task
                 return TaskSignal.EndSuccess;
