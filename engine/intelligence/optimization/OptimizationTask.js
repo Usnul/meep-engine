@@ -6,16 +6,31 @@ export class OptimizationTask extends Task {
      *
      * @param {RandomOptimizer} optimizer
      * @param {number} [threshold] number of retries without improvement before optimization is considered completed
+     * @param {number} timeLimit maximum number of seconds the task is allowed to run
      */
-    constructor(optimizer, threshold = 100) {
+    constructor(optimizer, threshold = 100, timeLimit = 60) {
         super({
             name: 'Optimization',
-            cycleFunction
+            cycleFunction,
+            computeProgress
         });
 
         let attempts = threshold;
 
+        const self = this;
+
+        const timeoutInMs = timeLimit * 1000;
+
+        function computeProgress() {
+            return self.getExecutedCpuTime() / timeoutInMs;
+        }
+
         function cycleFunction() {
+
+            if (self.getExecutedCpuTime() > timeoutInMs) {
+                return TaskSignal.EndFailure;
+            }
+
             const step = optimizer.step();
 
             if (step) {
