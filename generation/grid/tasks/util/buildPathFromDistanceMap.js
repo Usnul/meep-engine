@@ -1,8 +1,8 @@
 /**
  *
  * @param {number[]} distances
- * @param {GridData} grid
- * @param {number} thickness
+ * @param {number} width
+ * @param {number} height
  * @param {number} x
  * @param {number} y
  * @param {number[]} neighbourhoodMask
@@ -11,15 +11,13 @@
 export function buildPathFromDistanceMap(
     {
         distances,
-        grid,
+        width,
+        height,
         x,
         y,
         neighbourhoodMask
     }
 ) {
-    const width = grid.width;
-    const height = grid.height;
-
     let index = x + y * width;
 
     const neighbourhoodMaskSize = neighbourhoodMask.length;

@@ -320,7 +320,8 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
         const path = buildPathFromDistanceMap({
             distances,
-            grid,
+            width: width,
+            height: height,
             x,
             y,
             neighbourhoodMask
