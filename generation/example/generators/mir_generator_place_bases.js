@@ -9,6 +9,7 @@ import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
 import { GridCellRuleContainsMarkerTypeWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerTypeWithinRadius.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
+import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 
 const pMatcher = new GridPatternMatcher();
 
@@ -37,14 +38,30 @@ const placeMarker = GridCellActionPlaceMarker.from('Base');
 
 placeMarker.transform.position.set(0.5, 0.1, -0.5);
 
-const placeRoadConnector = GridCellActionPlaceMarker.from('Road Connector');
-placeRoadConnector.offset.set(-1, 0);
+const placeRoadConnector0 = GridCellActionPlaceMarker.from('Road Connector');
+placeRoadConnector0.offset.set(-1, 0);
+
+const placeRoadConnector1 = GridCellActionPlaceMarker.from('Road Connector');
+placeRoadConnector1.offset.set(2, 1);
+
+const placeRoadConnector2 = GridCellActionPlaceMarker.from('Road Connector');
+placeRoadConnector2.offset.set(1, -1);
+
+const placeRoadConnector3 = GridCellActionPlaceMarker.from('Road Connector');
+placeRoadConnector3.offset.set(0, 2);
+
+const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
+    placeRoadConnector0,
+    placeRoadConnector1,
+    placeRoadConnector2,
+    placeRoadConnector3
+]);
 
 const rule = GridCellPlacementRule.from(pMatcher, [
     placeTags,
     clearTags,
     placeMarker,
-    placeRoadConnector
+    placeRoadConnectors
 ], 0.1);
 
 rule.allowRotation = false;

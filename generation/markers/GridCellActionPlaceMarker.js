@@ -47,7 +47,16 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         return r;
     }
 
-    execute(data, x, y, rotation) {
+    /**
+     *
+     * @param {GridData} data
+     * @param {number} x
+     * @param {number} y
+     * @param {number} rotation
+     * @returns {MarkerNode}
+     */
+    buildNode(data, x, y, rotation) {
+
         const node = new MarkerNode();
 
 
@@ -76,6 +85,12 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         node.transofrm.multiplyTransforms(node.transofrm, this.transform);
 
         this.mutator(node, data);
+
+        return node;
+    }
+
+    execute(data, x, y, rotation) {
+        const node = this.buildNode(data, x, y, rotation);
 
         data.addMarker(node);
     }
