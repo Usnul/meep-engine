@@ -252,7 +252,7 @@ export function promiseTask(promise, name) {
 export function wrapTaskIgnoreFailure(task) {
     let initializationFailed = false;
 
-    return new Task({
+    const wrapper = new Task({
         name: `Ignore Failure of [${task.name}]`,
         initializer() {
             try {
@@ -265,8 +265,8 @@ export function wrapTaskIgnoreFailure(task) {
         estimatedDuration: task.estimatedDuration,
         cycleFunction() {
 
-            task.__executedCpuTime = this.__executedCpuTime;
-            task.__executedCycleCount = this.__executedCycleCount;
+            task.__executedCpuTime = wrapper.__executedCpuTime;
+            task.__executedCycleCount = wrapper.__executedCycleCount;
 
             if (initializationFailed) {
                 //initializer failed, don't execute the source task
@@ -285,4 +285,6 @@ export function wrapTaskIgnoreFailure(task) {
             return task.computeProgress();
         }
     });
+
+    return wrapper;
 }
