@@ -46,11 +46,6 @@ const storyActionControllerParamFactories = {
         distance: 40,
         duration: 0
     },
-    [StoryActionType.CameraFocusEntity]: {
-        entity: 0,
-        distance: 40,
-        duration: 0
-    },
     [StoryActionType.CameraFocusPoint]: {
         x: 0,
         y: 0,
