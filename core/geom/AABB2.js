@@ -126,13 +126,17 @@ class AABB2 {
     _expandToFitPoint(x, y) {
         if (x < this.x0) {
             this.x0 = x;
-        } else if (x > this.x1) {
+        }
+
+        if (x > this.x1) {
             this.x1 = x;
         }
 
         if (y < this.y0) {
             this.y0 = y;
-        } else if (y > this.y1) {
+        }
+
+        if (y > this.y1) {
             this.y1 = y;
         }
     }

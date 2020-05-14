@@ -482,6 +482,25 @@ export class QuadTreeNode extends AABB2 {
      * @param {QuadTreeDatum<D>[]} result
      * @param {number} x
      * @param {number} y
+     * @param {number} radius
+     * @returns {number} number of intersecting objects added to the result
+     */
+    requestDatumIntersectionsCircle(result, x, y, radius) {
+        //TODO optimize closures out to avoid GC
+        let count = 0;
+
+        this.traverseCircleIntersections(x, y, radius, datum => {
+            return result[count++] = datum;
+        });
+
+        return count;
+    }
+
+    /**
+     *
+     * @param {QuadTreeDatum<D>[]} result
+     * @param {number} x
+     * @param {number} y
      * @returns {number} number of intersecting objects added to the result
      */
     requestDatumIntersectionsPoint(result, x, y) {
@@ -576,9 +595,9 @@ export class QuadTreeNode extends AABB2 {
      * @param {*} [thisArg]
      */
     traverseCircleIntersections(x, y, radius, visitor, thisArg) {
-        assert.isNumber(x,'x');
-        assert.isNumber(y,'y');
-        assert.isNumber(radius,'radius');
+        assert.isNumber(x, 'x');
+        assert.isNumber(y, 'y');
+        assert.isNumber(radius, 'radius');
 
         const radius2 = radius * radius;
 

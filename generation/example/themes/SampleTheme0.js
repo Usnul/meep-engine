@@ -24,8 +24,8 @@ const matcher_tag_road = GridCellRuleContainsTag.from(GridTags.Road);
 terrainTheme.rules.push(TerrainLayerRule.from(CellMatcherAnd.from(matcher_tag_traversable, CellMatcherNot.from(matcher_tag_road)), 0));
 terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_not_traversable, 1));
 // terrainTheme.rules.push(TerrainLayerRule.from(GridCellRuleContainsTag.from(GridTags.Occupied), 2));
-terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 2, new NumericInterval(0.3, 1)));
-terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 0, new NumericInterval(0.5, 0.7)));
+terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 4, new NumericInterval(1, 1)));
+// terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 0, new NumericInterval(0.5, 0.7)));
 
 SampleTheme0.terrain = terrainTheme;
 

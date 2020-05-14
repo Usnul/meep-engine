@@ -18,7 +18,7 @@ import { matcher_tag_traversable_unoccupied } from "./rules/matcher_tag_traversa
 import { mir_generator_place_starting_point } from "./generators/mir_generator_place_starting_point.js";
 import { GridTaskConnectRooms } from "../grid/tasks/GridTaskConnectRooms.js";
 import { matcher_tag_traversable } from "./rules/matcher_tag_traversable.js";
-import { GridTaskGenerateRoads } from "../grid/tasks/GridTaskGenerateRoads.js";
+import { GridTaskGenerateRoads } from "../grid/tasks/road/GridTaskGenerateRoads.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -140,6 +140,7 @@ gRuleSet1.addDependency(gBases);
 
 const gRoads = new GridTaskGenerateRoads();
 
+gRoads.addDependency(gConnectRooms);
 gRoads.addDependency(gBases);
 
 SampleGenerator0.addGenerator(gMakeEmpty);
