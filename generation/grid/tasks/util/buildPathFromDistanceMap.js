@@ -1,3 +1,5 @@
+import { returnZero } from "../../../../core/function/Functions.js";
+
 /**
  *
  * @param {number[]} distances
@@ -6,6 +8,7 @@
  * @param {number} x
  * @param {number} y
  * @param {number[]} neighbourhoodMask
+ * @param {function(index:number):number} heuristic
  * @returns {number[]} Sequence of indices
  */
 export function buildPathFromDistanceMap(
@@ -15,7 +18,8 @@ export function buildPathFromDistanceMap(
         height,
         x,
         y,
-        neighbourhoodMask
+        neighbourhoodMask,
+        heuristic = returnZero
     }
 ) {
     let index = x + y * width;
@@ -34,7 +38,8 @@ export function buildPathFromDistanceMap(
         //pick next index
 
         let bestNext = -1;
-        let bestDistance = distances[index];
+        let bestDistance = distances[index] - 1;
+        let bestHeuristicValue = Number.NEGATIVE_INFINITY;
 
         for (let i = 0; i < neighbourhoodMaskSize; i += 2) {
 
@@ -56,12 +61,17 @@ export function buildPathFromDistanceMap(
             const neighbour_index = n_x + n_y * width;
 
             const distance = distances[neighbour_index];
+            const heuristicValue = heuristic(neighbour_index);
 
-
-            if (distance < bestDistance) {
+            if (
+                (distance < bestDistance) ||
+                (distance === bestDistance && heuristicValue > bestHeuristicValue)
+            ) {
                 bestNext = neighbour_index;
 
                 bestDistance = distance;
+
+                bestHeuristicValue = heuristicValue;
             }
         }
 

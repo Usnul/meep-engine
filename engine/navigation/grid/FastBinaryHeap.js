@@ -159,6 +159,23 @@ class BinaryHeap {
     }
 
     /**
+     *
+     * @param {T} node
+     * @returns {boolean}
+     */
+    delete(node) {
+        const i = this.data.indexOf(node);
+
+        if (i === -1) {
+            return false;
+        }
+
+        this.data.splice(i, 1);
+
+        return true;
+    }
+
+    /**
      * Remove all the data from the heap
      */
     clear() {

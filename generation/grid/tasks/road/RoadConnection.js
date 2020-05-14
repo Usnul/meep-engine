@@ -1,6 +1,6 @@
 import { assert } from "../../../../core/assert.js";
 
-export class Path {
+export class RoadConnection {
     constructor() {
 
         /**
@@ -29,13 +29,13 @@ export class Path {
      * @param {number[]} indices
      */
     static from(source, target, indices) {
-        assert.defined(source,'source');
-        assert.defined(target,'target');
-        assert.defined(indices,'indices');
+        assert.defined(source, 'source');
+        assert.defined(target, 'target');
+        assert.defined(indices, 'indices');
 
-        assert.isArray(indices,'indices');
+        assert.isArray(indices, 'indices');
 
-        const r = new Path();
+        const r = new RoadConnection();
 
         r.source = source;
         r.target = target;
