@@ -6,8 +6,6 @@ export class CellFilterSimplexNoise extends CellFilter {
     constructor() {
         super();
 
-        this.seed = 0;
-
         /**
          * @private
          * @type {SimplexNoise}
@@ -24,12 +22,29 @@ export class CellFilterSimplexNoise extends CellFilter {
         this.scale_y = 1;
     }
 
-    initialize() {
-        this.random.setCurrentSeed(this.seed);
+    /**
+     *
+     * @param {number} scale_x
+     * @param {number} scale_y
+     * @returns {CellFilterSimplexNoise}
+     */
+    static from(scale_x, scale_y) {
+        const r = new CellFilterSimplexNoise();
+
+        r.scale_x = scale_x;
+        r.scale_y = scale_y;
+
+        return r;
+    }
+
+    initialize(seed) {
+        this.random.setCurrentSeed(seed);
 
         const noise = new SimplexNoise(this.random);
 
         this.noise = noise;
+
+        super.initialize(seed);
     }
 
     execute(grid, x, y, rotation) {

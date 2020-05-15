@@ -163,7 +163,11 @@ export class GridData {
      * @return {number}
      */
     readTags(x, y) {
-        const cellIndex = y * this.width + x;
+        const _x = x | 0;
+        const _y = y | 0;
+
+        const cellIndex = _y * this.width + _x;
+
         return this.tags[cellIndex];
     }
 }

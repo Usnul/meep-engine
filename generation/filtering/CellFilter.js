@@ -1,6 +1,32 @@
 export class CellFilter {
-    initialize() {
 
+    constructor() {
+        /**
+         *
+         * @type {boolean}
+         * @protected
+         */
+        this.__initialized = false;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    get initialized() {
+        return this.__initialized;
+    }
+
+    /**
+     *
+     * @param {number} seed
+     */
+    initialize(seed) {
+        this.__initialized = true;
+    }
+
+    finalize() {
+        this.__initialized = false;
     }
 
     /**

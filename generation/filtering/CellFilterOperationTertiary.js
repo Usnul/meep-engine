@@ -33,10 +33,24 @@ export class CellFilterOperationTertiary extends CellFilter {
 
     }
 
-    initialize() {
-        this.a.initialize();
-        this.b.initialize();
-        this.c.initialize();
+    initialize(seed) {
+        if (this.initialized) {
+            return;
+        }
+
+        super.initialize(seed);
+
+        if (!this.a.initialized) {
+            this.a.initialize(seed);
+        }
+
+        if (!this.b.initialized) {
+            this.b.initialize(seed);
+        }
+
+        if (!this.c.initialized) {
+            this.c.initialize(seed);
+        }
     }
 
     execute(grid, x, y, rotation) {

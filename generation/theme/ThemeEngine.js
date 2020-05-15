@@ -3,7 +3,7 @@ import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
-import { countTask } from "../../core/process/task/TaskUtils.js";
+import { actionTask, countTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import Task from "../../core/process/task/Task.js";
@@ -122,6 +122,7 @@ export class ThemeEngine {
         assert.equal(width, terrain.size.x);
         assert.equal(height, terrain.size.y);
 
+
         const random = this.random;
 
         /**
@@ -148,6 +149,37 @@ export class ThemeEngine {
         //splat map size can vary from the terrain size, for that reason we write splat weights into an intermediate storage so we can re-sample it to splat map after
         const weights = Sampler2D.uint8(layerCount, width, height);
 
+        const tInitializeThemes = actionTask(() => {
+            /**
+             *
+             * @type {AreaTheme[]}
+             */
+            const areas = [];
+
+            this.areas.getRawData(areas);
+
+            /**
+             *
+             * @type {Theme[]}
+             */
+            const themes = [];
+
+            const n = areas.length;
+            for (let i = 0; i < n; i++) {
+                const areaTheme = areas[i];
+
+                const theme = areaTheme.theme;
+
+                if (themes.indexOf(theme) === -1) {
+                    themes.push(theme);
+
+                    const seed = this.random();
+                    theme.initialize(seed);
+                }
+            }
+
+        });
+
         const tApplyThemes = countTask(0, width * height, (index) => {
             const y = (index / width) | 0;
             const x = index % width;
@@ -167,7 +199,7 @@ export class ThemeEngine {
 
                 /**
                  *
-                 * @type {null}
+                 * @type {Theme}
                  */
                 const theme = areaTheme.theme;
 
@@ -178,10 +210,9 @@ export class ThemeEngine {
                 for (let j = 0; j < ruleCount; j++) {
                     const terrainLayerRule = rules[j];
 
-                    const ruleMatch = terrainLayerRule.rule.match(grid, x, y);
+                    let power = terrainLayerRule.filter.execute(grid, x, y, 0);
 
-                    if (!ruleMatch) {
-                        //terrain doesn't match the rule, skip
+                    if (power <= 0) {
                         continue;
                     }
 
@@ -190,9 +221,6 @@ export class ThemeEngine {
                      * @type {number}
                      */
                     const layerIndex = terrainLayerRule.layer;
-
-                    //TODO replace with sampling from a perlin noise function instead. To preserve continuity
-                    let power = terrainLayerRule.intensity.sampleRandom(random);
 
 
                     if (matchingThemeCount > 1) {
@@ -213,6 +241,8 @@ export class ThemeEngine {
             weights.set(x, y, aggregator.powers);
 
         });
+
+        tApplyThemes.addDependency(tInitializeThemes);
 
 
         //re-sample weights
@@ -248,7 +278,7 @@ export class ThemeEngine {
 
         tasks.forEach(t => t.addDependency(tResample));
 
-        return new TaskGroup([tApplyThemes, tResample].concat(tasks), 'Applying a level generation theme');
+        return new TaskGroup([tInitializeThemes, tApplyThemes, tResample].concat(tasks), 'Applying a level generation theme');
     }
 
     /**

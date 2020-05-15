@@ -95,6 +95,29 @@ function greaterThanOrEqual(a, b, m) {
     }
 }
 
+/**
+ *
+ * @param {number} a
+ * @param {number} b
+ * @param {string} [m]
+ */
+function lessThanOrEqual(a, b, m) {
+    assert.equal(typeof a, 'number');
+    assert.equal(typeof b, 'number');
+
+    if (!(a <= b)) {
+        let message = '';
+
+        if (m !== undefined) {
+            message += m + '. ';
+        }
+
+        message += `Expected ${a} <= ${b}.`;
+
+        throw new Error(message);
+    }
+}
+
 const typeOfTypes = ['string', 'boolean', 'number', 'object', 'undefined', 'function', 'symbol'];
 const stringListOfTypes = typeOfTypes.join(', ');
 
@@ -159,8 +182,12 @@ assert.equal = equal;
 assert.logicalyEqual = logicalEquals;
 assert.ok = assert;
 assert.greaterThan = greaterThan;
-assert.lessThan = lessThan;
+
 assert.greaterThanOrEqual = greaterThanOrEqual;
+
+assert.lessThan = lessThan;
+assert.lessThanOrEqual = lessThanOrEqual;
+
 assert.typeOf = typeOf;
 assert.arrayHas = arrayHas;
 assert.arrayHasNo = arrayHasNo;

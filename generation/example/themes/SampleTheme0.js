@@ -14,18 +14,56 @@ import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js"
 import { GridTags } from "../../GridTags.js";
 import { CellMatcherAnd } from "../../rules/CellMatcherAnd.js";
 import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
-import { NumericInterval } from "../../../core/math/interval/NumericInterval.js";
+import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
+import { CellFilterGaussianBlur } from "../../filtering/CellFilterGaussianBlur.js";
+import { CellFilterSimplexNoise } from "../../filtering/CellFilterSimplexNoise.js";
+import { CellFilterLerp } from "../../filtering/CellFilterLerp.js";
+import { CellFilterConstant } from "../../filtering/CellFilterConstant.js";
+import { CellFilterMultiply } from "../../filtering/algebra/CellFilterMultiply.js";
 
 export const SampleTheme0 = new Theme();
 
 const terrainTheme = new TerrainTheme();
 
 const matcher_tag_road = GridCellRuleContainsTag.from(GridTags.Road);
-terrainTheme.rules.push(TerrainLayerRule.from(CellMatcherAnd.from(matcher_tag_traversable, CellMatcherNot.from(matcher_tag_road)), 0));
-terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_not_traversable, 1));
-// terrainTheme.rules.push(TerrainLayerRule.from(GridCellRuleContainsTag.from(GridTags.Occupied), 2));
-terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 2, new NumericInterval(1, 1)));
-// terrainTheme.rules.push(TerrainLayerRule.from(matcher_tag_road, 0, new NumericInterval(0.5, 0.7)));
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    CellFilterGaussianBlur.from(
+        CellFilterCellMatcher.from(
+            CellMatcherAnd.from(matcher_tag_traversable, CellMatcherNot.from(matcher_tag_road))
+        ),
+        3,
+        3
+    ),
+    0
+));
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    CellFilterGaussianBlur.from(
+        CellFilterCellMatcher.from(matcher_tag_not_traversable),
+        3,
+        3
+    ),
+    1
+));
+
+const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    CellFilterMultiply.from(
+        CellFilterCellMatcher.from(matcher_tag_road),
+        CellFilterLerp.from(CellFilterConstant.from(0.3), CellFilterConstant.from(1), NOISE_10_a)
+    ),
+    2,
+));
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    CellFilterMultiply.from(
+        CellFilterCellMatcher.from(matcher_tag_road),
+        CellFilterLerp.from(CellFilterConstant.from(1), CellFilterConstant.from(0.3), NOISE_10_a)
+    ),
+    0,
+));
 
 SampleTheme0.terrain = terrainTheme;
 

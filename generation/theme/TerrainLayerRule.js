@@ -1,38 +1,35 @@
-import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
+import { assert } from "../../core/assert.js";
 
 export class TerrainLayerRule {
     constructor() {
         /**
          *
-         * @type {GridCellRule}
+         * @type {CellFilter}
          */
-        this.rule = null;
-        this.layer = 0;
-        this.intensity = new NumericInterval(1, 1);
-
+        this.filter = null;
         /**
          *
          * @type {number}
          */
-        this.blur = 0;
+        this.layer = 0;
+
     }
 
     /**
      *
-     * @param {GridCellRule} rule
+     * @param {CellFilter} filter
      * @param {number} layer
-     * @param {NumericInterval} intensity
      * @returns {TerrainLayerRule}
      */
-    static from(rule, layer, intensity) {
+    static from(filter, layer) {
+
+        assert.equal(filter.isCellFilter, true, 'filter.isCellFilter');
+        assert.isNumber(layer, 'layer');
+
         const r = new TerrainLayerRule();
 
-        r.rule = rule;
+        r.filter = filter;
         r.layer = layer;
-
-        if (intensity !== undefined) {
-            r.intensity.copy(intensity);
-        }
 
         return r;
     }

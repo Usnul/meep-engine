@@ -12,6 +12,11 @@ export class CellFilterConstant extends CellFilter {
         this.value = 1;
     }
 
+    /**
+     *
+     * @param {number} value
+     * @returns {CellFilterConstant}
+     */
     static from(value) {
         assert.isNumber(value, 'value');
         assert.greaterThanOrEqual(value, 0, 'value >= 0');
@@ -21,7 +26,7 @@ export class CellFilterConstant extends CellFilter {
 
         r.value = value;
 
-        return value;
+        return r;
     }
 
     execute(grid, x, y, rotation) {

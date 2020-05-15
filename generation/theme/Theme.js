@@ -16,4 +16,8 @@ export class Theme {
          */
         this.nodes = new MarkerNodeProcessingRuleSet();
     }
+
+    initialize(seed){
+        this.terrain.initialize(seed);
+    }
 }
