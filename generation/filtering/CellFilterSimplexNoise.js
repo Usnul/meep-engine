@@ -48,7 +48,7 @@ export class CellFilterSimplexNoise extends CellFilter {
     }
 
     execute(grid, x, y, rotation) {
-        const noiseValue = this.noise.noise2D(x * this.scale_x, y * this.scale_y);
+        const noiseValue = this.noise.noise2D(x / this.scale_x, y / this.scale_y);
 
         //noise function returns values in range [-1,1] we need to scale that to [0,1] range
         const normalizedValue = (noiseValue + 1) / 2;
