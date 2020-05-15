@@ -17,9 +17,10 @@ import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
 import { CellFilterGaussianBlur } from "../../filtering/CellFilterGaussianBlur.js";
 import { CellFilterSimplexNoise } from "../../filtering/CellFilterSimplexNoise.js";
+import { CellFilterFXAA } from "../../filtering/CellFilterFXAA.js";
+import { CellFilterMultiply } from "../../filtering/algebra/CellFilterMultiply.js";
 import { CellFilterLerp } from "../../filtering/CellFilterLerp.js";
 import { CellFilterConstant } from "../../filtering/CellFilterConstant.js";
-import { CellFilterMultiply } from "../../filtering/algebra/CellFilterMultiply.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -49,9 +50,11 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 
 const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
 
+const ROAD_FILTER = CellFilterFXAA.from(CellFilterCellMatcher.from(matcher_tag_road));
+
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterMultiply.from(
-        CellFilterCellMatcher.from(matcher_tag_road),
+        ROAD_FILTER,
         CellFilterLerp.from(CellFilterConstant.from(0.3), CellFilterConstant.from(1), NOISE_10_a)
     ),
     2,
@@ -59,7 +62,7 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterMultiply.from(
-        CellFilterCellMatcher.from(matcher_tag_road),
+        ROAD_FILTER,
         CellFilterLerp.from(CellFilterConstant.from(1), CellFilterConstant.from(0.3), NOISE_10_a)
     ),
     0,
