@@ -365,7 +365,7 @@ export class ThemeEngine {
              */
             const ruleSet = theme.nodes;
 
-            ruleSet.processNode(ecd, node);
+            ruleSet.processNode(grid, ecd, node);
 
             i++;
 

@@ -5,6 +5,12 @@ export class MarkerNodeMatcher {
      * @returns {boolean}
      */
     match(node) {
-        
+
     }
 }
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+MarkerNodeMatcher.prototype.isMarkerNodeMatcher = true;

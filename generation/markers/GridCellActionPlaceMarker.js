@@ -3,6 +3,7 @@ import { GridCellAction } from "../placement/GridCellAction.js";
 import { MarkerNode } from "./MarkerNode.js";
 import { Transform } from "../../engine/ecs/components/Transform.js";
 import Vector2 from "../../core/geom/Vector2.js";
+import { assert } from "../../core/assert.js";
 
 export class GridCellActionPlaceMarker extends GridCellAction {
     constructor() {
@@ -20,6 +21,13 @@ export class GridCellActionPlaceMarker extends GridCellAction {
          */
         this.transform = new Transform();
 
+        /**
+         *
+         * @type {String[]}
+         */
+        this.tags = [];
+
+        this.properties = {};
 
         /**
          *
@@ -32,6 +40,23 @@ export class GridCellActionPlaceMarker extends GridCellAction {
          * @type {Vector2}
          */
         this.offset = new Vector2();
+    }
+
+    /**
+     *
+     * @param {String} tag
+     * @returns {boolean}
+     */
+    addTag(tag) {
+        assert.typeOf(tag, 'string', 'tag');
+
+        if (this.tags.indexOf(tag) !== -1) {
+            return false;
+        }
+
+        this.tags.push(tag);
+
+        return true;
     }
 
     /**
@@ -83,6 +108,17 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         node.transofrm.rotation.__setFromEuler(0, rotation, 0);
 
         node.transofrm.multiplyTransforms(node.transofrm, this.transform);
+
+        //add tags
+        const tags = this.tags;
+        const tagCount = tags.length;
+        for (let i = 0; i < tagCount; i++) {
+            const tag = tags[i];
+            node.tags.push(tag);
+        }
+
+        //write properties
+        Object.assign(node.properties, this.properties);
 
         this.mutator(node, data);
 

@@ -50,7 +50,8 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 
 const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
 
-const ROAD_FILTER = CellFilterFXAA.from(CellFilterCellMatcher.from(matcher_tag_road));
+const ROAD_FILTER = CellFilterCellMatcher.from(matcher_tag_road);
+const ROAD_FILTER_AA = CellFilterFXAA.from(ROAD_FILTER);
 
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterMultiply.from(
@@ -143,3 +144,37 @@ nrBase.actions.push(MarkerNodeActionEntityPlacement.from(ebpBase, Transform.from
 })));
 
 SampleTheme0.nodes.add(nrBase);
+
+const ebpRoadJunction90 = new EntityBlueprint();
+ebpRoadJunction90.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_blue.gltf' }));
+ebpRoadJunction90.add(Transform.fromJSON({}));
+ebpRoadJunction90.add(GridPosition.fromJSON({}));
+
+const nrRoadJunction90 = new MarkerProcessingRule();
+
+nrRoadJunction90.consume = true;
+nrRoadJunction90.matcher = TypeMarkerNodeMatcher.from('Road Junction Decorator 90');
+
+nrRoadJunction90.actions.push(MarkerNodeActionEntityPlacement.from(ebpRoadJunction90, Transform.fromJSON({
+    scale: { x: 0.1, y: 1, z: 0.1 },
+    position: { x: 0, y: 1, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrRoadJunction90);
+
+const ebpBuffObject0 = new EntityBlueprint();
+ebpBuffObject0.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpBuffObject0.add(Transform.fromJSON({}));
+ebpBuffObject0.add(GridPosition.fromJSON({}));
+
+const nrBuffObject = new MarkerProcessingRule();
+
+nrBuffObject.consume = true;
+nrBuffObject.matcher = TypeMarkerNodeMatcher.from('Buff Object');
+
+nrBuffObject.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObject0, Transform.fromJSON({
+    scale: { x: 0.4, y: 1, z: 0.4 },
+    position: { x: 0, y: 1, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrBuffObject);

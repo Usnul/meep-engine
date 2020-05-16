@@ -9,6 +9,12 @@ export class MarkerNode {
          */
         this.type = null;
 
+        /**
+         *
+         * @type {String[]}
+         */
+        this.tags = [];
+
         this.position = new Vector2();
 
         this.transofrm = new Transform();

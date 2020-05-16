@@ -45,7 +45,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
         return r;
     }
 
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
 
         const width = grid.width;
         const field = Sampler2D.uint8(1, width, grid.height);
@@ -65,7 +65,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
         const mask_area = mask_width * mask_height;
 
-        const random = seededRandom(this.randomSeed);
+        const random = seededRandom(seed);
 
         const tSeed = countTask(0, mask_area, index => {
             const x = index % mask_width + mask_x0;

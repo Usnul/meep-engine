@@ -20,7 +20,7 @@ export class CellFilterFXAA extends CellFilter {
          * 0.25 leaves more aliasing, and is sharper
          * @type {number}
          */
-        this.edge_threshold = 0.125;
+        this.edge_threshold = 0.25;
 
         /**
          *  0.06 - faster but more aliasing in darks
@@ -36,7 +36,7 @@ export class CellFilterFXAA extends CellFilter {
          *  2.0 is really soft (good only for vector graphics inputs)
          * @type {number}
          */
-        this.console_edge_sharpness = 8;
+        this.console_edge_sharpness = 2;
     }
 
     /**

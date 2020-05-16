@@ -6,7 +6,7 @@ import BinaryHeap from "../../../../engine/navigation/grid/FastBinaryHeap.js";
 import { BitSet } from "../../../../core/binary/BitSet.js";
 import { matcher_tag_traversable } from "../../../example/rules/matcher_tag_traversable.js";
 import { buildPathFromDistanceMap } from "../util/buildPathFromDistanceMap.js";
-import { inverseLerp, lerp } from "../../../../core/math/MathUtils.js";
+import { inverseLerp, lerp, seededRandom } from "../../../../core/math/MathUtils.js";
 import { GridCellActionPlaceTags } from "../../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../../GridTags.js";
 import { CellMatcher } from "../../../rules/CellMatcher.js";
@@ -516,7 +516,7 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
     /**
      * TODO add post-processing step to merge various paths
      */
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
         /**
          *
          * @type {MarkerNode[]}
@@ -539,6 +539,8 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
 
         const traversable = matcher_tag_traversable;
 
+        const random = seededRandom(seed);
+
         //collect all goad connector nodes
         const tCollectConnectors = actionTask(() => {
             grid.markers.traverseData(datum => {
@@ -549,6 +551,19 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
                 const node = datum.data;
 
                 if (node.type === NODE_TYPE_ROAD_CONNECTOR) {
+
+
+                    const connectivity = node.properties.connectivity;
+
+                    if (connectivity !== undefined) {
+                        const connectivity_roll = random();
+
+                        if (connectivity_roll > connectivity) {
+                            //skip this connector
+                            return;
+                        }
+                    }
+
                     connectorNodes.push(node);
 
                     graph.addNode(node);

@@ -2,12 +2,6 @@ export class GridTaskGenerator {
     constructor() {
         /**
          *
-         * @type {number}
-         */
-        this.randomSeed = 0;
-
-        /**
-         *
          * @type {GridTaskGenerator[]}
          */
         this.dependencies = [];
@@ -36,9 +30,10 @@ export class GridTaskGenerator {
      *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
+     * @param {number} seed
      * @returns {Task|TaskGroup}
      */
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
 
     }
 }

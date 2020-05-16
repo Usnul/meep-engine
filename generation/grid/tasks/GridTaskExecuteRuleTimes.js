@@ -31,7 +31,7 @@ export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
         return r;
     }
 
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
 
         let completed = 0;
 
@@ -51,7 +51,7 @@ export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
          */
         const closed = new BitSet();
 
-        const random = seededRandom(this.randomSeed);
+        const random = seededRandom(seed);
 
         return new Task({
             name: `Execute Rule ${count} times`,

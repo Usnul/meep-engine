@@ -37,10 +37,10 @@ export class GridData {
      * @param {number} x
      * @param {number} y
      * @param {number} radius
-     * @param {String} type
+     * @param {MarkerNodeMatcher} matcher
      * @returns {boolean}
      */
-    containsMarkerInCircleByType(x, y, radius, type) {
+    containsMarkerInCircle(x, y, radius, matcher) {
         let result = false;
         this.markers.traverseCircleIntersections(x, y, radius, data => {
             /**
@@ -49,7 +49,7 @@ export class GridData {
              */
             const marker = data.data;
 
-            if (marker.type === type) {
+            if (matcher.match(marker)) {
                 result = true;
 
                 //stop traversal

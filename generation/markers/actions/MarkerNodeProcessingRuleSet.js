@@ -21,10 +21,11 @@ export class MarkerNodeProcessingRuleSet {
 
     /**
      *
+     * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
      * @param {MarkerNode} node
      */
-    processNode(ecd, node) {
+    processNode(grid, ecd, node) {
         assert.defined(ecd, 'node');
         assert.defined(node, 'node');
 
@@ -52,7 +53,7 @@ export class MarkerNodeProcessingRuleSet {
             for (let k = 0; k < nActions; k++) {
                 const action = actions[k];
 
-                action.execute(ecd, node);
+                action.execute(grid, ecd, node);
             }
 
             if (rule.consume) {
@@ -113,7 +114,7 @@ export class MarkerNodeProcessingRuleSet {
                     for (let k = 0; k < nActions; k++) {
                         const action = actions[k];
 
-                        action.execute(ecd, node);
+                        action.execute(grid, ecd, node);
                     }
 
                 }

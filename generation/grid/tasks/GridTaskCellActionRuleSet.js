@@ -24,7 +24,7 @@ export class GridTaskActionRuleSet extends GridTaskGenerator {
         return r;
     }
 
-    build(grid, ecd) {
-        return this.rules.process(grid, this.randomSeed);
+    build(grid, ecd, seed) {
+        return this.rules.process(grid, seed);
     }
 }

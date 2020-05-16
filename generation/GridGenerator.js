@@ -23,9 +23,10 @@ export class GridGenerator {
      *
      * @param {EntityComponentDataset} ecd
      * @param {GridData} grid
+     * @param {number} seed
      * @returns {TaskGroup}
      */
-    generate(ecd, grid) {
+    generate(ecd, grid, seed) {
 
         const tasks = [];
 
@@ -35,7 +36,7 @@ export class GridGenerator {
         for (let i = 0; i < n; i++) {
             const generator = this.generators[i];
 
-            const task = generator.build(grid, ecd);
+            const task = generator.build(grid, ecd, seed);
 
             tasks[i] = task;
         }
