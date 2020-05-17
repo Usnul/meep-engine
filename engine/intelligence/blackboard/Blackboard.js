@@ -172,13 +172,15 @@ export class Blackboard {
         const result = {};
 
         this.traverse((name, value, type) => {
-            result[name] = value;
+            result[name] = value.toJSON();
         });
 
         return result;
     }
 
     fromJSON(json) {
+        this.reset();
+
         for (let propName in json) {
             const value = json[propName];
 
