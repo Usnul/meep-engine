@@ -1,5 +1,7 @@
 import Signal from "../events/signal/Signal.js";
 import { hsv2rgb, parseColor } from "./ColorUtils.js";
+import { assert } from "../assert.js";
+import { computeHashFloat, computeHashIntegerArray } from "../math/MathUtils.js";
 
 class Color {
     /**
@@ -9,8 +11,23 @@ class Color {
      * @param {number} b value from 0 to 1
      */
     constructor(r = 0, g = 0, b = 0) {
+        /**
+         * Red channel
+         * Value from 0 to 1
+         * @type {number}
+         */
         this.r = r;
+        /**
+         * Green channel
+         * Value from 0 to 1
+         * @type {number}
+         */
         this.g = g;
+        /**
+         * Blue channel
+         * Value from 0 to 1
+         * @type {number}
+         */
         this.b = b;
 
         this.onChanged = new Signal();
@@ -23,6 +40,10 @@ class Color {
      * @param {number} b
      */
     setRGB(r, g, b) {
+        assert.isNumber(r, 'r');
+        assert.isNumber(g, 'g');
+        assert.isNumber(b, 'b');
+
         const _r = this.r;
         const _g = this.g;
         const _b = this.b;
@@ -96,6 +117,30 @@ class Color {
         result.copy(this);
 
         return result;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    hash() {
+        return computeHashIntegerArray(
+            computeHashFloat(this.r),
+            computeHashFloat(this.g),
+            computeHashFloat(this.b)
+        );
+    }
+
+    fromJSON({ r, g, b }) {
+        this.setRGB(r, g, b);
+    }
+
+    toJSON() {
+        return {
+            r: this.r,
+            g: this.g,
+            b: this.b
+        };
     }
 
     /**

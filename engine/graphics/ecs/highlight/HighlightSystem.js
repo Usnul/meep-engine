@@ -5,13 +5,13 @@
 
 import { System } from '../../../ecs/System.js';
 import Highlight from './Highlight.js';
-import Mesh from '../mesh/Mesh.js';
-import { MeshBasicMaterial, Scene as ThreeScene } from 'three';
+import Mesh, { MeshFlags } from '../mesh/Mesh.js';
+import { Scene as ThreeScene } from 'three';
 import { OutlineRenderer } from "./OutlineRenderer.js";
 import { BlendingType } from "../../texture/sampler/BlendingType.js";
 import { max2 } from "../../../../core/math/MathUtils.js";
-
-const materialMemory = new Map();
+import { HighlightRenderGroup } from "./HighlightRenderGroup.js";
+import { HighlightRenderElement } from "./HighlightRenderElement.js";
 
 class HighlightSystem extends System {
     /**
@@ -40,28 +40,20 @@ class HighlightSystem extends System {
         this.boundRender = this.render.bind(this);
 
 
+        /**
+         *
+         * @type {HighlightRenderGroup}
+         * @private
+         */
+        this.__highlightRenderGroup = new HighlightRenderGroup();
+
+
         this.setViewportSize = function (x, y) {
             const width = max2(0, x);
             const height = max2(0, y);
 
             self.outlineRenderer.resize(width, height);
         };
-    }
-
-    __handleModelMeshSet({ component, entity }) {
-        if (component.hasMesh() && component.mesh.material !== null) {
-            /**
-             *
-             * @type {Highlight}
-             */
-            const highlight = this.entityManager.getComponent(entity, Highlight);
-
-            component.mesh.traverse(o => {
-                if (o.isSkinnedMesh) {
-                    highlight.material.skinning = true;
-                }
-            });
-        }
     }
 
 
@@ -97,10 +89,10 @@ class HighlightSystem extends System {
 
         this.graphicsEngine.viewport.size.process(this.setViewportSize);
 
-        this.graphicsEngine.on.preRender.add(this.boundRender);
+        this.graphicsEngine.on.preComposite.add(this.boundRender);
 
         //this.graphicsEngine.renderTargets.push(this.outlineRenderer.composer.renderTarget2);
-        const compositLayer = this.graphicsEngine.layerComposer.addLayer(this.outlineRenderer.mainRenderTarget, BlendingType.Add);
+        const compositLayer = this.graphicsEngine.layerComposer.addLayer(this.outlineRenderer.__renderTargetFinal, BlendingType.Add);
 
         //render at half the resolution
         compositLayer.setRenderTargetScale(1);
@@ -108,67 +100,50 @@ class HighlightSystem extends System {
         readyCallback();
     }
 
+    /**
+     *
+     * @param {Highlight} highlight
+     * @param {Mesh} model
+     * @param {number} entity
+     * @private
+     */
+    __visitHighlightMeshPreRender(highlight, model, entity) {
+        if (!model.hasMesh()) {
+            return;
+        }
+
+        if (!model.getFlag(MeshFlags.InView)) {
+            return;
+        }
+
+        const renderElement = new HighlightRenderElement();
+
+        renderElement.definitions = highlight.elements.asArray();
+        renderElement.object = model.mesh;
+
+        this.__highlightRenderGroup.elements.add(renderElement);
+    }
+
     render(renderer, camera, scene) {
         const em = this.entityManager;
 
-        const _scene = this.scene;
-
         const dataset = em.dataset;
 
-
         if (dataset !== null) {
+            this.__highlightRenderGroup.clear();
+
             //swap materials of scene objects
-            dataset.traverseEntities([Highlight, Mesh], function (highlight, model, entity) {
-                if (model.hasMesh()) {
+            dataset.traverseEntities([Highlight, Mesh], this.__visitHighlightMeshPreRender, this);
 
-                    model.mesh.traverse(o => {
-                        if (o.isMesh || o.isSkinnedMesh) {
-                            //remember material
-                            materialMemory.set(o, o.material);
-
-                            //replace with highlight material
-                            o.material = highlight.material;
-                        }
-                    });
-
-                    highlight.oldMeshParent = model.mesh.parent;
-                    _scene.add(model.mesh);
-                }
-            });
-
-            if (_scene.children.length === 0) {
+            if (this.__highlightRenderGroup.isEmpty()) {
                 this.outlineRenderer.clearRenderTarget();
                 //nothing to render
                 return;
             } else {
                 this.outlineRenderer.setCamera(camera);
-                this.outlineRenderer.render();
+                this.outlineRenderer.render(this.__highlightRenderGroup);
             }
 
-            //return material
-            dataset.traverseEntities([Highlight, Mesh], function (highlight, model, entity) {
-                if (model.hasMesh()) {
-                    _scene.remove(model.mesh);
-
-                    model.mesh.traverse(o => {
-                        if (o.isMesh || o.isSkinnedMesh) {
-                            // retrieve material
-                            const material = materialMemory.get(o);
-
-                            // restore material
-                            o.material = material;
-                        }
-                    });
-
-
-                    //THREE.js only allows a node to have a single parent, so we re-parent it back to original place
-                    if (highlight.oldMeshParent !== null) {
-                        highlight.oldMeshParent.add(model.mesh);
-                    }
-                }
-            });
-
-            materialMemory.clear();
         }
     }
 
@@ -179,19 +154,7 @@ class HighlightSystem extends System {
      * @param {int} entityId
      */
     link(highlight, model, entityId) {
-        if (highlight.material === undefined) {
-            highlight.material = new MeshBasicMaterial({
-                color: { r: highlight.r, g: highlight.g, b: highlight.b },
-                opacity: highlight.a,
-                transparent: true
-            });
-        }
 
-        const dataset = this.entityManager.dataset;
-
-        dataset.addEntityEventListener(entityId, "model-mesh-set", this.__handleModelMeshSet, this);
-
-        this.__handleModelMeshSet({ component: model, entity: entityId });
     }
 
     /**
@@ -202,42 +165,10 @@ class HighlightSystem extends System {
      */
     unlink(highlight, model, entityId) {
 
-        const dataset = this.entityManager.dataset;
 
-        dataset.removeEntityEventListener(entityId, "model-mesh-set", this.__handleModelMeshSet, this);
     }
 
     update(timeDelta) {
-        const entityManager = this.entityManager;
-        const dataset = entityManager.dataset;
-
-        if (dataset !== null) {
-            dataset.traverseComponents(Highlight, function (h, entity) {
-
-                if (h === undefined) {
-                    console.error(`ECD.traverseComponents supplied undefined Highlight for entity ${entity}, skipping`);
-                    return;
-                }
-
-                const m = h.material;
-
-                if (m === undefined) {
-                    return;
-                }
-
-                const c = m.color;
-                if (c.r !== h.r || c.g !== h.g || c.b !== h.b) {
-                    c.r = h.r;
-                    c.g = h.g;
-                    c.b = h.b;
-                    m.needsUpdate = true;
-                }
-                if (h.a !== m.opacity) {
-                    m.opacity = h.a;
-                    m.needsUpdate = true;
-                }
-            });
-        }
     }
 }
 

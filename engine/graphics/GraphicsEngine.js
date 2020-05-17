@@ -109,6 +109,10 @@ function GraphicsEngine(camera, entityManger) {
     this.on = {
         preRender: new Signal(),
         postRender: new Signal(),
+
+        preComposite: new Signal(),
+       postComposite: new Signal(),
+
         buffersRendered: new Signal(),
         visibilityConstructionStarted: new Signal(),
         visibilityConstructionEnded: new Signal()
@@ -561,14 +565,24 @@ GraphicsEngine.prototype.render = function (renderTarget) {
 
     if (this.postprocessingEnabled) {
         this.effects.render(renderer, camera, scene, 0.017);
+
+        this.on.preComposite.send3(renderer, camera, scene);
+
         this.layerComposer.composite(renderer);
+
+        this.on.postComposite.send3(renderer,camera, scene);
+
     } else {
 
         if (renderTarget !== undefined) {
             renderer.setRenderTarget(renderTarget);
         }
 
+        this.on.preComposite.send3(renderer, camera, scene);
+
         this.layerComposer.composite(renderer);
+
+        this.on.postComposite.send3(renderer,camera, scene);
 
         if (renderTarget !== undefined) {
             renderer.setRenderTarget(null);

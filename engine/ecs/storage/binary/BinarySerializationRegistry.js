@@ -147,7 +147,7 @@ export class BinarySerializationRegistry {
         const classUpgraders = this.upgraders.get(className);
 
         if (classUpgraders === undefined) {
-            throw new Error(`No upgraders available for class '${className}'`);
+            throw new Error(`No upgraders available for class '${className}', upgrade is required from from version ${startVersion} to ${goalVersion}`);
         }
 
         const starts = [];

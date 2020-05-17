@@ -116,7 +116,7 @@ function deserializeTask(
                     }
                 });
             } catch (e) {
-                const failure = new Error(`Failed to initialized collection de-serializer`);
+                const failure = new Error(`Failed to initialized collection de-serializer: ${e.message}`);
 
                 failure.previousClass = previousClass;
                 failure.case = e;
