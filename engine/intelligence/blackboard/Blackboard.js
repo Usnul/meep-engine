@@ -167,6 +167,28 @@ export class Blackboard {
         this.data = {};
     }
 
+
+    toJSON() {
+        const result = {};
+
+        this.traverse((name, value, type) => {
+            result[name] = value;
+        });
+
+        return result;
+    }
+
+    fromJSON(json) {
+        for (let propName in json) {
+            const value = json[propName];
+
+            if (typeof value === 'number') {
+                this.acquireNumber(propName, value).set(value);
+            } else if (typeof value === 'boolean') {
+                this.acquireNumber(propName, value).set(value);
+            }
+        }
+    }
 }
 
 Blackboard.typeName = 'Blackboard';
