@@ -10,7 +10,7 @@ import Stat from "../core/model/stat/Stat.js";
  *
  * @returns {number}
  */
-function timeInSeconds() {
+export function currentTimeInSeconds() {
     //Use highest available resolution time source
     const source = typeof performance === "undefined" ? Date : performance;
 
@@ -22,7 +22,7 @@ function timeInSeconds() {
  * @param {Clock} clock
  */
 function updateElapsedTime(clock) {
-    const now = timeInSeconds();
+    const now = currentTimeInSeconds();
     const delta = (now - clock.__lastMeasurement) * clock.speed;
     clock.__lastMeasurement = now;
     clock.elapsedTime += delta;
@@ -78,7 +78,7 @@ class Clock {
     }
 
     start() {
-        this.__lastMeasurement = timeInSeconds();
+        this.__lastMeasurement = currentTimeInSeconds();
         this.timeAtDelta = this.getElapsedTime();
         this.__isRunning = true;
     }

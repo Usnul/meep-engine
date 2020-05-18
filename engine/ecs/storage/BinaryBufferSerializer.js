@@ -2,6 +2,8 @@ import { SerializationFlags, SerializationMetadata } from "../components/Seriali
 import { assert } from "../../../core/assert.js";
 import { BinaryCollectionSerializer } from "./binary/collection/BinaryCollectionSerializer.js";
 import { COMPONENT_SERIALIZATION_TRANSIENT_FIELD } from "./COMPONENT_SERIALIZATION_TRANSIENT_FIELD.js";
+import { currentTimeInSeconds } from "../../Clock.js";
+
 
 class BinaryBufferSerialization {
     constructor() {
@@ -52,8 +54,11 @@ class BinaryBufferSerialization {
 
             const className = componentType.typeName;
 
+
             collectionSerializer.setClass(className);
             collectionSerializer.initialize();
+
+            const __start_time = currentTimeInSeconds();
 
             let lastEntity = 0;
 
@@ -75,6 +80,8 @@ class BinaryBufferSerialization {
 
             const numComponentsWritten = collectionSerializer.getElementCount();
 
+            const __end_time = currentTimeInSeconds();
+
             collectionSerializer.finalize();
 
             if (numComponentsWritten > 0) {
@@ -84,7 +91,7 @@ class BinaryBufferSerialization {
 
                 //print size of the component set
                 const componentsByteSize = currentPosition - positionComponentsStart;
-                console.log(`Component ${componentType.typeName} written. Count: ${numComponentsWritten}, Bytes: ${componentsByteSize}, Bytes/component: ${Math.ceil(componentsByteSize / numComponentsWritten)}`);
+                console.log(`Component ${componentType.typeName} written. Count: ${numComponentsWritten}, Bytes: ${componentsByteSize}, Bytes/component: ${Math.ceil(componentsByteSize / numComponentsWritten)}. Time taken: ${((__end_time - __start_time) * 1000).toFixed(2)}ms`);
             } else {
                 //no elements written, lets re-wind to skip the type
                 buffer.position = positionComponentsStart;
