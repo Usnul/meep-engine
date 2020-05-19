@@ -1,4 +1,5 @@
 import { ReactiveTrigger } from "./ReactiveTrigger.js";
+import { assert } from "../../../assert.js";
 
 export class BlackboardTrigger {
     constructor() {
@@ -45,6 +46,8 @@ export class BlackboardTrigger {
      * @param {Blackboard} blackboard
      */
     link(blackboard) {
+        assert.defined(blackboard, 'blackboard');
+
         if (this.isLinked) {
             //already linked
             return;

@@ -5,6 +5,7 @@ import ListView from "../../../../../view/common/ListView.js";
 import ObservedValue from "../../../../../core/model/ObservedValue.js";
 import EmptyView from "../../../../../view/elements/EmptyView.js";
 import { StoryAction } from "../../../../../../model/game/story/action/StoryAction.js";
+import { NativeListController } from "../../../../../view/controller/controls/NativeListController.js";
 
 const storyActionControllerParamFactories = {
     [StoryActionType.Delay]: {
@@ -98,16 +99,12 @@ class StoryActionController extends DatGuiController {
     /**
      *
      * @param {StoryAction} action
-     * @param {function} remove
      */
-    constructor(action, remove) {
+    constructor(action) {
         super();
 
         this.addClass('story-action');
 
-        const proxy = {
-            remove
-        };
 
         const control = this.addControl(action, 'type', StoryActionType);
 
@@ -129,7 +126,6 @@ class StoryActionController extends DatGuiController {
             });
         }
 
-        this.addControl(proxy, 'remove');
     }
 }
 
@@ -137,13 +133,11 @@ class StoryTriggerController extends EmptyView {
     /**
      *
      * @param {StoryTrigger} trigger
-     * @param {function} remove
      */
-    constructor(trigger, remove) {
+    constructor(trigger) {
         super({ classList: ['story-trigger'] });
 
         const proxy = {
-            remove,
             actionType: StoryActionType.Unknown,
             active: trigger.active.getValue(),
             addAction() {
@@ -158,7 +152,6 @@ class StoryTriggerController extends EmptyView {
 
 
         const dat = new DatGuiController();
-        dat.addControl(proxy, 'remove');
         dat.addControl(trigger, "code").onFinishChange(() => trigger.compile());
         dat.addControl(proxy, 'active').onChange(() => trigger.active.set(proxy.active));
 
@@ -168,12 +161,14 @@ class StoryTriggerController extends EmptyView {
 
         this.addChild(dat);
 
-        this.addChild(new ListView(trigger.actions, {
+        this.addChild(new NativeListController({
+            model:trigger.actions,
             classList: ["actions"],
-            elementFactory(action) {
-                return new StoryActionController(action, () => {
-                    trigger.actions.removeOneOf(action);
-                });
+            elementFactory() {
+                return new StoryAction();
+            },
+            elementViewFactory(action){
+                return new StoryActionController(action);
             }
         }));
     }
@@ -191,37 +186,27 @@ export class StoryTriggerSetController extends EmptyView {
         this.model = model;
 
 
-        const proxy = {
-            code: "true",
-            addTrigger() {
-                const trigger = new StoryTrigger();
-
-                trigger.code = proxy.code;
-
-                model.getValue().elements.add(trigger);
-            }
-        };
-
-        const dat = new DatGuiController();
-
-
-        dat.addControl(proxy, 'code');
-        dat.addControl(proxy, 'addTrigger').name('+trigger');
-
         this.model.onChanged.add((triggers) => {
             this.removeAllChildren();
 
-            this.addChild(dat);
 
             if (triggers !== null) {
-                const view = new ListView(triggers.elements, {
-                    elementFactory(trigger) {
-                        return new StoryTriggerController(trigger, () => {
-                            triggers.elements.removeOneOf(trigger);
-                        });
+
+                /**
+                 * @type {List<StoryTrigger>}
+                 */
+                const list = triggers.elements;
+
+                const view = new NativeListController({
+                    model: list,
+                    elementFactory() {
+                        return new StoryTrigger();
+                    },
+                    elementViewFactory(trigger) {
+                        return new StoryTriggerController(trigger);
                     },
                     classList: ['triggers']
-                });
+                })
 
                 this.addChild(view);
             }

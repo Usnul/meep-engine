@@ -726,6 +726,8 @@ class View {
         for (let i = 0; i < n; i++) {
             const name = names[i];
 
+            assert.typeOf(name, 'string', 'name');
+
             classList.add(name);
         }
     }

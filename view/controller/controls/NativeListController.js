@@ -9,13 +9,16 @@ export class NativeListController extends View {
      * @param {List} model
      * @param {function} elementViewFactory
      * @param {function} elementFactory
+     * @param {string[]} [classList]
      */
-    constructor({ model, elementViewFactory, elementFactory }) {
+    constructor({ model, elementViewFactory, elementFactory, classList=[] }) {
         super();
 
         this.el = document.createElement('div');
 
         this.addClass('ui-native-list-controller');
+
+        this.addClasses(classList);
 
         this.addChild(new ListView(model, {
             elementFactory(el) {

@@ -1,8 +1,8 @@
 import { assert } from "../../../core/assert.js";
 import EditorEntity from "../../ecs/EditorEntity.js";
-import { seededRandom } from "../../../core/math/MathUtils.js";
 import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
 import { ComponentSymbolicDisplay } from "./ComponentSymbolicDisplay.js";
+import { SymbolicDisplayInternalAPI } from "./SymbolicDisplayInternalAPI.js";
 
 /**
  *
@@ -38,12 +38,6 @@ export function make3DSymbolicDisplay({
      */
     const entityBindings = [];
 
-    /**
-     *
-     * @type {FrameRunner[][]}
-     */
-    const entityFrameRunners = [];
-
     function added(...args) {
         const entity = args[args.length - 1];
 
@@ -55,50 +49,20 @@ export function make3DSymbolicDisplay({
             return;
         }
 
+
+        const api = new SymbolicDisplayInternalAPI();
+
+        api.__engine = engine;
+        api.__requestUpdate.add(() => {
+            removed(...args);
+            added(...args);
+        });
+
         /**
          *
          * @type {SignalBinding[]}
          */
-        const bindings = [];
-
-        const random = seededRandom(42);
-
-        const frameRunners = [];
-
-
-        const api = {
-            bind(signal, action, context) {
-                const binding = new SignalBinding(signal, action, context);
-                bindings.push(binding);
-                binding.link();
-            },
-
-            onFrame(method, thisArg) {
-                api.bind(engine.graphics.on.visibilityConstructionEnded, method, thisArg);
-            },
-
-            unbind(signal, action, context) {
-                for (let i = 0; i < bindings.length; i++) {
-
-                    const b = bindings[i];
-
-                    if (b.signal === signal && b.handler === action && b.context === context) {
-                        b.unlink();
-
-                        bindings.splice(i, 1);
-                        return true;
-                    }
-                }
-                return false;
-
-            },
-            update() {
-                removed(...args);
-                added(...args);
-            },
-            random,
-            bindings
-        };
+        const bindings = api.bindings;
 
         let helper;
 
@@ -117,13 +81,11 @@ export function make3DSymbolicDisplay({
                 console.warn(`Cleaning up ${bindings.length} accidental bindings`);
 
                 bindings.forEach(b => b.unlink());
-                frameRunners.forEach(r => r.shutdown());
             }
             return;
         }
 
         entityBindings[entity] = bindings;
-        entityFrameRunners[entity] = frameRunners;
 
         bindings.forEach(b => b.link());
 
@@ -144,12 +106,6 @@ export function make3DSymbolicDisplay({
         const binding = entityBindings[entity];
 
         binding.forEach(b => b.unlink());
-
-        const frameRunners = entityFrameRunners[entity];
-
-        frameRunners.forEach(r => r.shutdown());
-
-        delete entityFrameRunners[entity];
 
         delete entityBindings[entity];
 
