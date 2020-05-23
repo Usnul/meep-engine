@@ -48,9 +48,9 @@ export class AsynchronousActionSequence extends AsynchronousAction {
      *
      * @private
      */
-    __handleActiveFailed() {
+    __handleActiveFailed(reason) {
         this.__finalizeActive();
-        this.__fail();
+        this.__fail(reason);
     }
 
     /**

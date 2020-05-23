@@ -40,8 +40,8 @@ export class PromiseAsynchronousAction extends AsynchronousAction {
             () => {
                 this.__succeed();
             },
-            () => {
-                this.__fail();
+            (reason) => {
+                this.__fail(reason);
             }
         );
     }

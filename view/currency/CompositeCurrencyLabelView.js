@@ -27,7 +27,11 @@ export class CompositeCurrencyLabelView extends View {
     update() {
         this.removeAllChildren();
 
-        let remainder = this.value.getValue();
+        const value = this.value.getValue();
+        let remainder = Math.abs(value);
+
+        this.setClass('negative', value < 0);
+        this.setClass('positive', value > 0);
 
         const spec = this.spec;
 
