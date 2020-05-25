@@ -43,12 +43,20 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
 
         const entityBuilder = blueprint.buildEntityBuilder();
 
+        /**
+         *
+         * @type {GridPosition}
+         */
         const gp = entityBuilder.getComponent(GridPosition);
 
         if (gp !== null) {
             gp.copy(node.position);
         }
 
+        /**
+         *
+         * @type {Transform}
+         */
         const t = entityBuilder.getComponent(Transform);
 
         if (t !== null) {
