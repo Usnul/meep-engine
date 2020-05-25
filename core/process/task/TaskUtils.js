@@ -3,7 +3,8 @@
  */
 import Task from './Task.js';
 import TaskSignal from './TaskSignal.js';
-import { clamp } from "../../math/MathUtils.js";
+import { clamp, seededRandom } from "../../math/MathUtils.js";
+import { randomizeArrayElementOrder } from "../../collection/ArrayUtils.js";
 
 /**
  *
@@ -18,6 +19,66 @@ export function actionTask(action, name = "unnamed") {
             action();
 
             return TaskSignal.EndSuccess;
+        }
+    });
+}
+
+/**
+ *
+ * @param {number} seed RNG seed
+ * @param {number|function(*):number} initial
+ * @param {number|function(*):number} limit
+ * @param {function(index:int)} callback
+ * @returns {Task}
+ */
+export function randomCountTask(seed, initial, limit, callback) {
+
+    const random = seededRandom(seed);
+
+    const span = limit - initial;
+
+    const sequence = new Uint16Array(span);
+
+    let i = 0;
+
+    function cycle() {
+        if (i >= span) {
+            return TaskSignal.EndSuccess;
+        }
+
+        const order = sequence[i];
+
+        const index = order + initial;
+
+        callback(index);
+
+        i++;
+
+        return TaskSignal.Continue;
+    }
+
+    return new Task({
+        name: `Count ${initial} -> ${limit}`,
+        initializer() {
+
+            i = 0;
+
+            //generate sequence
+            for (let i = 0; i < span; i++) {
+                sequence[i] = i;
+            }
+
+            //shuffle
+            randomizeArrayElementOrder(sequence, random);
+        },
+        cycleFunction: cycle,
+        computeProgress: function () {
+
+            if (span === 0) {
+                return 0;
+            }
+
+            return i / span;
         }
     });
 }
