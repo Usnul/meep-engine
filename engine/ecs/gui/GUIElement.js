@@ -130,8 +130,8 @@ class GUIElement {
      * @returns {GUIElement}
      */
     static fromView(view) {
-        assert.notEqual(view, undefined, 'view is undefined');
-        assert.notEqual(view, null, 'view is null');
+        assert.defined(view, 'view');
+        assert.notNull(view, 'view');
 
         const r = new GUIElement();
 

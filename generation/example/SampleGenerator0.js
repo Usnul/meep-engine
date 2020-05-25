@@ -20,7 +20,7 @@ import { GridTaskConnectRooms } from "../grid/tasks/GridTaskConnectRooms.js";
 import { matcher_tag_traversable } from "./rules/matcher_tag_traversable.js";
 import { GridTaskGenerateRoads } from "../grid/tasks/road/GridTaskGenerateRoads.js";
 import { mir_generator_place_road_decorators } from "./generators/mir_generator_place_road_decorators.js";
-import { TypeMarkerNodeMatcher } from "../markers/matcher/TypeMarkerNodeMatcher.js";
+import { MarkerNodeMatcherByType } from "../markers/matcher/MarkerNodeMatcherByType.js";
 import { mir_generator_place_buff_objects } from "./generators/mir_generator_place_buff_objects.js";
 
 
@@ -42,7 +42,7 @@ pTreasureCorner.addRule(0, 0, matcher_tag_traversable_unoccupied);
 
 const pNoTreasureIn3 = new GridPatternMatcher();
 pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(
-    TypeMarkerNodeMatcher.from('Treasure'), 3
+    MarkerNodeMatcherByType.from('Treasure'), 3
 )));
 
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
@@ -70,7 +70,7 @@ pNearTreasure.addRule(0, 0,
 pNearTreasure.addRule(1, 1, MATCH_TREASURE);
 pNearTreasure.addRule(2, 2, MATCH_NOT_EMPTY);
 
-const MATCH_ENEMY_IN_3 = GridCellRuleContainsMarkerWithinRadius.from(TypeMarkerNodeMatcher.from('Enemy'), 3);
+const MATCH_ENEMY_IN_3 = GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Enemy'), 3);
 
 const MATCH_NO_ENEMY_IN_3 = CellMatcherNot.from(MATCH_ENEMY_IN_3);
 

@@ -10,7 +10,7 @@ import { GridCellRuleContainsMarkerWithinRadius } from "../../rules/cell/GridCel
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
-import { TypeMarkerNodeMatcher } from "../../markers/matcher/TypeMarkerNodeMatcher.js";
+import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 
 const pMatcher = new GridPatternMatcher();
 
@@ -22,7 +22,7 @@ pMatcher.addRule(1, 1, matcher_tag_traversable_unoccupied);
 
 //no other bases nearby
 pMatcher.addRule(0, 0, CellMatcherNot.from(
-    GridCellRuleContainsMarkerWithinRadius.from(TypeMarkerNodeMatcher.from('Base'), 25)
+    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Base'), 25)
 ));
 
 const placeTags = new GridCellActionPlaceTags();

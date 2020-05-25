@@ -9,7 +9,7 @@ import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { GridCellRuleContainsMarkerWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerWithinRadius.js";
-import { TypeMarkerNodeMatcher } from "../../markers/matcher/TypeMarkerNodeMatcher.js";
+import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MarkerNodeMatcherContainsTag } from "../../markers/matcher/MarkerNodeMatcherContainsTag.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 
@@ -28,7 +28,7 @@ const TAG_ROAD_DECORATOR = 'Road Decorator';
 matchBend90.addRule(0, 0,
     CellMatcherAnd.from(
         CellMatcherAnd.from(
-            CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(TypeMarkerNodeMatcher.from('Road Connector'), 2)),
+            CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Road Connector'), 2)),
             CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherContainsTag.from(TAG_ROAD_DECORATOR), 3))
         ),
         CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherAny.INSTANCE, 0.5))

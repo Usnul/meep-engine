@@ -57,8 +57,8 @@ export class CellFilterGaussianBlur extends CellFilter {
         const samplesX = this.samples_x;
         const samplesY = this.samples_y;
 
-        const half_samples_x = samplesX / 2;
-        const half_samples_y = samplesY / 2;
+        const half_samples_x = (samplesX / 2);
+        const half_samples_y = (samplesY / 2);
 
         const sizeX = this.size_x;
         const sizeY = this.size_y;

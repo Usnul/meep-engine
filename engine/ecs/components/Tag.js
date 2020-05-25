@@ -71,6 +71,19 @@ export class Tag {
     }
 
     /**
+     * Add multiple tags
+     * @param {string[]} values
+     */
+    addAll(values) {
+        const n = values.length;
+        for (let i = 0; i < n; i++) {
+            const value = values[i];
+
+            this.add(value);
+        }
+    }
+
+    /**
      *
      * @returns {String}
      */
