@@ -13,6 +13,24 @@ export class MarkerNodeProcessingRuleSet {
 
     /**
      *
+     * @param {number} seed
+     */
+    initialize(seed) {
+
+        assert.isNumber(seed, 'seed');
+
+        const elements = this.elements;
+        const n = elements.length;
+
+        for (let i = 0; i < n; i++) {
+            const rule = elements[i];
+
+            rule.initialize(seed);
+        }
+    }
+
+    /**
+     *
      * @param {MarkerProcessingRule} rule
      */
     add(rule) {

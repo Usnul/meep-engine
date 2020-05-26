@@ -811,15 +811,17 @@ class Terrain {
             this.samplerHeight = sampler;
             this.updateHeightTexture();
 
-            const s = this.samplerHeight;
-
-            this.buildWorker.setHeightSampler(s.data, s.itemSize, s.width, s.height);
+            this.updateWorkerHeights();
         });
 
     }
 
     startBuildService() {
         this.buildWorker.start();
+        this.updateWorkerHeights();
+    }
+
+    updateWorkerHeights() {
         const s = this.samplerHeight;
         this.buildWorker.setHeightSampler(s.data, s.itemSize, s.width, s.height);
     }
@@ -861,9 +863,7 @@ class Terrain {
             //modern build path
             this.updateHeightTexture();
 
-            const samplerHeight = this.samplerHeight;
-
-            this.buildWorker.setHeightSampler(samplerHeight.data, samplerHeight.itemSize, samplerHeight.width, samplerHeight.height);
+            this.updateWorkerHeights();
 
             this.layers.buildTexture();
 

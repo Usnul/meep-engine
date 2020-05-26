@@ -19,8 +19,6 @@ export class CellFilterConstant extends CellFilter {
      */
     static from(value) {
         assert.isNumber(value, 'value');
-        assert.greaterThanOrEqual(value, 0, 'value >= 0');
-        assert.lessThanOrEqual(value, 1, 'value <= 1');
 
         const r = new CellFilterConstant();
 

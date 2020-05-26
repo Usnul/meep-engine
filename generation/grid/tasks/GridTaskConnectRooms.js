@@ -16,6 +16,8 @@ import { matcher_tag_unoccupied } from "../../example/rules/matcher_tag_unoccupi
 import { buildDistanceMapToObjective } from "./util/buildDistanceMapToObjective.js";
 import { buildPathFromDistanceMap } from "./util/buildPathFromDistanceMap.js";
 
+const ESTIMATED_TILES_PER_ROOM = 900;
+
 /**
  * Algorithm works in the following steps:
  * 1) keep a closed set of tiles, these are the tiles that are "connected"
@@ -130,7 +132,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             computeProgress() {
                 return i / gridSize;
             },
-            estimatedDuration: gridSize
+            estimatedDuration: gridSize / 10000
         });
     }
 
@@ -451,6 +453,8 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         const thickness = this.thickness;
         let i = 0;
 
+        const estimatedNumberOfRooms = gridSize / ESTIMATED_TILES_PER_ROOM;
+
         const tMain = new Task({
             cycleFunction: () => {
 
@@ -469,6 +473,20 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
                 i++;
 
                 return TaskSignal.Continue;
+            },
+            estimatedDuration: gridSize / 10000,
+            computeProgress() {
+
+                const p = i / estimatedNumberOfRooms;
+
+                if (Number.isNaN(p)) {
+                    return 0;
+                } else if (p > 1) {
+                    return 1;
+                } else {
+                    return p;
+                }
+
             }
         });
 

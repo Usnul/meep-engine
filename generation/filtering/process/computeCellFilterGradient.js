@@ -25,7 +25,7 @@ export function computeCellFilterGradient(result, x, y, filter, grid) {
     const dY = (bottomLeft + 2.0 * bottom + bottomRight) - (topLeft + 2.0 * top + topRight);
 
     //normalize vector
-    const magnitude = Math.sqrt(dX * dX + dY * dY + 0.25);
+    const magnitude = Math.sqrt(dX * dX + dY * dY);
 
     const _x = dX / magnitude;
     const _y = dY / magnitude;

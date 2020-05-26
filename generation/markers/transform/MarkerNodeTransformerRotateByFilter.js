@@ -29,6 +29,10 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
         this.offset = 0;
     }
 
+    initialize(seed) {
+        this.filter.initialize(seed);
+    }
+
     /**
      *
      * @param {CellFilter} filter
@@ -51,7 +55,11 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
         computeCellFilterGradient(v2, node.position.x, node.position.y, this.filter, grid);
 
         //compute angle from the gradient
-        const gradientAngle = Math.atan2(v2[1], v2[0]);
+
+        const gradient_x = v2[0];
+        const gradient_y = v2[1];
+
+        const gradientAngle = Math.atan2(gradient_y, gradient_x);
 
         const finalAngle = this.offset + gradientAngle;
 

@@ -1,3 +1,5 @@
+import { assert } from "../../../core/assert.js";
+
 export class MarkerProcessingRule {
     constructor() {
         /**
@@ -23,5 +25,30 @@ export class MarkerProcessingRule {
          * @type {boolean}
          */
         this.consume = true;
+    }
+
+    /**
+     *
+     * @param {number} seed
+     */
+    initialize(seed) {
+        assert.isNumber(seed, 'seed');
+
+        const transformers = this.transformers;
+        const nT = transformers.length;
+
+        for (let i = 0; i < nT; i++) {
+            const transformer = transformers[i];
+            transformer.initialize(seed);
+        }
+
+        const actions = this.actions;
+        const nA = actions.length;
+
+        for (let i = 0; i < nA; i++) {
+            const action = actions[i];
+            //TODO initialize actions
+        }
+
     }
 }

@@ -107,6 +107,48 @@ export class ThemeEngine {
 
     /**
      *
+     * @param {number} seed
+     * @param {EntityComponentDataset} ecd
+     * @param {GridData} grid
+     * @returns {Task}
+     */
+    initializeThemes(seed, ecd, grid) {
+
+        return actionTask(() => {
+            /**
+             *
+             * @type {AreaTheme[]}
+             */
+            const areas = [];
+
+            this.areas.getRawData(areas);
+
+            /**
+             *
+             * @type {Theme[]}
+             */
+            const themes = [];
+
+            const n = areas.length;
+            for (let i = 0; i < n; i++) {
+                const areaTheme = areas[i];
+
+                const theme = areaTheme.theme;
+
+                if (themes.indexOf(theme) === -1) {
+                    themes.push(theme);
+
+                    const seed = this.random();
+
+                    theme.initialize(seed, ecd, grid);
+                }
+            }
+
+        });
+    }
+
+    /**
+     *
      * @param {GridData} grid
      * @param {Terrain} terrain
      * @returns {TaskGroup}
@@ -149,36 +191,6 @@ export class ThemeEngine {
         //splat map size can vary from the terrain size, for that reason we write splat weights into an intermediate storage so we can re-sample it to splat map after
         const weights = Sampler2D.uint8(layerCount, width, height);
 
-        const tInitializeThemes = actionTask(() => {
-            /**
-             *
-             * @type {AreaTheme[]}
-             */
-            const areas = [];
-
-            this.areas.getRawData(areas);
-
-            /**
-             *
-             * @type {Theme[]}
-             */
-            const themes = [];
-
-            const n = areas.length;
-            for (let i = 0; i < n; i++) {
-                const areaTheme = areas[i];
-
-                const theme = areaTheme.theme;
-
-                if (themes.indexOf(theme) === -1) {
-                    themes.push(theme);
-
-                    const seed = this.random();
-                    theme.initialize(seed);
-                }
-            }
-
-        });
 
         const tApplyThemes = countTask(0, width * height, (index) => {
             const y = (index / width) | 0;
@@ -242,8 +254,6 @@ export class ThemeEngine {
 
         });
 
-        tApplyThemes.addDependency(tInitializeThemes);
-
 
         //re-sample weights
         const weightSample = [];
@@ -278,7 +288,7 @@ export class ThemeEngine {
 
         tasks.forEach(t => t.addDependency(tResample));
 
-        return new TaskGroup([tInitializeThemes, tApplyThemes, tResample].concat(tasks), 'Applying a level generation theme');
+        return new TaskGroup([tApplyThemes, tResample].concat(tasks), 'Applying a level generation theme');
     }
 
     /**
@@ -384,15 +394,99 @@ export class ThemeEngine {
      *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
+     */
+    applyCellRules(grid, ecd) {
+
+        const width = grid.width;
+        const height = grid.height;
+
+        /**
+         *
+         * @type {AreaTheme[]}
+         */
+        const matchingThemes = [];
+
+        return countTask(0, width * height, (index) => {
+            const y = (index / width) | 0;
+            const x = index % width;
+
+            const matchingThemeCount = this.getThemesByPosition(matchingThemes, x, y);
+
+            for (let i = 0; i < matchingThemeCount; i++) {
+                const areaTheme = matchingThemes[i];
+
+                const theme = areaTheme.theme;
+
+                /**
+                 *
+                 * @type {CellProcessingRule[]}
+                 */
+                const cellRules = theme.cells.elements;
+
+                const cellRuleCount = cellRules.length;
+
+                for (let j = 0; j < cellRuleCount; j++) {
+                    const rule = cellRules[j];
+
+                    rule.action.execute(ecd, grid, x, y, 0, rule.filter);
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     * @param {Terrain} terrain
+     * @returns {Task}
+     */
+    updateTerrain(terrain) {
+
+        const optimizer = new SplatMapOptimizer();
+        optimizer.mapping = terrain.splat;
+
+        const tasks = optimizer.optimize();
+
+        const tOptimizeSplats = new TaskGroup(tasks, 'optimize splat maps');
+
+        const tUpdateHeights = actionTask(() => {
+
+            terrain.updateWorkerHeights();
+            terrain.tiles.rebuild();
+
+        }, 'update terrain');
+
+        return new TaskGroup([tUpdateHeights, tOptimizeSplats]);
+    }
+
+    /**
+     *
+     * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @returns {TaskGroup}
      */
     apply(grid, ecd) {
         const terrain = obtainTerrain(ecd);
 
+        const tInitializeThemes = this.initializeThemes(this.random(), ecd, grid);
+
         const tTerrain = this.applyTerrainThemes(grid, terrain);
 
         const tNodes = this.applyNodes(grid, ecd);
 
-        return new TaskGroup([tTerrain, tNodes]);
+        const tCells = this.applyCellRules(grid, ecd);
+
+        tTerrain.addDependency(tInitializeThemes);
+        tNodes.addDependency(tInitializeThemes);
+        tCells.addDependency(tInitializeThemes);
+
+        const tUpdateTerrain = this.updateTerrain(terrain);
+
+        tUpdateTerrain.addDependencies([
+            tTerrain,
+            tNodes,
+            tCells
+        ]);
+
+        return new TaskGroup([tInitializeThemes, tTerrain, tNodes, tCells, tUpdateTerrain]);
     }
 }

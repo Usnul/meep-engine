@@ -27,6 +27,9 @@ import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
 import { MarkerNodeTransformerRotateByFilter } from "../../markers/transform/MarkerNodeTransformerRotateByFilter.js";
 import { PI_HALF } from "../../../core/math/MathUtils.js";
 import { CellFilterGaussianBlur } from "../../filtering/CellFilterGaussianBlur.js";
+import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
+import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
+import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -68,7 +71,6 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 ));
 
 SampleTheme0.terrain = terrainTheme;
-
 
 const ebpTreasure = new EntityBlueprint();
 ebpTreasure.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_yellow.gltf', castShadow: true, receiveShadow: true }));
@@ -133,6 +135,22 @@ nrEnemy.actions.push(MarkerNodeActionEntityPlacement.from(ebpEnemy, Transform.fr
     scale: { x: 0.3, y: 0.5, z: 0.3 },
     position: { x: 0, y: 0.5, z: 0 }
 })));
+
+nrEnemy.transformers.push(
+    MarkerNodeTransformerRotateByFilter.from(
+        CellFilterLerp.from(
+            CellFilterGaussianBlur.from(
+                CellFilterCellMatcher.from(matcher_tag_not_traversable)
+                ,
+                2,
+                2
+            ),
+            CellFilterSimplexNoise.from(50, 50),
+            CellFilterConstant.from(0.8)
+        ),
+        -PI_HALF
+    )
+);
 
 SampleTheme0.nodes.add(nrEnemy);
 
@@ -277,3 +295,43 @@ nrBuffObjectCampfire.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffOb
 })));
 
 SampleTheme0.nodes.add(nrBuffObjectCampfire);
+
+
+//HEIGHT
+// ====================
+
+const aHeight = new ContinuousGridCellActionSetTerrainHeight();
+
+aHeight.target = CellFilterLerp.from(
+    CellFilterConstant.from(-2),
+    CellFilterConstant.from(7),
+    CellFilterMultiply.from(
+        CellFilterSimplexNoise.from(30, 30),
+        CellFilterSimplexNoise.from(13, 13)
+    )
+);
+
+const mHeightArea = new GridPatternMatcher();
+
+mHeightArea.addRule(-1, -1, matcher_tag_not_traversable);
+mHeightArea.addRule(0, -1, matcher_tag_not_traversable);
+mHeightArea.addRule(1, -1, matcher_tag_not_traversable);
+
+mHeightArea.addRule(-1, 0, matcher_tag_not_traversable);
+mHeightArea.addRule(0, 0, matcher_tag_not_traversable);
+mHeightArea.addRule(1, 0, matcher_tag_not_traversable);
+
+mHeightArea.addRule(-1, 1, matcher_tag_not_traversable);
+mHeightArea.addRule(0, 1, matcher_tag_not_traversable);
+mHeightArea.addRule(1, 1, matcher_tag_not_traversable);
+
+SampleTheme0.cells.add(CellProcessingRule.from(
+    CellFilterGaussianBlur.from(
+        CellFilterCellMatcher.from(
+            mHeightArea
+        ),
+        1,
+        1
+    ),
+    aHeight
+))
