@@ -35,15 +35,16 @@ export function convertHeightMap2NormalMap(heightSampler) {
             const columnLeft = max2(x - 1, 0);
             const columnRight = min2(x + 1, maxX);
 
-            //
+            // read surrounding points
+            const topLeft = heightData[rowIndexTop + columnLeft];
             const top = heightData[rowIndexTop + x];
-            const bottom = heightData[rowIndexBottom + x];
+            const topRight = heightData[rowIndexTop + columnRight];
+
             const left = heightData[rowIndex + columnLeft];
             const right = heightData[rowIndex + columnRight];
-            //
-            const topLeft = heightData[rowIndexTop + columnLeft];
-            const topRight = heightData[rowIndexTop + columnRight];
+
             const bottomLeft = heightData[rowIndexBottom + columnLeft];
+            const bottom = heightData[rowIndexBottom + x];
             const bottomRight = heightData[rowIndexBottom + columnRight];
             //
             const dX = (topRight + 2.0 * right + bottomRight) - (topLeft + 2.0 * left + bottomLeft);

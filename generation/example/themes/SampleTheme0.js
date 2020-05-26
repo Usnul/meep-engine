@@ -24,6 +24,9 @@ import Tag from "../../../engine/ecs/components/Tag.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
 import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
+import { MarkerNodeTransformerRotateByFilter } from "../../markers/transform/MarkerNodeTransformerRotateByFilter.js";
+import { PI_HALF } from "../../../core/math/MathUtils.js";
+import { CellFilterGaussianBlur } from "../../filtering/CellFilterGaussianBlur.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -76,6 +79,16 @@ const nrTreasure = new MarkerProcessingRule();
 
 nrTreasure.consume = true;
 nrTreasure.matcher = MarkerNodeMatcherByType.from('Treasure');
+nrTreasure.transformers.push(
+    MarkerNodeTransformerRotateByFilter.from(
+        CellFilterGaussianBlur.from(
+            CellFilterCellMatcher.from(matcher_tag_not_traversable),
+            1,
+            1
+        ),
+        -PI_HALF
+    )
+);
 
 nrTreasure.actions.push(MarkerNodeActionEntityPlacement.from(ebpTreasure, Transform.fromJSON({
     scale: { x: 0.25, y: 0.25, z: 0.5 },

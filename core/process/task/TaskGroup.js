@@ -114,6 +114,8 @@ TaskGroup.prototype.getEstimatedDuration = function () {
     const n = children.length;
     for (let i = 0; i < n; i++) {
 
+        const child = children[i];
+
         const childDuration = child.getEstimatedDuration();
 
         if (!(isNaN(childDuration) || childDuration < 0)) {
@@ -134,7 +136,12 @@ TaskGroup.prototype.computeProgress = function () {
     let progressTotal = 0;
 
     for (let i = 0; i < numChildren; i++) {
+        /**
+         *
+         * @type {Task|TaskGroup}
+         */
         const child = children[i];
+
         const estimatedDuration = child.getEstimatedDuration();
 
         if (isNaN(estimatedDuration)) {

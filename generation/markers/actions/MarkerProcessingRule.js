@@ -5,6 +5,13 @@ export class MarkerProcessingRule {
          */
         this.matcher = null;
 
+
+        /**
+         *
+         * @type {MarkerNodeTransformer[]}
+         */
+        this.transformers = [];
+
         /**
          *
          * @type {MarkerNodeAction[]}

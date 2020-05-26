@@ -1,5 +1,6 @@
 import Vector2 from "../../core/geom/Vector2.js";
 import { Transform } from "../../engine/ecs/components/Transform.js";
+import { copyArray } from "../../core/collection/array/copyArray.js";
 
 export class MarkerNode {
     constructor() {
@@ -31,6 +32,36 @@ export class MarkerNode {
          * @type {Object}
          */
         this.properties = {};
+    }
+
+    /**
+     *
+     * @returns {MarkerNode}
+     */
+    clone() {
+        const r = new MarkerNode();
+
+        r.copy(this);
+
+        return r;
+    }
+
+    /**
+     *
+     * @param {MarkerNode} other
+     */
+    copy(other) {
+        this.type = other.type;
+
+        copyArray(other.tags, this.tags);
+
+        this.position.copy(other.position);
+
+        this.transofrm.copy(other.transofrm);
+
+        this.size = other.size;
+
+        this.properties = Object.assign({}, other.properties);
     }
 
     /**
