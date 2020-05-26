@@ -28,39 +28,6 @@ function TaskGroup(subtasks, name = 'Unnamed') {
      */
     this.children = subtasks;
 
-
-    const self = this;
-
-    this.computeProgress = function () {
-        const children = self.children;
-        const numChildren = children.length;
-        let progressSum = 0;
-        let progressTotal = 0;
-        for (let i = 0; i < numChildren; i++) {
-            const child = children[i];
-            const estimatedDuration = child.getEstimatedDuration();
-
-            if (isNaN(estimatedDuration)) {
-                //Duration is not a number, ignore this child
-                continue;
-            }
-
-            const childProgress = child.computeProgress();
-
-            assert.ok(childProgress >= 0 && childProgress <= 1, `Expected progress to be between 0 and 1, instead was '${childProgress}' for child '${child.name}'`);
-
-            progressSum += childProgress * estimatedDuration;
-            progressTotal += estimatedDuration;
-        }
-
-        if (progressTotal === 0) {
-            return 0;
-        } else {
-            return progressSum / progressTotal;
-        }
-
-    };
-
     this.on = {
         started: new Signal(),
         completed: new Signal(),
@@ -137,17 +104,58 @@ TaskGroup.prototype.addDependencies = function (dependencies) {
 
 };
 
+/**
+ *
+ * @returns {number}
+ */
 TaskGroup.prototype.getEstimatedDuration = function () {
-    return this.children.reduce(function (s, child) {
+    let result = 0;
+    const children = this.children;
+    const n = children.length;
+    for (let i = 0; i < n; i++) {
+
         const childDuration = child.getEstimatedDuration();
 
-        if (isNaN(childDuration) || childDuration < 0) {
-            return s;
-        } else {
-            return s + childDuration;
+        if (!(isNaN(childDuration) || childDuration < 0)) {
+            result += childDuration;
         }
 
-    }, 0);
+    }
+
+    return result;
+};
+
+
+TaskGroup.prototype.computeProgress = function () {
+    const children = this.children;
+    const numChildren = children.length;
+
+    let progressSum = 0;
+    let progressTotal = 0;
+
+    for (let i = 0; i < numChildren; i++) {
+        const child = children[i];
+        const estimatedDuration = child.getEstimatedDuration();
+
+        if (isNaN(estimatedDuration)) {
+            //Duration is not a number, ignore this child
+            continue;
+        }
+
+        const childProgress = child.computeProgress();
+
+        assert.ok(childProgress >= 0 && childProgress <= 1, `Expected progress to be between 0 and 1, instead was '${childProgress}' for child '${child.name}'`);
+
+        progressSum += childProgress * estimatedDuration;
+        progressTotal += estimatedDuration;
+    }
+
+    if (progressTotal === 0) {
+        return 0;
+    } else {
+        return progressSum / progressTotal;
+    }
+
 };
 
 /**
