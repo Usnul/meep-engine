@@ -10,11 +10,10 @@ import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import { buildPlanarRenderLayerClipPlaneComputationMethod } from "../../render/RenderLayerUtils.js";
 import ThreeFactory from "../../three/ThreeFactory.js";
 import { threeUpdateTransform } from "../../Utils.js";
-import { NodeWaterShader } from "../water2/NodeWaterShader1.js";
-import { NodeFrame } from "three/examples/jsm/nodes/core/NodeFrame.js";
 import { StandardFrameBuffers } from "../../GraphicsEngine.js";
 import { RenderPassType } from "../../render/RenderPassType.js";
 import { obtainTerrain } from "../../../../../model/game/scenes/SceneUtils.js";
+import { makeAlexWaterMaterial } from "../water2/shader/AlexWaterShader.js";
 
 const WATER_SIZE = 800;
 
@@ -48,8 +47,6 @@ class WaterSystem extends System {
         //TODO come up with a less convoluted design
 
         this.cleaup = [];
-
-        this.frame = new NodeFrame();
 
         /**
          *
@@ -117,6 +114,12 @@ class WaterSystem extends System {
 
         const self = this;
 
+        /**
+         *
+         * @param {WebGLRenderer} renderer
+         * @param camera
+         * @param scene
+         */
         function preRenderHook(renderer, camera, scene) {
 
             const em = self.entityManager;
@@ -129,8 +132,10 @@ class WaterSystem extends System {
             dataset.traverseComponents(Water, function (component, entity) {
                 const shader = component.__shader;
 
-                shader.cameraNear.value = camera.near;
-                shader.cameraFar.value = camera.far;
+                shader.uniforms.fCameraNear.value = camera.near;
+                shader.uniforms.fCameraFar.value = camera.far;
+
+                renderer.getSize(shader.uniforms.vScreenResolution.value);
 
             });
         }
@@ -149,14 +154,14 @@ class WaterSystem extends System {
         const frameBuffer = this.graphicsEngine.frameBuffers.getById(StandardFrameBuffers.ColorAndDepth);
 
         /**
-         * @type {NodeWaterShader}
+         * @type {ShaderMaterial}
          */
         let water;
 
         if (component.__shader === null) {
-            water = new NodeWaterShader(
-                frameBuffer.renderTarget.depthTexture
-            );
+            water = makeAlexWaterMaterial();
+
+            water.uniforms.tDepthTexture.value = frameBuffer.renderTarget.depthTexture;
 
             component.__shader = water;
 
@@ -166,13 +171,14 @@ class WaterSystem extends System {
             water = component.__shader;
         }
 
-        water.level.value = component.level.getValue();
+        // water.level.value = component.level.getValue();
 
         const width = WATER_SIZE;
         const height = WATER_SIZE;
 
-        water.textureRepeat.value.set(width / 6, height / 6);
-        water.material.side = BackSide;
+        // water.textureRepeat.value.set(width / 6, height / 6);
+
+        water.side = BackSide;
 
         /**
          * @type {Object3D}
@@ -183,7 +189,7 @@ class WaterSystem extends System {
 
             mesh = ThreeFactory.createMesh(
                 geometry,
-                water.material
+                water
             );
 
 
@@ -217,8 +223,6 @@ class WaterSystem extends System {
             threeUpdateTransform(mesh);
 
             leafNode.move(0, 0, v - oldV);
-
-            water.level.value = v;
         }
 
         component.level.onChanged.add(processLevelValue);
@@ -299,21 +303,16 @@ class WaterSystem extends System {
 
         this.processUpdateQueue();
 
-        const frame = this.frame;
-
-        frame.setRenderer(renderer).update(timeDelta);
-
         dataset.traverseComponents(Water, function (component, entity) {
-            const shader = component.__shader;
-            const material = shader.material;
+            const material = component.__shader;
 
             if (material === undefined) {
-                console.error('Mater undefined on WaterComponent', entity, component);
+                console.error('Material undefined on WaterComponent', entity, component);
                 //skip
                 return;
             }
 
-            frame.updateNode(material);
+            material.uniforms.time.value += timeDelta;
 
             dataset.traverseEntities([Light, Transform], function (light, transform, lightEntity) {
                 if (light.type === Light.Type.DIRECTION && light.castShadow) {

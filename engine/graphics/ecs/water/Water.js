@@ -6,6 +6,7 @@
 import Vector3 from "../../../../core/geom/Vector3.js";
 import Vector1 from "../../../../core/geom/Vector1.js";
 import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import { ClampToEdgeWrapping, DataTexture, FloatType, LinearFilter, RedFormat } from "three";
 
 class Water {
     constructor(options) {
@@ -19,7 +20,7 @@ class Water {
 
         /**
          *
-         * @type {NodeWaterShader}
+         * @type {ShaderMaterial}
          */
         this.__shader = null;
 
@@ -48,9 +49,23 @@ class Water {
         const tW = terrain.size.x * terrain.gridScale;
         const tH = terrain.size.y * terrain.gridScale;
 
-        shader.heightTexture.value = terrain.heightTexture;
+        const heightTexture = new DataTexture(terrain.samplerHeight.data, terrain.samplerHeight.width, terrain.samplerHeight.width, RedFormat, FloatType);
 
-        shader.heightUv.value.set(
+        heightTexture.wrapS = ClampToEdgeWrapping;
+        heightTexture.wrapT = ClampToEdgeWrapping;
+
+        heightTexture.generateMipmaps = false;
+
+        heightTexture.minFilter = LinearFilter;
+        heightTexture.magFilter = LinearFilter;
+
+        heightTexture.flipY = false;
+
+        heightTexture.internalFormat = 'R32F';
+
+        shader.uniforms.tHeightTexture.value = heightTexture;
+
+        shader.uniforms.vHeightUv.value.set(
             -0.25,
             -0.25,
             (waterSize / tW),
@@ -63,7 +78,7 @@ class Water {
         const g = this.color.y;
         const b = this.color.z;
 
-        this.__shader.color.value.setRGB(r, g, b);
+        this.__shader.uniforms.waterColor.value.setRGB(r, g, b);
     }
 
     fromJSON(json) {
