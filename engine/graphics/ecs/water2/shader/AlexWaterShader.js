@@ -60,17 +60,7 @@ vec4 sampleTextureGaussian( sampler2D tex,vec2 uv, vec2 texelSize){
         
 void main(){
 
-    //sample water depth
-    vec2 depthUV = (vUv + vHeightUv.xy) * vHeightUv.zw;
-    
-    float height = texture2D(tHeightTexture, depthUV).r;
-    
-    float depth = level - height;
-    
-    if(depth < 0.0){
-        discard;
-    }
-    
+    //compute view depth
     float screenEnvDepth = texture2D(tDepthTexture, gl_FragCoord.xy / vScreenResolution ).x;
     
     float screenEnvDepthLinear = depthToLinear(screenEnvDepth, fCameraNear, fCameraFar);
@@ -81,19 +71,31 @@ void main(){
 
     float viewDepth = screenEnvDepthLinear - objectDepthLinear;
     
+    if(viewDepth < 0.0){
+        discard;
+    }
+    
+    //sample water depth relative to the sky
+    vec2 depthUV = (vUv + vHeightUv.xy) * vHeightUv.zw;
+    
+    float height = texture2D(tHeightTexture, depthUV).r;
+    
+    float depth = level - height;
+    
     vec4 shoreColor = vec4(0.219, 0.474, 0.572, 1.0);
     
     vec4 color = mix(
         shoreColor, 
         vec4(waterColor,1.0), 
-        smoothstep(0.0, 0.5, depth)
+        smoothstep(0.5, 1.5, depth)
     );
     
-    float alpha = clamp(viewDepth,0.0, 1.7) / 1.7;
+    //this simulates scattering under water
+    float fogAmount = 1.0 - exp(-viewDepth);
 
     gl_FragColor = color;
     
-    gl_FragColor.a *= alpha;
+    gl_FragColor.a *= fogAmount;
 }
 `;
 
