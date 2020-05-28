@@ -16,6 +16,7 @@ void main(){
 
 const fs = `
 uniform vec3 waterColor;
+
 uniform sampler2D tHeightTexture;
 uniform sampler2D tDepthTexture;
 
@@ -25,6 +26,11 @@ uniform float fCameraNear;
 uniform float fCameraFar;
 
 uniform vec4 vHeightUv;
+
+uniform float time;
+
+uniform float fWaveAmplitude;
+uniform float fWaveSpeed;
 
 varying vec2 vUv;
 varying float level;
@@ -84,10 +90,18 @@ void main(){
     
     vec4 shoreColor = vec4(0.219, 0.474, 0.572, 1.0);
     
+    float geoHash = (depthUV.x+ depthUV.y)*23.123;
+    
+    float waveHeightModifier = sin(geoHash + time*fWaveSpeed) / 3.14159265359;
+    
+    float waveHeight = depth+fWaveAmplitude*waveHeightModifier;
+    
+    float deepColorFactor = smoothstep(0.2, 0.7, waveHeight);
+    
     vec4 color = mix(
         shoreColor, 
         vec4(waterColor,1.0), 
-        smoothstep(0.5, 1.5, depth)
+        deepColorFactor
     );
     
     //this simulates scattering under water
@@ -136,6 +150,14 @@ export function makeAlexWaterMaterial() {
         waterColor: {
             type: 'c',
             value: new Color()
+        },
+        fWaveSpeed: {
+            type: 'f',
+            value: 1.7,
+        },
+        fWaveAmplitude: {
+            type: 'f',
+            value: 0.4
         }
     };
 
