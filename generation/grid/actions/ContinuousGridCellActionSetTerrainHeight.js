@@ -2,7 +2,7 @@ import { ContinuousGridCellAction } from "./ContinuousGridCellAction.js";
 import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import { assert } from "../../../core/assert.js";
-import { lerp } from "../../../core/math/MathUtils.js";
+import { lerp, min2 } from "../../../core/math/MathUtils.js";
 import { CellFilterConstant } from "../../filtering/CellFilterConstant.js";
 
 export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCellAction {
@@ -41,7 +41,6 @@ export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCell
 
     execute(ecd, grid, x, y, rotation, strength) {
 
-
         const g_width = grid.width;
         const g_height = grid.height;
 
@@ -68,10 +67,10 @@ export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCell
 
         //round down to nearest integer
         const x0 = Math.floor(s_x);
-        const x1 = Math.floor(s_x + scale_x);
+        const x1 = min2(hs_x_1, Math.ceil(s_x + scale_x));
 
         const y0 = Math.floor(s_y);
-        const y1 = Math.floor(s_y + scale_y);
+        const y1 = min2(hs_y_1, Math.ceil(s_y + scale_y));
 
         for (let _y = y0; _y < y1; _y++) {
             //convert coordinates to grid space
