@@ -353,7 +353,14 @@ StateMachine.prototype.transitionOn = function (transition, targetState) {
         //lock state machine
         sm.isLocked = true;
 
-        const promise = transition.action(stateFrom, targetState);
+        let promise;
+
+        try {
+            promise = transition.action(stateFrom, targetState);
+        } catch (e) {
+            //failed to perform transition
+            promise = Promise.reject(e);
+        }
 
         function handleTransitionSuccess() {
             sm.isLocked = false;

@@ -1,5 +1,4 @@
 import { TerrainPaintTool } from "./TerrainPaintTool.js";
-import Vector4 from "../../../core/geom/Vector4.js";
 import { clamp, inverseLerp } from "../../../core/math/MathUtils.js";
 import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
 import { PatchTerrainTextureAction } from "../../actions/concrete/PatchTerrainTextureAction.js";
@@ -109,9 +108,6 @@ export class TerrainTexturePaintTool extends TerrainPaintTool {
         const uv_y0 = uv_y - uv_h / 2;
         const uv_y1 = uv_y + uv_h / 2;
 
-
-        const markerSample = new Vector4();
-
         const marker = this.settings.marker;
 
         const direction = this.modifiers.shift ? -1 : 1;
@@ -153,12 +149,6 @@ export class TerrainTexturePaintTool extends TerrainPaintTool {
 
         /**
          *
-         * @type {Uint8ClampedArray}
-         */
-        const materialData = splat.materialData;
-
-        /**
-         *
          * @type {Sampler2D}
          */
         const materialSampler = splat.materialSampler;
@@ -185,9 +175,7 @@ export class TerrainTexturePaintTool extends TerrainPaintTool {
 
                 const u = inverseLerp(h_x0, h_x1, x);
 
-                marker.sample(u, v, markerSample);
-
-                const markerValue = markerSample.w;
+                const markerValue = marker.sampleChannelBilinearUV(u, v, 3);
 
                 if (Number.isNaN(markerValue)) {
                     continue;

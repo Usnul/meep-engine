@@ -4,6 +4,7 @@ import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHei
 import { QuadTreeNode } from "../../../core/geom/2d/quad-tree/QuadTreeNode.js";
 import { Transform } from "../../../engine/ecs/components/Transform.js";
 import TransformModifyAction from "../../actions/concrete/TransformModifyAction.js";
+import EditorEntity from "../../ecs/EditorEntity.js";
 
 const LIMIT_VALUE = 1000;
 
@@ -54,6 +55,11 @@ export class TerrainHeightPaintTool extends TerrainPaintTool {
         const vS = 1 / (this.terrain.size.y * gridScale);
 
         dataset.traverseComponents(Transform, (transform, entity) => {
+            if(dataset.getComponent(entity, EditorEntity) !== undefined){
+                //it's an editor entity
+                return;
+            }
+
             const position = transform.position;
 
             const x = position.x;
