@@ -330,8 +330,8 @@ SampleTheme0.cells.add(CellProcessingRule.from(
         CellFilterCellMatcher.from(
             mHeightArea
         ),
-        1,
-        1
+        1.5,
+        1.5
     ),
     aHeight
 ))
