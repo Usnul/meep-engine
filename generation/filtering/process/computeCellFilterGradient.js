@@ -27,9 +27,14 @@ export function computeCellFilterGradient(result, x, y, filter, grid) {
     //normalize vector
     const magnitude = Math.sqrt(dX * dX + dY * dY);
 
-    const _x = dX / magnitude;
-    const _y = dY / magnitude;
+    if (magnitude === 0) {
+        result[0] = 0;
+        result[1] = 0;
+    } else {
+        const _x = dX / magnitude;
+        const _y = dY / magnitude;
 
-    result[0] = _x;
-    result[1] = _y;
+        result[0] = _x;
+        result[1] = _y;
+    }
 }
