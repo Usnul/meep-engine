@@ -16,6 +16,7 @@ function vertex() {
     uniform vec4 uGridTransform;
     
     varying vec3 vViewPosition;
+    varying vec2 vGridPosition;
     
     #ifndef FLAT_SHADED
         varying vec3 vNormal;
@@ -46,7 +47,8 @@ function vertex() {
         vUv2 = uv;
         #endif
         
-        vUvGrid = (position.xz - uGridTransform.zw) /  ( gridResolution * uGridTransform.xy );
+        vGridPosition = (position.xz - uGridTransform.zw) / uGridTransform.xy;
+        vUvGrid = vGridPosition / gridResolution;
         
         #include <color_vertex>
         #include <beginnormal_vertex>
@@ -124,6 +126,7 @@ function fragment() {
     
     varying vec2 vUv;
     varying vec2 vUvGrid;
+    varying vec2 vGridPosition;
     
     #include <uv2_pars_fragment>
     #include <alphamap_pars_fragment>
@@ -156,25 +159,7 @@ function fragment() {
        
        return (tex0*b0 + tex1*b1 + tex2*b2 + tex3*b3) / (b0 + b1 + b2 + b3);
     }
-    
-    vec2 computeGridPosition(in vec2 uv){
-       return uv * ( gridResolution - 1.0)+0.5;
-    }
-    
-    float computeGridAlpha(in vec2 coord){
-       vec2 p = computeGridPosition(coord);
-       vec2 grid = abs(fract(p - 0.5) - 0.5 ) / fwidth(p);
-       return 1.0 - clamp(min(grid.x, grid.y), 0.0, 1.0);
-    }
-
-    vec4 blendLuminanceAlpha(in vec4 source, in vec4 target){
-       float lL = (0.2126*target.r + 0.7152*target.g + 0.0722*target.b)*(1.0+target.a);
-       float sL = (0.2126*source.r + 0.7152*source.g + 0.0722*source.b);
-       float gain = max((lL+sL)/sL, 1.0);
-       float correction = (1.0+target.a) / gain ;
-       return source*(1.0 - target.a) + vec4(target.rgb * correction, target.a);
-    }
-
+   
     void randomBlend(in vec2 uv, inout vec3 v, float level){
        vec3 noise = vec3( rand(uv.x*12.9898 + uv.y*78.233), rand(uv.x*10.9898 + uv.y*73.233) , rand(uv.x*6.9898 + uv.y*71.233));
        v = v*(1.0 - level) + noise*level;
@@ -251,7 +236,7 @@ function fragment() {
     }
     
     vec4 computeGridOverlayTexel(const in vec2 grid_uv, const in vec2 grid_resolution){
-        vec2 grid_texel = grid_uv * ( grid_resolution - 1.0) + 0.5;
+        vec2 grid_texel = vGridPosition + 0.5;
         
         vec2 uv = grid_texel / grid_resolution;
         

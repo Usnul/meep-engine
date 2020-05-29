@@ -866,6 +866,7 @@ class Terrain {
 
             this.gridTransform.offset_x = 0;
             this.gridTransform.offset_y = 0;
+
         } else if (this.gridTransformKind === GridTransformKind.Direct) {
             this.gridTransform.scale_x = this.gridScale;
             this.gridTransform.scale_y = this.gridScale;
