@@ -37,6 +37,8 @@ import { writeSample2DDataToDataTexture } from "../../../graphics/texture/sample
 import { loadLegacyTerrainLayers, TerrainLayers } from "./layers/TerrainLayers.js";
 import { SplatMaterial } from "../../../graphics/material/SplatMaterial.js";
 import { loadLegacyTerrainSplats, SplatMapping } from "./splat/SplatMapping.js";
+import { OffsetScaleTransform2D } from "./OffsetScaleTransform2D.js";
+import { GridTransformKind } from "./GridTransformKind.js";
 
 function makeLightTexture(sampler) {
     const texture = sampler2D2Texture(sampler, 1, 0);
@@ -257,6 +259,18 @@ class Terrain {
          * @type {number}
          */
         this.gridScale = 1;
+
+        /**
+         * Transform from grid coordinate system to world coordinate system
+         * @type {OffsetScaleTransform2D}
+         */
+        this.gridTransform = new OffsetScaleTransform2D();
+
+        /**
+         *
+         * @type {number}
+         */
+        this.gridTransformKind = GridTransformKind.Direct;
 
         /**
          * Number of geometric subdivisions per single terrain tile
@@ -661,7 +675,12 @@ class Terrain {
         assert.notEqual(result, undefined, 'result is undefined');
         assert.ok(result.isVector3, 'result is not Vector3');
 
-        result.set(x * this.worldGridScale.x, result.y, y * this.worldGridScale.y);
+        const transform = this.gridTransform;
+
+        const _x = x * transform.scale_x + transform.offset_x;
+        const _z = y * transform.scale_y + transform.offset_y;
+
+        result.set(_x, result.y, _z);
     }
 
     /**
@@ -670,7 +689,12 @@ class Terrain {
      * @param {Vector2} result
      */
     mapPointWorld2Grid(v3, result) {
-        result.set(v3.x / this.worldGridScale.x, v3.z / this.worldGridScale.y);
+        const transform = this.gridTransform;
+
+        const x = (v3.x - transform.offset_x) / transform.scale_x;
+        const y = (v3.z - transform.offset_y) / transform.scale_y;
+
+        result.set(x, y);
     }
 
     /**
@@ -774,7 +798,12 @@ class Terrain {
         this.material.uniforms.splatResolution.value.set(this.splat.size.x, this.splat.size.y);
         this.material.uniforms.gridResolution.value.set(this.size.x, this.size.y);
 
-        this.material.uniforms.gridScale.value = this.gridScale;
+        this.material.uniforms.uGridTransform.value.set(
+            this.gridTransform.scale_x,
+            this.gridTransform.scale_y,
+            this.gridTransform.offset_x,
+            this.gridTransform.offset_y
+        );
 
         this.layers.updateLayerScales(this.size.x * this.gridScale, this.size.y * this.gridScale);
     }
@@ -830,6 +859,22 @@ class Terrain {
         this.buildWorker.stop();
     }
 
+    buildGridTransform() {
+        if (this.gridTransformKind === GridTransformKind.Legacy) {
+            this.gridTransform.scale_x = (this.size.x / (this.size.x - 1)) * this.gridScale;
+            this.gridTransform.scale_y = (this.size.y / (this.size.y - 1)) * this.gridScale;
+
+            this.gridTransform.offset_x = 0;
+            this.gridTransform.offset_y = 0;
+        } else if (this.gridTransformKind === GridTransformKind.Direct) {
+            this.gridTransform.scale_x = this.gridScale;
+            this.gridTransform.scale_y = this.gridScale;
+
+            this.gridTransform.offset_x = this.gridScale / 2;
+            this.gridTransform.offset_y = this.gridScale / 2;
+        }
+    }
+
     /**
      *
      * @param {AssetManager} assetManager
@@ -838,13 +883,7 @@ class Terrain {
 
         this.__assetManager = assetManager;
 
-
-        /**
-         *
-         * @type {Vector2}
-         */
-        this.worldGridScale = this.size.clone().multiplyScalar(this.gridScale).divide(this.size.clone().addScalar(-1));
-
+        this.buildGridTransform();
 
         this.bvh.reset();
         this.bvh.setNegativelyInfiniteBounds();

@@ -10,7 +10,8 @@ import {
     ShaderMaterial,
     UniformsLib,
     UniformsUtils,
-    Vector2
+    Vector2,
+    Vector4 as ThreeVector4
 } from 'three';
 import TerrainShader from "../shaders/TerrainShader.js";
 import Vector4 from "../../../core/geom/Vector4.js";
@@ -148,8 +149,11 @@ export function SplatMaterial(
             "splatResolution": { type: 'v2', value: new Vector2(1, 1) },
 
             "gridResolution": { type: "v2", value: new Vector2(1, 1) },
+            uGridTransform:{
+                type:'v4',
+                value: new ThreeVector4()
+            },
             "gridBorderWidth": { type: "f", value: 0.1 },
-            "gridScale": { type: 'f', value: 1 },
 
             "materialScalesMap": { type: "t", value: null },
             "diffuseMaps": { type: "t", value: null },

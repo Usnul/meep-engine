@@ -2,6 +2,8 @@ import { BinaryClassSerializationAdapter } from "../../storage/binary/BinaryClas
 import Terrain from "../ecs/Terrain.js";
 import { assert } from "../../../../core/assert.js";
 import { TerrainLayer } from "../ecs/layers/TerrainLayer.js";
+import { objectKeyByValue } from "../../../../core/model/ObjectUtils.js";
+import { GridTransformKind } from "../ecs/GridTransformKind.js";
 
 export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter {
     constructor() {
@@ -41,7 +43,9 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
         buffer.writeFloat64(value.preview.scale.y);
 
         //extra metadata
-        const extra = {};
+        const extra = {
+            gridTransform: objectKeyByValue(GridTransformKind, value.gridTransformKind)
+        };
 
         if (value.lightMapURL !== null) {
             extra.lightMapURL = value.lightMapURL;
@@ -136,6 +140,12 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
             value.lightMapURL = extraMetadata.lightMapURL;
         } else {
             value.lightMapURL = null;
+        }
+
+        if (extraMetadata.gridTransform !== undefined) {
+            value.gridTransformKind = GridTransformKind[extraMetadata.gridTransform];
+        } else {
+            value.gridTransformKind = GridTransformKind.Legacy;
         }
 
         value.heightRange = height_range;

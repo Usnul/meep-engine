@@ -104,7 +104,12 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         node.position.set(target_x, target_y);
         node.type = this.type;
 
-        node.transofrm.position.set(target_x * data.scale.x, 0, target_y * data.scale.y);
+        node.transofrm.position.set(
+            target_x * data.transform.scale_x + data.transform.offset_x,
+            0,
+            target_y * data.transform.scale_y + data.transform.offset_y
+        );
+
         node.transofrm.rotation.__setFromEuler(0, rotation, 0);
 
         node.transofrm.multiplyTransforms(node.transofrm, this.transform);

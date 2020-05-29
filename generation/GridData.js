@@ -1,6 +1,6 @@
 import { assert } from "../core/assert.js";
 import { QuadTreeNode } from "../core/geom/2d/quad-tree/QuadTreeNode.js";
-import Vector2 from "../core/geom/Vector2.js";
+import { OffsetScaleTransform2D } from "../engine/ecs/terrain/ecs/OffsetScaleTransform2D.js";
 
 export class GridData {
     constructor() {
@@ -9,9 +9,9 @@ export class GridData {
 
         /**
          *
-         * @type {Vector2}
+         * @type {OffsetScaleTransform2D}
          */
-        this.scale = new Vector2(1, 1);
+        this.transform = new OffsetScaleTransform2D();
 
         /**
          *
@@ -65,11 +65,11 @@ export class GridData {
      * @param tileSize
      */
     computeScale(tileSize) {
+        this.transform.scale_x = tileSize;
+        this.transform.scale_y = tileSize;
 
-        const sx = (this.width * tileSize) / (this.width - 1);
-        const sy = (this.height * tileSize) / (this.height - 1);
-
-        this.scale.set(sx, sy);
+        this.transform.offset_x = tileSize / 2;
+        this.transform.offset_y = tileSize / 2;
     }
 
     /**
