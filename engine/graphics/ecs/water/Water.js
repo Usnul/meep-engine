@@ -49,7 +49,7 @@ class Water {
         const tW = terrain.size.x * terrain.gridScale;
         const tH = terrain.size.y * terrain.gridScale;
 
-        const heightTexture = new DataTexture(terrain.samplerHeight.data, terrain.samplerHeight.width, terrain.samplerHeight.width, RedFormat, FloatType);
+        const heightTexture = new DataTexture(terrain.samplerHeight.data, terrain.samplerHeight.width, terrain.samplerHeight.height, RedFormat, FloatType);
 
         heightTexture.wrapS = ClampToEdgeWrapping;
         heightTexture.wrapT = ClampToEdgeWrapping;
