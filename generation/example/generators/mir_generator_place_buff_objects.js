@@ -152,7 +152,7 @@ const ruleWell = GridCellPlacementRule.from(
             CellMatcherNot.from(
                 CellMatcherOr.from(
                     mBuffObjectNearby,
-                    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_CAMPFIRE), 21)
+                    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_WELL), 21)
                 )
             )
         )
