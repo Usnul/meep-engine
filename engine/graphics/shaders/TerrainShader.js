@@ -290,7 +290,7 @@ function fragment() {
     ${ShaderChunks.clouds_pars_fragment}
     
     void main() { 
-        vec4 splatDiffuseColor = computeSplatMix(vUvGrid);
+        vec4 splatDiffuseColor = computeSplatMix(vUv);
                 
         //decode the texture
         splatDiffuseColor = sRGBToLinear( splatDiffuseColor );
