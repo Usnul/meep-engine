@@ -2,6 +2,7 @@ import { MarkerNodeTransformer } from "./MarkerNodeTransformer.js";
 import Vector3 from "../../../core/geom/Vector3.js";
 import { assert } from "../../../core/assert.js";
 import { computeCellFilterGradient } from "../../filtering/process/computeCellFilterGradient.js";
+import { EPSILON, epsilonEquals } from "../../../core/math/MathUtils.js";
 
 const v3_object = new Vector3();
 
@@ -52,22 +53,31 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
     }
 
     transform(node, grid) {
-        computeCellFilterGradient(v2, node.position.x, node.position.y, this.filter, grid);
+        const hasGradient = computeCellFilterGradient(v2, node.position.x, node.position.y, this.filter, grid);
 
-        //compute angle from the gradient
+        if(!hasGradient){
+            return node;
+        }
 
         const gradient_x = v2[0];
         const gradient_y = v2[1];
 
+        //compute angle from the gradient
         const gradientAngle = Math.atan2(gradient_y, gradient_x);
 
-        const finalAngle = this.offset + gradientAngle;
+        let finalAngle = this.offset + gradientAngle;
+
+        node.transofrm.rotation.toEulerAnglesXYZ(v3_object);
+
+        if (epsilonEquals(v3_object.y, finalAngle, EPSILON)) {
+            //special case, already facing in the right direction
+            return node;
+        }
 
         const result = node.clone();
 
-        result.transofrm.rotation.toEulerAnglesXYZ(v3_object);
 
-        result.transofrm.rotation.__setFromEuler(v3_object.x, finalAngle, v3_object.z);
+        result.transofrm.rotation.__setFromEuler(v3_object.x, finalAngle, v3_object.z, 'YXZ');
 
         return result;
     }

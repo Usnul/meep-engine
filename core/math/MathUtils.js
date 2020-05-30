@@ -718,9 +718,9 @@ export function computeIsoscelesTriangleApexAngle(side, base) {
  * @returns {boolean}
  */
 export function epsilonEquals(a, b, tolerance) {
-    assert.equal(typeof a, 'number', `a must be a number, instead was '${typeof a}'`);
-    assert.equal(typeof b, 'number', `a must be a number, instead was '${typeof b}'`);
-    assert.equal(typeof tolerance, 'number', `a must be a number, instead was '${typeof tolerance}'`);
+    assert.isNumber(a, 'a');
+    assert.isNumber(b, 'b');
+    assert.isNumber(tolerance, 'tolerance');
 
     return Math.abs(a - b) <= tolerance;
 }

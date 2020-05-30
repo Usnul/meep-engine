@@ -5,6 +5,9 @@
  * @param {number} y
  * @param {CellFilter} filter
  * @param {GridData} grid
+ *
+ * Gradient vector is normalized
+ * @returns {boolean}
  */
 export function computeCellFilterGradient(result, x, y, filter, grid) {
 
@@ -30,11 +33,16 @@ export function computeCellFilterGradient(result, x, y, filter, grid) {
     if (magnitude === 0) {
         result[0] = 0;
         result[1] = 0;
+
+        return false;
+
     } else {
         const _x = dX / magnitude;
         const _y = dY / magnitude;
 
         result[0] = _x;
         result[1] = _y;
+
+        return true;
     }
 }

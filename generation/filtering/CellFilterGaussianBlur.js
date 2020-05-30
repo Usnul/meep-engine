@@ -30,6 +30,12 @@ export class CellFilterGaussianBlur extends CellFilter {
         this.size_y = 1;
     }
 
+    initialize(seed) {
+        if (!this.source.initialized) {
+            this.source.initialize(seed);
+        }
+    }
+
 
     /**
      *

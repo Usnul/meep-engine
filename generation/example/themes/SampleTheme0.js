@@ -84,9 +84,13 @@ nrTreasure.matcher = MarkerNodeMatcherByType.from('Treasure');
 nrTreasure.transformers.push(
     MarkerNodeTransformerRotateByFilter.from(
         CellFilterGaussianBlur.from(
-            CellFilterCellMatcher.from(matcher_tag_not_traversable),
-            1,
-            1
+            CellFilterLerp.from(
+                CellFilterCellMatcher.from(matcher_tag_not_traversable),
+                CellFilterSimplexNoise.from(2, 2),
+                CellFilterConstant.from(0.15)
+            ),
+            1.5,
+            1.5,
         ),
         -PI_HALF
     )
@@ -313,17 +317,23 @@ aHeight.target = CellFilterLerp.from(
 
 const mHeightArea = new GridPatternMatcher();
 
+mHeightArea.addRule(0, -2, matcher_tag_not_traversable);
+
 mHeightArea.addRule(-1, -1, matcher_tag_not_traversable);
 mHeightArea.addRule(0, -1, matcher_tag_not_traversable);
 mHeightArea.addRule(1, -1, matcher_tag_not_traversable);
 
+mHeightArea.addRule(-2, 0, matcher_tag_not_traversable);
 mHeightArea.addRule(-1, 0, matcher_tag_not_traversable);
 mHeightArea.addRule(0, 0, matcher_tag_not_traversable);
 mHeightArea.addRule(1, 0, matcher_tag_not_traversable);
+mHeightArea.addRule(2, 0, matcher_tag_not_traversable);
 
 mHeightArea.addRule(-1, 1, matcher_tag_not_traversable);
 mHeightArea.addRule(0, 1, matcher_tag_not_traversable);
 mHeightArea.addRule(1, 1, matcher_tag_not_traversable);
+
+mHeightArea.addRule(0, 2, matcher_tag_not_traversable);
 
 SampleTheme0.cells.add(CellProcessingRule.from(
     CellFilterGaussianBlur.from(
