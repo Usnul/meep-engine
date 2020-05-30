@@ -1,4 +1,5 @@
 import Vector2 from "../../Vector2.js";
+import { circleIntersectsCircle } from "./circleIntersectsCircle.js";
 
 /**
  * A circle or a 2-dimensional sphere. Represented as a position (x,y) and radius (r)
@@ -59,11 +60,7 @@ Circle.prototype.overlaps = function (other) {
     const y1 = other.y;
     const r1 = other.r;
 
-    const minSeparation = r0 + r1;
-
-    const distance = Vector2._distance(x0, y0, x1, y1);
-
-    return distance < minSeparation;
+    return circleIntersectsCircle(x0, y0, r0, x1, y1, r1);
 };
 
 /**

@@ -1,6 +1,7 @@
 import Vector2 from "../../core/geom/Vector2.js";
 import { Transform } from "../../engine/ecs/components/Transform.js";
 import { copyArray } from "../../core/collection/array/copyArray.js";
+import { CircleShape } from "../../core/geom/2d/shape/CircleShape.js";
 
 export class MarkerNode {
     constructor() {
@@ -16,8 +17,16 @@ export class MarkerNode {
          */
         this.tags = [];
 
+        /**
+         * Grid position
+         * @type {Vector2}
+         */
         this.position = new Vector2();
 
+        /**
+         * World transform, this can differ from the grid position
+         * @type {Transform}
+         */
         this.transofrm = new Transform();
 
         /**
@@ -26,6 +35,12 @@ export class MarkerNode {
          * @type {number}
          */
         this.size = 0;
+
+        /**
+         *
+         * @type {AbstractShape}
+         */
+        this.shape = new CircleShape();
 
         /**
          *
@@ -59,7 +74,7 @@ export class MarkerNode {
 
         this.transofrm.copy(other.transofrm);
 
-        this.size = other.size;
+        this.shape = other.shape.clone();
 
         this.properties = Object.assign({}, other.properties);
     }
@@ -70,17 +85,7 @@ export class MarkerNode {
      * @returns {boolean}
      */
     overlaps(other) {
-
-        const penetrationDistance = computeCircleCirclePenetrationDistance(
-            this.position.x,
-            this.position.y,
-            this.size,
-            other.position.x,
-            other.position.y,
-            other.size
-        );
-
-        return penetrationDistance > 0;
+        return this.shape.intersects(other.shape);
     }
 
 }
