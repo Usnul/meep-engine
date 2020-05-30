@@ -24,12 +24,13 @@ import Tag from "../../../engine/ecs/components/Tag.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
 import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
-import { MarkerNodeTransformerRotateByFilter } from "../../markers/transform/MarkerNodeTransformerRotateByFilter.js";
+import { MarkerNodeTransformerYRotateByFilterGradient } from "../../markers/transform/MarkerNodeTransformerYRotateByFilterGradient.js";
 import { PI_HALF } from "../../../core/math/MathUtils.js";
 import { CellFilterGaussianBlur } from "../../filtering/CellFilterGaussianBlur.js";
 import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -82,7 +83,7 @@ const nrTreasure = new MarkerProcessingRule();
 nrTreasure.consume = true;
 nrTreasure.matcher = MarkerNodeMatcherByType.from('Treasure');
 nrTreasure.transformers.push(
-    MarkerNodeTransformerRotateByFilter.from(
+    MarkerNodeTransformerYRotateByFilterGradient.from(
         CellFilterGaussianBlur.from(
             CellFilterLerp.from(
                 CellFilterCellMatcher.from(matcher_tag_not_traversable),
@@ -141,7 +142,7 @@ nrEnemy.actions.push(MarkerNodeActionEntityPlacement.from(ebpEnemy, Transform.fr
 })));
 
 nrEnemy.transformers.push(
-    MarkerNodeTransformerRotateByFilter.from(
+    MarkerNodeTransformerYRotateByFilterGradient.from(
         CellFilterLerp.from(
             CellFilterGaussianBlur.from(
                 CellFilterCellMatcher.from(matcher_tag_not_traversable)
@@ -299,6 +300,23 @@ nrBuffObjectCampfire.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffOb
 })));
 
 SampleTheme0.nodes.add(nrBuffObjectCampfire);
+
+const ebpFoliageTree = new EntityBlueprint();
+ebpFoliageTree.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpFoliageTree.add(Transform.fromJSON({}));
+
+const nrFoliageTree = new MarkerProcessingRule();
+
+nrFoliageTree.consume = true;
+nrFoliageTree.matcher = MarkerNodeMatcherByType.from('Tree');
+nrFoliageTree.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1)))
+
+nrFoliageTree.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree, Transform.fromJSON({
+    scale: { x: 0.4, y: 1, z: 0.4 },
+    position: { x: 0, y: 1, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrFoliageTree);
 
 
 //HEIGHT

@@ -1,7 +1,7 @@
 import Vector2 from "../../core/geom/Vector2.js";
 import { Transform } from "../../engine/ecs/components/Transform.js";
 import { copyArray } from "../../core/collection/array/copyArray.js";
-import { CircleShape } from "../../core/geom/2d/shape/CircleShape.js";
+import { circleIntersectsCircle } from "../../core/geom/2d/circle/circleIntersectsCircle.js";
 
 export class MarkerNode {
     constructor() {
@@ -38,12 +38,6 @@ export class MarkerNode {
 
         /**
          *
-         * @type {AbstractShape}
-         */
-        this.shape = new CircleShape();
-
-        /**
-         *
          * @type {Object}
          */
         this.properties = {};
@@ -74,7 +68,7 @@ export class MarkerNode {
 
         this.transofrm.copy(other.transofrm);
 
-        this.shape = other.shape.clone();
+        this.radius = other.radius;
 
         this.properties = Object.assign({}, other.properties);
     }
@@ -85,7 +79,10 @@ export class MarkerNode {
      * @returns {boolean}
      */
     overlaps(other) {
-        return this.shape.intersects(other.shape);
+        const p0 = this.transofrm.position;
+        const p1 = other.transofrm.position;
+
+        return circleIntersectsCircle(p0.x, p0.y, this.size, p1.x, p1.y, other.size);
     }
 
 }

@@ -1,18 +1,11 @@
 import { MarkerNodeTransformer } from "./MarkerNodeTransformer.js";
-import Vector3 from "../../../core/geom/Vector3.js";
 import { assert } from "../../../core/assert.js";
-import { computeCellFilterGradient } from "../../filtering/process/computeCellFilterGradient.js";
 import { EPSILON, epsilonEquals } from "../../../core/math/MathUtils.js";
+import Vector3 from "../../../core/geom/Vector3.js";
 
 const v3_object = new Vector3();
 
-const v2 = [];
-
-/**
- * Rotate marker on Y axis to align on positive gradient of a cell filter
- * @example A filter that detects mountain tiles can be used to rotate a node to always face towards the nearby mountain tiles
- */
-export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
+export class MarkerNodeTransformerYRotateByFilter extends MarkerNodeTransformer {
 
     constructor() {
         super();
@@ -31,8 +24,11 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
     }
 
     initialize(seed) {
-        this.filter.initialize(seed);
+        if (!this.filter.initialized) {
+            this.filter.initialize(seed);
+        }
     }
+
 
     /**
      *
@@ -44,7 +40,7 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
         assert.ok(filter.isCellFilter, 'filter.isCellFilter !== true');
         assert.isNumber(offset, 'offset');
 
-        const r = new MarkerNodeTransformerRotateByFilter();
+        const r = new MarkerNodeTransformerYRotateByFilter();
 
         r.filter = filter;
         r.offset = offset;
@@ -53,19 +49,10 @@ export class MarkerNodeTransformerRotateByFilter extends MarkerNodeTransformer {
     }
 
     transform(node, grid) {
-        const hasGradient = computeCellFilterGradient(v2, node.position.x, node.position.y, this.filter, grid);
 
-        if(!hasGradient){
-            return node;
-        }
+        const angle_factor = this.filter.execute(grid, node.position.x, node.position.y, 0);
 
-        const gradient_x = v2[0];
-        const gradient_y = v2[1];
-
-        //compute angle from the gradient
-        const gradientAngle = Math.atan2(gradient_y, gradient_x);
-
-        let finalAngle = this.offset + gradientAngle;
+        let finalAngle = this.offset + angle_factor * Math.PI * 2;
 
         node.transofrm.rotation.toEulerAnglesXYZ(v3_object);
 

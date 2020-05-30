@@ -176,6 +176,12 @@ export class NumericInterval {
 
 /**
  * @readonly
+ * @type {boolean}
+ */
+NumericInterval.prototype.isNumericInterval = true;
+
+/**
+ * @readonly
  * @type {NumericInterval}
  */
 NumericInterval.one_one = Object.freeze(new NumericInterval(1, 1));

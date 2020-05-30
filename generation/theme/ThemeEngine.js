@@ -59,6 +59,8 @@ export class ThemeEngine {
      * @param {AreaTheme} theme
      */
     add(theme) {
+        assert.defined(theme, 'theme');
+
         theme.mask.updateBounds();
         theme.mask.updateDistanceField();
 
@@ -328,12 +330,18 @@ export class ThemeEngine {
 
             const node = nodes[i];
 
+            i++;
+
             const nodePosition = node.position;
 
             const x = nodePosition.x;
             const y = nodePosition.y;
 
             const matchingThemeCount = this.getThemesByPosition(themeAreas, x, y);
+
+            if (matchingThemeCount === 0) {
+                return TaskSignal.Continue;
+            }
 
             let influenceSum = 0;
 
@@ -377,7 +385,6 @@ export class ThemeEngine {
 
             ruleSet.processNode(grid, ecd, node);
 
-            i++;
 
             return TaskSignal.Continue;
         }

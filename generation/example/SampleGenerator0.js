@@ -22,6 +22,15 @@ import { GridTaskGenerateRoads } from "../grid/tasks/road/GridTaskGenerateRoads.
 import { mir_generator_place_road_decorators } from "./generators/mir_generator_place_road_decorators.js";
 import { MarkerNodeMatcherByType } from "../markers/matcher/MarkerNodeMatcherByType.js";
 import { mir_generator_place_buff_objects } from "./generators/mir_generator_place_buff_objects.js";
+import { GridTaskDensityMarkerDistribution } from "../grid/tasks/GridTaskDensityMarkerDistribution.js";
+import { CellFilterSimplexNoise } from "../filtering/CellFilterSimplexNoise.js";
+import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
+import { CellFilterMultiply } from "../filtering/algebra/CellFilterMultiply.js";
+import { CellFilterCellMatcher } from "../filtering/CellFilterCellMatcher.js";
+import { matcher_tag_not_traversable } from "./rules/matcher_tag_not_traversable.js";
+import { matcher_tag_unoccupied } from "./rules/matcher_tag_unoccupied.js";
+import { CellFilterSubtract } from "../filtering/algebra/CellFilterSubtract.js";
+import { CellFilterConstant } from "../filtering/CellFilterConstant.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -158,6 +167,26 @@ const gRoadDecorators = mir_generator_place_road_decorators();
 
 gRoadDecorators.addDependency(gRoads);
 
+//trees
+const aPlaceTreeNode = GridCellActionPlaceMarker.from('Tree');
+aPlaceTreeNode.size = 0.565;
+
+const gTrees = GridTaskDensityMarkerDistribution.from(
+    CellFilterMultiply.from(
+        CellFilterSubtract.from(
+            CellFilterSimplexNoise.from(20, 20),
+            CellFilterConstant.from(0.6)
+        ),
+        CellFilterCellMatcher.from(
+            CellMatcherAnd.from(matcher_tag_not_traversable, matcher_tag_unoccupied)
+        )
+    ),
+    aPlaceTreeNode,
+    new NumericInterval(0.5, 1)
+);
+
+gTrees.addDependency(gBuildDistanceMap);
+
 SampleGenerator0.addGenerator(gMakeEmpty);
 SampleGenerator0.addGenerator(gConnectRooms);
 SampleGenerator0.addGenerator(gRoads);
@@ -169,3 +198,4 @@ SampleGenerator0.addGenerator(gBuildDistanceMap);
 SampleGenerator0.addGenerator(gRuleSet1);
 SampleGenerator0.addGenerator(gRuleSet2);
 SampleGenerator0.addGenerator(gRuleSetTreasureGuards);
+SampleGenerator0.addGenerator(gTrees);

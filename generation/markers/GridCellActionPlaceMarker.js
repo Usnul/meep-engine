@@ -29,6 +29,8 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         this.properties = {};
 
+        this.size = 0;
+
         /**
          *
          * @type {function(MarkerNode,GridData)}
@@ -104,6 +106,8 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         node.position.set(target_x, target_y);
         node.type = this.type;
 
+        node.size = this.size;
+
         node.transofrm.position.set(
             target_x * data.transform.scale_x + data.transform.offset_x,
             0,
@@ -136,3 +140,9 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         data.addMarker(node);
     }
 }
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+GridCellActionPlaceMarker.prototype.isGridCellActionPlaceMarker = true;
