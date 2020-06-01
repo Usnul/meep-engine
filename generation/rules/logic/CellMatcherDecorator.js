@@ -1,4 +1,4 @@
-import { CellMatcher } from "./CellMatcher.js";
+import { CellMatcher } from "../CellMatcher.js";
 
 export class CellMatcherDecorator extends CellMatcher {
     constructor() {

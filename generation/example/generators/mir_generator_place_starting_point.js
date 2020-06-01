@@ -1,21 +1,21 @@
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
-import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
+import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
-import { GridTaskExecuteRuleTimes } from "../../grid/tasks/GridTaskExecuteRuleTimes.js";
-import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
+import { GridTaskExecuteRuleTimes } from "../../grid/generation/GridTaskExecuteRuleTimes.js";
+import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 
-const MATCH_STARTING_POINT = GridCellRuleContainsTag.from(GridTags.StartingPoint);
+const MATCH_STARTING_POINT = CellMatcherContainsTag.from(GridTags.StartingPoint);
 
 
 const pattern = new GridPatternMatcher();
 
 pattern.addRule(0, 0, matcher_tag_traversable_unoccupied);
 pattern.addRule(0, 0, CellMatcherNot.from(MATCH_STARTING_POINT));
-pattern.addRule(0, -1, GridCellRuleContainsTag.from(GridTags.Base));
+pattern.addRule(0, -1, CellMatcherContainsTag.from(GridTags.Base));
 
 const rule = GridCellPlacementRule.from(
     pattern,

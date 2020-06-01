@@ -1,4 +1,4 @@
-import { CellMatcherAnd } from "../CellMatcherAnd.js";
+import { CellMatcherAnd } from "../logic/CellMatcherAnd.js";
 import { GridPatternMatcherCell } from "./GridPatternMatcherCell.js";
 import { CellMatcher } from "../CellMatcher.js";
 

@@ -1,6 +1,6 @@
 import { CellMatcher } from "./CellMatcher.js";
 
-export class GridCellRuleContainsTag extends CellMatcher {
+export class CellMatcherContainsTag extends CellMatcher {
     constructor() {
         super();
 
@@ -26,10 +26,10 @@ export class GridCellRuleContainsTag extends CellMatcher {
     /**
      *
      * @param {number} mask
-     * @return {GridCellRuleContainsTag}
+     * @return {CellMatcherContainsTag}
      */
     static from(mask) {
-        const r = new GridCellRuleContainsTag();
+        const r = new CellMatcherContainsTag();
 
         r.tags = mask;
 

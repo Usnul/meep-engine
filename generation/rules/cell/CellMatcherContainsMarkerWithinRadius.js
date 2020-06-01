@@ -1,7 +1,7 @@
 import { CellMatcher } from "../CellMatcher.js";
 import { assert } from "../../../core/assert.js";
 
-export class GridCellRuleContainsMarkerWithinRadius extends CellMatcher {
+export class CellMatcherContainsMarkerWithinRadius extends CellMatcher {
     constructor() {
         super();
 
@@ -21,13 +21,13 @@ export class GridCellRuleContainsMarkerWithinRadius extends CellMatcher {
      *
      * @param {MarkerNodeMatcher} matcher
      * @param {number} radius
-     * @returns {GridCellRuleContainsMarkerWithinRadius}
+     * @returns {CellMatcherContainsMarkerWithinRadius}
      */
     static from(matcher, radius) {
         assert.equal(matcher.isMarkerNodeMatcher, true, 'matcher.isMarkerNodeMatcher');
         assert.isNumber(radius, 'radius');
 
-        const r = new GridCellRuleContainsMarkerWithinRadius();
+        const r = new CellMatcherContainsMarkerWithinRadius();
 
         r.matcher = matcher;
         r.radius = radius;

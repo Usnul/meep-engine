@@ -1,6 +1,7 @@
 import { assert } from "../core/assert.js";
 import { QuadTreeNode } from "../core/geom/2d/quad-tree/QuadTreeNode.js";
 import { OffsetScaleTransform2D } from "../engine/ecs/terrain/ecs/OffsetScaleTransform2D.js";
+import { Sampler2D } from "../engine/graphics/texture/sampler/Sampler2D.js";
 
 export class GridData {
     constructor() {
@@ -18,6 +19,12 @@ export class GridData {
          * @type {Uint32Array}
          */
         this.tags = new Uint32Array();
+
+        /**
+         * Terrain height map
+         * @type {Sampler2D}
+         */
+        this.heights = Sampler2D.float32(1, 1, 1);
 
         /**
          *
@@ -108,6 +115,8 @@ export class GridData {
 
         this.tags = new Uint32Array(gridSize);
         this.startDistances = new Uint16Array(gridSize);
+
+        this.heights.resize(width, height);
     }
 
     /**

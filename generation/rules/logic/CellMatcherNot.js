@@ -1,5 +1,5 @@
 import { CellMatcherDecorator } from "./CellMatcherDecorator.js";
-import { assert } from "../../core/assert.js";
+import { assert } from "../../../core/assert.js";
 
 export class CellMatcherNot extends CellMatcherDecorator {
     match(data, x, y, rotation) {

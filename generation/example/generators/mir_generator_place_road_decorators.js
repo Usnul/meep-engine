@@ -1,20 +1,20 @@
-import { GridTaskActionRuleSet } from "../../grid/tasks/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
-import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
+import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
 import { GridTags } from "../../GridTags.js";
-import { CellMatcherAnd } from "../../rules/CellMatcherAnd.js";
-import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
+import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
+import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
-import { GridCellRuleContainsMarkerWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerWithinRadius.js";
+import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MarkerNodeMatcherContainsTag } from "../../markers/matcher/MarkerNodeMatcherContainsTag.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 
 
-const matcher_tag_road = GridCellRuleContainsTag.from(GridTags.Road);
+const matcher_tag_road = CellMatcherContainsTag.from(GridTags.Road);
 
 const matchBend90 = new GridPatternMatcher();
 
@@ -28,10 +28,10 @@ const TAG_ROAD_DECORATOR = 'Road Decorator';
 matchBend90.addRule(0, 0,
     CellMatcherAnd.from(
         CellMatcherAnd.from(
-            CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Road Connector'), 2)),
-            CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherContainsTag.from(TAG_ROAD_DECORATOR), 3))
+            CellMatcherNot.from(CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Road Connector'), 2)),
+            CellMatcherNot.from(CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherContainsTag.from(TAG_ROAD_DECORATOR), 3))
         ),
-        CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherAny.INSTANCE, 0.5))
+        CellMatcherNot.from(CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherAny.INSTANCE, 0.5))
     )
 );
 

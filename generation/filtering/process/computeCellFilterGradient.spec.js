@@ -1,7 +1,7 @@
 import { GridData } from "../../GridData.js";
 import { computeCellFilterGradient } from "./computeCellFilterGradient.js";
 import { CellFilterCellMatcher } from "../CellFilterCellMatcher.js";
-import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
+import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
 
 test('computeCellFilterGradient center', () => {
 
@@ -10,7 +10,7 @@ test('computeCellFilterGradient center', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -37,7 +37,7 @@ test('computeCellFilterGradient top', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -63,7 +63,7 @@ test('computeCellFilterGradient bottom', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -90,7 +90,7 @@ test('computeCellFilterGradient left', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 0);
@@ -117,7 +117,7 @@ test('computeCellFilterGradient right', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -144,7 +144,7 @@ test('computeCellFilterGradient top left', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -172,7 +172,7 @@ test('computeCellFilterGradient top right', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -200,7 +200,7 @@ test('computeCellFilterGradient bottom left', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 0);
@@ -228,7 +228,7 @@ test('computeCellFilterGradient bottom right', () => {
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(GridCellRuleContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);

@@ -1,20 +1,20 @@
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
-import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
-import { GridCellRuleContainsMarkerWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerWithinRadius.js";
+import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
+import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
 import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
-import { GridTaskActionRuleSet } from "../../grid/tasks/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
 import { MarkerNodeMatcherContainsTag } from "../../markers/matcher/MarkerNodeMatcherContainsTag.js";
-import { CellMatcherAnd } from "../../rules/CellMatcherAnd.js";
+import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
-import { CellMatcherOr } from "../../rules/CellMatcherOr.js";
+import { CellMatcherOr } from "../../rules/logic/CellMatcherOr.js";
 import { RuleSelectionPolicyType } from "../../markers/RuleSelectionPolicyType.js";
 import { MarkerNodeMatcherAnd } from "../../markers/matcher/MarkerNodeMatcherAnd.js";
 
@@ -39,14 +39,14 @@ pMatcherNextToWall.addRule(0, -1, matcher_tag_traversable_unoccupied);
 pMatcherNextToWall.addRule(0, -2, matcher_tag_traversable_unoccupied);
 
 
-const mBuffObjectNearby = GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherContainsTag.from(TAG_BUFF_OBJECT), 6);
+const mBuffObjectNearby = CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherContainsTag.from(TAG_BUFF_OBJECT), 6);
 
 const mNoBuffObjectsNearby = CellMatcherNot.from(
     mBuffObjectNearby
 );
 
 const mNoMajorBuffObjectNearby = CellMatcherNot.from(
-    GridCellRuleContainsMarkerWithinRadius.from(
+    CellMatcherContainsMarkerWithinRadius.from(
         MarkerNodeMatcherAnd.from(
             MarkerNodeMatcherContainsTag.from(TAG_BUFF_OBJECT),
             MarkerNodeMatcherContainsTag.from(TAG_MAJOR)
@@ -55,7 +55,7 @@ const mNoMajorBuffObjectNearby = CellMatcherNot.from(
 );
 
 const mNoMinorBuffObjectNearby = CellMatcherNot.from(
-    GridCellRuleContainsMarkerWithinRadius.from(
+    CellMatcherContainsMarkerWithinRadius.from(
         MarkerNodeMatcherAnd.from(
             MarkerNodeMatcherContainsTag.from(TAG_BUFF_OBJECT),
             MarkerNodeMatcherContainsTag.from(TAG_MINOR)
@@ -94,7 +94,7 @@ const ruleAttackPower = GridCellPlacementRule.from(
         CellMatcherAnd.from(
             pMatcherNextToWall,
             CellMatcherNot.from(
-                GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_ATTACK_POWER), 42)
+                CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_ATTACK_POWER), 42)
             )
         )
     ), [
@@ -116,7 +116,7 @@ const ruleDefense = GridCellPlacementRule.from(
         CellMatcherAnd.from(
             pMatcherNextToWall,
             CellMatcherNot.from(
-                GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_DEFENSE), 42)
+                CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_DEFENSE), 42)
             )
         )
     ), [
@@ -152,7 +152,7 @@ const ruleWell = GridCellPlacementRule.from(
             CellMatcherNot.from(
                 CellMatcherOr.from(
                     mBuffObjectNearby,
-                    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_WELL), 21)
+                    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_WELL), 21)
                 )
             )
         )
@@ -176,7 +176,7 @@ const ruleCampfire = GridCellPlacementRule.from(
             CellMatcherNot.from(
                 CellMatcherOr.from(
                     mBuffObjectNearby,
-                    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_CAMPFIRE), 21)
+                    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_CAMPFIRE), 21)
                 )
             )
         )

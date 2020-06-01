@@ -1,28 +1,28 @@
 import { GridGenerator } from "../GridGenerator.js";
 import { GridCellPlacementRule } from "../placement/GridCellPlacementRule.js";
 import { GridPatternMatcher } from "../rules/cell/GridPatternMatcher.js";
-import { GridCellRuleContainsTag } from "../rules/GridCellRuleContainsTag.js";
+import { CellMatcherContainsTag } from "../rules/CellMatcherContainsTag.js";
 import { GridTags } from "../GridTags.js";
-import { CellMatcherNot } from "../rules/CellMatcherNot.js";
+import { CellMatcherNot } from "../rules/logic/CellMatcherNot.js";
 import { GridCellActionPlaceMarker } from "../markers/GridCellActionPlaceMarker.js";
-import { GridTaskCellularAutomata } from "../grid/tasks/GridTaskCellularAutomata.js";
-import { GridTaskActionRuleSet } from "../grid/tasks/GridTaskCellActionRuleSet.js";
+import { GridTaskCellularAutomata } from "../grid/generation/GridTaskCellularAutomata.js";
+import { GridTaskActionRuleSet } from "../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../markers/GridActionRuleSet.js";
-import { GridTaskBuildSourceDistanceMap } from "../grid/tasks/GridTaskBuildSourceDistanceMap.js";
-import { CellMatcherAnd } from "../rules/CellMatcherAnd.js";
+import { GridTaskBuildSourceDistanceMap } from "../grid/generation/GridTaskBuildSourceDistanceMap.js";
+import { CellMatcherAnd } from "../rules/logic/CellMatcherAnd.js";
 import { GridCellActionPlaceTags } from "../placement/GridCellActionPlaceTags.js";
-import { GridCellRuleContainsMarkerWithinRadius } from "../rules/cell/GridCellRuleContainsMarkerWithinRadius.js";
+import { CellMatcherContainsMarkerWithinRadius } from "../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
 import { mir_matcher_attack_corridor } from "./rules/mir_matcher_attack_corridor.js";
 import { mir_generator_place_bases } from "./generators/mir_generator_place_bases.js";
 import { matcher_tag_traversable_unoccupied } from "./rules/matcher_tag_traversable_unoccupied.js";
 import { mir_generator_place_starting_point } from "./generators/mir_generator_place_starting_point.js";
-import { GridTaskConnectRooms } from "../grid/tasks/GridTaskConnectRooms.js";
+import { GridTaskConnectRooms } from "../grid/generation/GridTaskConnectRooms.js";
 import { matcher_tag_traversable } from "./rules/matcher_tag_traversable.js";
-import { GridTaskGenerateRoads } from "../grid/tasks/road/GridTaskGenerateRoads.js";
+import { GridTaskGenerateRoads } from "../grid/generation/road/GridTaskGenerateRoads.js";
 import { mir_generator_place_road_decorators } from "./generators/mir_generator_place_road_decorators.js";
 import { MarkerNodeMatcherByType } from "../markers/matcher/MarkerNodeMatcherByType.js";
 import { mir_generator_place_buff_objects } from "./generators/mir_generator_place_buff_objects.js";
-import { GridTaskDensityMarkerDistribution } from "../grid/tasks/GridTaskDensityMarkerDistribution.js";
+import { GridTaskDensityMarkerDistribution } from "../grid/generation/GridTaskDensityMarkerDistribution.js";
 import { CellFilterSimplexNoise } from "../filtering/CellFilterSimplexNoise.js";
 import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
 import { CellFilterMultiply } from "../filtering/algebra/CellFilterMultiply.js";
@@ -38,11 +38,11 @@ export const SampleGenerator0 = new GridGenerator();
 
 const pTreasureCorner = new GridPatternMatcher();
 
-const MATCH_EMPTY = GridCellRuleContainsTag.from(GridTags.Traversable);
-const MATCH_TREASURE = GridCellRuleContainsTag.from(GridTags.Treasure);
+const MATCH_EMPTY = CellMatcherContainsTag.from(GridTags.Traversable);
+const MATCH_TREASURE = CellMatcherContainsTag.from(GridTags.Treasure);
 const MATCH_NOT_EMPTY = CellMatcherNot.from(MATCH_EMPTY);
-const MATCH_STARTING_POINT = GridCellRuleContainsTag.from(GridTags.StartingPoint);
-const MATCH_ENEMY = GridCellRuleContainsTag.from(GridTags.Enemy);
+const MATCH_STARTING_POINT = CellMatcherContainsTag.from(GridTags.StartingPoint);
+const MATCH_ENEMY = CellMatcherContainsTag.from(GridTags.Enemy);
 
 pTreasureCorner.addRule(1, 0, MATCH_NOT_EMPTY);
 pTreasureCorner.addRule(0, 1, MATCH_NOT_EMPTY);
@@ -50,7 +50,7 @@ pTreasureCorner.addRule(0, 1, MATCH_NOT_EMPTY);
 pTreasureCorner.addRule(0, 0, matcher_tag_traversable_unoccupied);
 
 const pNoTreasureIn3 = new GridPatternMatcher();
-pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(GridCellRuleContainsMarkerWithinRadius.from(
+pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithinRadius.from(
     MarkerNodeMatcherByType.from('Treasure'), 3
 )));
 
@@ -79,7 +79,7 @@ pNearTreasure.addRule(0, 0,
 pNearTreasure.addRule(1, 1, MATCH_TREASURE);
 pNearTreasure.addRule(2, 2, MATCH_NOT_EMPTY);
 
-const MATCH_ENEMY_IN_3 = GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Enemy'), 3);
+const MATCH_ENEMY_IN_3 = CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Enemy'), 3);
 
 const MATCH_NO_ENEMY_IN_3 = CellMatcherNot.from(MATCH_ENEMY_IN_3);
 

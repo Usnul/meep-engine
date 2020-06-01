@@ -1,5 +1,5 @@
 import { CellMatcherBinary } from "./CellMatcherBinary.js";
-import { assert } from "../../core/assert.js";
+import { assert } from "../../../core/assert.js";
 
 export class CellMatcherAnd extends CellMatcherBinary {
 

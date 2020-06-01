@@ -1,7 +1,7 @@
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { matcher_tag_not_traversable } from "./matcher_tag_not_traversable.js";
 import { matcher_tag_traversable_unoccupied } from "./matcher_tag_traversable_unoccupied.js";
-import { CellMatcherOr } from "../../rules/CellMatcherOr.js";
+import { CellMatcherOr } from "../../rules/logic/CellMatcherOr.js";
 
 //
 const pCorridor0 = new GridPatternMatcher();

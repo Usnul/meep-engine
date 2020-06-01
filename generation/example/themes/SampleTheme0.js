@@ -10,10 +10,10 @@ import { Transform } from "../../../engine/ecs/components/Transform.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
 import { matcher_tag_traversable } from "../rules/matcher_tag_traversable.js";
-import { GridCellRuleContainsTag } from "../../rules/GridCellRuleContainsTag.js";
+import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
 import { GridTags } from "../../GridTags.js";
-import { CellMatcherAnd } from "../../rules/CellMatcherAnd.js";
-import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
+import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
+import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
 import { CellFilterSimplexNoise } from "../../filtering/CellFilterSimplexNoise.js";
 import { CellFilterFXAA } from "../../filtering/CellFilterFXAA.js";
@@ -36,7 +36,7 @@ export const SampleTheme0 = new Theme();
 
 const terrainTheme = new TerrainTheme();
 
-const matcher_tag_road = GridCellRuleContainsTag.from(GridTags.Road);
+const matcher_tag_road = CellMatcherContainsTag.from(GridTags.Road);
 
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterCellMatcher.from(

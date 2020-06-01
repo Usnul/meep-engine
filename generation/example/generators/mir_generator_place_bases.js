@@ -1,12 +1,12 @@
-import { GridTaskActionRuleSet } from "../../grid/tasks/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
-import { CellMatcherNot } from "../../rules/CellMatcherNot.js";
-import { GridCellRuleContainsMarkerWithinRadius } from "../../rules/cell/GridCellRuleContainsMarkerWithinRadius.js";
+import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
+import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
@@ -22,7 +22,7 @@ pMatcher.addRule(1, 1, matcher_tag_traversable_unoccupied);
 
 //no other bases nearby
 pMatcher.addRule(0, 0, CellMatcherNot.from(
-    GridCellRuleContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Base'), 25)
+    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Base'), 25)
 ));
 
 const placeTags = new GridCellActionPlaceTags();

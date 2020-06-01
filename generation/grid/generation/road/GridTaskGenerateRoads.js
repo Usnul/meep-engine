@@ -18,7 +18,7 @@ import { PathEndPoint } from "./PathEndPoint.js";
 import { RoadConnection } from "./RoadConnection.js";
 import { readMarkerNodeGroupId } from "./readMarkerNodeGroupId.js";
 import { buildUnsignedDistanceField } from "../util/buildUnsignedDistanceField.js";
-import { CellMatcherNot } from "../../../rules/CellMatcherNot.js";
+import { CellMatcherNot } from "../../../rules/logic/CellMatcherNot.js";
 import { RoadConnectionNetwork } from "./RoadConnectionNetwork.js";
 
 const NODE_TYPE_ROAD_CONNECTOR = 'Road Connector';
