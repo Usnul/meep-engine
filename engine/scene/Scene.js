@@ -45,7 +45,33 @@ class Scene {
         this.speedModifiers = new List();
     }
 
+    /**
+     * Executed just before the scene is is activated
+     */
+    handlePreActivation() {
+        //implement in subclass
+    }
 
+    /**
+     * Executed just after scene is activate
+     */
+    handlePostActivation() {
+        //implement in subclass
+    }
+
+    /**
+     * Executed just before scene is deactivated
+     */
+    handlePreDeactivation() {
+        //implement in subclass
+    }
+
+    /**
+     * Executed just after scene is deactivated
+     */
+    handlePostDeactivation() {
+        //implement in subclass
+    }
 
     /**
      *

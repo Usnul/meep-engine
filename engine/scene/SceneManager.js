@@ -152,20 +152,83 @@ SceneManager.prototype.exists = function (name) {
 
 /**
  * @private
+ * @param {Scene} scene
+ */
+SceneManager.prototype.deactivateScene = function (scene) {
+
+    if (!scene.active.getValue()) {
+        //not active, nothing to do
+        return;
+    }
+
+    try {
+        scene.handlePreDeactivation();
+    } catch (e) {
+        console.error(`Exception in pre-deactivation routine of scene '${scene.name}'`, e);
+    }
+
+    scene.active.set(false);
+
+    if (this.entityManager.dataset === scene.dataset) {
+        this.entityManager.detachDataSet();
+    }
+
+    //remove speed modifiers
+    scene.speedModifiers.forEach(m => this.clock.speed.removeModifier(m));
+
+    //unwatch modifiers
+    scene.speedModifiers.on.added.remove(this.__handleSpeedModifierAdded, this);
+    scene.speedModifiers.on.removed.remove(this.__handleSpeedModifierRemoved, this);
+
+    try {
+        scene.handlePostDeactivation();
+    } catch (e) {
+        console.error(`Exception in post-deactivation routine of scene '${scene.id}'`, e);
+    }
+};
+
+/**
+ * @private
+ * @param {Scene} scene
+ */
+SceneManager.prototype.activateScene = function (scene) {
+
+    try {
+        scene.handlePreActivation();
+    } catch (e) {
+        console.error(`Exception in pre-activation routine of scene '${scene.id}'`, e);
+    }
+
+    const em = this.entityManager;
+
+    em.attachDataSet(scene.dataset);
+
+    scene.active.set(true);
+
+    scene.speedModifiers.forEach(m => this.clock.speed.addModifier(m));
+    //watch speed modifiers
+    scene.speedModifiers.on.added.add(this.__handleSpeedModifierAdded, this);
+    scene.speedModifiers.on.removed.add(this.__handleSpeedModifierRemoved, this);
+
+
+    try {
+        scene.handlePostActivation();
+    } catch (e) {
+        console.error(`Exception in post-activation routine of scene '${scene.id}'`, e);
+    }
+
+    this.currentScene = scene;
+};
+
+/**
+ * @private
  */
 SceneManager.prototype.deactivateCurrentScene = function () {
 
     const currentScene = this.currentScene;
+
     if (currentScene !== null) {
-        currentScene.active.set(false);
-        this.entityManager.detachDataSet();
-
-        //remove speed modifiers
-        currentScene.speedModifiers.forEach(m => this.clock.speed.removeModifier(m));
-
-        //unwatch modifiers
-        currentScene.speedModifiers.on.added.remove(this.__handleSpeedModifierAdded, this);
-        currentScene.speedModifiers.on.removed.remove(this.__handleSpeedModifierRemoved, this);
+        this.deactivateScene(currentScene);
     }
 
 };
@@ -206,16 +269,7 @@ SceneManager.prototype.set = function (name) {
     const em = this.entityManager;
 
     this.deactivateCurrentScene();
-
-    em.attachDataSet(scene.dataset);
-    scene.active.set(true);
-
-    scene.speedModifiers.forEach(m => this.clock.speed.addModifier(m));
-    //watch speed modifiers
-    scene.speedModifiers.on.added.add(this.__handleSpeedModifierAdded, this);
-    scene.speedModifiers.on.removed.add(this.__handleSpeedModifierRemoved, this);
-
-    this.currentScene = scene;
+    this.activateScene(scene);
 };
 
 /**
