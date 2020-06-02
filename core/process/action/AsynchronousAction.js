@@ -87,6 +87,12 @@ export class AsynchronousAction {
      * @returns {Promise}
      */
     cancel() {
+
+        if (this.status !== TaskState.RUNNING) {
+            // action is not running, so we can say that cancellation was a success
+            return Promise.resolve();
+        }
+
         throw new Error('Unsupported operation');
     }
 }
