@@ -111,6 +111,12 @@ export class RandomOptimizer {
 
         const newScore = this.scoreFunction(tempState);
 
+        if (Number.isNaN(newScore)) {
+            console.error('Score function returned NaN');
+
+            return false;
+        }
+
         if (newScore <= currentScore) {
             //score not improved
             return false;
