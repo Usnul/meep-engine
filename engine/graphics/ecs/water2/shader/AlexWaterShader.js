@@ -16,9 +16,14 @@ void main(){
 
 const fs = `
 uniform vec3 waterColor;
+uniform vec3 shoreColor;
+
+uniform float fScattering;
 
 uniform sampler2D tHeightTexture;
 uniform sampler2D tDepthTexture;
+
+uniform vec2 vHeightTextureResolution;
 
 uniform vec2 vScreenResolution;
 
@@ -63,7 +68,34 @@ vec4 sampleTextureGaussian( sampler2D tex,vec2 uv, vec2 texelSize){
         texture2D(tex, uv + vec2( dx1, dy1 ) )
     ) * ( 1.0 / 9.0 );
 }
-        
+
+vec4 blur9(sampler2D image, vec2 uv, vec2 texelSize, vec2 direction) {
+  vec4 color = vec4(0.0);
+  vec2 off1 = vec2(1.3846153846) * direction;
+  vec2 off2 = vec2(3.2307692308) * direction;
+  color += texture2D(image, uv) * 0.2270270270;
+  color += texture2D(image, uv + (off1 * texelSize )) * 0.3162162162;
+  color += texture2D(image, uv - (off1 * texelSize )) * 0.3162162162;
+  color += texture2D(image, uv + (off2 * texelSize )) * 0.0702702703;
+  color += texture2D(image, uv - (off2 * texelSize )) * 0.0702702703;
+  return color;
+}
+
+vec4 blur13(sampler2D image, vec2 uv, vec2 texelSize, vec2 direction) {
+  vec4 color = vec4(0.0);
+  vec2 off1 = vec2(1.411764705882353) * direction;
+  vec2 off2 = vec2(3.2941176470588234) * direction;
+  vec2 off3 = vec2(5.176470588235294) * direction;
+  color += texture2D(image, uv) * 0.1964825501511404;
+  color += texture2D(image, uv + (off1 * texelSize)) * 0.2969069646728344;
+  color += texture2D(image, uv - (off1 * texelSize)) * 0.2969069646728344;
+  color += texture2D(image, uv + (off2 * texelSize)) * 0.09447039785044732;
+  color += texture2D(image, uv - (off2 * texelSize)) * 0.09447039785044732;
+  color += texture2D(image, uv + (off3 * texelSize)) * 0.010381362401148057;
+  color += texture2D(image, uv - (off3 * texelSize)) * 0.010381362401148057;
+  return color;
+} 
+
 void main(){
 
     //compute view depth
@@ -84,28 +116,26 @@ void main(){
     //sample water depth relative to the sky
     vec2 depthUV = (vUv + vHeightUv.xy) * vHeightUv.zw;
     
-    float height = texture2D(tHeightTexture, depthUV).r;
+    float height = blur13( tHeightTexture, depthUV, 1.0 / vHeightTextureResolution, vec2(1.0) ).r;
     
     float depth = level - height;
     
-    vec4 shoreColor = vec4(0.219, 0.474, 0.572, 1.0);
-    
-    float geoHash = (depthUV.x+ depthUV.y)*23.123;
+    float geoHash = (depthUV.x+ depthUV.y)*313.123;
     
     float waveHeightModifier = sin(geoHash + time*fWaveSpeed) / 3.14159265359;
     
-    float waveHeight = depth+fWaveAmplitude*waveHeightModifier;
+    float waveHeight = depth + fWaveAmplitude * waveHeightModifier;
     
-    float deepColorFactor = smoothstep(0.2, 0.7, waveHeight);
+    float deepColorFactor = smoothstep(0.7, 2.0, waveHeight);
     
     vec4 color = mix(
-        shoreColor, 
-        vec4(waterColor,1.0), 
+        vec4(shoreColor, 0.8), 
+        vec4(waterColor, 1.0), 
         deepColorFactor
     );
     
     //this simulates scattering under water
-    float fogAmount = 1.0 - exp(-viewDepth);
+    float fogAmount = 1.0 - exp( - viewDepth * fScattering );
 
     gl_FragColor = color;
     
@@ -139,6 +169,10 @@ export function makeAlexWaterMaterial() {
             type: 't',
             value: null
         },
+        vHeightTextureResolution: {
+            type: 'v2',
+            value: new Vector2()
+        },
         tDepthTexture: {
             type: 't',
             value: null
@@ -151,13 +185,21 @@ export function makeAlexWaterMaterial() {
             type: 'c',
             value: new Color()
         },
+        shoreColor: {
+            type: 'c',
+            value: new Color(0x95cad9)
+        },
         fWaveSpeed: {
             type: 'f',
-            value: 1.7,
+            value: 1.8,
+        },
+        fScattering: {
+            type: 'f',
+            value: 1.2
         },
         fWaveAmplitude: {
             type: 'f',
-            value: 0.4
+            value: 0.3
         }
     };
 

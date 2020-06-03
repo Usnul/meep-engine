@@ -71,6 +71,8 @@ class Water {
             (waterSize / tW),
             (waterSize / tH)
         );
+
+        shader.uniforms.vHeightTextureResolution.value.set(terrain.samplerHeight.width, terrain.samplerHeight.height);
     }
 
     writeColorToShader() {
