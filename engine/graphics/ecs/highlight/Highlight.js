@@ -113,12 +113,29 @@ class Highlight {
 
     /**
      *
+     * @param {HighlightDefinition} def
+     */
+    add(def) {
+        this.elements.add(def);
+    }
+
+    /**
+     *
+     * @param {HighlightDefinition} def
+     * @returns {boolean}
+     */
+    remove(def){
+       return this.elements.removeOneOf(def);
+    }
+
+    /**
+     *
      * @returns {HighlightDefinition}
      */
     createElement() {
         const el = new HighlightDefinition();
 
-        this.elements.add(el);
+        this.add(el);
 
         return el;
     }

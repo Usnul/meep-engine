@@ -1,6 +1,7 @@
 import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
 import Highlight from "./Highlight.js";
 import { HighlightDefinition } from "./HighlightDefinition.js";
+import { COMPONENT_SERIALIZATION_TRANSIENT_FIELD } from "../../../ecs/storage/COMPONENT_SERIALIZATION_TRANSIENT_FIELD.js";
 
 export class HighlightSerializationAdapter extends BinaryClassSerializationAdapter {
     constructor() {
@@ -18,10 +19,30 @@ export class HighlightSerializationAdapter extends BinaryClassSerializationAdapt
     serialize(buffer, value) {
         const n = value.elements.length;
 
-        buffer.writeUintVar(n);
+        /**
+         *
+         * @type {HighlightDefinition[]}
+         */
+        const serializable = [];
 
+        //collect serializable highlights
         for (let i = 0; i < n; i++) {
             const highlightElement = value.elements.get(i);
+
+            if (highlightElement[COMPONENT_SERIALIZATION_TRANSIENT_FIELD]) {
+                continue;
+            }
+
+            serializable.push(highlightElement);
+
+        }
+
+        const l = serializable.length;
+
+        buffer.writeUintVar(l);
+
+        for (let i = 0; i < l; i++) {
+            const highlightElement = serializable[i];
 
             const color = highlightElement.color;
 

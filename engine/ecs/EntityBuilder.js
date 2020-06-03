@@ -74,6 +74,8 @@ class EntityBuilder {
      * @returns {boolean}
      */
     getFlag(flag) {
+        assert.isNumber(flag, 'flag');
+
         return (this.flags & flag) !== 0;
     }
 
@@ -111,10 +113,12 @@ class EntityBuilder {
         assert.notOk(this.getComponent(componentInstance.__proto__.constructor) !== null, `Component of this type already exists`);
 
         this.element.push(componentInstance);
-        if (this.entity !== void 0) {
+
+        if (this.getFlag(EntityBuilderFlags.Built)) {
             //already built, add component to entity
             this.dataset.addComponentToEntity(this.entity, componentInstance);
         }
+
         return this;
     }
 
@@ -168,7 +172,7 @@ class EntityBuilder {
      * @param {*} event
      */
     sendEvent(eventName, event) {
-        if (this.entity !== void 0) {
+        if (this.getFlag(EntityBuilderFlags.Built)) {
             this.dataset.sendEvent(this.entity, eventName, event);
         } else {
             console.warn("Entity doesn't exist. Event " + eventName + ":" + event + " was not sent.")
@@ -182,7 +186,7 @@ class EntityBuilder {
      * @returns {EntityBuilder}
      */
     addEventListener(eventName, listener) {
-        if (this.entity !== void 0) {
+        if (this.getFlag(EntityBuilderFlags.Built)) {
             this.dataset.addEntityEventListener(this.entity, eventName, listener);
         } else {
             this.deferredListeners.push({
@@ -200,7 +204,7 @@ class EntityBuilder {
      * @returns {EntityBuilder}
      */
     removeEventListener(eventName, listener) {
-        if (this.entity !== void 0) {
+        if (this.getFlag(EntityBuilderFlags.Built)) {
             this.dataset.removeEntityEventListener(this.entity, eventName, listener);
         } else {
             const listeners = this.deferredListeners;

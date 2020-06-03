@@ -1,6 +1,7 @@
 import { Color } from "../../../../core/color/Color.js";
 import { assert } from "../../../../core/assert.js";
 import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
+import { COMPONENT_SERIALIZATION_TRANSIENT_FIELD } from "../../../ecs/storage/COMPONENT_SERIALIZATION_TRANSIENT_FIELD.js";
 
 export class HighlightDefinition {
     constructor() {
@@ -17,6 +18,11 @@ export class HighlightDefinition {
          */
         this.opacity = 1;
 
+        /**
+         *
+         * @type {boolean}
+         */
+        this[COMPONENT_SERIALIZATION_TRANSIENT_FIELD] = false;
     }
 
     /**
