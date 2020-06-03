@@ -7,6 +7,7 @@ import Vector3 from "../../../../core/geom/Vector3.js";
 import TopDownCameraController from "./TopDownCameraController.js";
 import Vector2 from "../../../../core/geom/Vector2.js";
 import { SignalBinding } from "../../../../core/events/signal/SignalBinding.js";
+import { clamp } from "../../../../core/math/MathUtils.js";
 
 
 /**
@@ -63,7 +64,10 @@ function land(lander, controller, terrain, samplerCache) {
 
     v2.divide(terrain.size);
 
-    const value = sampler.sampleChannelBilinear(v2.x * sampler.width, v2.y * sampler.height, 0);
+    const x = clamp(v2.x * sampler.width, 0, sampler.width - 1);
+    const y = clamp(v2.y * sampler.height, 0, sampler.height - 1);
+
+    const value = sampler.sampleChannelBilinear(x, y, 0);
 
     target.setY(value);
 }
