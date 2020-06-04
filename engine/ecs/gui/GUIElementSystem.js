@@ -140,7 +140,11 @@ class GUIElementSystem extends System {
                  */
                 const view = component.view;
 
-                view.initialize(component.parameters, entity, ecd, this.engine);
+                try {
+                    view.initialize(component.parameters, entity, ecd, this.engine);
+                } catch (e) {
+                    console.error('Failed to initialize GUIElement View:', e);
+                }
 
                 ecd.sendEvent(entity, GUIElementEvent.Initialized);
 
