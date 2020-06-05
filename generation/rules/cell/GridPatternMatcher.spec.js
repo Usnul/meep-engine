@@ -1,6 +1,6 @@
 import { GridPatternMatcher } from "./GridPatternMatcher.js";
 import { GridData } from "../../GridData.js";
-import { GridCellRuleContainsTag } from "../TagRuleContains.js";
+import { CellMatcherContainsTag } from "../CellMatcherContainsTag.js";
 
 const R_90 = Math.PI / 2;
 const R_180 = Math.PI;
@@ -27,7 +27,7 @@ test('always matches empty rule set', () => {
 test('exact single point match', () => {
     const pattern = new GridPatternMatcher();
 
-    pattern.addRule(0, 0, GridCellRuleContainsTag.from(1));
+    pattern.addRule(0, 0, CellMatcherContainsTag.from(1));
 
     const data = new GridData();
 

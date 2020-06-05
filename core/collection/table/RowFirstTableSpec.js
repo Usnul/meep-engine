@@ -4,6 +4,7 @@
  */
 import { Cache } from "../../Cache.js";
 import { FunctionCompiler } from "../../function/FunctionCompiler.js";
+import { DataType } from "./DataType.js";
 
 /**
  * @readonly
@@ -45,21 +46,21 @@ export const DataType2DataViewWriters = {
 
 /**
  * @readonly
- * @type {object.<string,number>}
+ * @enum {number}
  */
-const ByteSizeMap = {
-    "uint8": 1,
-    "uint16": 2,
-    "uint32": 4,
-    "uint64": 8,
+export const DataTypeByteSizes = {
+    [DataType.Uint8]: 1,
+    [DataType.Uint16]: 2,
+    [DataType.Uint32]: 4,
+    [DataType.Uint64]: 8,
 
-    "int8": 1,
-    "int16": 2,
-    "int32": 4,
-    "int64": 8,
+    [DataType.Int8]: 1,
+    [DataType.Int16]: 2,
+    [DataType.Int32]: 4,
+    [DataType.Int64]: 8,
 
-    "float32": 4,
-    "float64": 8
+    [DataType.Float32]: 4,
+    [DataType.Float64]: 8
 };
 
 /**
@@ -78,7 +79,7 @@ function genRowReader(types) {
 
         const type = types[i];
         lines.push("result[" + i + "] = dataView." + DataType2DataViewReaders[type] + "(" + offset + " + byteOffset);");
-        offset += ByteSizeMap[type];
+        offset += DataTypeByteSizes[type];
 
     }
 
@@ -105,7 +106,7 @@ function genRowWriter(types) {
     for (let i = 0; i < numTypes; i++) {
         const type = types[i];
         lines.push("dataView." + DataType2DataViewWriters[type] + "(" + offset + " + byteOffset, record[" + i + "]);");
-        offset += ByteSizeMap[type];
+        offset += DataTypeByteSizes[type];
     }
 
     const result = FunctionCompiler.INSTANCE.compile({
@@ -169,7 +170,7 @@ export function RowFirstTableSpec(types) {
     types.forEach((type, index) => {
         this.columnOffsets[index] = byteOffset;
 
-        const columnByteSize = ByteSizeMap[type];
+        const columnByteSize = DataTypeByteSizes[type];
 
         byteOffset += columnByteSize;
     });

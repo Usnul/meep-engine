@@ -2,6 +2,8 @@ import { DataTypeIndices } from "../../../../core/collection/table/DataTypeIndic
 import { Sampler2D } from "./Sampler2D.js";
 import { EndianType } from "../../../../core/binary/BinaryBuffer.js";
 import { DataType } from "../../../../core/collection/table/DataType.js";
+import { DataTypeByteSizes } from "../../../../core/collection/table/RowFirstTableSpec.js";
+import { assert } from "../../../../core/assert.js";
 
 
 /**
@@ -132,7 +134,11 @@ export function serializeTexture(buffer, texture) {
         throw new TypeError(`No buffer found on data array, only TypedArrays are supported. It appears that data array is not a TypedArray`);
     }
 
-    const byteSize = width * height * itemSize;
+    const itemByteSize = DataTypeByteSizes[type];
+
+    assert.isNumber(itemByteSize, 'itemByteSize');
+
+    const byteSize = width * height * itemSize * itemByteSize;
 
     buffer.writeBytes(new Uint8Array(byteBuffer), 0, byteSize);
 }

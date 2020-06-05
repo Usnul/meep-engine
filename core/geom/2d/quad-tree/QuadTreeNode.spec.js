@@ -146,36 +146,36 @@ test('test traverseRectangleIntersections', () => {
     tree.traverseRectangleIntersections(0, 0, 1, 1, visitor);
 
     expect(visitor).toHaveBeenCalledTimes(1);
-    expect(visitor).toHaveBeenLastCalledWith(a);
+    expect(visitor).toHaveBeenLastCalledWith(a, 0, 0, 1, 1);
 
     tree.traverseRectangleIntersections(2, 0, 3, 1, visitor);
 
     expect(visitor).toHaveBeenCalledTimes(2);
-    expect(visitor).toHaveBeenLastCalledWith(b);
+    expect(visitor).toHaveBeenLastCalledWith(b, 2, 0, 3, 1);
 
     tree.traverseRectangleIntersections(1, 1, 2, 2, visitor);
 
     expect(visitor).toHaveBeenCalledTimes(3);
-    expect(visitor).toHaveBeenLastCalledWith(c);
+    expect(visitor).toHaveBeenLastCalledWith(c, 1, 1, 2, 2);
 
     tree.traverseRectangleIntersections(0, 2, 1, 3, visitor);
 
     expect(visitor).toHaveBeenCalledTimes(4);
-    expect(visitor).toHaveBeenLastCalledWith(d);
+    expect(visitor).toHaveBeenLastCalledWith(d, 0, 2, 1, 3);
 
     tree.traverseRectangleIntersections(2, 2, 3, 3, visitor);
 
     expect(visitor).toHaveBeenCalledTimes(5);
-    expect(visitor).toHaveBeenLastCalledWith(e);
+    expect(visitor).toHaveBeenLastCalledWith(e, 2, 2, 3, 3);
 
     const visitor0 = jest.fn();
 
     tree.traverseRectangleIntersections(0, 0, 3, 3, visitor0);
 
     expect(visitor0).toHaveBeenCalledTimes(5);
-    expect(visitor0).toHaveBeenCalledWith(a);
-    expect(visitor0).toHaveBeenCalledWith(b);
-    expect(visitor0).toHaveBeenCalledWith(c);
-    expect(visitor0).toHaveBeenCalledWith(d);
-    expect(visitor0).toHaveBeenCalledWith(e);
+    expect(visitor0).toHaveBeenCalledWith(a, 0, 0, 3, 3);
+    expect(visitor0).toHaveBeenCalledWith(b, 0, 0, 3, 3);
+    expect(visitor0).toHaveBeenCalledWith(c, 0, 0, 3, 3);
+    expect(visitor0).toHaveBeenCalledWith(d, 0, 0, 3, 3);
+    expect(visitor0).toHaveBeenCalledWith(e, 0, 0, 3, 3);
 });

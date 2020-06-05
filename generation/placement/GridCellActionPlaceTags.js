@@ -79,11 +79,11 @@ export class GridCellActionPlaceTags extends GridCellAction {
                 const target_x = Math.round(rotated_local_x + x);
                 const target_y = Math.round(rotated_local_y + y);
 
-                const source = grid.readTags(target_x, target_y);
+                const source = data.readTags(target_x, target_y);
 
                 const result = this.operation(source, cell_tags);
 
-                grid.writeTags(target_x, target_y, result);
+                data.writeTags(target_x, target_y, result);
             }
         }
     }

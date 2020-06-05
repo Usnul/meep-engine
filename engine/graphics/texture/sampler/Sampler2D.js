@@ -528,15 +528,20 @@ Sampler2D.prototype.sampleChannelBilinearUV = function (u, v, channel) {
  * @returns {number}
  */
 Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
+
     const itemSize = this.itemSize;
 
     const width = this.width;
+    const height = this.height;
 
     const rowSize = width * itemSize;
 
     //sample 4 points
-    const x0 = x | 0;
-    const y0 = y | 0;
+    const x_max = width-1;
+    const x0 = clamp(x,0,x_max) | 0;
+
+    const y_max = height-1;
+    const y0 = clamp(y,0,y_max) | 0;
     //
     const row0 = y0 * rowSize;
     const i0 = row0 + x0 * itemSize + channel;
@@ -544,15 +549,14 @@ Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
     //
     let x1, y1;
 
-    if (x === x0 || x0 >= width - 1) {
+    if (x === x0 || x0 >= x_max) {
         x1 = x0;
     } else {
         x1 = x0 + 1;
     }
 
-    const height = this.height;
 
-    if (y === y0 || y0 >= height) {
+    if (y === y0 || y0 >= y_max) {
         y1 = y0;
     } else {
         y1 = y0 + 1;
