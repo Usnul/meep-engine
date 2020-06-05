@@ -152,10 +152,9 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             const actualDensity = estimateDensityTarget(node.size);
 
             // Compute deviation in number of samples using actual density and desired density
-
             const sampleCountError = densityValue / actualDensity;
 
-            iterationLimit += sampleCountError;
+            iterationLimit += sampleCountError * SUB_SAMPLE_COUNT;
 
             grid.addMarker(node);
 
