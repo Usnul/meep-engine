@@ -1,10 +1,21 @@
 import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import Task from "../../../core/process/task/Task.js";
-import { seededRandom } from "../../../core/math/MathUtils.js";
+import { clamp, seededRandom } from "../../../core/math/MathUtils.js";
 import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import { NumericInterval } from "../../../core/math/interval/NumericInterval.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../../core/assert.js";
+
+
+/**
+ *
+ * @param {number} radius
+ */
+function estimateDensityTarget(radius) {
+    const area = Math.PI * radius * radius;
+
+    return area;
+}
 
 export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
     constructor() {
@@ -76,6 +87,8 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
          */
         const scale = this.scale;
 
+        const SUB_SAMPLE_COUNT = 8;
+
         /**
          * @returns {TaskSignal}
          */
@@ -124,6 +137,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             if (overlap) {
                 rejectedSampleBudget--;
+                iterationLimit++;
 
                 if (rejectedSampleBudget <= 0) {
                     //rejection budget exhausted, terminate
@@ -134,21 +148,32 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             }
 
+            // the way iteration is set up, we aim to update the iteration limit based on actual area taken up by the placed marker with respect to target density
+            const actualDensity = estimateDensityTarget(node.size);
+
+            // Compute deviation in number of samples using actual density and desired density
+
+            const sampleCountError = densityValue / actualDensity;
+
+            iterationLimit += sampleCountError;
+
             grid.addMarker(node);
 
             return TaskSignal.Continue;
         }
 
         function initializer() {
-            rejectedSampleBudget = grid.height * grid.height * 0.2;
 
-            iterationLimit = grid.height * grid.width * 8;
+            iterationLimit = grid.height * grid.width * SUB_SAMPLE_COUNT;
             iteration = 0;
 
+            rejectedSampleBudget = iterationLimit * 0.15;
 
             if (!density.initialized) {
                 density.initialize(grid, seed);
             }
+
+            action.initialize(grid, seed);
 
             random.setCurrentSeed(seed);
         }
@@ -163,7 +188,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
                     return 0;
                 }
 
-                return iteration / iterationLimit;
+                return clamp(iteration / iterationLimit, 0, 1);
             }
         });
     }

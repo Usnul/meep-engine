@@ -230,7 +230,7 @@ const gTrees = GridTaskDensityMarkerDistribution.from(
         )
     ),
     aPlaceTreeNode,
-    new NumericInterval(0.6, 1)
+    new NumericInterval(0.4, 1)
 );
 
 
