@@ -31,6 +31,7 @@ import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
+import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -304,6 +305,7 @@ SampleTheme0.nodes.add(nrBuffObjectCampfire);
 const ebpFoliageTree = new EntityBlueprint();
 ebpFoliageTree.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
 ebpFoliageTree.add(Transform.fromJSON({}));
+ebpFoliageTree.add(new ClingToTerrain())
 
 const nrFoliageTree = new MarkerProcessingRule();
 

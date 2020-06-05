@@ -1,5 +1,5 @@
 import { GridPatternMatcher } from "./GridPatternMatcher.js";
-import { GridData } from "../../GridData.js";
+import { GridData } from "../../grid/GridData.js";
 import { CellMatcherContainsTag } from "../CellMatcherContainsTag.js";
 
 const R_90 = Math.PI / 2;

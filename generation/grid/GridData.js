@@ -1,7 +1,7 @@
-import { assert } from "../core/assert.js";
-import { QuadTreeNode } from "../core/geom/2d/quad-tree/QuadTreeNode.js";
-import { OffsetScaleTransform2D } from "../engine/ecs/terrain/ecs/OffsetScaleTransform2D.js";
-import { Sampler2D } from "../engine/graphics/texture/sampler/Sampler2D.js";
+import { assert } from "../../core/assert.js";
+import { QuadTreeNode } from "../../core/geom/2d/quad-tree/QuadTreeNode.js";
+import { OffsetScaleTransform2D } from "../../engine/ecs/terrain/ecs/OffsetScaleTransform2D.js";
+import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 
 export class GridData {
     constructor() {
@@ -37,6 +37,12 @@ export class GridData {
          * @type {Uint16Array}
          */
         this.startDistances = new Uint16Array();
+
+        /**
+         * Discrete data layers
+         * @type {Sampler2D[]}
+         */
+        this.layers = [];
     }
 
     /**

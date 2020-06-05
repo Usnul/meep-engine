@@ -1,5 +1,5 @@
 import { CellMatcherContainsTag } from "./CellMatcherContainsTag.js";
-import { GridData } from "../GridData.js";
+import { GridData } from "../grid/GridData.js";
 
 test('correct match of a single tag', () => {
     const data = new GridData();

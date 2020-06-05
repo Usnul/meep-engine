@@ -1,4 +1,4 @@
-import { GridData } from "../GridData.js";
+import { GridData } from "../grid/GridData.js";
 import { GridCellActionPlaceTags } from "./GridCellActionPlaceTags.js";
 
 test('write a single 1x1 set of tags', () => {

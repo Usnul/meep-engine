@@ -1,4 +1,4 @@
-import { GridData } from "../../GridData.js";
+import { GridData } from "../../grid/GridData.js";
 import { computeCellFilterGradient } from "./computeCellFilterGradient.js";
 import { CellFilterCellMatcher } from "../CellFilterCellMatcher.js";
 import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
