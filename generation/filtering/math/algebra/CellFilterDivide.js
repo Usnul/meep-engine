@@ -1,5 +1,5 @@
-import { CellFilterBinaryOperation } from "../core/CellFilterBinaryOperation.js";
-import { assert } from "../../../core/assert.js";
+import { CellFilterBinaryOperation } from "../../core/CellFilterBinaryOperation.js";
+import { assert } from "../../../../core/assert.js";
 
 export class CellFilterDivide extends CellFilterBinaryOperation {
     operation(left, right) {

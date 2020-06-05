@@ -1,5 +1,6 @@
 import { assert } from "../../core/assert.js";
 import { GridLayerCellMatcher } from "./GridLayerCellMatcher.js";
+import { clamp } from "../../core/math/MathUtils.js";
 
 export class CellMatcherLayerBitMaskTest extends GridLayerCellMatcher {
     constructor() {
@@ -13,18 +14,20 @@ export class CellMatcherLayerBitMaskTest extends GridLayerCellMatcher {
     }
 
 
-    match(grid, x, y) {
-        let tags;
+    match(grid, x, y, rotation) {
 
 
         const layer = this.__layer;
         const sampler = layer.sampler;
 
-        if (x < 0 || x >= grid.width || y < 0 || y >= grid.height) {
-            tags = 0;
-        } else {
-            tags = sampler.readChannel(x, y, 0);
-        }
+        //convert to uv
+        const u = clamp(x / (grid.width - 1), 0, 1);
+        const v = clamp(y / (grid.height - 1), 0, 1);
+
+        const _x = Math.round(u * (sampler.width - 1));
+        const _y = Math.round(v * (sampler.height - 1));
+
+        const tags = sampler.readChannel(_x, _y, 0);
 
         return (tags & this.mask) === this.mask;
     }

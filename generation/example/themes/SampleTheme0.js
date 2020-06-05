@@ -17,8 +17,8 @@ import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
 import { CellFilterSimplexNoise } from "../../filtering/complex/CellFilterSimplexNoise.js";
 import { CellFilterFXAA } from "../../filtering/complex/CellFilterFXAA.js";
-import { CellFilterMultiply } from "../../filtering/algebra/CellFilterMultiply.js";
-import { CellFilterLerp } from "../../filtering/CellFilterLerp.js";
+import { CellFilterMultiply } from "../../filtering/math/algebra/CellFilterMultiply.js";
+import { CellFilterLerp } from "../../filtering/math/CellFilterLerp.js";
 import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
 import Tag from "../../../engine/ecs/components/Tag.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
@@ -30,7 +30,6 @@ import { CellFilterGaussianBlur } from "../../filtering/complex/CellFilterGaussi
 import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
-import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 import { CellFilterReadGridLayer } from "../../filtering/CellFilterReadGridLayer.js";
 
@@ -306,7 +305,7 @@ SampleTheme0.nodes.add(nrBuffObjectCampfire);
 const ebpFoliageTree = new EntityBlueprint();
 ebpFoliageTree.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
 ebpFoliageTree.add(Transform.fromJSON({}));
-ebpFoliageTree.add(new ClingToTerrain())
+// ebpFoliageTree.add(new ClingToTerrain())
 
 const nrFoliageTree = new MarkerProcessingRule();
 

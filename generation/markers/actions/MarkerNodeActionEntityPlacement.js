@@ -60,7 +60,7 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         const t = entityBuilder.getComponent(Transform);
 
         if (t !== null) {
-            t.multiplyTransforms(node.transofrm, this.transform);
+            t.multiplyTransforms(node.transform, this.transform);
         }
 
         entityBuilder.build(ecd);

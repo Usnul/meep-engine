@@ -9,5 +9,6 @@ export const GridTags = {
     Treasure: 8,
     StartingPoint: 16,
     Occupied: 32,
-    Road:64
+    Road: 64,
+    PlayArea: 128
 };

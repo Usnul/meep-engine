@@ -1,6 +1,6 @@
-import { CellFilterOperationTertiary } from "./core/CellFilterOperationTertiary.js";
-import { lerp } from "../../core/math/MathUtils.js";
-import { assert } from "../../core/assert.js";
+import { CellFilterOperationTertiary } from "../core/CellFilterOperationTertiary.js";
+import { lerp } from "../../../core/math/MathUtils.js";
+import { assert } from "../../../core/assert.js";
 
 /**
  * Linear interpolation filter

@@ -25,17 +25,19 @@ import { mir_generator_place_buff_objects } from "./generators/mir_generator_pla
 import { GridTaskDensityMarkerDistribution } from "../grid/generation/GridTaskDensityMarkerDistribution.js";
 import { CellFilterSimplexNoise } from "../filtering/complex/CellFilterSimplexNoise.js";
 import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
-import { CellFilterMultiply } from "../filtering/algebra/CellFilterMultiply.js";
+import { CellFilterMultiply } from "../filtering/math/algebra/CellFilterMultiply.js";
 import { CellFilterCellMatcher } from "../filtering/CellFilterCellMatcher.js";
-import { matcher_tag_not_traversable } from "./rules/matcher_tag_not_traversable.js";
-import { matcher_tag_unoccupied } from "./rules/matcher_tag_unoccupied.js";
-import { CellFilterSubtract } from "../filtering/algebra/CellFilterSubtract.js";
+import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
 import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
 import { MirGridLayers } from "./grid/MirGridLayers.js";
-import { CellFilterLerp } from "../filtering/CellFilterLerp.js";
+import { CellFilterLerp } from "../filtering/math/CellFilterLerp.js";
 import { GridCellActionWriteFilterToLayer } from "../placement/GridCellActionWriteFilterToLayer.js";
 import { CellMatcherAny } from "../rules/CellMatcherAny.js";
 import { CellFilterGaussianBlur } from "../filtering/complex/CellFilterGaussianBlur.js";
+import { GridCellActionSequence } from "../placement/GridCellActionSequence.js";
+import { CellFilterStep } from "../filtering/math/CellFilterStep.js";
+import { CellFilterReadGridLayer } from "../filtering/CellFilterReadGridLayer.js";
+import { MarkerNodeTransformerAddPositionYFromFilter } from "../markers/transform/MarkerNodeTransformerAddPositionYFromFilter.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -65,14 +67,18 @@ const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreas
 ], 0.5);
 
 
+const aMakePlayArea = GridCellActionSequence.from([
+    GridCellActionPlaceTags.from(GridTags.Traversable | GridTags.PlayArea, MirGridLayers.Tags)
+]);
+
 const gMakeEmpty = GridTaskCellularAutomata.from(
-    GridCellActionPlaceTags.from(GridTags.Traversable, MirGridLayers.Tags),
+    aMakePlayArea,
     3
 );
 
 const gConnectRooms = GridTaskConnectRooms.from(
     matcher_tag_traversable,
-    GridCellActionPlaceTags.from(GridTags.Traversable, MirGridLayers.Tags)
+    aMakePlayArea
 );
 
 gConnectRooms.addDependency(gMakeEmpty);
@@ -180,8 +186,16 @@ const gRoadDecorators = mir_generator_place_road_decorators();
 gRoadDecorators.addDependency(gRoads);
 
 //trees
+const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
+
 const aPlaceTreeNode = GridCellActionPlaceMarker.from('Tree');
 aPlaceTreeNode.size = 0.565;
+
+aPlaceTreeNode.addTransformer(MarkerNodeTransformerAddPositionYFromFilter.from(
+    fReadHeight
+));
+
+const matcher_not_play_area = CellMatcherNot.from(CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags));
 
 const gTrees = GridTaskDensityMarkerDistribution.from(
     CellFilterMultiply.from(
@@ -189,12 +203,21 @@ const gTrees = GridTaskDensityMarkerDistribution.from(
             CellFilterSimplexNoise.from(20, 20),
             CellFilterConstant.from(0.6)
         ),
-        CellFilterCellMatcher.from(
-            CellMatcherAnd.from(matcher_tag_not_traversable, matcher_tag_unoccupied)
+
+        CellFilterMultiply.from(
+            //filter out areas that are below height of 0
+            CellFilterStep.from(
+                CellFilterConstant.from(0),
+                fReadHeight
+            ),
+            //filter areas that are playable
+            CellFilterCellMatcher.from(
+                matcher_not_play_area
+            )
         )
     ),
     aPlaceTreeNode,
-    new NumericInterval(0.5, 1)
+    new NumericInterval(0.6, 1)
 );
 
 
@@ -202,23 +225,23 @@ const gTrees = GridTaskDensityMarkerDistribution.from(
 
 const mHeightArea = new GridPatternMatcher();
 
-mHeightArea.addRule(0, -2, matcher_tag_not_traversable);
+mHeightArea.addRule(0, -2, matcher_not_play_area);
 
-mHeightArea.addRule(-1, -1, matcher_tag_not_traversable);
-mHeightArea.addRule(0, -1, matcher_tag_not_traversable);
-mHeightArea.addRule(1, -1, matcher_tag_not_traversable);
+mHeightArea.addRule(-1, -1, matcher_not_play_area);
+mHeightArea.addRule(0, -1, matcher_not_play_area);
+mHeightArea.addRule(1, -1, matcher_not_play_area);
 
-mHeightArea.addRule(-2, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(-1, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(0, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(1, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(2, 0, matcher_tag_not_traversable);
+mHeightArea.addRule(-2, 0, matcher_not_play_area);
+mHeightArea.addRule(-1, 0, matcher_not_play_area);
+mHeightArea.addRule(0, 0, matcher_not_play_area);
+mHeightArea.addRule(1, 0, matcher_not_play_area);
+mHeightArea.addRule(2, 0, matcher_not_play_area);
 
-mHeightArea.addRule(-1, 1, matcher_tag_not_traversable);
-mHeightArea.addRule(0, 1, matcher_tag_not_traversable);
-mHeightArea.addRule(1, 1, matcher_tag_not_traversable);
+mHeightArea.addRule(-1, 1, matcher_not_play_area);
+mHeightArea.addRule(0, 1, matcher_not_play_area);
+mHeightArea.addRule(1, 1, matcher_not_play_area);
 
-mHeightArea.addRule(0, 2, matcher_tag_not_traversable);
+mHeightArea.addRule(0, 2, matcher_not_play_area);
 
 const aWriteHeight = GridCellActionWriteFilterToLayer.from(
     MirGridLayers.Heights,
@@ -255,7 +278,7 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
 
 gHeights.addDependency(gConnectRooms);
 
-gTrees.addDependencies([gBuildDistanceMap, gHeights]);
+gTrees.addDependencies([gMakeEmpty, gConnectRooms, gBuildDistanceMap, gHeights]);
 
 SampleGenerator0.addGenerator(gHeights);
 SampleGenerator0.addGenerator(gMakeEmpty);

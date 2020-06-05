@@ -27,7 +27,7 @@ export class MarkerNode {
          * World transform, this can differ from the grid position
          * @type {Transform}
          */
-        this.transofrm = new Transform();
+        this.transform = new Transform();
 
         /**
          * Treated as a radius
@@ -66,9 +66,9 @@ export class MarkerNode {
 
         this.position.copy(other.position);
 
-        this.transofrm.copy(other.transofrm);
+        this.transform.copy(other.transform);
 
-        this.radius = other.radius;
+        this.size = other.size;
 
         this.properties = Object.assign({}, other.properties);
     }
@@ -79,8 +79,8 @@ export class MarkerNode {
      * @returns {boolean}
      */
     overlaps(other) {
-        const p0 = this.transofrm.position;
-        const p1 = other.transofrm.position;
+        const p0 = this.transform.position;
+        const p1 = other.transform.position;
 
         return circleIntersectsCircle(p0.x, p0.y, this.size, p1.x, p1.y, other.size);
     }

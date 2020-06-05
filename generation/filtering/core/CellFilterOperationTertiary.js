@@ -30,7 +30,7 @@ export class CellFilterOperationTertiary extends CellFilter {
      * @returns {number}
      */
     operation(a, b, c) {
-
+        throw new Error('Not implemented');
     }
 
     initialize(grid, seed) {

@@ -1,4 +1,3 @@
-import { noop } from "../../core/function/Functions.js";
 import { GridCellAction } from "../placement/GridCellAction.js";
 import { MarkerNode } from "./MarkerNode.js";
 import { Transform } from "../../engine/ecs/components/Transform.js";
@@ -33,15 +32,28 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         /**
          *
-         * @type {function(MarkerNode,GridData)}
+         * @type {MarkerNodeTransformer[]}
          */
-        this.mutator = noop;
+        this.transformers = [];
 
         /**
          *
          * @type {Vector2}
          */
         this.offset = new Vector2();
+    }
+
+    initialize(data, seed) {
+        super.initialize(data, seed);
+
+        const transformers = this.transformers;
+
+        const n = transformers.length;
+        for (let i = 0; i < n; i++) {
+            const nodeTransformer = transformers[i];
+
+            nodeTransformer.initialize(grid, seed);
+        }
     }
 
     /**
@@ -59,6 +71,16 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         this.tags.push(tag);
 
         return true;
+    }
+
+    /**
+     *
+     * @param {MarkerNodeTransformer} transformer
+     */
+    addTransformer(transformer) {
+        assert.equal(transformer.isMarkerNodeTransformer, true, 'transformer.isMarkerNodeTransformer !== true');
+
+        this.transformers.push(transformer);
     }
 
     /**
@@ -84,7 +106,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
      */
     buildNode(data, x, y, rotation) {
 
-        const node = new MarkerNode();
+        let node = new MarkerNode();
 
 
         const sin = Math.sin(rotation);
@@ -108,15 +130,15 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         node.size = this.size;
 
-        node.transofrm.position.set(
+        node.transform.position.set(
             target_x * data.transform.scale_x + data.transform.offset_x,
             0,
             target_y * data.transform.scale_y + data.transform.offset_y
         );
 
-        node.transofrm.rotation.__setFromEuler(0, rotation, 0);
+        node.transform.rotation.__setFromEuler(0, rotation, 0);
 
-        node.transofrm.multiplyTransforms(node.transofrm, this.transform);
+        node.transform.multiplyTransforms(node.transform, this.transform);
 
         //add tags
         const tags = this.tags;
@@ -129,7 +151,14 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         //write properties
         Object.assign(node.properties, this.properties);
 
-        this.mutator(node, data);
+        //apply transformations
+        const transformers = this.transformers;
+        const transformerCount = transformers.length;
+
+        for (let i = 0; i < transformerCount; i++) {
+            const transformer = transformers[i];
+            node = transformer.transform(node, grid);
+        }
 
         return node;
     }

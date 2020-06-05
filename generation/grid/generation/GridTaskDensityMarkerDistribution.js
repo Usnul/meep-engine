@@ -118,7 +118,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             //modify size and scale
             node.size *= markerScale;
 
-            node.transofrm.scale.multiplyScalar(markerScale);
+            node.transform.scale.multiplyScalar(markerScale);
 
             const overlap = grid.containsMarkerInCircle(_x, _y, node.size, MarkerNodeMatcherAny.INSTANCE);
 

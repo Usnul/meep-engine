@@ -1,16 +1,17 @@
-import { CellFilterBinaryOperation } from "../core/CellFilterBinaryOperation.js";
-import { assert } from "../../../core/assert.js";
+import { CellFilterBinaryOperation } from "../../core/CellFilterBinaryOperation.js";
+import { assert } from "../../../../core/assert.js";
 
-export class CellFilterMultiply extends CellFilterBinaryOperation {
+export class CellFilterSubtract extends CellFilterBinaryOperation {
+
     operation(left, right) {
-        return left * right;
+        return left - right;
     }
 
     /**
      *
      * @param {CellFilter} left
      * @param {CellFilter} right
-     * @returns {CellFilterMultiply}
+     * @returns {CellFilterSubtract}
      */
     static from(left, right) {
         assert.defined(left, 'left');
@@ -19,7 +20,7 @@ export class CellFilterMultiply extends CellFilterBinaryOperation {
         assert.equal(left.isCellFilter, true, 'left.isCellFilter');
         assert.equal(right.isCellFilter, true, 'right.isCellFilter');
 
-        const r = new CellFilterMultiply();
+        const r = new CellFilterSubtract();
 
         r.left = left;
         r.right = right;

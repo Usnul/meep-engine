@@ -17,3 +17,9 @@ export class MarkerNodeTransformer {
         throw new Error(`Not implemented`);
     }
 }
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+MarkerNodeTransformer.prototype.isMarkerNodeTransformer = true;
