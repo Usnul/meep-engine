@@ -13,7 +13,7 @@ export class CellFilterAngleToNormal extends CellFilter {
          * Reference vector to which the angle is computes
          * @type {Vector3}
          */
-        this.reference = new Vector3(0, 1, 0);
+        this.reference = new Vector3(0, 0, 1);
 
         /**
          * Is treated as a 3d surface

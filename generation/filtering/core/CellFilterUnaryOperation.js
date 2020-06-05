@@ -1,3 +1,5 @@
+import { CellFilter } from "../CellFilter.js";
+
 export class CellFilterUnaryOperation extends CellFilter {
     constructor() {
         super();

@@ -38,7 +38,10 @@ import { GridCellActionSequence } from "../placement/GridCellActionSequence.js";
 import { CellFilterStep } from "../filtering/math/CellFilterStep.js";
 import { CellFilterReadGridLayer } from "../filtering/CellFilterReadGridLayer.js";
 import { MarkerNodeTransformerAddPositionYFromFilter } from "../markers/transform/MarkerNodeTransformerAddPositionYFromFilter.js";
-
+import { CellFilterAngleToNormal } from "../filtering/complex/CellFilterAngleToNormal.js";
+import Vector3 from "../../core/geom/Vector3.js";
+import { CellFilterOneMinus } from "../filtering/math/CellFilterOneMinus.js";
+import { CellFilterSmoothStep } from "../filtering/math/CellFilterSmoothStep.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -205,14 +208,24 @@ const gTrees = GridTaskDensityMarkerDistribution.from(
         ),
 
         CellFilterMultiply.from(
-            //filter out areas that are below height of 0
-            CellFilterStep.from(
-                CellFilterConstant.from(0),
-                fReadHeight
+            CellFilterMultiply.from(
+                //filter out areas that are below height of 0
+                CellFilterStep.from(
+                    CellFilterConstant.from(0),
+                    fReadHeight
+                ),
+                //filter areas that are playable
+                CellFilterCellMatcher.from(
+                    matcher_not_play_area
+                )
             ),
-            //filter areas that are playable
-            CellFilterCellMatcher.from(
-                matcher_not_play_area
+            // Filter areas with sharp slopes
+            CellFilterOneMinus.from(
+                CellFilterSmoothStep.from(
+                    CellFilterConstant.from(Math.PI / 9),
+                    CellFilterConstant.from(Math.PI / 2),
+                    CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
+                )
             )
         )
     ),
