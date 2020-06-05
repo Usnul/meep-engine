@@ -8,8 +8,8 @@
 import { System } from '../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
 import { Transform } from '../../ecs/components/Transform.js';
-import { Asset } from "../../asset/Asset.js";
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
+import { SoundAssetManager } from "../../asset/loaders/SoundAssetManager.js";
 
 /**
  * @readonly
@@ -54,36 +54,7 @@ export class SoundEmitterSystem extends System {
         this.channels[SoundEmitterChannels.Effects].gain.setValueAtTime(1.2, 0);
         this.channels[SoundEmitterChannels.Music].gain.setValueAtTime(0.1, 0);
 
-        assetManager.registerLoader("sound", function (path, success, failure, progress) {
-            // Load a sound file using an ArrayBuffer XMLHttpRequest.
-            const request = new XMLHttpRequest();
-
-            request.open("GET", path, true);
-
-            request.responseType = "arraybuffer";
-
-            request.onload = function (e) {
-                //decode works asynchronously, this is important to prevent lag in main thread
-                context.decodeAudioData(request.response, function (buffer) {
-                    const byteSize = e.total;
-
-                    const asset = new Asset(function () {
-                        return buffer;
-                    }, byteSize);
-
-                    success(asset);
-                });
-            };
-
-            request.onerror = failure;
-
-            request.onprogress = function (e) {
-                //report progress
-                progress(e.loaded, e.total);
-            };
-
-            request.send();
-        });
+        assetManager.registerLoader("sound", new SoundAssetManager(context));
     }
 
     /**

@@ -1,13 +1,15 @@
 import xhr from "../xhr.js";
+import { AssetLoader } from "./AssetLoader.js";
 
-export function TextAssetLoader(path, callback, failure, progress) {
-    // load the level
-    xhr(path, function (data) {
-        const asset = {
-            create: function () {
-                return data;
-            }
-        };
-        callback(asset);
-    }, failure);
+export class TextAssetLoader extends AssetLoader {
+    load(path, callback, failure, progress) {
+        xhr(path, function (data) {
+            const asset = {
+                create: function () {
+                    return data;
+                }
+            };
+            callback(asset);
+        }, failure);
+    }
 }

@@ -2,148 +2,21 @@
  * Created by Alex on 03/09/2014.
  */
 
-import {
-    BufferGeometry,
-    Geometry,
-    MeshLambertMaterial as ThreeMeshLambertMaterial,
-    MultiMaterial as ThreeMultiMaterial,
-    sRGBEncoding,
-    TextureLoader as ThreeTextureLoader
-} from 'three';
+import { sRGBEncoding, TextureLoader as ThreeTextureLoader } from 'three';
 
-import checkerTexture from '../graphics/texture/CheckersTexture.js';
-import ThreeFactory from '../graphics/three/ThreeFactory.js';
-
-import { load as loadGLTF } from './loaders/GLTFAssetLoader.js';
 import { Asset } from "./Asset.js";
 import { computeFileExtension } from "../../core/FilePath.js";
 import { DDSLoader } from "three/examples/jsm/loaders/DDSLoader.js";
-import { loadArrayBuffer } from "./loaders/ArrayBufferLoader.js";
+import { ArrayBufferLoader } from "./loaders/ArrayBufferLoader.js";
 import { JsonAssetLoader } from "./loaders/JsonAssetLoader.js";
 import { GameAssetType } from "./GameAssetType.js";
 import { TextAssetLoader } from "./loaders/TextAssetLoader.js";
-import { LegacyJSONLoader } from "../graphics/loader/threejs/LegacyJSONLoader.js";
 import { AnimationGraphDefinitionAssetLoader } from "../graphics/ecs/animation/animator/graph/definition/serialization/AnimationGraphDefinitionAssetLoader.js";
 import { JavascriptAssetLoader } from "./loaders/JavascriptAssetLoader.js";
 import { ImageRGBADataLoader } from "./loaders/ImageRGBADataLoader.js";
-
-const placeholderTexture = checkerTexture.create();
-
-const placeholderMaterial = new ThreeMeshLambertMaterial({ map: placeholderTexture });
-
-/**
- *
- * @param  {Geometry|BufferGeometry} geometry
- * @returns {boolean}
- */
-function isSkinnedGeometry(geometry) {
-    return geometry.skinIndices !== void 0 && geometry.skinIndices.length > 0;
-}
-
-function loadThreeJSON(path, callback, onError, progress) {
-
-    console.warn(`JSON loader is deprecated. Attempting to load model '${path}'`);
-
-    const loader = new LegacyJSONLoader();
-
-    loader.load(path, function (geometry, materials) {
-        //is it skinned?
-        const isSkinned = isSkinnedGeometry(geometry);
-        if (materials === undefined) {
-            materials = [
-                placeholderMaterial
-            ];
-        }
-        if (isSkinned) {
-            materials.forEach(function (material) {
-                material.skinning = true;
-            });
-        }
-        //check for transparent materials
-        materials.forEach(function (material) {
-            if (material.opacity <= 0) {
-                console.warn("Fully transparent material " + material + " of model " + path);
-            }
-            //fix shininess of 0
-            if (material.shininess !== undefined && material.shininess <= 0) {
-                //see https://github.com/mrdoob/three.js/pull/8429/files
-                material.shininess = 1e-4;
-                material.needsUpdate = true;
-            }
-        });
-        let faceMaterial = null;
-
-        if (materials.length === 1) {
-            faceMaterial = materials[0];
-        } else {
-            console.log(path, ' uses MultiMaterial', materials);
-            faceMaterial = new ThreeMultiMaterial(materials);
-        }
-
-        ThreeFactory.prepareMaterial(faceMaterial);
-
-        let bufferGeometry;
-        if (geometry instanceof BufferGeometry) {
-            bufferGeometry = geometry;
-        } else if (geometry instanceof Geometry) {
-            //Convert plain old geometry to a BufferGeometry for better performance
-            bufferGeometry = new BufferGeometry();
-            bufferGeometry.fromGeometry(geometry);
-            if (geometry.animations !== undefined) {
-                bufferGeometry.animations = geometry.animations;
-            }
-            if (geometry.bones !== undefined) {
-                bufferGeometry.bones = geometry.bones;
-            }
-        } else {
-            throw new Error(`Unexpected geometry type`);
-        }
-
-        bufferGeometry.computeBoundingSphere();
-        bufferGeometry.computeBoundingBox();
-
-        const asset = new Asset(function () {
-            let mesh;
-            if (isSkinned) {
-                mesh = ThreeFactory.createSkinnedMesh(bufferGeometry, faceMaterial);
-            } else {
-                mesh = ThreeFactory.createMesh(bufferGeometry, faceMaterial);
-            }
-            mesh.castShadow = true;
-            mesh.receiveShadow = false;
-            //
-            return mesh;
-        }, 1);
-
-        callback(asset);
-    }, progress, onError);
-}
-
-function loadSVG(url, callback, progress) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-
-    xhr.addEventListener('load', function () {
-        if (xhr.readyState === xhr.DONE && xhr.status === 200) {
-            const domParser = new DOMParser();
-            const domXML = domParser.parseFromString(xhr.responseText, 'image/svg+xml');
-            let svgRoot = domXML.children[0];
-            const asset = {
-                create: function () {
-                    return svgRoot.cloneNode(true);
-                }
-            };
-            callback(asset);
-        }
-    }, false);
-
-    xhr.addEventListener('error', function () {
-        console.error(xhr);
-    }, false);
-
-    xhr.send();
-
-}
+import { GLTFAssetLoader } from "./loaders/GLTFAssetLoader.js";
+import { LegacyThreeJSONAssetLoader } from "./loaders/LegacyThreeJSONAssetLoader.js";
+import { SVGAssetLoader } from "./loaders/SVGAssetLoader.js";
 
 
 function loadDDSTexture(path, success, failure, progress) {
@@ -362,15 +235,15 @@ function deferredTextureLoader(path, success, failure, progress) {
  */
 function initAssetManager(assetManager) {
 
-    assetManager.registerLoader(GameAssetType.ModelGLTF, loadGLTF);
-    assetManager.registerLoader(GameAssetType.ModelGLTF_JSON, loadGLTF);
-    assetManager.registerLoader(GameAssetType.ModelThreeJs, loadThreeJSON);
-    assetManager.registerLoader(GameAssetType.ArrayBuffer, loadArrayBuffer);
+    assetManager.registerLoader(GameAssetType.ModelGLTF, new GLTFAssetLoader());
+    assetManager.registerLoader(GameAssetType.ModelGLTF_JSON, new GLTFAssetLoader());
+    assetManager.registerLoader(GameAssetType.ModelThreeJs, new LegacyThreeJSONAssetLoader());
+    assetManager.registerLoader(GameAssetType.ArrayBuffer, new ArrayBufferLoader());
     assetManager.registerLoader(GameAssetType.Texture, loadTexture);
     assetManager.registerLoader(GameAssetType.DeferredTexture, deferredTextureLoader);
 
-    assetManager.registerLoader(GameAssetType.JSON, JsonAssetLoader);
-    assetManager.registerLoader(GameAssetType.Text, TextAssetLoader);
+    assetManager.registerLoader(GameAssetType.JSON, new JsonAssetLoader());
+    assetManager.registerLoader(GameAssetType.Text, new TextAssetLoader());
 
     assetManager.registerLoader(GameAssetType.JavaScript, new JavascriptAssetLoader());
 
@@ -379,7 +252,7 @@ function initAssetManager(assetManager) {
 
     assetManager.registerLoader(GameAssetType.Image, new ImageRGBADataLoader());
 
-    assetManager.registerLoader(GameAssetType.ImageSvg, loadSVG);
+    assetManager.registerLoader(GameAssetType.ImageSvg, new SVGAssetLoader());
 }
 
 /**
