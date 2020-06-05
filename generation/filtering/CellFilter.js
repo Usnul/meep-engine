@@ -38,13 +38,13 @@ export class CellFilter {
     /**
      *
      * @param {GridData} grid
-     * @param {number} x
-     * @param {number} y
+     * @param {number} x Grid coordinate X
+     * @param {number} y Grid coordinate Y
      * @param {number} rotation
      * @returns {number}
      */
     execute(grid, x, y, rotation) {
-
+        throw new Error('Must be overridden in the subclass');
     }
 }
 

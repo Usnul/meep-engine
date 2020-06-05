@@ -1,4 +1,4 @@
-import { CellFilterBinaryOperation } from "../CellFilterBinaryOperation.js";
+import { CellFilterBinaryOperation } from "../core/CellFilterBinaryOperation.js";
 import { assert } from "../../../core/assert.js";
 
 export class CellFilterSubtract extends CellFilterBinaryOperation {

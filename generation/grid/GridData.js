@@ -57,6 +57,8 @@ export class GridData {
      * @returns {GridDataLayer|undefined}
      */
     getLayerById(id) {
+        assert.typeOf(id, 'string', 'id');
+
         const layers = this.layers;
 
         const n = layers.length;

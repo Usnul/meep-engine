@@ -1,6 +1,6 @@
-import { max2, min2 } from "../../core/math/MathUtils.js";
-import { assert } from "../../core/assert.js";
-import { CellFilter } from "./CellFilter.js";
+import { max2, min2 } from "../../../core/math/MathUtils.js";
+import { assert } from "../../../core/assert.js";
+import { CellFilter } from "../CellFilter.js";
 
 /**
  * Based on FXAA algorithm by NVidia

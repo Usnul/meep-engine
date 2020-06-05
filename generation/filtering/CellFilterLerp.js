@@ -1,7 +1,10 @@
-import { CellFilterOperationTertiary } from "./CellFilterOperationTertiary.js";
+import { CellFilterOperationTertiary } from "./core/CellFilterOperationTertiary.js";
 import { lerp } from "../../core/math/MathUtils.js";
 import { assert } from "../../core/assert.js";
 
+/**
+ * Linear interpolation filter
+ */
 export class CellFilterLerp extends CellFilterOperationTertiary {
     operation(a, b, c) {
         return lerp(a, b, c);
@@ -11,7 +14,7 @@ export class CellFilterLerp extends CellFilterOperationTertiary {
      *
      * @param {CellFilter} a
      * @param {CellFilter} b
-     * @param {CellFilter} f
+     * @param {CellFilter} f Interpolation factor, expected value between 0 and 1, 0 would lead to filter A being used, and 1 to filter B being used, values between 0 and 1 produce a proportional mix
      * @returns {CellFilterLerp}
      */
     static from(a, b, f) {

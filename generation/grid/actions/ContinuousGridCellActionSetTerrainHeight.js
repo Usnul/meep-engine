@@ -3,7 +3,7 @@ import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import { assert } from "../../../core/assert.js";
 import { lerp, min2 } from "../../../core/math/MathUtils.js";
-import { CellFilterConstant } from "../../filtering/CellFilterConstant.js";
+import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
 
 export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCellAction {
     constructor() {

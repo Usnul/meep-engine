@@ -23,14 +23,14 @@ import { mir_generator_place_road_decorators } from "./generators/mir_generator_
 import { MarkerNodeMatcherByType } from "../markers/matcher/MarkerNodeMatcherByType.js";
 import { mir_generator_place_buff_objects } from "./generators/mir_generator_place_buff_objects.js";
 import { GridTaskDensityMarkerDistribution } from "../grid/generation/GridTaskDensityMarkerDistribution.js";
-import { CellFilterSimplexNoise } from "../filtering/CellFilterSimplexNoise.js";
+import { CellFilterSimplexNoise } from "../filtering/complex/CellFilterSimplexNoise.js";
 import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
 import { CellFilterMultiply } from "../filtering/algebra/CellFilterMultiply.js";
 import { CellFilterCellMatcher } from "../filtering/CellFilterCellMatcher.js";
 import { matcher_tag_not_traversable } from "./rules/matcher_tag_not_traversable.js";
 import { matcher_tag_unoccupied } from "./rules/matcher_tag_unoccupied.js";
 import { CellFilterSubtract } from "../filtering/algebra/CellFilterSubtract.js";
-import { CellFilterConstant } from "../filtering/CellFilterConstant.js";
+import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
 import { MirGridLayers } from "./grid/MirGridLayers.js";
 
 

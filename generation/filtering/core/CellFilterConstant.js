@@ -1,5 +1,5 @@
-import { CellFilter } from "./CellFilter.js";
-import { assert } from "../../core/assert.js";
+import { CellFilter } from "../CellFilter.js";
+import { assert } from "../../../core/assert.js";
 
 export class CellFilterConstant extends CellFilter {
     constructor() {

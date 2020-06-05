@@ -1,4 +1,4 @@
-import { CellFilter } from "./CellFilter.js";
+import { CellFilter } from "../CellFilter.js";
 
 export class CellFilterBinaryOperation extends CellFilter {
     constructor() {

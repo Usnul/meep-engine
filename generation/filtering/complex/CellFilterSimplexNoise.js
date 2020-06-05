@@ -1,6 +1,6 @@
-import { CellFilter } from "./CellFilter.js";
+import { CellFilter } from "../CellFilter.js";
 import SimplexNoise from 'simplex-noise';
-import { seededRandom } from "../../core/math/MathUtils.js";
+import { seededRandom } from "../../../core/math/MathUtils.js";
 
 export class CellFilterSimplexNoise extends CellFilter {
     constructor() {
