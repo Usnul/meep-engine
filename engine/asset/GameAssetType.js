@@ -1,5 +1,5 @@
 /**
- *
+ * NOTE, trying to keep to IANA registry: https://www.iana.org/assignments/media-types/media-types.xhtml
  * @enum {string}
  */
 export const GameAssetType = {
@@ -14,5 +14,6 @@ export const GameAssetType = {
     Image: "image",
     ImageSvg: "image/svg",
     AnimationGraph: 'x-meep/animation-graph',
-    JavaScript: "text/javascript"
+    JavaScript: "text/javascript",
+    Sound: 'audio'
 };

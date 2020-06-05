@@ -10,6 +10,7 @@ import { SoundEmitter } from './SoundEmitter.js';
 import { Transform } from '../../ecs/components/Transform.js';
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
 import { SoundAssetManager } from "../../asset/loaders/SoundAssetManager.js";
+import { GameAssetType } from "../../asset/GameAssetType.js";
 
 /**
  * @readonly
@@ -54,7 +55,7 @@ export class SoundEmitterSystem extends System {
         this.channels[SoundEmitterChannels.Effects].gain.setValueAtTime(1.2, 0);
         this.channels[SoundEmitterChannels.Music].gain.setValueAtTime(0.1, 0);
 
-        assetManager.registerLoader("sound", new SoundAssetManager(context));
+        assetManager.registerLoader(GameAssetType.Sound, new SoundAssetManager(context));
     }
 
     /**
@@ -243,7 +244,7 @@ function registerTrack(context, assetManager, soundEmitter, soundTrack) {
     nodes.source.loop = soundTrack.loop;
     nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
     //
-    assetManager.get(soundTrack.url, "sound", function (asset) {
+    assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
         /**
          *
          * @type {AudioBuffer}
