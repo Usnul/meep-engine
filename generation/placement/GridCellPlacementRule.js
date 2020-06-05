@@ -49,6 +49,23 @@ export class GridCellPlacementRule {
         return r;
     }
 
+    /**
+     *
+     * @param {GridData} grid
+     * @param {number} seed
+     */
+    initialize(grid, seed) {
+        const actions = this.actions;
+        const n = actions.length;
+
+        for (let i = 0; i < n; i++) {
+            const action = actions[i];
+
+            action.initialize(grid, seed);
+        }
+
+        this.pattern.initialize(grid, seed);
+    }
 
     /**
      * Write placement tags into the grid at a given position, the tag pattern will be rotated as specified

@@ -34,19 +34,19 @@ export class CellFilterBinaryOperation extends CellFilter {
         return this.operation(left, right);
     }
 
-    initialize(seed) {
+    initialize(grid, seed) {
         if (this.initialized) {
             return;
         }
 
-        super.initialize(seed);
+        super.initialize(grid,seed);
 
         if (!this.left.initialized) {
-            this.left.initialize(seed);
+            this.left.initialize(grid,seed);
         }
 
         if (!this.right.initialized) {
-            this.right.initialize(seed);
+            this.right.initialize(grid,seed);
         }
 
     }

@@ -2,6 +2,15 @@ export class CellMatcher {
 
     /**
      *
+     * @param {GridData} grid
+     * @param {number} seed
+     */
+    initialize(grid, seed) {
+
+    }
+
+    /**
+     *
      * @returns {boolean}
      * @param {GridData} grid
      * @param {number} x

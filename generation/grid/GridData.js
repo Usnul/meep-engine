@@ -1,7 +1,6 @@
 import { assert } from "../../core/assert.js";
 import { QuadTreeNode } from "../../core/geom/2d/quad-tree/QuadTreeNode.js";
 import { OffsetScaleTransform2D } from "../../engine/ecs/terrain/ecs/OffsetScaleTransform2D.js";
-import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 
 export class GridData {
     constructor() {
@@ -16,33 +15,61 @@ export class GridData {
 
         /**
          *
-         * @type {Uint32Array}
-         */
-        this.tags = new Uint32Array();
-
-        /**
-         * Terrain height map
-         * @type {Sampler2D}
-         */
-        this.heights = Sampler2D.float32(1, 1, 1);
-
-        /**
-         *
          * @type {QuadTreeNode<MarkerNode>}
          */
         this.markers = new QuadTreeNode();
 
         /**
-         * Distance to a cell from the nearest starting position
-         * @type {Uint16Array}
-         */
-        this.startDistances = new Uint16Array();
-
-        /**
          * Discrete data layers
-         * @type {Sampler2D[]}
+         * @type {GridDataLayer[]}
          */
         this.layers = [];
+    }
+
+    /**
+     *
+     * @param {GridDataLayer} layer
+     */
+    addLayer(layer) {
+        assert.equal(layer.isGridDataLayer, true, 'layer.GridDataLayer !== true');
+
+
+        const existing = this.getLayerById(layer.id);
+
+
+        if (existing === layer) {
+            //layer is already attached
+            return;
+        }
+
+        if (existing !== undefined) {
+            throw new Error(`Layer with ID '${layer.id}' already exists. ID must be unique`);
+        }
+
+        layer.resize(this.width, this.height);
+
+        this.layers.push(layer);
+    }
+
+    /**
+     *
+     * @param {string} id
+     * @returns {GridDataLayer|undefined}
+     */
+    getLayerById(id) {
+        const layers = this.layers;
+
+        const n = layers.length;
+
+        for (let i = 0; i < n; i++) {
+            const layer = layers[i];
+
+            if (layer.id === id) {
+                return layer;
+            }
+        }
+
+        return undefined;
     }
 
     /**
@@ -117,12 +144,15 @@ export class GridData {
         this.width = width;
         this.height = height;
 
-        const gridSize = width * height;
+        const layers = this.layers;
 
-        this.tags = new Uint32Array(gridSize);
-        this.startDistances = new Uint16Array(gridSize);
+        const n = layers.length;
 
-        this.heights.resize(width, height);
+        for (let i = 0; i < n; i++) {
+            const layer = layers[i];
+
+            layer.resize(width, height);
+        }
     }
 
     /**
@@ -186,3 +216,10 @@ export class GridData {
         return this.tags[cellIndex];
     }
 }
+
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+GridData.prototype.isGridData = true;

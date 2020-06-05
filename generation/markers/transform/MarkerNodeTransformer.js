@@ -1,9 +1,10 @@
 export class MarkerNodeTransformer {
     /**
      *
+     * @param {GridData} grid
      * @param {number} seed
      */
-    initialize(seed) {
+    initialize(grid, seed) {
 
     }
 

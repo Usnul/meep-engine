@@ -16,4 +16,9 @@ export class CellMatcherBinary extends CellMatcher {
          */
         this.right = null;
     }
+
+    initialize(grid, seed) {
+        this.left.initialize(grid, seed);
+        this.right.initialize(grid, seed);
+    }
 }

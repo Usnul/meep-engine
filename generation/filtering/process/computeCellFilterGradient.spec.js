@@ -1,16 +1,19 @@
 import { GridData } from "../../grid/GridData.js";
 import { computeCellFilterGradient } from "./computeCellFilterGradient.js";
 import { CellFilterCellMatcher } from "../CellFilterCellMatcher.js";
-import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
+import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
+import { GridDataLayer } from "../../grid/layers/GridDataLayer.js";
+import { DataType } from "../../../core/collection/table/DataType.js";
 
 test('computeCellFilterGradient center', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -33,11 +36,12 @@ test('computeCellFilterGradient center', () => {
 test('computeCellFilterGradient top', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -59,11 +63,12 @@ test('computeCellFilterGradient top', () => {
 test('computeCellFilterGradient bottom', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -86,11 +91,12 @@ test('computeCellFilterGradient bottom', () => {
 test('computeCellFilterGradient left', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 0);
@@ -113,11 +119,12 @@ test('computeCellFilterGradient left', () => {
 test('computeCellFilterGradient right', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);
@@ -140,11 +147,12 @@ test('computeCellFilterGradient right', () => {
 test('computeCellFilterGradient top left', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -168,11 +176,12 @@ test('computeCellFilterGradient top left', () => {
 test('computeCellFilterGradient top right', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 1);
@@ -196,11 +205,12 @@ test('computeCellFilterGradient top right', () => {
 test('computeCellFilterGradient bottom left', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 1);
     grid.writeTags(1, 0, 0);
@@ -224,11 +234,12 @@ test('computeCellFilterGradient bottom left', () => {
 test('computeCellFilterGradient bottom right', () => {
 
     const grid = new GridData();
+    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
     grid.resize(3, 3);
 
     const v = [];
 
-    const filter = CellFilterCellMatcher.from(CellMatcherContainsTag.from(1));
+    const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
     grid.writeTags(0, 0, 0);
     grid.writeTags(1, 0, 0);

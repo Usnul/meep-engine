@@ -10,4 +10,8 @@ export class CellMatcherDecorator extends CellMatcher {
          */
         this.source = null;
     }
+
+    initialize(grid, seed) {
+        this.source.initialize(grid, seed);
+    }
 }

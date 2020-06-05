@@ -1,3 +1,5 @@
+import { assert } from "../../core/assert.js";
+
 export class CellFilter {
 
     constructor() {
@@ -19,9 +21,13 @@ export class CellFilter {
 
     /**
      *
+     * @param {GridData} grid
      * @param {number} seed
      */
-    initialize(seed) {
+    initialize(grid, seed) {
+        assert.equal(grid.isGridData, true, 'grid.isGridData !== true');
+        assert.isNumber(seed, 'seed');
+
         this.__initialized = true;
     }
 

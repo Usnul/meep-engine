@@ -11,6 +11,7 @@ import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_travers
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
+import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 const pMatcher = new GridPatternMatcher();
 
@@ -27,12 +28,14 @@ pMatcher.addRule(0, 0, CellMatcherNot.from(
 
 const placeTags = new GridCellActionPlaceTags();
 
+placeTags.layerId = MirGridLayers.Tags;
 placeTags.resize(2, 2);
 placeTags.fill(GridTags.Base | GridTags.Occupied);
 
 
 const clearTags = new GridCellActionPlaceTags();
 
+clearTags.layerId = MirGridLayers.Tags;
 clearTags.resize(2, 2);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;

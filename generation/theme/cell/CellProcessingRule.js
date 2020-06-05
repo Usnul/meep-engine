@@ -46,7 +46,7 @@ export class CellProcessingRule {
         }
 
         if (!this.filter.initialized) {
-            this.filter.initialize(seed);
+            this.filter.initialize(grid, seed);
         }
     }
 }

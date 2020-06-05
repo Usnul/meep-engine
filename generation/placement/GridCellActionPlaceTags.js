@@ -18,18 +18,49 @@ export class GridCellActionPlaceTags extends GridCellAction {
          * @type {Sampler2D}
          */
         this.tags = Sampler2D.uint32(1, 1, 1);
+
+        /**
+         *
+         * @type {string}
+         */
+        this.layerId = null;
+
+        /**
+         *
+         * @type {GridDataLayer}
+         * @private
+         */
+        this.__layer = null;
+    }
+
+    initialize(data, seed) {
+        const layer = data.getLayerById(this.layerId);
+
+        if (layer === undefined) {
+            throw new Error(`Layer '${this.layerId}' not found`);
+        }
+
+        this.__layer = layer;
     }
 
     /**
      *
      * @param {number} value
+     * @param {string} layer ID of the layer
      * @returns {GridCellActionPlaceTags}
      */
-    static from(value) {
+    static from(value, layer) {
+        assert.isNumber(value, 'value');
+        assert.typeOf(layer, 'string', 'layer');
+
+        assert.notNull(layer, 'layer');
+
         const r = new GridCellActionPlaceTags();
 
         r.resize(1, 1);
         r.fill(value);
+
+        r.layerId = layer;
 
         return r;
     }
@@ -65,6 +96,8 @@ export class GridCellActionPlaceTags extends GridCellAction {
         const height = tags.height;
         const width = tags.width;
 
+        const sampler = this.__layer.sampler;
+
         for (let local_y = 0; local_y < height; local_y++) {
             for (let local_x = 0; local_x < width; local_x++) {
 
@@ -79,11 +112,11 @@ export class GridCellActionPlaceTags extends GridCellAction {
                 const target_x = Math.round(rotated_local_x + x);
                 const target_y = Math.round(rotated_local_y + y);
 
-                const source = data.readTags(target_x, target_y);
+                const source = sampler.readChannel(target_x, target_y, 0);
 
                 const result = this.operation(source, cell_tags);
 
-                data.writeTags(target_x, target_y, result);
+                sampler.writeChannel(target_x, target_y, 0, result);
             }
         }
     }

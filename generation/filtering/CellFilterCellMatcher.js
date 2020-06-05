@@ -15,6 +15,10 @@ export class CellFilterCellMatcher extends CellFilter {
         this.matcher = null;
     }
 
+    initialize(grid, seed) {
+        this.matcher.initialize(grid, seed);
+    }
+
     /**
      *
      * @param {CellMatcher} matcher

@@ -6,6 +6,7 @@ import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
 import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import { assert } from "../../../core/assert.js";
+import { MirGridLayers } from "../../example/grid/MirGridLayers.js";
 
 /**
  * Build a map of distances across the grid, using 2 concepts: source cells and passable cells. Source cells are where the distance is 0, and passable cells are those that can be travelled through
@@ -16,13 +17,13 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
 
         /**
          *
-         * @type {GridCellMatcher}
+         * @type {CellMatcher}
          */
         this.sourceMatcher = null;
 
         /**
          *
-         * @type {GridCellMatcher}
+         * @type {CellMatcher}
          */
         this.passMatcher = null;
 
@@ -35,8 +36,8 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
 
     /**
      *
-     * @param {GridCellMatcher} source
-     * @param {GridCellMatcher} pass
+     * @param {CellMatcher} source
+     * @param {CellMatcher} pass
      */
     static from(source, pass) {
         assert.defined(source);
@@ -50,22 +51,22 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
         return r;
     }
 
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
         /**
          *
-         * @type {GridCellMatcher}
+         * @type {CellMatcher}
          */
         const sourceMatcher = this.sourceMatcher;
 
         /**
          *
-         * @type {GridCellMatcher}
+         * @type {CellMatcher}
          */
         const passMatcher = this.passMatcher;
 
         const initial = this.initial;
 
-        const target = grid.startDistances;
+        const target = grid.getLayerById(MirGridLayers.DistanceFromStart).sampler.data;
 
         const open = new BinaryHeap(function (i) {
             return target[i];
@@ -80,8 +81,14 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
         const width = grid.width;
         const height = grid.height;
 
-        const tInitializeTarget = actionTask(() => {
+        const tInitialize = actionTask(() => {
+            //initialize target
             target.fill(initial);
+
+            //initialize matchers
+            sourceMatcher.initialize(grid, seed);
+            passMatcher.initialize(grid, seed);
+
         });
 
         //collect start cells
@@ -99,7 +106,7 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
             }
         });
 
-        tCollectSources.addDependency(tInitializeTarget);
+        tCollectSources.addDependency(tInitialize);
 
         /**
          *
@@ -175,6 +182,6 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
 
         tMain.addDependency(tCollectSources);
 
-        return new TaskGroup([tInitializeTarget, tCollectSources, tMain]);
+        return new TaskGroup([tInitialize, tCollectSources, tMain]);
     }
 }

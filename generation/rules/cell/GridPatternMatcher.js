@@ -12,6 +12,17 @@ export class GridPatternMatcher extends CellMatcher {
         this.rules = [];
     }
 
+    initialize(grid, seed) {
+        const rules = this.rules;
+        const n = rules.length;
+
+        for (let i = 0; i < n; i++) {
+            const rule = rules[i];
+
+            rule.rule.initialize(grid, seed);
+        }
+    }
+
     /**
      *
      * @param {number} x

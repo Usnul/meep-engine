@@ -29,9 +29,11 @@ export class MarkerProcessingRule {
 
     /**
      *
+     * @param {GridData} grid
      * @param {number} seed
      */
-    initialize(seed) {
+    initialize(grid, seed) {
+        assert.equal(grid.isGridData, true, 'grid.isGridData !== true');
         assert.isNumber(seed, 'seed');
 
         const transformers = this.transformers;
@@ -39,7 +41,7 @@ export class MarkerProcessingRule {
 
         for (let i = 0; i < nT; i++) {
             const transformer = transformers[i];
-            transformer.initialize(seed);
+            transformer.initialize(grid, seed);
         }
 
         const actions = this.actions;

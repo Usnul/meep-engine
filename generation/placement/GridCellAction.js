@@ -9,4 +9,19 @@ export class GridCellAction {
     execute(data, x, y, rotation) {
 
     }
+
+    /**
+     *
+     * @param {GridData} data
+     * @param {number} seed
+     */
+    initialize(data, seed) {
+
+    }
 }
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+GridCellAction.prototype.isGridCellAction = true;

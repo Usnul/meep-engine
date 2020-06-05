@@ -20,6 +20,7 @@ import { readMarkerNodeGroupId } from "./readMarkerNodeGroupId.js";
 import { buildUnsignedDistanceField } from "../util/buildUnsignedDistanceField.js";
 import { CellMatcherNot } from "../../../rules/logic/CellMatcherNot.js";
 import { RoadConnectionNetwork } from "./RoadConnectionNetwork.js";
+import { MirGridLayers } from "../../../example/grid/MirGridLayers.js";
 
 const NODE_TYPE_ROAD_CONNECTOR = 'Road Connector';
 
@@ -509,7 +510,7 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
          * @type {GridCellAction[]}
          */
         this.actions = [
-            GridCellActionPlaceTags.from(GridTags.Road)
+            GridCellActionPlaceTags.from(GridTags.Road, MirGridLayers.Tags)
         ];
     }
 
@@ -540,6 +541,12 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
         const traversable = matcher_tag_traversable;
 
         const random = seededRandom(seed);
+
+        const tInitializeActions = actionTask(() => {
+            this.actions.forEach(a => {
+                a.initialize(grid, seed);
+            });
+        });
 
         //collect all goad connector nodes
         const tCollectConnectors = actionTask(() => {
@@ -605,10 +612,12 @@ export class GridTaskGenerateRoads extends GridTaskGenerator {
             drawPath(path, this.actions, traversable, grid);
         });
 
+        tDrawPaths.addDependency(tInitializeActions);
         tDrawPaths.addDependency(tBuildPaths);
 
 
         return new TaskGroup([
+            tInitializeActions,
             tCollectConnectors,
             tBuildDistanceField,
             tBuildPaths,

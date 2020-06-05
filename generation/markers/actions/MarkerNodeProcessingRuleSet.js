@@ -13,9 +13,10 @@ export class MarkerNodeProcessingRuleSet {
 
     /**
      *
+     * @param grid
      * @param {number} seed
      */
-    initialize(seed) {
+    initialize(grid, seed) {
 
         assert.isNumber(seed, 'seed');
 
@@ -25,7 +26,7 @@ export class MarkerNodeProcessingRuleSet {
         for (let i = 0; i < n; i++) {
             const rule = elements[i];
 
-            rule.initialize(seed);
+            rule.initialize(grid, seed);
         }
     }
 

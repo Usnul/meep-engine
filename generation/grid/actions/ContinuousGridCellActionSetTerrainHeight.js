@@ -36,7 +36,7 @@ export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCell
         this.heightSampler = terrain.samplerHeight;
 
 
-        this.target.initialize(seed);
+        this.target.initialize(grid, seed);
     }
 
     execute(ecd, grid, x, y, rotation, strength) {

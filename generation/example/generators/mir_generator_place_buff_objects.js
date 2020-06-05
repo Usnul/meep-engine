@@ -17,6 +17,7 @@ import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcher
 import { CellMatcherOr } from "../../rules/logic/CellMatcherOr.js";
 import { RuleSelectionPolicyType } from "../../markers/RuleSelectionPolicyType.js";
 import { MarkerNodeMatcherAnd } from "../../markers/matcher/MarkerNodeMatcherAnd.js";
+import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 const TAG_BUFF_OBJECT = 'Buff Object';
 
@@ -67,12 +68,14 @@ pMatcherNextToWall.addRule(0, 0, mNoBuffObjectsNearby);
 
 const placeTags = new GridCellActionPlaceTags();
 
+placeTags.layerId = MirGridLayers.Tags;
 placeTags.resize(1, 1);
 placeTags.fill(GridTags.Occupied);
 
 
 const clearTags = new GridCellActionPlaceTags();
 
+clearTags.layerId = MirGridLayers.Tags;
 clearTags.resize(1, 1);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;

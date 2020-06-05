@@ -3,6 +3,8 @@ import Task from "../../../core/process/task/Task.js";
 import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import { BitSet } from "../../../core/binary/BitSet.js";
 import { PI_HALF, randomIntegerBetween, seededRandom } from "../../../core/math/MathUtils.js";
+import { actionTask } from "../../../core/process/task/TaskUtils.js";
+import TaskGroup from "../../../core/process/task/TaskGroup.js";
 
 export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
     constructor() {
@@ -53,7 +55,11 @@ export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
 
         const random = seededRandom(seed);
 
-        return new Task({
+        const tInitialize = actionTask(() => {
+            this.rule.initialize(grid, seed);
+        });
+
+        const tMain = new Task({
             name: `Execute Rule ${count} times`,
             cycleFunction() {
                 if (completed >= count) {
@@ -102,5 +108,9 @@ export class GridTaskExecuteRuleTimes extends GridTaskGenerator {
                 return TaskSignal.Continue;
             }
         });
+
+        tMain.addDependency(tInitialize);
+
+        return new TaskGroup([tInitialize, tMain]);
     }
 }

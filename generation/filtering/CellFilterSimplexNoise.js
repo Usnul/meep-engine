@@ -37,14 +37,14 @@ export class CellFilterSimplexNoise extends CellFilter {
         return r;
     }
 
-    initialize(seed) {
+    initialize(grid, seed) {
         this.random.setCurrentSeed(seed);
 
         const noise = new SimplexNoise(this.random);
 
         this.noise = noise;
 
-        super.initialize(seed);
+        super.initialize(grid, seed);
     }
 
     execute(grid, x, y, rotation) {

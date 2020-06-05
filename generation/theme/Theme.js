@@ -32,11 +32,11 @@ export class Theme {
      * @param {GridData} grid
      */
     initialize(seed, ecd, grid) {
-        assert.defined(ecd,'ecd');
-        assert.defined(grid,'grid');
+        assert.defined(ecd, 'ecd');
+        assert.defined(grid, 'grid');
 
-        this.terrain.initialize(seed);
-        this.nodes.initialize(seed);
+        this.terrain.initialize(grid, seed);
+        this.nodes.initialize(grid, seed);
         this.cells.initialize(seed, ecd, grid);
     }
 }

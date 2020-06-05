@@ -147,7 +147,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
 
             if (!density.initialized) {
-                density.initialize(seed);
+                density.initialize(grid, seed);
             }
 
             random.setCurrentSeed(seed);

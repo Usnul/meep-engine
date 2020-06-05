@@ -30,9 +30,9 @@ export class CellFilterGaussianBlur extends CellFilter {
         this.size_y = 1;
     }
 
-    initialize(seed) {
+    initialize(grid, seed) {
         if (!this.source.initialized) {
-            this.source.initialize(seed);
+            this.source.initialize(grid, seed);
         }
     }
 

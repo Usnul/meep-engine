@@ -1,4 +1,5 @@
 import { seededRandom } from "../../core/math/MathUtils.js";
+import { assert } from "../../core/assert.js";
 
 export class TerrainTheme {
     constructor() {
@@ -11,9 +12,13 @@ export class TerrainTheme {
 
     /**
      *
+     * @param {GridData} grid
      * @param {number} seed
      */
-    initialize(seed) {
+    initialize(grid, seed) {
+        assert.equal(grid.isGridData, true, 'grid.isGridData !== true');
+        assert.typeOf(seed, 'number', 'seed');
+
         const rules = this.rules;
         const n = rules.length;
 
@@ -24,7 +29,7 @@ export class TerrainTheme {
 
             const ruleSeed = random();
 
-            rule.filter.initialize(ruleSeed);
+            rule.filter.initialize(grid, ruleSeed);
         }
     }
 }

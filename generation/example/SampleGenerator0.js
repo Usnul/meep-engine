@@ -1,7 +1,7 @@
 import { GridGenerator } from "../GridGenerator.js";
 import { GridCellPlacementRule } from "../placement/GridCellPlacementRule.js";
 import { GridPatternMatcher } from "../rules/cell/GridPatternMatcher.js";
-import { CellMatcherContainsTag } from "../rules/CellMatcherContainsTag.js";
+import { CellMatcherLayerBitMaskTest } from "../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../GridTags.js";
 import { CellMatcherNot } from "../rules/logic/CellMatcherNot.js";
 import { GridCellActionPlaceMarker } from "../markers/GridCellActionPlaceMarker.js";
@@ -31,6 +31,7 @@ import { matcher_tag_not_traversable } from "./rules/matcher_tag_not_traversable
 import { matcher_tag_unoccupied } from "./rules/matcher_tag_unoccupied.js";
 import { CellFilterSubtract } from "../filtering/algebra/CellFilterSubtract.js";
 import { CellFilterConstant } from "../filtering/CellFilterConstant.js";
+import { MirGridLayers } from "./grid/MirGridLayers.js";
 
 
 export const SampleGenerator0 = new GridGenerator();
@@ -38,11 +39,11 @@ export const SampleGenerator0 = new GridGenerator();
 
 const pTreasureCorner = new GridPatternMatcher();
 
-const MATCH_EMPTY = CellMatcherContainsTag.from(GridTags.Traversable);
-const MATCH_TREASURE = CellMatcherContainsTag.from(GridTags.Treasure);
+const MATCH_EMPTY = CellMatcherLayerBitMaskTest.from(GridTags.Traversable, MirGridLayers.Tags);
+const MATCH_TREASURE = CellMatcherLayerBitMaskTest.from(GridTags.Treasure, MirGridLayers.Tags);
 const MATCH_NOT_EMPTY = CellMatcherNot.from(MATCH_EMPTY);
-const MATCH_STARTING_POINT = CellMatcherContainsTag.from(GridTags.StartingPoint);
-const MATCH_ENEMY = CellMatcherContainsTag.from(GridTags.Enemy);
+const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
+const MATCH_ENEMY = CellMatcherLayerBitMaskTest.from(GridTags.Enemy, MirGridLayers.Tags);
 
 pTreasureCorner.addRule(1, 0, MATCH_NOT_EMPTY);
 pTreasureCorner.addRule(0, 1, MATCH_NOT_EMPTY);
@@ -56,11 +57,11 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
 
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
     GridCellActionPlaceMarker.from('Treasure'),
-    GridCellActionPlaceTags.from(GridTags.Treasure)
+    GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
 ], 0.5);
 
 
-const gMakeEmpty = GridTaskCellularAutomata.from(GridTags.Traversable, 3);
+const gMakeEmpty = GridTaskCellularAutomata.from(GridCellActionPlaceTags.from(GridTags.Traversable, MirGridLayers.Tags), 3);
 
 const gConnectRooms = GridTaskConnectRooms.from(matcher_tag_traversable);
 gConnectRooms.addDependency(gMakeEmpty);
@@ -88,7 +89,7 @@ const pNoEnemyIn3 = new GridPatternMatcher();
 pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
 
 const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from('Enemy');
-const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied);
+const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied, MirGridLayers.Tags);
 
 const prTreasureGuards = GridCellPlacementRule.from(
     pNearTreasure,

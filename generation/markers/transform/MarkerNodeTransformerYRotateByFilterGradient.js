@@ -30,9 +30,9 @@ export class MarkerNodeTransformerYRotateByFilterGradient extends MarkerNodeTran
         this.offset = 0;
     }
 
-    initialize(seed) {
+    initialize(grid, seed) {
         if (!this.filter.initialized) {
-            this.filter.initialize(seed);
+            this.filter.initialize(grid, seed);
         }
     }
 

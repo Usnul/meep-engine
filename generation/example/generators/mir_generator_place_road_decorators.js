@@ -2,7 +2,7 @@ import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionR
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
-import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
+import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
 import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
@@ -12,9 +12,10 @@ import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatc
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MarkerNodeMatcherContainsTag } from "../../markers/matcher/MarkerNodeMatcherContainsTag.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
+import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 
-const matcher_tag_road = CellMatcherContainsTag.from(GridTags.Road);
+const matcher_tag_road = CellMatcherLayerBitMaskTest.from(GridTags.Road, MirGridLayers.Tags);
 
 const matchBend90 = new GridPatternMatcher();
 

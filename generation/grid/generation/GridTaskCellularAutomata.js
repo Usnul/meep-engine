@@ -1,6 +1,6 @@
 import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import { CaveGeneratorCellularAutomata } from "../../automata/CaveGeneratorCellularAutomata.js";
-import { countTask } from "../../../core/process/task/TaskUtils.js";
+import { actionTask, countTask } from "../../../core/process/task/TaskUtils.js";
 import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
 import TaskGroup from "../../../core/process/task/TaskGroup.js";
 import { seededRandom } from "../../../core/math/MathUtils.js";
@@ -9,8 +9,6 @@ import { assert } from "../../../core/assert.js";
 export class GridTaskCellularAutomata extends GridTaskGenerator {
     constructor() {
         super();
-
-        this.tag = 0;
 
         this.marginLeft = 0;
         this.marginRight = 0;
@@ -22,20 +20,26 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
          * @type {number}
          */
         this.steps = 50;
+
+        /**
+         *
+         * @type {GridCellAction}
+         */
+        this.action = null;
     }
 
     /**
      *
-     * @param {number} tags
+     * @param {GridCellAction} action
      * @param {number} margin
      */
-    static from(tags, margin) {
-
+    static from(action, margin) {
+        assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
         assert.isNumber(margin);
 
         const r = new GridTaskCellularAutomata();
 
-        r.tag = tags;
+        r.action = action;
 
         r.marginTop = margin;
         r.marginLeft = margin;
@@ -51,8 +55,6 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
         const field = Sampler2D.uint8(1, width, grid.height);
 
         const automata = new CaveGeneratorCellularAutomata();
-
-        const writeTags = this.tag;
 
         const mask_x0 = this.marginLeft;
         const mask_y0 = this.marginTop;
@@ -82,21 +84,29 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
         tAutomata.addDependency(tSeed);
 
+
+        const action = this.action;
+
+        const tInitializeAction = actionTask(() => {
+            action.initialize(grid, seed);
+        });
+
         const tWriteTags = countTask(0, width * grid.height, index => {
             const cellValue = field.data[index];
 
+            const x = index % width;
+            const y = (index / width) | 0;
+
             if (cellValue !== 0) {
-                const tag = grid.tags[index];
 
-                const result = tag | writeTags;
+                action.execute(grid, x, y, 0);
 
-                grid.tags[index] = result;
             }
         });
 
-
+        tWriteTags.addDependency(tInitializeAction);
         tWriteTags.addDependency(tAutomata);
 
-        return new TaskGroup([tSeed, tAutomata, tWriteTags]);
+        return new TaskGroup([tInitializeAction, tSeed, tAutomata, tWriteTags]);
     }
 }

@@ -10,7 +10,7 @@ import { Transform } from "../../../engine/ecs/components/Transform.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
 import { matcher_tag_traversable } from "../rules/matcher_tag_traversable.js";
-import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
+import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
 import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
@@ -32,12 +32,13 @@ import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/Con
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
+import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 export const SampleTheme0 = new Theme();
 
 const terrainTheme = new TerrainTheme();
 
-const matcher_tag_road = CellMatcherContainsTag.from(GridTags.Road);
+const matcher_tag_road = CellMatcherLayerBitMaskTest.from(GridTags.Road, MirGridLayers.Tags);
 
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterCellMatcher.from(

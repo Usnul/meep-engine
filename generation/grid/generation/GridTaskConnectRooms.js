@@ -15,6 +15,8 @@ import { drawSamplerHTML } from "../../../engine/graphics/texture/sampler/util/d
 import { matcher_tag_unoccupied } from "../../example/rules/matcher_tag_unoccupied.js";
 import { buildDistanceMapToObjective } from "./util/buildDistanceMapToObjective.js";
 import { buildPathFromDistanceMap } from "./util/buildPathFromDistanceMap.js";
+import { MirGridLayers } from "../../example/grid/MirGridLayers.js";
+import { actionTask } from "../../../core/process/task/TaskUtils.js";
 
 const ESTIMATED_TILES_PER_ROOM = 900;
 
@@ -79,7 +81,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
          * @type {GridCellAction[]}
          */
         this.actions = [
-            GridCellActionPlaceTags.from(GridTags.Traversable)
+            GridCellActionPlaceTags.from(GridTags.Traversable, MirGridLayers.Tags)
         ];
     }
 
@@ -438,7 +440,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
     }
 
-    build(grid, ecd) {
+    build(grid, ecd, seed) {
 
         const connected = new BitSet();
 
@@ -454,6 +456,12 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         let i = 0;
 
         const estimatedNumberOfRooms = gridSize / ESTIMATED_TILES_PER_ROOM;
+
+        const tInitializeActions = actionTask(() => {
+            this.actions.forEach(a => {
+                a.initialize(grid, seed);
+            });
+        });
 
         const tMain = new Task({
             cycleFunction: () => {
@@ -490,9 +498,10 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             }
         });
 
+        tMain.addDependency(tInitializeActions);
         tMain.addDependency(tFindStart);
 
-        return new TaskGroup([tFindStart, tMain]);
+        return new TaskGroup([tInitializeActions, tFindStart, tMain]);
         // return new TaskGroup([emptyTask()]);
     }
 }

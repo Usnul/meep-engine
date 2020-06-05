@@ -5,22 +5,23 @@ import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags
 import { GridTags } from "../../GridTags.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { GridTaskExecuteRuleTimes } from "../../grid/generation/GridTaskExecuteRuleTimes.js";
-import { CellMatcherContainsTag } from "../../rules/CellMatcherContainsTag.js";
+import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { MirGridLayers } from "../grid/MirGridLayers.js";
 
-const MATCH_STARTING_POINT = CellMatcherContainsTag.from(GridTags.StartingPoint);
+const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
 
 
 const pattern = new GridPatternMatcher();
 
 pattern.addRule(0, 0, matcher_tag_traversable_unoccupied);
 pattern.addRule(0, 0, CellMatcherNot.from(MATCH_STARTING_POINT));
-pattern.addRule(0, -1, CellMatcherContainsTag.from(GridTags.Base));
+pattern.addRule(0, -1, CellMatcherLayerBitMaskTest.from(GridTags.Base, MirGridLayers.Tags));
 
 const rule = GridCellPlacementRule.from(
     pattern,
     [
-        GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied),
+        GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
         GridCellActionPlaceMarker.from('Starting Point')
     ]
 );

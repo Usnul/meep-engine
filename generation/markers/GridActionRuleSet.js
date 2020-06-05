@@ -1,9 +1,10 @@
 import { PI_HALF, seededRandom } from "../../core/math/MathUtils.js";
 import { assert } from "../../core/assert.js";
-import { randomCountTask } from "../../core/process/task/TaskUtils.js";
+import { countTask, randomCountTask } from "../../core/process/task/TaskUtils.js";
 import { RuleSelectionPolicyType } from "./RuleSelectionPolicyType.js";
 import { ArrayIteratorSequential } from "../../core/collection/array/ArrayIteratorSequential.js";
 import { ArrayIteratorRandom } from "../../core/collection/array/ArrayIteratorRandom.js";
+import TaskGroup from "../../core/process/task/TaskGroup.js";
 
 
 /**
@@ -82,8 +83,14 @@ export class GridActionRuleSet {
          */
         const ruleIterator = new RuleIteratorClass();
 
+        //initialize rules
+        const tInitializeRules = countTask(0, this.elements.length, i => {
+            const rule = this.elements[i];
 
-        return randomCountTask(seed, 0, gridSize, index => {
+            rule.initialize(grid, seed);
+        });
+
+        const tMain = randomCountTask(seed, 0, gridSize, index => {
             const y = (index / width) | 0;
             const x = index % width;
 
@@ -128,5 +135,9 @@ export class GridActionRuleSet {
             }
 
         });
+
+        tMain.addDependency(tInitializeRules);
+
+        return new TaskGroup([tInitializeRules,tMain]);
     }
 }
