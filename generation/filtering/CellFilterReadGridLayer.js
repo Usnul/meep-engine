@@ -44,7 +44,7 @@ export class CellFilterReadGridLayer extends CellFilter {
 
         //convert to UV
         const u = x / (grid.width - 1);
-        const v = v / (grid.height - 1);
+        const v = y / (grid.height - 1);
 
 
         /**

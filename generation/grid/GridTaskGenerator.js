@@ -1,3 +1,5 @@
+import { assert } from "../../core/assert.js";
+
 export class GridTaskGenerator {
     constructor() {
         /**
@@ -13,6 +15,8 @@ export class GridTaskGenerator {
      * @returns {boolean}
      */
     addDependency(generator) {
+        assert.equal(generator.isGridTaskGenerator, true, 'generator.isGridTaskGenerator !== true');
+
         const i = this.dependencies.indexOf(generator);
 
         if (i !== -1) {
@@ -28,6 +32,20 @@ export class GridTaskGenerator {
 
     /**
      *
+     * @param {GridTaskGenerator[]} dependencies
+     */
+    addDependencies(dependencies) {
+        const n = dependencies.length;
+
+        for (let i = 0; i < n; i++) {
+            const generator = dependencies[i];
+
+            this.addDependency(generator);
+        }
+    }
+
+    /**
+     *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
      * @param {number} seed
@@ -37,3 +55,10 @@ export class GridTaskGenerator {
 
     }
 }
+
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+GridTaskGenerator.prototype.isGridTaskGenerator = true;

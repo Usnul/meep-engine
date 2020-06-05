@@ -60,15 +60,14 @@ export class GridActionRuleSet {
      *
      * @param {GridData} grid
      * @param {number} seed
+     * @param {number} [resolution=1] Number of sub-samples per single grid cell in each dimension
      * @returns {Task}
      */
-    process(grid, seed) {
+    process(grid, seed, resolution = 1) {
         assert.typeOf(seed, 'number', 'seed');
 
         const width = grid.width;
         const height = grid.height;
-
-        const gridSize = width * height;
 
         const random = seededRandom(seed);
 
@@ -90,9 +89,20 @@ export class GridActionRuleSet {
             rule.initialize(grid, seed);
         });
 
-        const tMain = randomCountTask(seed, 0, gridSize, index => {
-            const y = (index / width) | 0;
-            const x = index % width;
+
+        const sampleCountX = width * resolution;
+        const sampleCountY = height * resolution;
+
+        const sampleCount = sampleCountX * sampleCountY;
+
+        const tMain = randomCountTask(seed, 0, sampleCount, index => {
+
+
+            const sample_y = (index / sampleCountX) | 0;
+            const sample_x = index % sampleCountX;
+
+            const x = sample_x / resolution;
+            const y = sample_y / resolution;
 
             ruleIterator.initialize(this.elements);
 
@@ -138,6 +148,6 @@ export class GridActionRuleSet {
 
         tMain.addDependency(tInitializeRules);
 
-        return new TaskGroup([tInitializeRules,tMain]);
+        return new TaskGroup([tInitializeRules, tMain]);
     }
 }

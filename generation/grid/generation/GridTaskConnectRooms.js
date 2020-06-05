@@ -5,8 +5,6 @@ import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
 import { passThrough } from "../../../core/function/Functions.js";
-import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
-import { GridTags } from "../../GridTags.js";
 import TaskGroup from "../../../core/process/task/TaskGroup.js";
 import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
 import { bitSet2Sampler2D } from "../../../engine/graphics/texture/sampler/util/bitSet2Sampler2D.js";
@@ -15,8 +13,8 @@ import { drawSamplerHTML } from "../../../engine/graphics/texture/sampler/util/d
 import { matcher_tag_unoccupied } from "../../example/rules/matcher_tag_unoccupied.js";
 import { buildDistanceMapToObjective } from "./util/buildDistanceMapToObjective.js";
 import { buildPathFromDistanceMap } from "./util/buildPathFromDistanceMap.js";
-import { MirGridLayers } from "../../example/grid/MirGridLayers.js";
 import { actionTask } from "../../../core/process/task/TaskUtils.js";
+import { assert } from "../../../core/assert.js";
 
 const ESTIMATED_TILES_PER_ROOM = 900;
 
@@ -77,22 +75,25 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         this.thickness = 3;
 
         /**
-         * Actions to perform on created corridors
-         * @type {GridCellAction[]}
+         * Action to perform on created corridors
+         * @type {GridCellAction}
          */
-        this.actions = [
-            GridCellActionPlaceTags.from(GridTags.Traversable, MirGridLayers.Tags)
-        ];
+        this.action = null
     }
 
     /**
      *
      * @param {CellMatcher} matcher
+     * @param {GridCellAction} action
      * @returns {GridTaskConnectRooms}
      */
-    static from(matcher) {
+    static from(matcher, action) {
+        assert.equal(matcher.isCellMatcher, true, 'matcher.isCellMatcher !== true');
+        assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
+
         const r = new GridTaskConnectRooms();
         r.matcher = matcher;
+        r.action = action;
         return r;
     }
 
@@ -314,8 +315,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         const width = grid.width;
         const height = grid.height;
 
-        const actions = this.actions;
-        const actionCount = actions.length;
+        const action = this.action;
 
         const neighbourhoodMask = this.neighbourhoodDrawMask;
 
@@ -368,11 +368,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
                     connected.set(t_index, true);
 
-                    for (let action_index = 0; action_index < actionCount; action_index++) {
-                        const action = actions[action_index];
-
-                        action.execute(grid, t_x, t_y, 0);
-                    }
+                    action.execute(grid, t_x, t_y, 0);
                 }
             }
 
@@ -458,9 +454,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         const estimatedNumberOfRooms = gridSize / ESTIMATED_TILES_PER_ROOM;
 
         const tInitializeActions = actionTask(() => {
-            this.actions.forEach(a => {
-                a.initialize(grid, seed);
-            });
+            this.action.initialize(grid, seed);
         });
 
         const tMain = new Task({

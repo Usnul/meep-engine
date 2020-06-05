@@ -29,10 +29,10 @@ import { PI_HALF } from "../../../core/math/MathUtils.js";
 import { CellFilterGaussianBlur } from "../../filtering/complex/CellFilterGaussianBlur.js";
 import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
-import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
+import { CellFilterReadGridLayer } from "../../filtering/CellFilterReadGridLayer.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -327,42 +327,9 @@ SampleTheme0.nodes.add(nrFoliageTree);
 
 const aHeight = new ContinuousGridCellActionSetTerrainHeight();
 
-aHeight.target = CellFilterLerp.from(
-    CellFilterConstant.from(-2),
-    CellFilterConstant.from(7),
-    CellFilterMultiply.from(
-        CellFilterSimplexNoise.from(30, 30),
-        CellFilterSimplexNoise.from(13, 13)
-    )
-);
-
-const mHeightArea = new GridPatternMatcher();
-
-mHeightArea.addRule(0, -2, matcher_tag_not_traversable);
-
-mHeightArea.addRule(-1, -1, matcher_tag_not_traversable);
-mHeightArea.addRule(0, -1, matcher_tag_not_traversable);
-mHeightArea.addRule(1, -1, matcher_tag_not_traversable);
-
-mHeightArea.addRule(-2, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(-1, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(0, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(1, 0, matcher_tag_not_traversable);
-mHeightArea.addRule(2, 0, matcher_tag_not_traversable);
-
-mHeightArea.addRule(-1, 1, matcher_tag_not_traversable);
-mHeightArea.addRule(0, 1, matcher_tag_not_traversable);
-mHeightArea.addRule(1, 1, matcher_tag_not_traversable);
-
-mHeightArea.addRule(0, 2, matcher_tag_not_traversable);
+aHeight.target = CellFilterReadGridLayer.from(MirGridLayers.Heights);
 
 SampleTheme0.cells.add(CellProcessingRule.from(
-    CellFilterGaussianBlur.from(
-        CellFilterCellMatcher.from(
-            mHeightArea
-        ),
-        1.5,
-        1.5
-    ),
+    CellFilterConstant.from(1),
     aHeight
 ))
