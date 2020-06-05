@@ -1,3 +1,5 @@
+import { assert } from "../../core/assert.js";
+
 export class GridCellAction {
     /**
      *
@@ -16,6 +18,9 @@ export class GridCellAction {
      * @param {number} seed
      */
     initialize(data, seed) {
+
+        assert.equal(data.isGridData, true, 'data.isGridData !== true');
+        assert.isNumber(seed, 'seed');
 
     }
 }
