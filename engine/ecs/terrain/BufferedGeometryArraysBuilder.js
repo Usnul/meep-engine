@@ -62,7 +62,7 @@ function buildBufferGeometry(samplerHeight, position, size, scale, totalSize, re
             const u = x * uMultiplier + uConst;
 
             //get height sample
-            const val = samplerHeight.sampleChannelBilinearUV(u, v, 0);
+            const val = samplerHeight.sampleChannelBicubicUV(u, v, 0);
 
             px = u * totalScaledSizeX;
             py = val;
