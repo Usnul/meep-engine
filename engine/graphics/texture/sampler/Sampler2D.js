@@ -6,7 +6,7 @@
 import Vector2 from '../../../../core/geom/Vector2.js';
 import Vector3 from '../../../../core/geom/Vector3.js';
 import Vector4 from '../../../../core/geom/Vector4.js';
-import { clamp, min2, mix } from "../../../../core/math/MathUtils.js";
+import { clamp, max2, min2, mix } from "../../../../core/math/MathUtils.js";
 import { BlendingType } from "./BlendingType.js";
 import { assert } from "../../../../core/assert.js";
 
@@ -490,6 +490,139 @@ Sampler2D.prototype.get = function (x, y, result) {
 };
 
 /**
+ * Based on code from From reddit https://www.reddit.com/r/javascript/comments/jxa8x/bicubic_interpolation/
+ * @param {number} t
+ * @param {number} a
+ * @param {number} b
+ * @param {number} c
+ * @param {number} d
+ * @returns {number}
+ */
+function bicubic_terp(t, a, b, c, d) {
+    return 0.5 * (c - a + (2.0 * a - 5.0 * b + 4.0 * c - d + (3.0 * (b - c) + d - a) * t) * t) * t + b;
+}
+
+/**
+ *
+ * @param {number} u
+ * @param {number} v
+ * @param {number} channel
+ * @returns {number}
+ */
+Sampler2D.prototype.sampleChannelBicubicUV = function (u, v, channel) {
+    const x = u * (this.width - 1);
+    const y = v * (this.height - 1);
+
+    return this.sampleChannelBicubic(x, y, channel);
+};
+
+/**
+ * Bicubic-filtered sampling
+ * @param {number} x
+ * @param {number} y
+ * @param {number} channel
+ * @returns {number}
+ */
+Sampler2D.prototype.sampleChannelBicubic = function (x, y, channel) {
+
+    const itemSize = this.itemSize;
+
+    const width = this.width;
+    const height = this.height;
+
+    const data = this.data;
+
+    const rowSize = width * itemSize;
+
+    const x_max = width - 1;
+    const y_max = height - 1;
+
+    const x1 = clamp(x, 0, x_max) | 0;
+    const y1 = clamp(y, 0, y_max) | 0;
+
+    const x0 = max2(0, x1 - 1);
+    const y0 = max2(0, y1 - 1);
+
+    const x2 = min2(x_max, x1 + 1);
+    const y2 = min2(y_max, y1 + 1);
+
+    const x3 = min2(x_max, x2 + 1);
+    const y3 = min2(y_max, y2 + 1);
+
+    // compute row offsets
+    const row0 = y0 * rowSize;
+    const row1 = y1 * rowSize;
+    const row2 = y2 * rowSize;
+    const row3 = y3 * rowSize;
+
+    const row0_address = row0 + channel;
+    const row1_address = row1 + channel;
+    const row2_address = row2 + channel;
+    const row3_address = row3 + channel;
+
+    const col0_offset = x0 * itemSize;
+    const col1_offset = x1 * itemSize;
+    const col2_offset = x2 * itemSize;
+    const col3_offset = x3 * itemSize;
+
+    // compute sample addresses
+    const i0 = row0_address + col0_offset;
+    const i1 = row0_address + col1_offset;
+    const i2 = row0_address + col2_offset;
+    const i3 = row0_address + col3_offset;
+
+    const j0 = row1_address + col0_offset;
+    const j1 = row1_address + col1_offset;
+    const j2 = row1_address + col2_offset;
+    const j3 = row1_address + col3_offset;
+
+    const k0 = row2_address + col0_offset;
+    const k1 = row2_address + col1_offset;
+    const k2 = row2_address + col2_offset;
+    const k3 = row2_address + col3_offset;
+
+    const l0 = row3_address + col0_offset;
+    const l1 = row3_address + col1_offset;
+    const l2 = row3_address + col2_offset;
+    const l3 = row3_address + col3_offset;
+
+    // read samples
+    const vi0 = data[i0];
+    const vi1 = data[i1];
+    const vi2 = data[i2];
+    const vi3 = data[i3];
+
+    const vj0 = data[j0];
+    const vj1 = data[j1];
+    const vj2 = data[j2];
+    const vj3 = data[j3];
+
+    const vk0 = data[k0];
+    const vk1 = data[k1];
+    const vk2 = data[k2];
+    const vk3 = data[k3];
+
+    const vl0 = data[l0];
+    const vl1 = data[l1];
+    const vl2 = data[l2];
+    const vl3 = data[l3];
+
+    const xd = x - x1;
+    const yd = y - y1;
+
+    // perform filtering in X
+    const s0 = bicubic_terp(xd, vi0, vi1, vi2, vi3);
+    const s1 = bicubic_terp(xd, vj0, vj1, vj2, vj3);
+    const s2 = bicubic_terp(xd, vk0, vk1, vk2, vk3);
+    const s3 = bicubic_terp(xd, vl0, vl1, vl2, vl3);
+
+    // filter in Y
+    const result = bicubic_terp(yd, s0, s1, s2, s3);
+
+    return result;
+};
+
+/**
  *
  * @param {number} x
  * @param {number} y
@@ -520,6 +653,7 @@ Sampler2D.prototype.sampleChannelBilinearUV = function (u, v, channel) {
     return this.sampleChannelBilinear(x, y, channel);
 };
 
+
 /**
  *
  * @param {number} x
@@ -537,11 +671,11 @@ Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
     const rowSize = width * itemSize;
 
     //sample 4 points
-    const x_max = width-1;
-    const x0 = clamp(x,0,x_max) | 0;
+    const x_max = width - 1;
+    const x0 = clamp(x, 0, x_max) | 0;
 
-    const y_max = height-1;
-    const y0 = clamp(y,0,y_max) | 0;
+    const y_max = height - 1;
+    const y0 = clamp(y, 0, y_max) | 0;
     //
     const row0 = y0 * rowSize;
     const i0 = row0 + x0 * itemSize + channel;
