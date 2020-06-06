@@ -10,4 +10,5 @@ export const MirGridLayers = {
      * Terrain height map
      */
     Heights: "heights",
+    Moisture: "moisture",
 }

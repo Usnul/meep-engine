@@ -22,7 +22,7 @@ const rule = GridCellPlacementRule.from(
     pattern,
     [
         GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
-        GridCellActionPlaceMarker.from('Starting Point')
+        GridCellActionPlaceMarker.from({ type: 'Starting Point' })
     ]
 );
 

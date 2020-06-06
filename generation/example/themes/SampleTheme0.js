@@ -29,9 +29,10 @@ import { PI_HALF } from "../../../core/math/MathUtils.js";
 import { CellFilterGaussianBlur } from "../../filtering/complex/CellFilterGaussianBlur.js";
 import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
-import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 import { CellFilterReadGridLayer } from "../../filtering/CellFilterReadGridLayer.js";
+import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
+import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -75,7 +76,11 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 SampleTheme0.terrain = terrainTheme;
 
 const ebpTreasure = new EntityBlueprint();
-ebpTreasure.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_yellow.gltf', castShadow: true, receiveShadow: true }));
+ebpTreasure.add(Mesh.fromJSON({
+    url: 'data/models/Fantasy Props/chest-wood.gltf',
+    castShadow: true,
+    receiveShadow: true
+}));
 ebpTreasure.add(Transform.fromJSON({}));
 ebpTreasure.add(GridPosition.fromJSON({}));
 
@@ -94,13 +99,13 @@ nrTreasure.transformers.push(
             1.5,
             1.5,
         ),
-        -PI_HALF
+        0
     )
 );
 
 nrTreasure.actions.push(MarkerNodeActionEntityPlacement.from(ebpTreasure, Transform.fromJSON({
-    scale: { x: 0.25, y: 0.25, z: 0.5 },
-    position: { x: 0, y: 0.25, z: 0 }
+    scale: { x: 0.5, y: 0.5, z: 0.5 },
+    position: { x: 0, y: 0, z: 0 }
 })));
 
 SampleTheme0.nodes.add(nrTreasure);
@@ -161,7 +166,11 @@ nrEnemy.transformers.push(
 SampleTheme0.nodes.add(nrEnemy);
 
 const ebpBase = new EntityBlueprint();
-ebpBase.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_blue.gltf' }));
+ebpBase.add(Mesh.fromJSON({
+    url: 'data/models/LowPolyTownshipSet/Large_house/model.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpBase.add(Transform.fromJSON({}));
 ebpBase.add(GridPosition.fromJSON({}));
 
@@ -170,15 +179,21 @@ const nrBase = new MarkerProcessingRule();
 nrBase.consume = true;
 nrBase.matcher = MarkerNodeMatcherByType.from('Base');
 
+nrBase.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1)))
+
 nrBase.actions.push(MarkerNodeActionEntityPlacement.from(ebpBase, Transform.fromJSON({
-    scale: { x: 1, y: 0.1, z: 1 },
-    position: { x: 0, y: 0.1, z: 0 }
+    scale: { x: 2.2, y: 2.2, z: 2.2 },
+    position: { x: 0, y: 0, z: 0 }
 })));
 
 SampleTheme0.nodes.add(nrBase);
 
 const ebpRoadJunction90 = new EntityBlueprint();
-ebpRoadJunction90.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_blue.gltf' }));
+ebpRoadJunction90.add(Mesh.fromJSON({
+    url: 'data/models/snaps/cube_blue.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpRoadJunction90.add(Transform.fromJSON({}));
 ebpRoadJunction90.add(GridPosition.fromJSON({}));
 
@@ -195,7 +210,11 @@ nrRoadJunction90.actions.push(MarkerNodeActionEntityPlacement.from(ebpRoadJuncti
 SampleTheme0.nodes.add(nrRoadJunction90);
 
 const ebpBuffObject0 = new EntityBlueprint();
-ebpBuffObject0.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpBuffObject0.add(Mesh.fromJSON({
+    url: 'data/models/snaps/cube_white.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpBuffObject0.add(new Tag());
 ebpBuffObject0.add(new HeadsUpDisplay());
 ebpBuffObject0.add(new ViewportPosition());
@@ -222,7 +241,11 @@ nrBuffObject.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObject0, T
 SampleTheme0.nodes.add(nrBuffObject);
 
 const ebpBuffObjectDefense = new EntityBlueprint();
-ebpBuffObjectDefense.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpBuffObjectDefense.add(Mesh.fromJSON({
+    url: 'data/models/snaps/cube_white.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpBuffObjectDefense.add(new Tag());
 ebpBuffObjectDefense.add(new HeadsUpDisplay());
 ebpBuffObjectDefense.add(new ViewportPosition());
@@ -249,7 +272,11 @@ nrBuffObjectDefense.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObj
 SampleTheme0.nodes.add(nrBuffObjectDefense);
 
 const ebpBuffObjectWell = new EntityBlueprint();
-ebpBuffObjectWell.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpBuffObjectWell.add(Mesh.fromJSON({
+    url: 'data/models/LowPolyTownshipSet/Well/model.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpBuffObjectWell.add(new Tag());
 ebpBuffObjectWell.add(new HeadsUpDisplay());
 ebpBuffObjectWell.add(new ViewportPosition());
@@ -268,15 +295,21 @@ const nrBuffObjectWell = new MarkerProcessingRule();
 nrBuffObjectWell.consume = true;
 nrBuffObjectWell.matcher = MarkerNodeMatcherByType.from('Buff Object :: Well');
 
+nrBuffObjectWell.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1)))
+
 nrBuffObjectWell.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObjectWell, Transform.fromJSON({
-    scale: { x: 0.4, y: 1, z: 0.4 },
-    position: { x: 0, y: 1, z: 0 }
+    scale: { x: 0.005, y: 0.005, z: 0.005 },
+    position: { x: 0, y: 0, z: 0 }
 })));
 
 SampleTheme0.nodes.add(nrBuffObjectWell);
 
 const ebpBuffObjectCampfire = new EntityBlueprint();
-ebpBuffObjectCampfire.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
+ebpBuffObjectCampfire.add(Mesh.fromJSON({
+    url: 'data/models/snaps/cube_white.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
 ebpBuffObjectCampfire.add(new Tag());
 ebpBuffObjectCampfire.add(new HeadsUpDisplay());
 ebpBuffObjectCampfire.add(new ViewportPosition());
@@ -302,23 +335,46 @@ nrBuffObjectCampfire.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffOb
 
 SampleTheme0.nodes.add(nrBuffObjectCampfire);
 
-const ebpFoliageTree = new EntityBlueprint();
-ebpFoliageTree.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_lilac.gltf' }));
-ebpFoliageTree.add(Transform.fromJSON({}));
-// ebpFoliageTree.add(new ClingToTerrain())
+const ebpFoliageTree0 = new EntityBlueprint();
+ebpFoliageTree0.add(Mesh.fromJSON({
+    url: 'data/models/LowPolyTownshipSet/Tree_2/Tree_2.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
+ebpFoliageTree0.add(Transform.fromJSON({}));
+ebpFoliageTree0.add(new ClingToTerrain())
 
-const nrFoliageTree = new MarkerProcessingRule();
+const nrFoliageTree0 = new MarkerProcessingRule();
 
-nrFoliageTree.consume = true;
-nrFoliageTree.matcher = MarkerNodeMatcherByType.from('Tree');
-nrFoliageTree.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1)))
-
-nrFoliageTree.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree, Transform.fromJSON({
-    scale: { x: 0.4, y: 1, z: 0.4 },
-    position: { x: 0, y: 1, z: 0 }
+nrFoliageTree0.consume = true;
+nrFoliageTree0.matcher = MarkerNodeMatcherByType.from('Tree-0');
+nrFoliageTree0.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree0, Transform.fromJSON({
+    scale: { x: 1, y: 1, z: 1 },
+    position: { x: 0, y: 0, z: 0 }
 })));
 
-SampleTheme0.nodes.add(nrFoliageTree);
+SampleTheme0.nodes.add(nrFoliageTree0);
+
+const ebpFoliageTree1 = new EntityBlueprint();
+ebpFoliageTree1.add(Mesh.fromJSON({
+    url: 'data/models/LowPolyTownshipSet/Tree_1/Tree_1.gltf',
+    dropShadow: true,
+    receiveShadow: true
+}));
+ebpFoliageTree1.add(Transform.fromJSON({}));
+ebpFoliageTree1.add(new ClingToTerrain())
+
+const nrFoliageTree1 = new MarkerProcessingRule();
+
+nrFoliageTree1.consume = true;
+nrFoliageTree1.matcher = MarkerNodeMatcherByType.from('Tree-1');
+
+nrFoliageTree1.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree1, Transform.fromJSON({
+    scale: { x: 1, y: 1, z: 1 },
+    position: { x: 0, y: 0, z: 0 }
+})));
+
+SampleTheme0.nodes.add(nrFoliageTree1);
 
 
 //HEIGHT

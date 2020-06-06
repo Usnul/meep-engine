@@ -41,7 +41,7 @@ matchBend90.addRule(-2, 0, matcher_tag_road);
 matchBend90.addRule(0, -1, matcher_tag_road);
 matchBend90.addRule(-1, -1, matcher_tag_road);
 
-const placeMarker = GridCellActionPlaceMarker.from('Road Junction Decorator 90');
+const placeMarker = GridCellActionPlaceMarker.from({ type: 'Road Junction Decorator 90' });
 placeMarker.addTag(TAG_ROAD_DECORATOR);
 
 const ruleBend90 = GridCellPlacementRule.from(matchBend90, [

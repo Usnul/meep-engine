@@ -80,11 +80,11 @@ clearTags.resize(1, 1);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;
 
-const placeMarker = GridCellActionPlaceMarker.from(BUFF_OBJECT_TYPE_ATTACK_POWER);
+const placeMarker = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_ATTACK_POWER });
 placeMarker.addTag(TAG_BUFF_OBJECT);
 placeMarker.addTag(TAG_MAJOR);
 
-const placeRoadConnector0 = GridCellActionPlaceMarker.from('Road Connector');
+const placeRoadConnector0 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector0.offset.set(0, -1);
 placeRoadConnector0.properties.connectivity = 0.1;
 
@@ -109,7 +109,7 @@ const ruleAttackPower = GridCellPlacementRule.from(
 
 ruleAttackPower.allowRotation = true;
 
-const placeMarkerDefense = GridCellActionPlaceMarker.from(BUFF_OBJECT_TYPE_DEFENSE);
+const placeMarkerDefense = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_DEFENSE });
 placeMarkerDefense.addTag(TAG_BUFF_OBJECT);
 placeMarkerDefense.addTag(TAG_MAJOR);
 
@@ -129,7 +129,7 @@ const ruleDefense = GridCellPlacementRule.from(
         placeRoadMarkers
     ], 0.1);
 
-const placeMarkerWell = GridCellActionPlaceMarker.from(BUFF_OBJECT_TYPE_WELL);
+const placeMarkerWell = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_WELL });
 placeMarkerWell.addTag(TAG_BUFF_OBJECT);
 placeMarkerWell.addTag(TAG_MINOR);
 
@@ -166,7 +166,7 @@ const ruleWell = GridCellPlacementRule.from(
         placeMarkerWell
     ], 0.1)
 
-const placeMarkerCampfire = GridCellActionPlaceMarker.from(BUFF_OBJECT_TYPE_CAMPFIRE);
+const placeMarkerCampfire = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_CAMPFIRE });
 placeMarkerCampfire.addTag(TAG_BUFF_OBJECT);
 placeMarkerCampfire.addTag(TAG_MINOR);
 

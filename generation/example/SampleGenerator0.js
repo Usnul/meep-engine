@@ -27,7 +27,6 @@ import { CellFilterSimplexNoise } from "../filtering/complex/CellFilterSimplexNo
 import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
 import { CellFilterMultiply } from "../filtering/math/algebra/CellFilterMultiply.js";
 import { CellFilterCellMatcher } from "../filtering/CellFilterCellMatcher.js";
-import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
 import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
 import { MirGridLayers } from "./grid/MirGridLayers.js";
 import { CellFilterLerp } from "../filtering/math/CellFilterLerp.js";
@@ -42,6 +41,9 @@ import { CellFilterAngleToNormal } from "../filtering/complex/CellFilterAngleToN
 import Vector3 from "../../core/geom/Vector3.js";
 import { CellFilterOneMinus } from "../filtering/math/CellFilterOneMinus.js";
 import { CellFilterSmoothStep } from "../filtering/math/CellFilterSmoothStep.js";
+import { SampleNoise20_0 } from "./filters/SampleNoise20_0.js";
+import { SampleGroundMoistureFilter } from "./filters/SampleGroundMoistureFilter.js";
+import { GridTaskSequence } from "../grid/generation/GridTaskSequence.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -65,7 +67,7 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
 )));
 
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
-    GridCellActionPlaceMarker.from('Treasure'),
+    GridCellActionPlaceMarker.from({ type: 'Treasure' }),
     GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
 ], 0.5);
 
@@ -108,7 +110,7 @@ const pNoEnemyIn3 = new GridPatternMatcher();
 
 pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
 
-const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from('Enemy');
+const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({ type: 'Enemy' });
 const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied, MirGridLayers.Tags);
 
 const prTreasureGuards = GridCellPlacementRule.from(
@@ -188,50 +190,81 @@ const gRoadDecorators = mir_generator_place_road_decorators();
 
 gRoadDecorators.addDependency(gRoads);
 
+/**
+ *
+ * @type {GridTaskActionRuleSet}
+ */
+const gDrawLayerMoisture = GridTaskActionRuleSet.from(GridActionRuleSet.from([
+    GridCellPlacementRule.from(
+        CellMatcherAny.INSTANCE,
+        [GridCellActionWriteFilterToLayer.from(MirGridLayers.Moisture, SampleGroundMoistureFilter)]
+    )
+]));
+
 //trees
 const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
 
-const aPlaceTreeNode = GridCellActionPlaceMarker.from('Tree');
-aPlaceTreeNode.size = 0.565;
-
-aPlaceTreeNode.addTransformer(MarkerNodeTransformerAddPositionYFromFilter.from(
-    fReadHeight
-));
-
 const matcher_not_play_area = CellMatcherNot.from(CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags));
 
-const gTrees = GridTaskDensityMarkerDistribution.from(
+const fTreeArea = CellFilterMultiply.from(
     CellFilterMultiply.from(
-        CellFilterSubtract.from(
-            CellFilterSimplexNoise.from(20, 20),
-            CellFilterConstant.from(0.6)
-        ),
-
+        SampleNoise20_0,
+        CellFilterReadGridLayer.from(MirGridLayers.Moisture)
+    ),
+    CellFilterMultiply.from(
         CellFilterMultiply.from(
-            CellFilterMultiply.from(
-                //filter out areas that are below height of 0
-                CellFilterStep.from(
-                    CellFilterConstant.from(0),
-                    fReadHeight
-                ),
-                //filter areas that are playable
-                CellFilterCellMatcher.from(
-                    matcher_not_play_area
-                )
+            //filter out areas that are below height of 0
+            CellFilterStep.from(
+                CellFilterConstant.from(0),
+                fReadHeight
             ),
-            // Filter areas with sharp slopes
-            CellFilterOneMinus.from(
-                CellFilterSmoothStep.from(
-                    CellFilterConstant.from(Math.PI / 9),
-                    CellFilterConstant.from(Math.PI / 2),
-                    CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
-                )
+            //filter areas that are playable
+            CellFilterCellMatcher.from(
+                matcher_not_play_area
+            )
+        ),
+        // Filter areas with sharp slopes
+        CellFilterOneMinus.from(
+            CellFilterSmoothStep.from(
+                CellFilterConstant.from(Math.PI / 7.5),
+                CellFilterConstant.from(Math.PI / 2),
+                CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
             )
         )
-    ),
-    aPlaceTreeNode,
-    new NumericInterval(0.4, 1)
+    )
 );
+
+const gTrees = GridTaskSequence.from([
+    GridTaskDensityMarkerDistribution.from(
+        CellFilterMultiply.from(
+            fTreeArea,
+            CellFilterConstant.from(0.05)
+        ),
+        GridCellActionPlaceMarker.from({
+            type: 'Tree-0',
+            size: 0.565,
+            transformers: [
+                MarkerNodeTransformerAddPositionYFromFilter.from(
+                    fReadHeight
+                )
+            ]
+        }),
+        new NumericInterval(1.21, 1.4)
+    ),
+    GridTaskDensityMarkerDistribution.from(
+        fTreeArea,
+        GridCellActionPlaceMarker.from({
+            type: 'Tree-1',
+            size: 0.5,
+            transformers: [
+                MarkerNodeTransformerAddPositionYFromFilter.from(
+                    fReadHeight
+                )
+            ]
+        }),
+        new NumericInterval(0.77, 1.2)
+    )
+]);
 
 
 //heights
@@ -291,9 +324,11 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
 
 gHeights.addDependency(gConnectRooms);
 
-gTrees.addDependencies([gMakeEmpty, gConnectRooms, gBuildDistanceMap, gHeights]);
+gTrees.addDependencies([gMakeEmpty, gConnectRooms, gHeights, gDrawLayerMoisture]);
+gDrawLayerMoisture.addDependencies([gHeights]);
 
 SampleGenerator0.addGenerator(gHeights);
+SampleGenerator0.addGenerator(gDrawLayerMoisture);
 SampleGenerator0.addGenerator(gMakeEmpty);
 SampleGenerator0.addGenerator(gConnectRooms);
 SampleGenerator0.addGenerator(gRoads);

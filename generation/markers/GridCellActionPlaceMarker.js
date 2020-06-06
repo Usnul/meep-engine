@@ -86,12 +86,26 @@ export class GridCellActionPlaceMarker extends GridCellAction {
     /**
      *
      * @param {String} type
+     * @param {number} [size=0]
+     * @param {MarkerNodeTransformer[]} [transformers]
      * @return {GridCellActionPlaceMarker}
      */
-    static from(type) {
+    static from({
+                    type,
+                    size = 0,
+                    transformers = []
+                }) {
+
+        assert.typeOf(type, 'string', 'type');
+
         const r = new GridCellActionPlaceMarker();
 
         r.type = type;
+        r.size = size;
+
+        for (let i = 0; i < transformers.length; i++) {
+            r.addTransformer(transformers[i]);
+        }
 
         return r;
     }

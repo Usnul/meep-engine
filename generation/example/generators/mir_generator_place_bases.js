@@ -40,21 +40,21 @@ clearTags.resize(2, 2);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;
 
-const placeMarker = GridCellActionPlaceMarker.from('Base');
+const placeMarker = GridCellActionPlaceMarker.from({ type: 'Base' });
 placeMarker.addTag('Town');
 
 placeMarker.transform.position.set(0.5, 0.1, -0.5);
 
-const placeRoadConnector0 = GridCellActionPlaceMarker.from('Road Connector');
+const placeRoadConnector0 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector0.offset.set(-1, 0);
 
-const placeRoadConnector1 = GridCellActionPlaceMarker.from('Road Connector');
+const placeRoadConnector1 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector1.offset.set(2, 1);
 
-const placeRoadConnector2 = GridCellActionPlaceMarker.from('Road Connector');
+const placeRoadConnector2 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector2.offset.set(1, -1);
 
-const placeRoadConnector3 = GridCellActionPlaceMarker.from('Road Connector');
+const placeRoadConnector3 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector3.offset.set(0, 2);
 
 const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
