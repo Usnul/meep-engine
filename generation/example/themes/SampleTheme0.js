@@ -9,10 +9,8 @@ import Mesh from "../../../engine/graphics/ecs/mesh/Mesh.js";
 import { Transform } from "../../../engine/ecs/components/Transform.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
-import { matcher_tag_traversable } from "../rules/matcher_tag_traversable.js";
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
-import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
 import { CellFilterSimplexNoise } from "../../filtering/complex/CellFilterSimplexNoise.js";
@@ -33,6 +31,14 @@ import { MirGridLayers } from "../grid/MirGridLayers.js";
 import { CellFilterReadGridLayer } from "../../filtering/CellFilterReadGridLayer.js";
 import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
+import { CellFilterAngleToNormal } from "../../filtering/complex/CellFilterAngleToNormal.js";
+import Vector3 from "../../../core/geom/Vector3.js";
+import { CellFilterClamp } from "../../filtering/math/CellFilterClamp.js";
+import { CellFilterOneMinus } from "../../filtering/math/CellFilterOneMinus.js";
+import { CellFilterSmoothStep } from "../../filtering/math/CellFilterSmoothStep.js";
+import { CellFilterInverseLerp } from "../../filtering/math/CellFilterInverseLerp.js";
+import { CellFilterAdd } from "../../filtering/math/algebra/CellFilterAdd.js";
+import { CellFilterNegate } from "../../filtering/math/algebra/CellFilterNegate.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -40,16 +46,78 @@ const terrainTheme = new TerrainTheme();
 
 const matcher_tag_road = CellMatcherLayerBitMaskTest.from(GridTags.Road, MirGridLayers.Tags);
 
-terrainTheme.rules.push(TerrainLayerRule.from(
-    CellFilterCellMatcher.from(
-        CellMatcherAnd.from(matcher_tag_traversable, CellMatcherNot.from(matcher_tag_road))
+const filterMoisture = CellFilterReadGridLayer.from(MirGridLayers.Moisture);
+
+const filterRock = CellFilterClamp.from(
+    CellFilterSmoothStep.from(
+        CellFilterConstant.from(Math.PI / 2.4),
+        CellFilterConstant.from(Math.PI / 2),
+        CellFilterAngleToNormal.from(
+            CellFilterReadGridLayer.from(MirGridLayers.Heights),
+            Vector3.forward
+        )
     ),
-    0
+    CellFilterConstant.from(0),
+    CellFilterConstant.from(1),
+);
+
+const filterSand = CellFilterMultiply.from(
+    CellFilterClamp.from(
+        CellFilterAdd.from(
+            CellFilterGaussianBlur.from(
+                CellFilterSmoothStep.from(
+                    CellFilterConstant.from(0),
+                    CellFilterConstant.from(0.2),
+                    CellFilterNegate.from(
+                        CellFilterReadGridLayer.from(MirGridLayers.Heights)
+                    )
+                ),
+                3,
+                3
+            ),
+            CellFilterOneMinus.from(
+                CellFilterClamp.from(
+                    CellFilterInverseLerp.from(
+                        CellFilterConstant.from(0),
+                        CellFilterConstant.from(0.15),
+                        filterMoisture
+                    ),
+                    CellFilterConstant.from(0),
+                    CellFilterConstant.from(1)
+                )
+            )
+        ),
+        CellFilterConstant.from(0),
+        CellFilterConstant.from(1)
+    ),
+    CellFilterOneMinus.from(filterRock)
+);
+
+const TERRAIN_LAYER_GRASS = 0;
+const TERRAIN_LAYER_ROCK = 1;
+const TERRAIN_LAYER_SAND = 3;
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    CellFilterMultiply.from(
+        CellFilterMultiply.from(
+            CellFilterOneMinus.from(filterSand),
+            CellFilterOneMinus.from(filterRock)
+        ),
+        CellFilterCellMatcher.from(
+            CellMatcherNot.from(matcher_tag_road)
+        )
+    ),
+    TERRAIN_LAYER_GRASS
 ));
 
 terrainTheme.rules.push(TerrainLayerRule.from(
-    CellFilterCellMatcher.from(matcher_tag_not_traversable),
-    1
+    filterRock,
+    TERRAIN_LAYER_ROCK
+));
+
+terrainTheme.rules.push(TerrainLayerRule.from(
+    filterSand,
+    TERRAIN_LAYER_SAND
 ));
 
 const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
@@ -70,7 +138,7 @@ terrainTheme.rules.push(TerrainLayerRule.from(
         ROAD_FILTER,
         CellFilterLerp.from(CellFilterConstant.from(1), CellFilterConstant.from(0.3), NOISE_10_a)
     ),
-    0,
+    TERRAIN_LAYER_GRASS,
 ));
 
 SampleTheme0.terrain = terrainTheme;
