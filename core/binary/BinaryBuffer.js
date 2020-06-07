@@ -202,7 +202,7 @@ BinaryBuffer.prototype.readUint24LE = function () {
 
     this.position += 3;
 
-    return b0 | (b1 >> 8) | (b2 >> 16);
+    return b0 | (b1 << 8) | (b2 << 16);
 };
 
 /**
@@ -216,7 +216,7 @@ BinaryBuffer.prototype.readUint24BE = function () {
 
     this.position += 3;
 
-    return b2 | (b1 >> 8) | (b0 >> 16);
+    return b2 | (b1 << 8) | (b0 << 16);
 };
 
 /**
@@ -491,8 +491,8 @@ BinaryBuffer.prototype.writeUint24BE = function (value) {
     this.ensureCapacity(end);
 
     const b0 = value & 0xFF;
-    const b1 = (value << 8) & 0xFF;
-    const b2 = (value << 16) & 0xFF;
+    const b1 = (value >> 8) & 0xFF;
+    const b2 = (value >> 16) & 0xFF;
 
     this.dataView.setUint8(this.position, b2);
     this.dataView.setUint8(this.position + 1, b1);
@@ -511,8 +511,8 @@ BinaryBuffer.prototype.writeUint24LE = function (value) {
     this.ensureCapacity(end);
 
     const b0 = value & 0xFF;
-    const b1 = (value << 8) & 0xFF;
-    const b2 = (value << 16) & 0xFF;
+    const b1 = (value >> 8) & 0xFF;
+    const b2 = (value >> 16) & 0xFF;
 
     this.dataView.setUint8(this.position, b0);
     this.dataView.setUint8(this.position + 1, b1);

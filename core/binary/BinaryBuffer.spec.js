@@ -165,3 +165,32 @@ test('string read write, multiple', () => {
     expect(buffer.readUTF8String()).toBe('a');
     expect(buffer.readUTF8String()).toBe('b');
 });
+
+
+test('uint24 LE read write consistency', () => {
+    const buffer = new BinaryBuffer();
+
+    buffer.writeUint24LE(0);
+    buffer.writeUint24LE(1);
+    buffer.writeUint24LE(16777215); //max value
+
+    buffer.position = 0;
+
+    expect(buffer.readUint24LE()).toBe(0);
+    expect(buffer.readUint24LE()).toBe(1);
+    expect(buffer.readUint24LE()).toBe(16777215);
+});
+
+test('uint24 BE read write consistency', () => {
+    const buffer = new BinaryBuffer();
+
+    buffer.writeUint24BE(0);
+    buffer.writeUint24BE(1);
+    buffer.writeUint24BE(16777215); //max value
+
+    buffer.position = 0;
+
+    expect(buffer.readUint24BE()).toBe(0);
+    expect(buffer.readUint24BE()).toBe(1);
+    expect(buffer.readUint24BE()).toBe(16777215);
+});
