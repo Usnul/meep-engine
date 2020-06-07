@@ -36,6 +36,7 @@ export class GridDataLayer {
      * @param {string} id
      * @param {DataType} type
      * @param {number} [resolution=1]
+     * @returns {GridDataLayer}
      */
     static from(id, type, resolution = 1) {
         assert.typeOf(id, 'string', 'id');

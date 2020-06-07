@@ -8,24 +8,28 @@ import { DataType } from "../../../core/collection/table/DataType.js";
 test('computeCellFilterGradient center', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
 
-    grid.writeTags(0, 0, 0);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 0);
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 0,0, 0);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 0);
 
-    grid.writeTags(0, 2, 0);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 0);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
+
+    layer.sampler.writeChannel(0, 2, 0, 0);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 0);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -36,24 +40,27 @@ test('computeCellFilterGradient center', () => {
 test('computeCellFilterGradient top', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 1);
-    grid.writeTags(1, 0, 1);
-    grid.writeTags(2, 0, 1);
+    layer.sampler.writeChannel(0, 0, 0, 1);
+    layer.sampler.writeChannel(1, 0, 0, 1);
+    layer.sampler.writeChannel(2, 0, 0, 1);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
 
-    grid.writeTags(0, 2, 0);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 0);
+    layer.sampler.writeChannel(0, 2, 0, 0);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 0);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -63,24 +70,27 @@ test('computeCellFilterGradient top', () => {
 test('computeCellFilterGradient bottom', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 0);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 0);
+    layer.sampler.writeChannel(0, 0, 0, 0);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 0);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
 
-    grid.writeTags(0, 2, 1);
-    grid.writeTags(1, 2, 1);
-    grid.writeTags(2, 2, 1);
+    layer.sampler.writeChannel(0, 2, 0, 1);
+    layer.sampler.writeChannel(1, 2, 0, 1);
+    layer.sampler.writeChannel(2, 2, 0, 1);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -91,24 +101,27 @@ test('computeCellFilterGradient bottom', () => {
 test('computeCellFilterGradient left', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 1);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 0);
+    layer.sampler.writeChannel(0, 0, 0, 1);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 0);
 
-    grid.writeTags(0, 1, 1);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 1, 0, 1);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
 
-    grid.writeTags(0, 2, 1);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 0);
+    layer.sampler.writeChannel(0, 2, 0, 1);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 0);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -119,24 +132,27 @@ test('computeCellFilterGradient left', () => {
 test('computeCellFilterGradient right', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 0);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 1);
+    layer.sampler.writeChannel(0, 0, 0, 0);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 1);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 1);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 1);
 
-    grid.writeTags(0, 2, 0);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 1);
+    layer.sampler.writeChannel(0, 2, 0, 0);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 1);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -147,24 +163,26 @@ test('computeCellFilterGradient right', () => {
 test('computeCellFilterGradient top left', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 1);
-    grid.writeTags(1, 0, 1);
-    grid.writeTags(2, 0, 1);
+    layer.sampler.writeChannel(0, 0, 0, 1);
+    layer.sampler.writeChannel(1, 0, 0, 1);
+    layer.sampler.writeChannel(2, 0, 0, 1);
 
-    grid.writeTags(0, 1, 1);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 1, 0, 1);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
 
-    grid.writeTags(0, 2, 1);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 0);
+    layer.sampler.writeChannel(0, 2, 0, 1);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 0);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -176,24 +194,27 @@ test('computeCellFilterGradient top left', () => {
 test('computeCellFilterGradient top right', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 1);
-    grid.writeTags(1, 0, 1);
-    grid.writeTags(2, 0, 1);
+    layer.sampler.writeChannel(0, 0, 0, 1);
+    layer.sampler.writeChannel(1, 0, 0, 1);
+    layer.sampler.writeChannel(2, 0, 0, 1);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 1);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 1);
 
-    grid.writeTags(0, 2, 0);
-    grid.writeTags(1, 2, 0);
-    grid.writeTags(2, 2, 1);
+    layer.sampler.writeChannel(0, 2, 0, 0);
+    layer.sampler.writeChannel(1, 2, 0, 0);
+    layer.sampler.writeChannel(2, 2, 0, 1);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -205,24 +226,27 @@ test('computeCellFilterGradient top right', () => {
 test('computeCellFilterGradient bottom left', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 1);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 0);
+    layer.sampler.writeChannel(0, 0, 0, 1);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 0);
 
-    grid.writeTags(0, 1, 1);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 0);
+    layer.sampler.writeChannel(0, 1, 0, 1);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 0);
 
-    grid.writeTags(0, 2, 1);
-    grid.writeTags(1, 2, 1);
-    grid.writeTags(2, 2, 1);
+    layer.sampler.writeChannel(0, 2, 0, 1);
+    layer.sampler.writeChannel(1, 2, 0, 1);
+    layer.sampler.writeChannel(2, 2, 0, 1);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
@@ -234,24 +258,27 @@ test('computeCellFilterGradient bottom left', () => {
 test('computeCellFilterGradient bottom right', () => {
 
     const grid = new GridData();
-    grid.addLayer(GridDataLayer.from('a', DataType.Uint32));
+    const layer = GridDataLayer.from('a', DataType.Uint32);
+
+    grid.addLayer(layer);
     grid.resize(3, 3);
 
     const v = [];
 
     const filter = CellFilterCellMatcher.from(CellMatcherLayerBitMaskTest.from(1, 'a'));
+    filter.initialize(grid,0);
 
-    grid.writeTags(0, 0, 0);
-    grid.writeTags(1, 0, 0);
-    grid.writeTags(2, 0, 1);
+    layer.sampler.writeChannel(0, 0, 0, 0);
+    layer.sampler.writeChannel(1, 0, 0, 0);
+    layer.sampler.writeChannel(2, 0, 0, 1);
 
-    grid.writeTags(0, 1, 0);
-    grid.writeTags(1, 1, 0);
-    grid.writeTags(2, 1, 1);
+    layer.sampler.writeChannel(0, 1, 0, 0);
+    layer.sampler.writeChannel(1, 1, 0, 0);
+    layer.sampler.writeChannel(2, 1, 0, 1);
 
-    grid.writeTags(0, 2, 1);
-    grid.writeTags(1, 2, 1);
-    grid.writeTags(2, 2, 1);
+    layer.sampler.writeChannel(0, 2, 0, 1);
+    layer.sampler.writeChannel(1, 2, 0, 1);
+    layer.sampler.writeChannel(2, 2, 0, 1);
 
     computeCellFilterGradient(v, 1, 1, filter, grid);
 
