@@ -19,8 +19,8 @@ export class WaterSerializationUpgrader_0_1 extends BinaryClassUpgrader {
 
         //water color
         target.writeUint24(
-            (((colorR * 255) & 0xFF) >> 16)
-            | (((colorG * 255) & 0xFF) >> 8)
+            (((colorR * 255) & 0xFF) << 16)
+            | (((colorG * 255) & 0xFF) << 8)
             | ((colorB * 255) & 0xFF)
         );
 
