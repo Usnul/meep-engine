@@ -37,7 +37,10 @@ test('exact single point match', () => {
     data.addLayer(tagLayer);
 
     data.resize(2, 1);
+
     tagLayer.sampler.writeChannel(0, 0, 0, 1);
+
+    pattern.initialize(data, 0);
 
     expect(pattern.match(data, 0, 0, 0)).toBe(true);
     expect(pattern.match(data, 0, 0, R_90)).toBe(true);

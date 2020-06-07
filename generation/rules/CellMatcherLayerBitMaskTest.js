@@ -21,8 +21,23 @@ export class CellMatcherLayerBitMaskTest extends GridLayerCellMatcher {
         const sampler = layer.sampler;
 
         //convert to uv
-        const u = clamp(x / (grid.width - 1), 0, 1);
-        const v = clamp(y / (grid.height - 1), 0, 1);
+        const x_max = grid.width - 1;
+        const y_max = grid.height - 1;
+
+        let u;
+        let v;
+
+        if (x_max === 0) {
+            u = 0;
+        } else {
+            u = clamp(x / x_max, 0, 1);
+        }
+
+        if (y_max === 0) {
+            v = 0;
+        } else {
+            v = clamp(y / y_max, 0, 1);
+        }
 
         const _x = Math.round(u * (sampler.width - 1));
         const _y = Math.round(v * (sampler.height - 1));
