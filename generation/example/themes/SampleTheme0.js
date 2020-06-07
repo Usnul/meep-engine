@@ -11,7 +11,6 @@ import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
-import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
 import { CellFilterSimplexNoise } from "../../filtering/complex/CellFilterSimplexNoise.js";
 import { CellFilterFXAA } from "../../filtering/complex/CellFilterFXAA.js";
@@ -50,7 +49,7 @@ const filterMoisture = CellFilterReadGridLayer.from(MirGridLayers.Moisture);
 
 const filterRock = CellFilterClamp.from(
     CellFilterSmoothStep.from(
-        CellFilterConstant.from(Math.PI / 2.4),
+        CellFilterConstant.from(Math.PI / 2.2),
         CellFilterConstant.from(Math.PI / 2),
         CellFilterAngleToNormal.from(
             CellFilterReadGridLayer.from(MirGridLayers.Heights),
@@ -59,6 +58,29 @@ const filterRock = CellFilterClamp.from(
     ),
     CellFilterConstant.from(0),
     CellFilterConstant.from(1),
+);
+
+const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
+
+const ROAD_FILTER = CellFilterCellMatcher.from(matcher_tag_road);
+const ROAD_FILTER_AA = CellFilterFXAA.from(ROAD_FILTER);
+
+const filterRoad = CellFilterGaussianBlur.from(
+    CellFilterMultiply.from(
+        ROAD_FILTER_AA,
+        CellFilterLerp.from(
+            CellFilterConstant.from(0.6),
+            CellFilterConstant.from(1),
+            NOISE_10_a
+        )
+    ),
+    1.2,
+    1.2
+);
+
+const filterNotRockAndNotRoad = CellFilterMultiply.from(
+    CellFilterOneMinus.from(filterRoad),
+    CellFilterOneMinus.from(filterRock)
 );
 
 const filterSand = CellFilterMultiply.from(
@@ -90,7 +112,7 @@ const filterSand = CellFilterMultiply.from(
         CellFilterConstant.from(0),
         CellFilterConstant.from(1)
     ),
-    CellFilterOneMinus.from(filterRock)
+    filterNotRockAndNotRoad
 );
 
 const TERRAIN_LAYER_GRASS = 0;
@@ -103,9 +125,7 @@ terrainTheme.rules.push(TerrainLayerRule.from(
             CellFilterOneMinus.from(filterSand),
             CellFilterOneMinus.from(filterRock)
         ),
-        CellFilterCellMatcher.from(
-            CellMatcherNot.from(matcher_tag_road)
-        )
+        filterNotRockAndNotRoad
     ),
     TERRAIN_LAYER_GRASS
 ));
@@ -120,16 +140,8 @@ terrainTheme.rules.push(TerrainLayerRule.from(
     TERRAIN_LAYER_SAND
 ));
 
-const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
-
-const ROAD_FILTER = CellFilterCellMatcher.from(matcher_tag_road);
-const ROAD_FILTER_AA = CellFilterFXAA.from(ROAD_FILTER);
-
 terrainTheme.rules.push(TerrainLayerRule.from(
-    CellFilterMultiply.from(
-        ROAD_FILTER,
-        CellFilterLerp.from(CellFilterConstant.from(0.3), CellFilterConstant.from(1), NOISE_10_a)
-    ),
+    filterRoad,
     2,
 ));
 
@@ -417,7 +429,7 @@ const nrFoliageTree0 = new MarkerProcessingRule();
 nrFoliageTree0.consume = true;
 nrFoliageTree0.matcher = MarkerNodeMatcherByType.from('Tree-0');
 nrFoliageTree0.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree0, Transform.fromJSON({
-    scale: { x: 1, y: 1, z: 1 },
+    scale: { x: 1.2, y: 1.2, z: 1.2 },
     position: { x: 0, y: 0, z: 0 }
 })));
 

@@ -40,7 +40,7 @@ clearTags.resize(2, 2);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;
 
-const placeMarker = GridCellActionPlaceMarker.from({ type: 'Base' });
+const placeMarker = GridCellActionPlaceMarker.from({ type: 'Base', size: 1 });
 placeMarker.addTag('Town');
 
 placeMarker.transform.position.set(0.5, 0.1, -0.5);

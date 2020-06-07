@@ -165,7 +165,7 @@ class WaterSystem extends System {
 
             component.__shader = water;
 
-            component.writeColorToShader();
+            component.writeShaderUniforms();
 
         } else {
             water = component.__shader;

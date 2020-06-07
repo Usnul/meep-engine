@@ -5,11 +5,15 @@ const vs = `
 varying vec2 vUv; 
 varying float level;
 
+varying vec3 vWorldPosition;
+
 void main(){
 
     vUv = uv;
    
-    level = (modelMatrix * vec4(position, 1.0)).y;
+    vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+   
+    level = vWorldPosition.y;
     
     gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 }`;
@@ -36,9 +40,13 @@ uniform float time;
 
 uniform float fWaveAmplitude;
 uniform float fWaveSpeed;
+uniform float fWaveFrequency;
+
+uniform vec2 vShoreDepthTransition;
 
 varying vec2 vUv;
 varying float level;
+varying vec3 vWorldPosition;
 
 float depthToLinear( float z, float cameraNear, float cameraFar ) {
     float z_n = 2.0 * z - 1.0;
@@ -120,13 +128,13 @@ void main(){
     
     float depth = level - height;
     
-    float geoHash = (depthUV.x+ depthUV.y)*313.123;
+    float geoHash = (vWorldPosition.x+ vWorldPosition.z)*fWaveFrequency;
     
     float waveHeightModifier = sin(geoHash + time*fWaveSpeed) / 3.14159265359;
     
     float waveHeight = depth + fWaveAmplitude * waveHeightModifier;
     
-    float deepColorFactor = smoothstep(0.7, 2.0, waveHeight);
+    float deepColorFactor = smoothstep(vShoreDepthTransition.x, vShoreDepthTransition.y, waveHeight);
     
     vec4 color = mix(
         vec4(shoreColor, 0.8), 
@@ -200,6 +208,14 @@ export function makeAlexWaterMaterial() {
         fWaveAmplitude: {
             type: 'f',
             value: 0.3
+        },
+        fWaveFrequency: {
+            type: 'f',
+            value: 3
+        },
+        vShoreDepthTransition: {
+            type: 'v2',
+            value: new Vector2(0.7, 2)
         }
     };
 

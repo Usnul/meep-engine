@@ -183,6 +183,46 @@ BinaryBuffer.prototype.readUint16BE = function () {
  *
  * @returns {number}
  */
+BinaryBuffer.prototype.readUint24 = function () {
+    if (this.endianness === EndianType.BigEndian) {
+        return this.readUint24BE();
+    } else {
+        return this.readUint24LE();
+    }
+};
+
+/**
+ *
+ * @returns {number}
+ */
+BinaryBuffer.prototype.readUint24LE = function () {
+    const b0 = this.dataView.getUint8(this.position);
+    const b1 = this.dataView.getUint8(this.position + 1);
+    const b2 = this.dataView.getUint8(this.position + 2);
+
+    this.position += 3;
+
+    return b0 | (b1 >> 8) | (b2 >> 16);
+};
+
+/**
+ *
+ * @returns {number}
+ */
+BinaryBuffer.prototype.readUint24BE = function () {
+    const b0 = this.dataView.getUint8(this.position);
+    const b1 = this.dataView.getUint8(this.position + 1);
+    const b2 = this.dataView.getUint8(this.position + 2);
+
+    this.position += 3;
+
+    return b2 | (b1 >> 8) | (b0 >> 16);
+};
+
+/**
+ *
+ * @returns {number}
+ */
 BinaryBuffer.prototype.readUint32 = function () {
     const result = this.dataView.getUint32(this.position, this.endianness);
 
@@ -425,6 +465,58 @@ BinaryBuffer.prototype.writeUint16LE = function (value) {
     this.ensureCapacity(end);
 
     this.dataView.setUint16(this.position, value, EndianType.LittleEndian);
+
+    this.position = end;
+};
+
+/**
+ *
+ * @param {number} value
+ */
+BinaryBuffer.prototype.writeUint24 = function (value) {
+    if (this.endianness === EndianType.BigEndian) {
+        this.writeUint24BE(value);
+    } else {
+        this.writeUint24LE(value);
+    }
+};
+
+/**
+ *
+ * @param {number} value
+ */
+BinaryBuffer.prototype.writeUint24BE = function (value) {
+    const end = this.position + 3;
+
+    this.ensureCapacity(end);
+
+    const b0 = value & 0xFF;
+    const b1 = (value << 8) & 0xFF;
+    const b2 = (value << 16) & 0xFF;
+
+    this.dataView.setUint8(this.position, b2);
+    this.dataView.setUint8(this.position + 1, b1);
+    this.dataView.setUint8(this.position + 2, b0);
+
+    this.position = end;
+};
+
+/**
+ *
+ * @param {number} value
+ */
+BinaryBuffer.prototype.writeUint24LE = function (value) {
+    const end = this.position + 3;
+
+    this.ensureCapacity(end);
+
+    const b0 = value & 0xFF;
+    const b1 = (value << 8) & 0xFF;
+    const b2 = (value << 16) & 0xFF;
+
+    this.dataView.setUint8(this.position, b0);
+    this.dataView.setUint8(this.position + 1, b1);
+    this.dataView.setUint8(this.position + 2, b2);
 
     this.position = end;
 };

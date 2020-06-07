@@ -3,10 +3,10 @@
  */
 
 
-import Vector3 from "../../../../core/geom/Vector3.js";
 import Vector1 from "../../../../core/geom/Vector1.js";
-import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
 import { ClampToEdgeWrapping, DataTexture, FloatType, LinearFilter, RedFormat } from "three";
+import { NumericInterval } from "../../../../core/math/interval/NumericInterval.js";
+import { Color } from "../../../../core/color/Color.js";
 
 class Water {
     constructor(options) {
@@ -16,7 +16,49 @@ class Water {
             this.fromJSON(options);
         }
 
-        this.color = new Vector3(0, 0.3, 0.5);
+        /**
+         *
+         * @type {Color}
+         */
+        this.color = new Color(0, 0.3, 0.5);
+
+
+        /**
+         * Defines what is considered as shore as well as how long is the transition between shore and deep water
+         * @type {NumericInterval}
+         */
+        this.shoreDepthTransition = new NumericInterval(0.7, 2);
+
+
+        /**
+         * Color of the water at the shore
+         * @type {Color}
+         */
+        this.shoreColor = new Color(0.584, 0.792, 0.850);
+
+        /**
+         *
+         * @type {Vector1}
+         */
+        this.waveSpeed = new Vector1(1.8);
+
+        /**
+         *
+         * @type {Vector1}
+         */
+        this.waveAmplitude = new Vector1(0.3);
+
+        /**
+         *
+         * @type {Vector1}
+         */
+        this.waveFrequency = new Vector1(1);
+
+        /**
+         * Scattering of light, the higher this value is - the more opaque water will become
+         * @type {Vector1}
+         */
+        this.scattering = new Vector1(1.2);
 
         /**
          *
@@ -31,7 +73,14 @@ class Water {
          */
         this.__threeObject = null;
 
-        this.color.onChanged.add(this.writeColorToShader, this);
+        // monitor changes
+        this.color.onChanged.add(this.writeShaderUniforms, this);
+        this.shoreDepthTransition.onChanged.add(this.writeShaderUniforms, this);
+        this.shoreColor.onChanged.add(this.writeShaderUniforms, this);
+        this.waveSpeed.onChanged.add(this.writeShaderUniforms, this);
+        this.waveAmplitude.onChanged.add(this.writeShaderUniforms, this);
+        this.waveFrequency.onChanged.add(this.writeShaderUniforms, this);
+        this.scattering.onChanged.add(this.writeShaderUniforms, this);
     }
 
     /**
@@ -75,12 +124,35 @@ class Water {
         shader.uniforms.vHeightTextureResolution.value.set(terrain.samplerHeight.width, terrain.samplerHeight.height);
     }
 
-    writeColorToShader() {
-        const r = this.color.x;
-        const g = this.color.y;
-        const b = this.color.z;
+    writeShaderUniforms() {
 
-        this.__shader.uniforms.waterColor.value.setRGB(r, g, b);
+        /**
+         *
+         * @type {ShaderMaterial}
+         */
+        const shader = this.__shader;
+
+        if (shader === null) {
+            //no shader attached
+            return;
+        }
+
+        const uniforms = shader.uniforms;
+
+        uniforms.waterColor.value.setRGB(this.color.r, this.color.g, this.color.b);
+        uniforms.shoreColor.value.setRGB(this.shoreColor.r, this.shoreColor.g, this.shoreColor.b);
+
+        uniforms.fWaveSpeed.value = this.waveSpeed.getValue();
+
+        uniforms.fWaveAmplitude.value = this.waveAmplitude.getValue();
+
+        uniforms.fWaveFrequency.value = this.waveFrequency.getValue();
+
+        uniforms.fScattering.value = this.scattering.getValue();
+
+        uniforms.vShoreDepthTransition.value.set(this.shoreDepthTransition.min, this.shoreDepthTransition.max);
+
+
     }
 
     fromJSON(json) {
@@ -104,33 +176,3 @@ Water.typeName = "Water";
 
 export default Water;
 
-export class WaterSerializationAdapter extends BinaryClassSerializationAdapter {
-    constructor() {
-        super();
-
-        this.klass = Water;
-        this.version = 0;
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {Water} value
-     */
-    serialize(buffer, value) {
-        value.level.toBinaryBuffer(buffer);
-
-        value.color.toBinaryBuffer(buffer);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {Water} value
-     */
-    deserialize(buffer, value) {
-        value.level.fromBinaryBuffer(buffer);
-
-        value.color.fromBinaryBuffer(buffer);
-    }
-}

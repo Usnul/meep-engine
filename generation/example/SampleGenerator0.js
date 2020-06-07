@@ -67,7 +67,7 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
 )));
 
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
-    GridCellActionPlaceMarker.from({ type: 'Treasure' }),
+    GridCellActionPlaceMarker.from({ type: 'Treasure', size: 0.5 }),
     GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
 ], 0.5);
 
@@ -110,7 +110,10 @@ const pNoEnemyIn3 = new GridPatternMatcher();
 
 pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
 
-const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({ type: 'Enemy' });
+const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({
+    type: 'Enemy',
+    size: 0.5
+});
 const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied, MirGridLayers.Tags);
 
 const prTreasureGuards = GridCellPlacementRule.from(
@@ -324,7 +327,17 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
 
 gHeights.addDependency(gConnectRooms);
 
-gTrees.addDependencies([gMakeEmpty, gConnectRooms, gHeights, gDrawLayerMoisture]);
+gTrees.addDependencies([
+    gMakeEmpty,
+    gConnectRooms,
+    gHeights,
+    gDrawLayerMoisture,
+    gRuleSet1,
+    gRuleSet2,
+    gRuleSetTreasureGuards,
+    gBuffObjects,
+    gBases
+]);
 gDrawLayerMoisture.addDependencies([gHeights]);
 
 SampleGenerator0.addGenerator(gHeights);
