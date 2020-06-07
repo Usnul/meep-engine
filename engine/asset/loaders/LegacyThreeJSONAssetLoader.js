@@ -96,7 +96,7 @@ export class LegacyThreeJSONAssetLoader extends AssetLoader {
                 return mesh;
             }, 1);
 
-            callback(asset);
+            success(asset);
         }, progress, failure);
     }
 }
