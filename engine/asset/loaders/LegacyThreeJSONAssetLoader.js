@@ -97,6 +97,6 @@ export class LegacyThreeJSONAssetLoader extends AssetLoader {
             }, 1);
 
             callback(asset);
-        }, progress, onError);
+        }, progress, failure);
     }
 }
