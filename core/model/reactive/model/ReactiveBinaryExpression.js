@@ -29,10 +29,12 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
     }
 
     copy(other) {
+        assert.equal(other.isReactiveExpression, true, 'other.isReactiveExpression !== true');
+
         this.disconnect();
 
         if (other.left !== null && other.right !== null) {
-            this.connect(other.left.copy(), other.right.copy());
+            this.connect(other.left.clone(), other.right.clone());
         }
     }
 
@@ -89,11 +91,18 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
     }
 
     disconnect() {
-        this.left.onChanged.remove(this.update, this);
-        this.right.onChanged.remove(this.update, this);
+        if (this.left !== null) {
 
-        this.right = null;
-        this.left = null;
+            this.left.onChanged.remove(this.update, this);
+            this.left = null;
+
+        }
+
+        if (this.right !== null) {
+            this.right.onChanged.remove(this.update, this);
+
+            this.right = null;
+        }
     }
 
     getValue() {

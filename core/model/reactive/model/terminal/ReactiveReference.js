@@ -11,6 +11,10 @@ export class ReactiveReference extends ReactiveExpression {
 
         this.name = name;
 
+        /**
+         *
+         * @type {ObservedBoolean|Vector1|ReactiveExpression}
+         */
         this.source = null;
     }
 
@@ -24,7 +28,7 @@ export class ReactiveReference extends ReactiveExpression {
         this.disconnect();
 
         if (other.source !== null) {
-            this.connect(other.source.clone());
+            this.connect(other.source);
         }
     }
 
