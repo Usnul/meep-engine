@@ -915,6 +915,20 @@ EntityComponentDataset.prototype.getComponentByIndex = function (entityIndex, co
     return this.components[componentIndex][entityIndex];
 };
 
+function computeComponentClassName(klass) {
+    if (klass === undefined) {
+        return 'undefined';
+    } else if (klass === null) {
+        return 'null';
+    } else if (typeof klass.type === "string") {
+        return klass.type;
+    } else if (typeof klass === 'function') {
+        return klass.name;
+    } else {
+        return "$UNKNOWN"
+    }
+}
+
 /**
  * @template C
  * @param {number} entityIndex
@@ -930,7 +944,7 @@ EntityComponentDataset.prototype.getComponent = function (entityIndex, klass) {
     const componentIndex = this.computeComponentTypeIndex(klass);
 
     if (componentIndex === -1) {
-        throw  new Error(`Component class not registered in this dataset`);
+        throw  new Error(`Component class ${computeComponentClassName(klass)} not registered in this dataset`);
     }
 
     return this.getComponentByIndex(entityIndex, componentIndex);
