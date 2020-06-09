@@ -16,15 +16,46 @@ export class MarkerProcessingRule {
 
         /**
          *
-         * @type {MarkerNodeAction[]}
+         * @type {MarkerNodeAction}
          */
-        this.actions = [];
+        this.action = null;
 
         /**
          * If this rule is applied, no other rules may be applied to the same node
          * @type {boolean}
          */
         this.consume = true;
+    }
+
+    /**
+     *
+     * @param {MarkerNodeMatcher} matcher
+     * @param {MarkerNodeTransformer[]} [transformers]
+     * @param {MarkerNodeAction} action
+     * @param {boolean} [consume]
+     * @returns {MarkerProcessingRule}
+     */
+    static from({
+                    matcher,
+                    transformers = [],
+                    action,
+                    consume = true
+                }) {
+
+        assert.equal(matcher.isMarkerNodeMatcher, true, 'matcher.isMarkerNodeMatcher !== true');
+        assert.equal(action.isMarkerNodeAction, true, 'action.isMarkerNodeAction !== true');
+
+        assert.typeOf(consume, 'boolean', 'consume');
+
+
+        const r = new MarkerProcessingRule();
+
+        r.matcher = matcher;
+        r.transformers = transformers;
+        r.action = action;
+        r.consume = consume;
+
+        return r;
     }
 
     /**
@@ -44,13 +75,6 @@ export class MarkerProcessingRule {
             transformer.initialize(grid, seed);
         }
 
-        const actions = this.actions;
-        const nA = actions.length;
-
-        for (let i = 0; i < nA; i++) {
-            const action = actions[i];
-            //TODO initialize actions
-        }
-
+        this.action.initialize(grid, seed);
     }
 }

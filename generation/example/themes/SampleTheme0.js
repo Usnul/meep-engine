@@ -164,31 +164,27 @@ ebpTreasure.add(Mesh.fromJSON({
 ebpTreasure.add(Transform.fromJSON({}));
 ebpTreasure.add(GridPosition.fromJSON({}));
 
-const nrTreasure = new MarkerProcessingRule();
-
-nrTreasure.consume = true;
-nrTreasure.matcher = MarkerNodeMatcherByType.from('Treasure');
-nrTreasure.transformers.push(
-    MarkerNodeTransformerYRotateByFilterGradient.from(
-        CellFilterGaussianBlur.from(
-            CellFilterLerp.from(
-                CellFilterCellMatcher.from(matcher_tag_not_traversable),
-                CellFilterSimplexNoise.from(2, 2),
-                CellFilterConstant.from(0.15)
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Treasure'),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilterGradient.from(
+            CellFilterGaussianBlur.from(
+                CellFilterLerp.from(
+                    CellFilterCellMatcher.from(matcher_tag_not_traversable),
+                    CellFilterSimplexNoise.from(2, 2),
+                    CellFilterConstant.from(0.15)
+                ),
+                1.5,
+                1.5,
             ),
-            1.5,
-            1.5,
-        ),
-        0
-    )
-);
-
-nrTreasure.actions.push(MarkerNodeActionEntityPlacement.from(ebpTreasure, Transform.fromJSON({
-    scale: { x: 0.5, y: 0.5, z: 0.5 },
-    position: { x: 0, y: 0, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrTreasure);
+            0
+        )
+    ],
+    action: MarkerNodeActionEntityPlacement.from(ebpTreasure, Transform.fromJSON({
+        scale: { x: 0.5, y: 0.5, z: 0.5 },
+        position: { x: 0, y: 0, z: 0 }
+    }))
+}));
 
 
 const ebpStartingPoint = new EntityBlueprint();
@@ -200,50 +196,41 @@ ebpStartingPoint.add(Mesh.fromJSON({
 ebpStartingPoint.add(Transform.fromJSON({}));
 ebpStartingPoint.add(GridPosition.fromJSON({}));
 
-const nrStartingPoint = new MarkerProcessingRule();
-
-nrStartingPoint.consume = true;
-nrStartingPoint.matcher = MarkerNodeMatcherByType.from('Starting Point');
-
-nrStartingPoint.actions.push(MarkerNodeActionEntityPlacement.from(ebpStartingPoint, Transform.fromJSON({
-    scale: { x: 0.5, y: 0.5, z: 0.5 },
-    position: { x: 0, y: 0.5, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrStartingPoint);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Starting Point'),
+    action: MarkerNodeActionEntityPlacement.from(ebpStartingPoint, Transform.fromJSON({
+        scale: { x: 0.5, y: 0.5, z: 0.5 },
+        position: { x: 0, y: 0.5, z: 0 }
+    }))
+}));
 
 const ebpEnemy = new EntityBlueprint();
 ebpEnemy.add(Mesh.fromJSON({ url: 'data/models/snaps/cube_red.gltf', castShadow: true, receiveShadow: true }));
 ebpEnemy.add(Transform.fromJSON({}));
 ebpEnemy.add(GridPosition.fromJSON({}));
 
-const nrEnemy = new MarkerProcessingRule();
-
-nrEnemy.consume = true;
-nrEnemy.matcher = MarkerNodeMatcherByType.from('Enemy');
-
-nrEnemy.actions.push(MarkerNodeActionEntityPlacement.from(ebpEnemy, Transform.fromJSON({
-    scale: { x: 0.3, y: 0.5, z: 0.3 },
-    position: { x: 0, y: 0.5, z: 0 }
-})));
-
-nrEnemy.transformers.push(
-    MarkerNodeTransformerYRotateByFilterGradient.from(
-        CellFilterLerp.from(
-            CellFilterGaussianBlur.from(
-                CellFilterCellMatcher.from(matcher_tag_not_traversable)
-                ,
-                2,
-                2
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Enemy'),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilterGradient.from(
+            CellFilterLerp.from(
+                CellFilterGaussianBlur.from(
+                    CellFilterCellMatcher.from(matcher_tag_not_traversable)
+                    ,
+                    2,
+                    2
+                ),
+                CellFilterSimplexNoise.from(50, 50),
+                CellFilterConstant.from(0.8)
             ),
-            CellFilterSimplexNoise.from(50, 50),
-            CellFilterConstant.from(0.8)
-        ),
-        -PI_HALF
-    )
-);
-
-SampleTheme0.nodes.add(nrEnemy);
+            -PI_HALF
+        )
+    ],
+    action: MarkerNodeActionEntityPlacement.from(ebpEnemy, Transform.fromJSON({
+        scale: { x: 0.3, y: 0.5, z: 0.3 },
+        position: { x: 0, y: 0.5, z: 0 }
+    }))
+}));
 
 const ebpBase = new EntityBlueprint();
 ebpBase.add(Mesh.fromJSON({
@@ -254,19 +241,14 @@ ebpBase.add(Mesh.fromJSON({
 ebpBase.add(Transform.fromJSON({}));
 ebpBase.add(GridPosition.fromJSON({}));
 
-const nrBase = new MarkerProcessingRule();
-
-nrBase.consume = true;
-nrBase.matcher = MarkerNodeMatcherByType.from('Base');
-
-nrBase.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1)))
-
-nrBase.actions.push(MarkerNodeActionEntityPlacement.from(ebpBase, Transform.fromJSON({
-    scale: { x: 2.2, y: 2.2, z: 2.2 },
-    position: { x: 0, y: 0, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrBase);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Base'),
+    transformers: [MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1))],
+    action: MarkerNodeActionEntityPlacement.from(ebpBase, Transform.fromJSON({
+        scale: { x: 2.2, y: 2.2, z: 2.2 },
+        position: { x: 0, y: 0, z: 0 }
+    }))
+}));
 
 const ebpRoadJunction90 = new EntityBlueprint();
 ebpRoadJunction90.add(Mesh.fromJSON({
@@ -277,17 +259,13 @@ ebpRoadJunction90.add(Mesh.fromJSON({
 ebpRoadJunction90.add(Transform.fromJSON({}));
 ebpRoadJunction90.add(GridPosition.fromJSON({}));
 
-const nrRoadJunction90 = new MarkerProcessingRule();
-
-nrRoadJunction90.consume = true;
-nrRoadJunction90.matcher = MarkerNodeMatcherByType.from('Road Junction Decorator 90');
-
-nrRoadJunction90.actions.push(MarkerNodeActionEntityPlacement.from(ebpRoadJunction90, Transform.fromJSON({
-    scale: { x: 0.1, y: 1, z: 0.1 },
-    position: { x: 0, y: 1, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrRoadJunction90);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Road Junction Decorator 90'),
+    action: MarkerNodeActionEntityPlacement.from(ebpRoadJunction90, Transform.fromJSON({
+        scale: { x: 0.1, y: 1, z: 0.1 },
+        position: { x: 0, y: 1, z: 0 }
+    }))
+}));
 
 const ebpBuffObject0 = new EntityBlueprint();
 ebpBuffObject0.add(Mesh.fromJSON({
@@ -308,17 +286,13 @@ ebpBuffObject0.add(GUIElement.fromJSON({
 ebpBuffObject0.add(Transform.fromJSON({}));
 ebpBuffObject0.add(GridPosition.fromJSON({}));
 
-const nrBuffObject = new MarkerProcessingRule();
-
-nrBuffObject.consume = true;
-nrBuffObject.matcher = MarkerNodeMatcherByType.from('Buff Object :: Attack Power Increase');
-
-nrBuffObject.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObject0, Transform.fromJSON({
-    scale: { x: 0.4, y: 1, z: 0.4 },
-    position: { x: 0, y: 1, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrBuffObject);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Buff Object :: Attack Power Increase'),
+    action: MarkerNodeActionEntityPlacement.from(ebpBuffObject0, Transform.fromJSON({
+        scale: { x: 0.4, y: 1, z: 0.4 },
+        position: { x: 0, y: 1, z: 0 }
+    }))
+}));
 
 const ebpBuffObjectDefense = new EntityBlueprint();
 ebpBuffObjectDefense.add(Mesh.fromJSON({
@@ -339,17 +313,13 @@ ebpBuffObjectDefense.add(GUIElement.fromJSON({
 ebpBuffObjectDefense.add(Transform.fromJSON({}));
 ebpBuffObjectDefense.add(GridPosition.fromJSON({}));
 
-const nrBuffObjectDefense = new MarkerProcessingRule();
-
-nrBuffObjectDefense.consume = true;
-nrBuffObjectDefense.matcher = MarkerNodeMatcherByType.from('Buff Object :: Defense Increase');
-
-nrBuffObjectDefense.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObjectDefense, Transform.fromJSON({
-    scale: { x: 0.4, y: 1, z: 0.4 },
-    position: { x: 0, y: 1, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrBuffObjectDefense);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Buff Object :: Defense Increase'),
+    action: MarkerNodeActionEntityPlacement.from(ebpBuffObjectDefense, Transform.fromJSON({
+        scale: { x: 0.4, y: 1, z: 0.4 },
+        position: { x: 0, y: 1, z: 0 }
+    }))
+}));
 
 const ebpBuffObjectWell = new EntityBlueprint();
 ebpBuffObjectWell.add(Mesh.fromJSON({
@@ -370,23 +340,20 @@ ebpBuffObjectWell.add(GUIElement.fromJSON({
 ebpBuffObjectWell.add(Transform.fromJSON({}));
 ebpBuffObjectWell.add(GridPosition.fromJSON({}));
 
-const nrBuffObjectWell = new MarkerProcessingRule();
-
-nrBuffObjectWell.consume = true;
-nrBuffObjectWell.matcher = MarkerNodeMatcherByType.from('Buff Object :: Well');
-
-nrBuffObjectWell.transformers.push(MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1)))
-
-nrBuffObjectWell.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObjectWell, Transform.fromJSON({
-    scale: { x: 0.005, y: 0.005, z: 0.005 },
-    position: { x: 0, y: 0, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrBuffObjectWell);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Buff Object :: Well'),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1))
+    ],
+    action: MarkerNodeActionEntityPlacement.from(ebpBuffObjectWell, Transform.fromJSON({
+        scale: { x: 0.005, y: 0.005, z: 0.005 },
+        position: { x: 0, y: 0, z: 0 }
+    }))
+}));
 
 const ebpBuffObjectCampfire = new EntityBlueprint();
 ebpBuffObjectCampfire.add(Mesh.fromJSON({
-    url: 'data/models/snaps/cube_white.gltf',
+    url: 'data/models/MOBA and Tower Defense/Campfire.gltf',
     dropShadow: true,
     receiveShadow: true
 }));
@@ -403,58 +370,49 @@ ebpBuffObjectCampfire.add(GUIElement.fromJSON({
 ebpBuffObjectCampfire.add(Transform.fromJSON({}));
 ebpBuffObjectCampfire.add(GridPosition.fromJSON({}));
 
-const nrBuffObjectCampfire = new MarkerProcessingRule();
-
-nrBuffObjectCampfire.consume = true;
-nrBuffObjectCampfire.matcher = MarkerNodeMatcherByType.from('Buff Object :: Campfire');
-
-nrBuffObjectCampfire.actions.push(MarkerNodeActionEntityPlacement.from(ebpBuffObjectCampfire, Transform.fromJSON({
-    scale: { x: 0.4, y: 1, z: 0.4 },
-    position: { x: 0, y: 1, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrBuffObjectCampfire);
-
-const ebpFoliageTree0 = new EntityBlueprint();
-ebpFoliageTree0.add(Mesh.fromJSON({
-    url: 'data/models/LowPolyTownshipSet/Tree_2/Tree_2.gltf',
-    dropShadow: true,
-    receiveShadow: true
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Buff Object :: Campfire'),
+    action: MarkerNodeActionEntityPlacement.from(ebpBuffObjectCampfire, Transform.fromJSON({
+        scale: { x: 1, y: 1, z: 1 },
+        position: { x: 0, y: 0, z: 0 }
+    }))
 }));
-ebpFoliageTree0.add(Transform.fromJSON({}));
-ebpFoliageTree0.add(new ClingToTerrain())
 
-const nrFoliageTree0 = new MarkerProcessingRule();
-
-nrFoliageTree0.consume = true;
-nrFoliageTree0.matcher = MarkerNodeMatcherByType.from('Tree-0');
-nrFoliageTree0.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree0, Transform.fromJSON({
-    scale: { x: 1.2, y: 1.2, z: 1.2 },
-    position: { x: 0, y: 0, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrFoliageTree0);
-
-const ebpFoliageTree1 = new EntityBlueprint();
-ebpFoliageTree1.add(Mesh.fromJSON({
-    url: 'data/models/LowPolyTownshipSet/Tree_1/Tree_1.gltf',
-    dropShadow: true,
-    receiveShadow: true
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Tree-0'),
+    action: MarkerNodeActionEntityPlacement.from(
+        EntityBlueprint.from([
+            Mesh.fromJSON({
+                url: 'data/models/LowPolyTownshipSet/Tree_2/Tree_2.gltf',
+                dropShadow: true,
+                receiveShadow: true
+            }),
+            Transform.fromJSON({}),
+            new ClingToTerrain()
+        ]),
+        Transform.fromJSON({
+            scale: { x: 1.2, y: 1.2, z: 1.2 },
+            position: { x: 0, y: 0, z: 0 }
+        }))
 }));
-ebpFoliageTree1.add(Transform.fromJSON({}));
-ebpFoliageTree1.add(new ClingToTerrain())
 
-const nrFoliageTree1 = new MarkerProcessingRule();
-
-nrFoliageTree1.consume = true;
-nrFoliageTree1.matcher = MarkerNodeMatcherByType.from('Tree-1');
-
-nrFoliageTree1.actions.push(MarkerNodeActionEntityPlacement.from(ebpFoliageTree1, Transform.fromJSON({
-    scale: { x: 1, y: 1, z: 1 },
-    position: { x: 0, y: 0, z: 0 }
-})));
-
-SampleTheme0.nodes.add(nrFoliageTree1);
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Tree-1'),
+    action: MarkerNodeActionEntityPlacement.from(
+        EntityBlueprint.from([
+            Mesh.fromJSON({
+                url: 'data/models/LowPolyTownshipSet/Tree_1/Tree_1.gltf',
+                dropShadow: true,
+                receiveShadow: true
+            }),
+            Transform.fromJSON({}),
+            new ClingToTerrain()
+        ]),
+        Transform.fromJSON({
+            scale: { x: 1, y: 1, z: 1 },
+            position: { x: 0, y: 0, z: 0 }
+        }))
+}));
 
 
 //HEIGHT

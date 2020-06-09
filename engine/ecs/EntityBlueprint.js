@@ -11,6 +11,23 @@ export class EntityBlueprint {
 
     /**
      *
+     * @param {[]} components
+     * @returns {EntityBlueprint}
+     */
+    static from(components = []) {
+        const r = new EntityBlueprint();
+
+        for (let i = 0; i < components.length; i++) {
+            const component = components[i];
+
+            r.add(component);
+        }
+
+        return r;
+    }
+
+    /**
+     *
      * @param {Object} component
      */
     add(component) {

@@ -83,15 +83,7 @@ export class MarkerNodeProcessingRuleSet {
                 assert.defined(_node, '_node');
             }
 
-            const actions = rule.actions;
-
-            const nActions = actions.length;
-
-            for (let k = 0; k < nActions; k++) {
-                const action = actions[k];
-
-                action.execute(grid, ecd, _node);
-            }
+            rule.action.execute(grid, ecd, _node);
 
             if (rule.consume) {
                 //consuming rule, stop here, no more rules can be applies as node is considered to have been "consumed"
