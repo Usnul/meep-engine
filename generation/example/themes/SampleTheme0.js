@@ -38,6 +38,8 @@ import { CellFilterSmoothStep } from "../../filtering/math/CellFilterSmoothStep.
 import { CellFilterInverseLerp } from "../../filtering/math/CellFilterInverseLerp.js";
 import { CellFilterAdd } from "../../filtering/math/algebra/CellFilterAdd.js";
 import { CellFilterNegate } from "../../filtering/math/algebra/CellFilterNegate.js";
+import { MarkerNodeActionWeightedElement } from "../../markers/actions/probability/MarkerNodeActionWeightedElement.js";
+import { MarkerNodeActionSelectWeighted } from "../../markers/actions/probability/MarkerNodeActionSelectWeighted.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -351,31 +353,31 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     }))
 }));
 
-const ebpBuffObjectCampfire = new EntityBlueprint();
-ebpBuffObjectCampfire.add(Mesh.fromJSON({
-    url: 'data/models/MOBA and Tower Defense/Campfire.gltf',
-    dropShadow: true,
-    receiveShadow: true
-}));
-ebpBuffObjectCampfire.add(new Tag());
-ebpBuffObjectCampfire.add(new HeadsUpDisplay());
-ebpBuffObjectCampfire.add(new ViewportPosition());
-ebpBuffObjectCampfire.add(GUIElement.fromJSON({
-    parameters: {
-        id: 'Campfire',
-        classList: "__debug-plaque"
-    },
-    klass: 'view.LocalizedLabel'
-}));
-ebpBuffObjectCampfire.add(Transform.fromJSON({}));
-ebpBuffObjectCampfire.add(GridPosition.fromJSON({}));
-
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Campfire'),
-    action: MarkerNodeActionEntityPlacement.from(ebpBuffObjectCampfire, Transform.fromJSON({
-        scale: { x: 1, y: 1, z: 1 },
-        position: { x: 0, y: 0, z: 0 }
-    }))
+    action: MarkerNodeActionEntityPlacement.from(
+        EntityBlueprint.from([
+            Mesh.fromJSON({
+                url: 'data/models/MOBA and Tower Defense/Campfire.gltf',
+                dropShadow: true,
+                receiveShadow: true
+            }),
+            new HeadsUpDisplay(),
+            new ViewportPosition(),
+            GUIElement.fromJSON({
+                parameters: {
+                    id: 'Campfire',
+                    classList: "__debug-plaque"
+                },
+                klass: 'view.LocalizedLabel'
+            }),
+            Transform.fromJSON({}),
+            GridPosition.fromJSON({})
+        ]),
+        Transform.fromJSON({
+            scale: { x: 1, y: 1, z: 1 },
+            position: { x: 0, y: 0, z: 0 }
+        }))
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
@@ -412,6 +414,49 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
             scale: { x: 1, y: 1, z: 1 },
             position: { x: 0, y: 0, z: 0 }
         }))
+}));
+
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Mushroom-0'),
+    action: MarkerNodeActionSelectWeighted.from([
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Mushroom3B.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 1, y: 1, z: 1 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Mushroom4B.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 1.5, y: 1.5, z: 1.5 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        )
+    ]),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1))
+    ]
 }));
 
 

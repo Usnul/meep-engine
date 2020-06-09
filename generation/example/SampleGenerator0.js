@@ -36,7 +36,6 @@ import { CellFilterGaussianBlur } from "../filtering/complex/CellFilterGaussianB
 import { GridCellActionSequence } from "../placement/GridCellActionSequence.js";
 import { CellFilterStep } from "../filtering/math/CellFilterStep.js";
 import { CellFilterReadGridLayer } from "../filtering/CellFilterReadGridLayer.js";
-import { MarkerNodeTransformerAddPositionYFromFilter } from "../markers/transform/MarkerNodeTransformerAddPositionYFromFilter.js";
 import { CellFilterAngleToNormal } from "../filtering/complex/CellFilterAngleToNormal.js";
 import Vector3 from "../../core/geom/Vector3.js";
 import { CellFilterOneMinus } from "../filtering/math/CellFilterOneMinus.js";
@@ -237,7 +236,7 @@ const fTreeArea = CellFilterMultiply.from(
     )
 );
 
-const gTrees = GridTaskSequence.from([
+const gFoliageLarge = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
             fTreeArea,
@@ -246,11 +245,7 @@ const gTrees = GridTaskSequence.from([
         GridCellActionPlaceMarker.from({
             type: 'Tree-0',
             size: 0.565,
-            transformers: [
-                MarkerNodeTransformerAddPositionYFromFilter.from(
-                    fReadHeight
-                )
-            ]
+            transformers: []
         }),
         new NumericInterval(1.21, 1.4)
     ),
@@ -259,13 +254,24 @@ const gTrees = GridTaskSequence.from([
         GridCellActionPlaceMarker.from({
             type: 'Tree-1',
             size: 0.5,
-            transformers: [
-                MarkerNodeTransformerAddPositionYFromFilter.from(
-                    fReadHeight
-                )
-            ]
+            transformers: []
         }),
         new NumericInterval(0.77, 1.2)
+    )
+]);
+
+const gFoliageSmall = GridTaskSequence.from([
+    GridTaskDensityMarkerDistribution.from(
+        CellFilterMultiply.from(
+            fTreeArea,
+            CellFilterConstant.from(1)
+        ),
+        GridCellActionPlaceMarker.from({
+            type: 'Mushroom-0',
+            size: 0.5,
+            transformers: []
+        }),
+        new NumericInterval(0.17, 0.25)
     )
 ]);
 
@@ -292,34 +298,34 @@ mHeightArea.addRule(1, 1, matcher_not_play_area);
 
 mHeightArea.addRule(0, 2, matcher_not_play_area);
 
-const aWriteHeight = GridCellActionWriteFilterToLayer.from(
-    MirGridLayers.Heights,
-
-    CellFilterLerp.from(
-        CellFilterConstant.from(0),
-        CellFilterLerp.from(
-            CellFilterConstant.from(-2),
-            CellFilterConstant.from(7),
-            CellFilterMultiply.from(
-                CellFilterSimplexNoise.from(30, 30),
-                CellFilterSimplexNoise.from(13, 13)
-            )
-        ),
-        CellFilterGaussianBlur.from(
-            CellFilterCellMatcher.from(
-                mHeightArea
-            ),
-            1.5,
-            1.5
-        )
-    )
-);
-
 const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
     [
         GridCellPlacementRule.from(
             CellMatcherAny.INSTANCE,
-            [aWriteHeight]
+            [
+                GridCellActionWriteFilterToLayer.from(
+                    MirGridLayers.Heights,
+
+                    CellFilterLerp.from(
+                        CellFilterConstant.from(0),
+                        CellFilterLerp.from(
+                            CellFilterConstant.from(-2),
+                            CellFilterConstant.from(7),
+                            CellFilterMultiply.from(
+                                CellFilterSimplexNoise.from(30, 30),
+                                CellFilterSimplexNoise.from(13, 13)
+                            )
+                        ),
+                        CellFilterGaussianBlur.from(
+                            CellFilterCellMatcher.from(
+                                mHeightArea
+                            ),
+                            1.5,
+                            1.5
+                        )
+                    )
+                )
+            ]
         )
     ]
 ), 1);
@@ -327,7 +333,7 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
 
 gHeights.addDependency(gConnectRooms);
 
-gTrees.addDependencies([
+gFoliageLarge.addDependencies([
     gMakeEmpty,
     gConnectRooms,
     gHeights,
@@ -338,6 +344,9 @@ gTrees.addDependencies([
     gBuffObjects,
     gBases
 ]);
+
+gFoliageSmall.addDependencies([gFoliageLarge]);
+
 gDrawLayerMoisture.addDependencies([gHeights]);
 
 SampleGenerator0.addGenerator(gHeights);
@@ -353,4 +362,5 @@ SampleGenerator0.addGenerator(gBuildDistanceMap);
 SampleGenerator0.addGenerator(gRuleSet1);
 SampleGenerator0.addGenerator(gRuleSet2);
 SampleGenerator0.addGenerator(gRuleSetTreasureGuards);
-SampleGenerator0.addGenerator(gTrees);
+SampleGenerator0.addGenerator(gFoliageLarge);
+SampleGenerator0.addGenerator(gFoliageSmall);

@@ -32,7 +32,7 @@ export class MarkerNodeActionSequence extends MarkerNodeAction {
         for (let i = 0; i < n; i++) {
             const action = actions[i];
 
-            action.initialize(grid, seed);
+            action.initialize(grid, seed + i);
         }
     }
 

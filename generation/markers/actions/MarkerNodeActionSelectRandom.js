@@ -21,7 +21,7 @@ export class MarkerNodeActionSelectRandom extends MarkerNodeAction {
      * @param {MarkerNodeAction[]} elements
      * @returns {MarkerNodeActionSelectRandom}
      */
-    static from(elements){
+    static from(elements) {
         const r = new MarkerNodeActionSelectRandom();
 
         r.elements = elements;
@@ -38,7 +38,7 @@ export class MarkerNodeActionSelectRandom extends MarkerNodeAction {
         for (let i = 0; i < n; i++) {
             const action = actions[i];
 
-            action.initialize(grid, seed);
+            action.initialize(grid, seed + i);
         }
 
         this.__random.setCurrentSeed(seed);

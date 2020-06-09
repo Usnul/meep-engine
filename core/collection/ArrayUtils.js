@@ -36,11 +36,12 @@ export function randomizeArrayElementOrder(array, random) {
  * @param {T[]} array
  * @param {T} el
  * @param {function(T,T):number} compareFunction
+ * @param {number} [minIndex]
+ * @param {number} [maxIndex]
  * @return {number} Index
  */
-export function binarySearchLowIndex(array, el, compareFunction) {
-    let minIndex = 0;
-    let maxIndex = array.length - 1;
+export function binarySearchLowIndex(array, el, compareFunction, minIndex = 0, maxIndex = array.length - 1) {
+
     let currentIndex;
 
     while (minIndex <= maxIndex) {

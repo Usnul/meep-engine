@@ -34,6 +34,10 @@ export class GridTaskSequence extends GridTaskGenerator {
         for (let i = 0; i < n; i++) {
             const child = children[i];
 
+            if (child.dependencies.length > 0) {
+                throw new Error('Children are not allowed to have dependencies');
+            }
+
             const task = child.build(grid, ecd, seed);
 
             if (tasks.length > 0) {
