@@ -84,6 +84,7 @@ export class MarkerNodeActionSelectWeighted extends MarkerNodeAction {
 
             const weightValue = weightFilter.execute(grid, nodePosition.x, nodePosition.y, 0);
 
+
             if (weightValue > 0) {
                 //if the weight is negative, we clamp it to 0
 
@@ -91,6 +92,7 @@ export class MarkerNodeActionSelectWeighted extends MarkerNodeAction {
             }
 
             evaluatedWeights[i] = totalWeight;
+
         }
 
         const targetWeight = this.__random() * totalWeight;

@@ -434,7 +434,10 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     scale: { x: 1, y: 1, z: 1 },
                     position: { x: 0, y: 0, z: 0 }
                 })),
-            CellFilterConstant.from(1)
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(20, 20, 507),
+                CellFilterSimplexNoise.from(30, 30, 1000)
+            )
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
@@ -451,7 +454,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     scale: { x: 1.5, y: 1.5, z: 1.5 },
                     position: { x: 0, y: 0, z: 0 }
                 })),
-            CellFilterConstant.from(1)
+            CellFilterSimplexNoise.from(30, 30, 10050)
         )
     ]),
     transformers: [

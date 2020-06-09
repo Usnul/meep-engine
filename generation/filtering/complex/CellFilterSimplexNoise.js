@@ -20,25 +20,34 @@ export class CellFilterSimplexNoise extends CellFilter {
 
         this.scale_x = 1;
         this.scale_y = 1;
+
+        /**
+         * RNG Seed offset
+         * @type {number}
+         * @private
+         */
+        this.__seed = 0;
     }
 
     /**
      *
      * @param {number} scale_x
      * @param {number} scale_y
+     * @param {number} [seed]
      * @returns {CellFilterSimplexNoise}
      */
-    static from(scale_x, scale_y) {
+    static from(scale_x, scale_y, seed = 0) {
         const r = new CellFilterSimplexNoise();
 
         r.scale_x = scale_x;
         r.scale_y = scale_y;
+        r.__seed = seed;
 
         return r;
     }
 
     initialize(grid, seed) {
-        this.random.setCurrentSeed(seed);
+        this.random.setCurrentSeed(seed + this.__seed);
 
         const noise = new SimplexNoise(this.random);
 

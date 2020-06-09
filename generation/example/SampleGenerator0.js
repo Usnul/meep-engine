@@ -228,8 +228,8 @@ const fTreeArea = CellFilterMultiply.from(
         // Filter areas with sharp slopes
         CellFilterOneMinus.from(
             CellFilterSmoothStep.from(
-                CellFilterConstant.from(Math.PI / 7.5),
-                CellFilterConstant.from(Math.PI / 2),
+                CellFilterConstant.from(Math.PI / 2.4),
+                CellFilterConstant.from(Math.PI / 2.1),
                 CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
             )
         )
