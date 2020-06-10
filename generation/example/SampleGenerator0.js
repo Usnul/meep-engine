@@ -264,14 +264,28 @@ const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
             fTreeArea,
-            CellFilterConstant.from(1)
+            CellFilterConstant.from(0.02)
+        ),
+        GridCellActionPlaceMarker.from({
+            type: 'Mushroom-1',
+            size: 0.5,
+            transformers: []
+        }),
+        new NumericInterval(0.3, 0.37),
+        42
+    ),
+    GridTaskDensityMarkerDistribution.from(
+        CellFilterMultiply.from(
+            fTreeArea,
+            CellFilterConstant.from(0.05)
         ),
         GridCellActionPlaceMarker.from({
             type: 'Mushroom-0',
             size: 0.5,
             transformers: []
         }),
-        new NumericInterval(0.17, 0.25)
+        new NumericInterval(0.17, 0.25),
+        9000234
     )
 ]);
 

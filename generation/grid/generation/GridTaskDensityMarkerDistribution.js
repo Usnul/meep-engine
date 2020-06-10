@@ -5,6 +5,7 @@ import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import { NumericInterval } from "../../../core/math/interval/NumericInterval.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../../core/assert.js";
+import { computeStatisticalMean } from "../../../core/math/statistics/computeStatisticalMean.js";
 
 
 /**
@@ -16,6 +17,7 @@ function estimateDensityTarget(radius) {
 
     return area;
 }
+
 
 export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
     constructor() {
@@ -38,6 +40,13 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
          * @type {NumericInterval}
          */
         this.scale = new NumericInterval(1, 1);
+
+        /**
+         * RNG seed offset
+         * @type {number}
+         * @private
+         */
+        this.__seed = 0;
     }
 
     /**
@@ -45,8 +54,9 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
      * @param {CellFilter} density
      * @param {GridCellActionPlaceMarker} action
      * @param {NumericInterval} scale
+     * @param {number} [seed]
      */
-    static from(density, action, scale) {
+    static from(density, action, scale, seed = 0) {
         assert.ok(density.isCellFilter, 'density.isCellFilter');
         assert.ok(action.isGridCellActionPlaceMarker, 'action.isGridCellActionPlaceMarker');
         assert.ok(scale.isNumericInterval, 'scale.isNumericInterval');
@@ -57,17 +67,110 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
         r.action = action;
         r.density = density;
 
+        r.__seed = seed;
+
         return r;
     }
 
+
+    /**
+     *
+     * @param {GridData} grid
+     */
+    estimateTapCount(grid) {
+        const random = seededRandom(99);
+
+        /*
+            for tap count we ween 3 things:
+                1) size of the field
+                2) average density
+                3) average size of the marker
+         */
+
+        const width = grid.width;
+        const height = grid.height;
+
+        const gridSize = width * height;
+
+        const SAMPLE_SIZE = 100;
+
+        const x_max = width - 1;
+        const y_max = height - 1;
+
+        const samplesDensity = [];
+
+        //we will make some samples to determine density
+        for (let i = 0; i < SAMPLE_SIZE; i++) {
+            const u = random();
+            const v = random();
+
+            const x = u * x_max;
+            const y = v * y_max;
+
+            const density = this.density.execute(grid, x, y, 0);
+
+            if (density < 0) {
+                samplesDensity.push(0);
+            } else {
+                samplesDensity.push(density);
+            }
+
+        }
+
+        const samplesSize = [];
+
+        const SIZE_SAMPLE_LIMIT = 10000;
+
+        for (let i = 0; i < SIZE_SAMPLE_LIMIT; i++) {
+            const u = random();
+            const v = random();
+
+            const x = u * x_max;
+            const y = v * y_max;
+
+            const density = this.density.execute(grid, x, y, 0);
+
+            if (density <= 0) {
+                samplesDensity.push(0);
+                continue;
+            }
+
+            samplesDensity.push(density);
+
+            const node = this.action.buildNode(grid, x, y, 0);
+
+            const markerScale = this.scale.sampleRandom(random);
+
+            //modify size and scale
+            node.size *= markerScale;
+
+            samplesSize.push(node.size);
+
+            if (samplesSize.length >= SAMPLE_SIZE) {
+                break;
+            }
+        }
+
+        const meanDensity = computeStatisticalMean(samplesDensity);
+        const meanNodeSize = samplesSize.length > 0 ? computeStatisticalMean(samplesSize) : 1;
+
+        //compute relative density per unit square of a single marker
+        const meanSingleNodeDensity = estimateDensityTarget(meanNodeSize);
+
+        return gridSize / meanSingleNodeDensity;
+    }
+
+
     build(grid, ecd, seed) {
+
+        //we want to estimate average size of a marker
 
         let rejectedSampleBudget = 100;
 
         let iterationLimit = 0;
         let iteration = 0;
 
-        const random = seededRandom(seed);
+        const random = seededRandom(seed + this.__seed);
 
         /**
          *
@@ -88,6 +191,8 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
         const scale = this.scale;
 
         const SUB_SAMPLE_COUNT = 8;
+
+        const self = this;
 
         /**
          * @returns {TaskSignal}
@@ -148,26 +253,12 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             }
 
-            // the way iteration is set up, we aim to update the iteration limit based on actual area taken up by the placed marker with respect to target density
-            const actualDensity = estimateDensityTarget(node.size);
-
-            // Compute deviation in number of samples using actual density and desired density
-            const sampleCountError = densityValue / actualDensity;
-
-            iterationLimit += sampleCountError * SUB_SAMPLE_COUNT;
-
             grid.addMarker(node);
 
             return TaskSignal.Continue;
         }
 
         function initializer() {
-
-            iterationLimit = grid.height * grid.width * SUB_SAMPLE_COUNT;
-            iteration = 0;
-
-            rejectedSampleBudget = iterationLimit * 0.15;
-
             if (!density.initialized) {
                 density.initialize(grid, seed);
             }
@@ -175,6 +266,11 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             action.initialize(grid, seed);
 
             random.setCurrentSeed(seed);
+
+            iterationLimit = self.estimateTapCount(grid);
+            iteration = 0;
+
+            rejectedSampleBudget = iterationLimit * 0.15;
         }
 
         return new Task({

@@ -431,7 +431,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     new ClingToTerrain()
                 ]),
                 Transform.fromJSON({
-                    scale: { x: 1, y: 1, z: 1 },
+                    scale: { x: 1.41, y: 1.41, z: 1.41 },
                     position: { x: 0, y: 0, z: 0 }
                 })),
             CellFilterMultiply.from(
@@ -451,7 +451,53 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     new ClingToTerrain()
                 ]),
                 Transform.fromJSON({
-                    scale: { x: 1.5, y: 1.5, z: 1.5 },
+                    scale: { x: 2.2, y: 2.2, z: 2.2 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 30, 10050)
+        )
+    ]),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1))
+    ]
+}));
+
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Mushroom-1'),
+    action: MarkerNodeActionSelectWeighted.from([
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Mushroom3A.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 1, y: 1, z: 1 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(20, 20, 507),
+                CellFilterSimplexNoise.from(30, 30, 1000)
+            )
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Mushroom4A.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 1.3, y: 1.3, z: 1.3 },
                     position: { x: 0, y: 0, z: 0 }
                 })),
             CellFilterSimplexNoise.from(30, 30, 10050)

@@ -3,7 +3,7 @@ import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
-import { actionTask, countTask } from "../../core/process/task/TaskUtils.js";
+import { actionTask, countTask, emptyTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import Task from "../../core/process/task/Task.js";
@@ -467,6 +467,16 @@ export class ThemeEngine {
 
     /**
      *
+     * @returns {TaskGroup}
+     * @param {EntityComponentDataset} ecd
+     */
+    optimize(ecd) {
+
+        return new TaskGroup([emptyTask()]);
+    }
+
+    /**
+     *
      * @param {GridData} grid
      * @param {EntityComponentDataset} ecd
      * @returns {TaskGroup}
@@ -486,6 +496,8 @@ export class ThemeEngine {
         tNodes.addDependency(tInitializeThemes);
         tCells.addDependency(tInitializeThemes);
 
+        const tOptimize = this.optimize(ecd);
+
         const tUpdateTerrain = this.updateTerrain(terrain);
 
         tUpdateTerrain.addDependencies([
@@ -494,6 +506,14 @@ export class ThemeEngine {
             tCells
         ]);
 
-        return new TaskGroup([tInitializeThemes, tTerrain, tNodes, tCells, tUpdateTerrain]);
+        tOptimize.addDependencies([
+            tUpdateTerrain,
+            tTerrain,
+            tNodes,
+            tCells,
+            tInitializeThemes
+        ]);
+
+        return new TaskGroup([tInitializeThemes, tTerrain, tNodes, tCells, tUpdateTerrain, tOptimize]);
     }
 }
