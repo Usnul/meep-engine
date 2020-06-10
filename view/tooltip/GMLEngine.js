@@ -31,13 +31,13 @@ function compileReferenceAction(values, database, localization, gml, tooltips) {
 
 /**
  *
- * @param {object} values
+ * @param {string} id
  * @param {StaticKnowledgeDatabase} database
  * @param {Localization} localization
  * @param {GMLEngine} gml
  * @param {DomTooltipManager} tooltips
  */
-function compileReferenceCreature(values, database, localization, gml, tooltips) {
+function compileReferenceCreature({ id }, database, localization, gml, tooltips) {
     /**
      *
      * @type {CombatUnitDescription}
