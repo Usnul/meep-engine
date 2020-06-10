@@ -508,6 +508,91 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     ]
 }));
 
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Stone-0'),
+    action: MarkerNodeActionSelectWeighted.from([
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_1.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    ClingToTerrain.fromJSON({
+                        normalAlign: true
+                    })
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 10, y: 10, z: 10 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_2.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    ClingToTerrain.fromJSON({
+                        normalAlign: true
+                    })
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 12, y: 12, z: 12 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_3.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    ClingToTerrain.fromJSON({
+                        normalAlign: true
+                    })
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 12, y: 12, z: 12 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_4.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    ClingToTerrain.fromJSON({
+                        normalAlign: true
+                    })
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 12, y: 12, z: 12 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterConstant.from(1)
+        )
+    ]),
+    transformers: [
+        MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1))
+    ]
+}));
+
 
 //HEIGHT
 // ====================

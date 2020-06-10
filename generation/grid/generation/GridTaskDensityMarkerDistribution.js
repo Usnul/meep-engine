@@ -6,6 +6,7 @@ import { NumericInterval } from "../../../core/math/interval/NumericInterval.js"
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../../core/assert.js";
 import { computeStatisticalMean } from "../../../core/math/statistics/computeStatisticalMean.js";
+import { computeSampleSize_Cochran } from "../../../core/math/statistics/computeSampleSize_Cochran.js";
 
 
 /**
@@ -92,34 +93,18 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
         const gridSize = width * height;
 
-        const SAMPLE_SIZE = 100;
+        const SAMPLE_SIZE = 60 + gridSize * 0.01;
 
         const x_max = width - 1;
         const y_max = height - 1;
 
+        const samplesCollisions = [];
+
         const samplesDensity = [];
-
-        //we will make some samples to determine density
-        for (let i = 0; i < SAMPLE_SIZE; i++) {
-            const u = random();
-            const v = random();
-
-            const x = u * x_max;
-            const y = v * y_max;
-
-            const density = this.density.execute(grid, x, y, 0);
-
-            if (density < 0) {
-                samplesDensity.push(0);
-            } else {
-                samplesDensity.push(density);
-            }
-
-        }
 
         const samplesSize = [];
 
-        const SIZE_SAMPLE_LIMIT = 10000;
+        const SIZE_SAMPLE_LIMIT = 10 + SAMPLE_SIZE * 3;
 
         for (let i = 0; i < SIZE_SAMPLE_LIMIT; i++) {
             const u = random();
@@ -128,14 +113,13 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             const x = u * x_max;
             const y = v * y_max;
 
-            const density = this.density.execute(grid, x, y, 0);
-
-            if (density <= 0) {
-                samplesDensity.push(0);
-                continue;
-            }
+            const density = clamp(this.density.execute(grid, x, y, 0), 0, 1);
 
             samplesDensity.push(density);
+
+            if (density <= 0) {
+                continue;
+            }
 
             const node = this.action.buildNode(grid, x, y, 0);
 
@@ -146,10 +130,22 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             samplesSize.push(node.size);
 
+
+            const overlap = grid.containsMarkerInCircle(x, y, node.size, MarkerNodeMatcherAny.INSTANCE);
+
+            if (overlap) {
+                //collision
+                samplesCollisions.push(1);
+            } else {
+                samplesCollisions.push(0);
+            }
+
             if (samplesSize.length >= SAMPLE_SIZE) {
                 break;
             }
         }
+
+        const collisionProbability = computeStatisticalMean(samplesCollisions);
 
         const meanDensity = computeStatisticalMean(samplesDensity);
         const meanNodeSize = samplesSize.length > 0 ? computeStatisticalMean(samplesSize) : 1;
@@ -157,7 +153,14 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
         //compute relative density per unit square of a single marker
         const meanSingleNodeDensity = estimateDensityTarget(meanNodeSize);
 
-        return gridSize / meanSingleNodeDensity;
+        const oversampleMultiplier = meanDensity < 1 ? computeSampleSize_Cochran(1.95996, meanDensity, 0.05) : 1;
+
+        const saturationTapCount = gridSize / meanSingleNodeDensity;
+
+        // it is possible that a tap will collide with other existing nodes, in which situation the tap is rejected, to account for that we want to estimate how often this will happen and increase the tap count accordingly
+        const collisionCompensation = clamp(1 / (1 - collisionProbability), 1, 10);
+
+        return saturationTapCount * collisionCompensation;
     }
 
 

@@ -43,6 +43,7 @@ import { CellFilterSmoothStep } from "../filtering/math/CellFilterSmoothStep.js"
 import { SampleNoise20_0 } from "./filters/SampleNoise20_0.js";
 import { SampleGroundMoistureFilter } from "./filters/SampleGroundMoistureFilter.js";
 import { GridTaskSequence } from "../grid/generation/GridTaskSequence.js";
+import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -285,6 +286,40 @@ const gFoliageSmall = GridTaskSequence.from([
             transformers: []
         }),
         new NumericInterval(0.17, 0.25),
+        9000234
+    ),
+    GridTaskDensityMarkerDistribution.from(
+        CellFilterMultiply.from(
+            CellFilterSubtract.from(
+                CellFilterGaussianBlur.from(
+                    CellFilterSmoothStep.from(
+                        CellFilterConstant.from(Math.PI / 2.2),
+                        CellFilterConstant.from(Math.PI / 2),
+                        CellFilterAngleToNormal.from(
+                            CellFilterReadGridLayer.from(MirGridLayers.Heights),
+                            Vector3.forward
+                        )
+                    ),
+                    3,
+                    3
+                ),
+                CellFilterSmoothStep.from(
+                    CellFilterConstant.from(Math.PI / 2.2),
+                    CellFilterConstant.from(Math.PI / 2),
+                    CellFilterAngleToNormal.from(
+                        CellFilterReadGridLayer.from(MirGridLayers.Heights),
+                        Vector3.forward
+                    )
+                )
+            ),
+            CellFilterConstant.from(0.1)
+        ),
+        GridCellActionPlaceMarker.from({
+            type: 'Stone-0',
+            size: 0.5,
+            transformers: []
+        }),
+        new NumericInterval(0.15, 0.35),
         9000234
     )
 ]);
