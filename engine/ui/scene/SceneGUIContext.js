@@ -55,8 +55,8 @@ function initializeNotifications(manager) {
         const animationTrack = new AnimationTrack(["alpha", "position.y", "scale"]);
         animationTrack.addKey(0, [0.2, 0, 1.1]);
         animationTrack.addKey(0.17, [1, 0, 1]);
-        animationTrack.addKey(3, [1, -60, 1]);
-        animationTrack.addKey(3.5, [0, -70, 1]);
+        animationTrack.addKey(3.2, [1, -60, 1]);
+        animationTrack.addKey(3.7, [0, -70, 1]);
 
         animationTrack.addTransition(0, TransitionFunctions.EaseIn);
         animationTrack.addTransition(1, TransitionFunctions.Linear);
@@ -85,7 +85,7 @@ function initializeNotifications(manager) {
 
 
     function makeToast() {
-        const displayDuration = 7;
+        const displayDuration = 7.5;
 
         const viewEmitter = new ViewEmitter();
         viewEmitter.setRushThreshold(5);
