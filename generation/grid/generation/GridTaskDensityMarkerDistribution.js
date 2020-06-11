@@ -6,7 +6,6 @@ import { NumericInterval } from "../../../core/math/interval/NumericInterval.js"
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../../core/assert.js";
 import { computeStatisticalMean } from "../../../core/math/statistics/computeStatisticalMean.js";
-import { computeSampleSize_Cochran } from "../../../core/math/statistics/computeSampleSize_Cochran.js";
 
 
 /**
@@ -147,13 +146,10 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
         const collisionProbability = computeStatisticalMean(samplesCollisions);
 
-        const meanDensity = computeStatisticalMean(samplesDensity);
         const meanNodeSize = samplesSize.length > 0 ? computeStatisticalMean(samplesSize) : 1;
 
         //compute relative density per unit square of a single marker
         const meanSingleNodeDensity = estimateDensityTarget(meanNodeSize);
-
-        const oversampleMultiplier = meanDensity < 1 ? computeSampleSize_Cochran(1.95996, meanDensity, 0.05) : 1;
 
         const saturationTapCount = gridSize / meanSingleNodeDensity;
 
@@ -192,8 +188,6 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
          * @type {NumericInterval}
          */
         const scale = this.scale;
-
-        const SUB_SAMPLE_COUNT = 8;
 
         const self = this;
 
