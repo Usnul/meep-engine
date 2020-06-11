@@ -38,6 +38,27 @@ function TaskGroup(subtasks, name = 'Unnamed') {
 }
 
 /**
+ * Time in milliseconds that the task has been executing for, suspended time does not count
+ * @returns {number}
+ */
+TaskGroup.prototype.getExecutedCpuTime = function () {
+    let result = 0;
+
+    const children = this.children;
+    const n = children.length;
+
+    for (let i = 0; i < n; i++) {
+        const child = children[i];
+
+        const time = child.getExecutedCpuTime();
+
+        result += time;
+    }
+
+    return result;
+}
+
+/**
  *
  * @param {Task|TaskGroup} child
  * @returns {boolean}

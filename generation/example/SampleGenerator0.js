@@ -44,6 +44,7 @@ import { SampleNoise20_0 } from "./filters/SampleNoise20_0.js";
 import { SampleGroundMoistureFilter } from "./filters/SampleGroundMoistureFilter.js";
 import { GridTaskSequence } from "../grid/generation/GridTaskSequence.js";
 import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
+import { CellFilterCache } from "../filtering/CellFilterCache.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -209,29 +210,31 @@ const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
 
 const matcher_not_play_area = CellMatcherNot.from(CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags));
 
-const fTreeArea = CellFilterMultiply.from(
-    CellFilterMultiply.from(
-        SampleNoise20_0,
-        CellFilterReadGridLayer.from(MirGridLayers.Moisture)
-    ),
+const fTreeArea = CellFilterCache.from(
     CellFilterMultiply.from(
         CellFilterMultiply.from(
-            //filter out areas that are below height of 0
-            CellFilterStep.from(
-                CellFilterConstant.from(0),
-                fReadHeight
-            ),
-            //filter areas that are playable
-            CellFilterCellMatcher.from(
-                matcher_not_play_area
-            )
+            SampleNoise20_0,
+            CellFilterReadGridLayer.from(MirGridLayers.Moisture)
         ),
-        // Filter areas with sharp slopes
-        CellFilterOneMinus.from(
-            CellFilterSmoothStep.from(
-                CellFilterConstant.from(Math.PI / 2.4),
-                CellFilterConstant.from(Math.PI / 2.1),
-                CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
+        CellFilterMultiply.from(
+            CellFilterMultiply.from(
+                //filter out areas that are below height of 0
+                CellFilterStep.from(
+                    CellFilterConstant.from(0),
+                    fReadHeight
+                ),
+                //filter areas that are playable
+                CellFilterCellMatcher.from(
+                    matcher_not_play_area
+                )
+            ),
+            // Filter areas with sharp slopes
+            CellFilterOneMinus.from(
+                CellFilterSmoothStep.from(
+                    CellFilterConstant.from(Math.PI / 2.4),
+                    CellFilterConstant.from(Math.PI / 2.1),
+                    CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
+                )
             )
         )
     )
@@ -261,6 +264,17 @@ const gFoliageLarge = GridTaskSequence.from([
     )
 ]);
 
+const fSharpSlope = CellFilterCache.from(
+    CellFilterSmoothStep.from(
+        CellFilterConstant.from(Math.PI / 2.2),
+        CellFilterConstant.from(Math.PI / 2),
+        CellFilterAngleToNormal.from(
+            CellFilterReadGridLayer.from(MirGridLayers.Heights),
+            Vector3.forward
+        )
+    )
+);
+
 const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
@@ -289,30 +303,18 @@ const gFoliageSmall = GridTaskSequence.from([
         9000234
     ),
     GridTaskDensityMarkerDistribution.from(
-        CellFilterMultiply.from(
-            CellFilterSubtract.from(
-                CellFilterGaussianBlur.from(
-                    CellFilterSmoothStep.from(
-                        CellFilterConstant.from(Math.PI / 2.2),
-                        CellFilterConstant.from(Math.PI / 2),
-                        CellFilterAngleToNormal.from(
-                            CellFilterReadGridLayer.from(MirGridLayers.Heights),
-                            Vector3.forward
-                        )
+        CellFilterCache.from(
+            CellFilterMultiply.from(
+                CellFilterSubtract.from(
+                    CellFilterGaussianBlur.from(
+                        fSharpSlope,
+                        3,
+                        3
                     ),
-                    3,
-                    3
+                    fSharpSlope
                 ),
-                CellFilterSmoothStep.from(
-                    CellFilterConstant.from(Math.PI / 2.2),
-                    CellFilterConstant.from(Math.PI / 2),
-                    CellFilterAngleToNormal.from(
-                        CellFilterReadGridLayer.from(MirGridLayers.Heights),
-                        Vector3.forward
-                    )
-                )
-            ),
-            CellFilterConstant.from(0.1)
+                CellFilterConstant.from(0.1)
+            )
         ),
         GridCellActionPlaceMarker.from({
             type: 'Stone-0',

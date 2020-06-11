@@ -181,6 +181,8 @@ class ConcurrentExecutor {
      * @returns {boolean}
      */
     startTask(task) {
+        const timeInitializationStart = performance.now();
+
         try {
             task.initialize(task, this);
         } catch (e) {
@@ -191,6 +193,12 @@ class ConcurrentExecutor {
             task.on.failed.dispatch(e);
 
             return false;
+        } finally {
+            const timeInitializationEnd = performance.now();
+
+            const timeInitializationDuration = timeInitializationEnd - timeInitializationStart;
+
+            task.__executedCpuTime += timeInitializationDuration;
         }
 
         // console.log("Starting task", task);

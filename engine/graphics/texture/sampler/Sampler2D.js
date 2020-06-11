@@ -672,50 +672,60 @@ Sampler2D.prototype.sampleChannelBilinear = function (x, y, channel) {
 
     //sample 4 points
     const x_max = width - 1;
-    const x0 = clamp(x, 0, x_max) | 0;
-
     const y_max = height - 1;
-    const y0 = clamp(y, 0, y_max) | 0;
+
+    const clamped_x = clamp(x, 0, x_max);
+    const clamped_y = clamp(y, 0, y_max);
+
+    const x0 = clamped_x | 0;
+    const y0 = clamped_y | 0;
+
     //
     const row0 = y0 * rowSize;
-    const i0 = row0 + x0 * itemSize + channel;
+    const col0_offset = x0 * itemSize + channel;
+
+    const i0 = row0 + col0_offset;
 
     //
     let x1, y1;
 
-    if (x === x0 || x0 >= x_max) {
+    if (clamped_x === x0 || x0 >= x_max) {
         x1 = x0;
     } else {
         x1 = x0 + 1;
     }
 
 
-    if (y === y0 || y0 >= y_max) {
+    if (clamped_y === y0 || y0 >= y_max) {
         y1 = y0;
     } else {
         y1 = y0 + 1;
     }
 
-    const q0 = this.data[i0];
+    const data = this.data;
+
+    const q0 = data[i0];
 
     if (x0 === x1 && y0 === y1) {
         return q0;
     }
 
     //
-    const xd = x - x0;
-    const yd = y - y0;
+    const xd = clamped_x - x0;
+    const yd = clamped_y - y0;
 
-    const i1 = row0 + x1 * itemSize + channel;
+    const col1_offset = x1 * itemSize + channel;
+
+    const i1 = row0 + col1_offset;
 
     const row1 = y1 * rowSize;
 
-    const j0 = row1 + x0 * itemSize + channel;
-    const j1 = row1 + x1 * itemSize + channel;
+    const j0 = row1 + col0_offset;
+    const j1 = row1 + col1_offset;
 
-    const q1 = this.data[i1];
-    const p0 = this.data[j0];
-    const p1 = this.data[j1];
+    const q1 = data[i1];
+    const p0 = data[j0];
+    const p1 = data[j1];
 
     return filterFunctionBilinear(q0, q1, p0, p1, xd, yd);
 };
