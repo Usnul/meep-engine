@@ -143,7 +143,9 @@ void main(){
     );
     
     //this simulates scattering under water
-    float fogAmount = 1.0 - exp( - viewDepth * fScattering );
+    float scatteringFactor = 1.0 - exp( - viewDepth * fScattering );
+    
+    float fogAmount = scatteringFactor;
 
     gl_FragColor = color;
     
