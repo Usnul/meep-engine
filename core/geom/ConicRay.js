@@ -100,9 +100,9 @@ ConicRay.prototype.sampleRandomDirection = function (random, result) {
 
     const z = random() * (1 - angleCosine) + angleCosine;
 
-    const phi = random() * 2 * Math.PI;
+    const phi = random() * 6.28318530718; //2*pi
 
-    const zSqr = Math.pow(z, 2);
+    const zSqr = z * z;
 
     const zSqrtNeg = Math.sqrt(1 - zSqr);
 
@@ -133,7 +133,7 @@ ConicRay.prototype.sampleRandomDirection = function (random, result) {
     // [2] See https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
 
     //write matrix
-    const c = dZ; //TODO can we replace this with dZ?
+    const c = dZ;
     const s = Math.sin(rot);
     const t = 1 - c;
     const tx = -t * dY;
