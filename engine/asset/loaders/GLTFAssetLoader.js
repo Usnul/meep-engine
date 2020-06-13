@@ -348,7 +348,6 @@ export class GLTFAssetLoader extends AssetLoader{
                 //validate and optimize animations
                 animations.forEach(function (animation) {
                     if (animation.validate()) {
-                        // animation.optimize();
                         animationOptimizer.optimize(animation);
                     }
                 });
