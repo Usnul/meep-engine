@@ -112,7 +112,9 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             const x = u * x_max;
             const y = v * y_max;
 
-            const density = clamp(this.density.execute(grid, x, y, 0), 0, 1);
+            const densityValue = this.density.execute(grid, x, y, 0);
+
+            const density = clamp(densityValue, 0, 1);
 
             samplesDensity.push(density);
 
@@ -144,7 +146,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             }
         }
 
-        const collisionProbability = computeStatisticalMean(samplesCollisions);
+        const collisionProbability = samplesCollisions.length > 0 ? computeStatisticalMean(samplesCollisions) : 0.01;
 
         const meanNodeSize = samplesSize.length > 0 ? computeStatisticalMean(samplesSize) : 1;
 
@@ -266,6 +268,10 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             iterationLimit = self.estimateTapCount(grid);
             iteration = 0;
+
+            assert.isNumber(iterationLimit, 'iterationLimit');
+            assert.isFiniteNumber(iterationLimit, 'iterationLimit');
+            assert.ok(!Number.isNaN(iterationLimit), 'iterationLimit is NaN');
 
             rejectedSampleBudget = iterationLimit * 0.15;
         }

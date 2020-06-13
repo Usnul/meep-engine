@@ -3,7 +3,7 @@ import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
-import { actionTask, countTask, emptyTask } from "../../core/process/task/TaskUtils.js";
+import { actionTask, countTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import Task from "../../core/process/task/Task.js";
@@ -472,7 +472,13 @@ export class ThemeEngine {
      */
     optimize(ecd) {
 
-        return new TaskGroup([emptyTask()]);
+        const terrain = obtainTerrain(ecd);
+
+        const tLightMap = actionTask(() => {
+            terrain.buildLightMap();
+        });
+
+        return new TaskGroup([tLightMap]);
     }
 
     /**

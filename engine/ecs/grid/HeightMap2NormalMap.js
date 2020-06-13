@@ -3,10 +3,9 @@
  */
 
 import { Sampler2D } from '../../graphics/texture/sampler/Sampler2D.js';
-import sampler2D2Texture from '../../graphics/texture/sampler/Sampler2D2Texture.js';
 import NormalMapShader from '../../graphics/shaders/NormalMapShader2.js';
 import ImageFilter from '../../graphics/filter/ImageFilter.js';
-import { LinearFilter, Vector2 } from "three";
+import { sampler2DtoFloat32Texture } from "./sampler2DToFloat32Texture.js";
 
 
 function convertChannel(v) {
@@ -49,30 +48,27 @@ function rgbaArray2RGB(source) {
  *
  * @param {WebGLRenderer} renderer
  * @param {Sampler2D} sampler
- * @param {number} zRange
  * @returns {Sampler2D}
  */
-function heightMap2NormalMap(renderer, sampler, zRange) {
+function heightMap2NormalMap(renderer, sampler) {
+
     const width = sampler.width;
     const height = sampler.height;
 
-    const resolution = new Vector2(width, height);
+    const texture = sampler2DtoFloat32Texture(sampler);
 
-    const texture = sampler2D2Texture(sampler, 255 / zRange, zRange / 2);
-
-    texture.magFilter = LinearFilter;
-    texture.minFilter = LinearFilter;
-    texture.flipY = false;
     //construct shader
     const shader = new NormalMapShader();
-    shader.uniforms.height.value = zRange;
     shader.uniforms.heightMap.value = texture;
-    shader.uniforms.resolution.value = resolution;
+    shader.uniforms.resolution.value.set(width, height);
+
     //perform filtering
     const result = ImageFilter(renderer, width, height, shader);
+
     //create the sampler
     const array = result.array;
     const rgb = rgbaArray2RGB(array);
+
     //reduce array's alpha component
     return new Sampler2D(rgb, 3, width, height);
 }

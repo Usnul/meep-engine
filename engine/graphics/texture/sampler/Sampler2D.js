@@ -867,7 +867,9 @@ Sampler2D.prototype.makeArrayFiller = function (scale, offset) {
     }
 
     function fillDD3(index, array, x, y) {
+
         sampler.sampleBilinear(x, y, v4);
+
         array[index] = (v4[0] + offset) * scale | 0;
         array[index + 1] = (v4[1] + offset) * scale | 0;
         array[index + 2] = (v4[2] + offset) * scale | 0;
@@ -1364,6 +1366,8 @@ export function arrayConstructorByInstance(a) {
         return Int32Array;
     } else if (a instanceof Uint8Array) {
         return Uint8Array;
+    } else if (a instanceof Uint8ClampedArray) {
+        return Uint8ClampedArray;
     } else if (a instanceof Uint16Array) {
         return Uint16Array;
     } else if (a instanceof Uint32Array) {

@@ -53,8 +53,8 @@ const filterMoisture = CellFilterReadGridLayer.from(MirGridLayers.Moisture);
 
 const filterRock = CellFilterClamp.from(
     CellFilterSmoothStep.from(
-        CellFilterConstant.from(Math.PI / 2.2),
-        CellFilterConstant.from(Math.PI / 2),
+        CellFilterConstant.from(Math.PI / 5),
+        CellFilterConstant.from(Math.PI / 3.5),
         CellFilterAngleToNormal.from(
             CellFilterReadGridLayer.from(MirGridLayers.Heights),
             Vector3.forward

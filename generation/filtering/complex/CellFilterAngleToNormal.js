@@ -50,28 +50,28 @@ export class CellFilterAngleToNormal extends CellFilter {
         const filter = this.surface;
 
         //read surrounding points
-        const topLeft = filter.execute(grid, x - 1, y - 1, 0);
         const top = filter.execute(grid, x, y - 1, 0);
-        const topRight = filter.execute(grid, x + 1, y - 1, 0);
 
         const left = filter.execute(grid, x - 1, y, 0);
         const right = filter.execute(grid, x + 1, y, 0);
 
-        const bottomLeft = filter.execute(grid, x - 1, y + 1, 0);
         const bottom = filter.execute(grid, x, y + 1, 0);
-        const bottomRight = filter.execute(grid, x + 1, y + 1, 0);
 
         // compute gradients
-        const dX = (topRight + 2.0 * right + bottomRight) - (topLeft + 2.0 * left + bottomLeft);
-        const dY = (bottomLeft + 2.0 * bottom + bottomRight) - (topLeft + 2.0 * top + topRight);
+        const dX = (right) - (left);
+        const dY = (bottom) - (top);
 
         //normalize vector
-        const magnitude = Math.sqrt(dX * dX + dY * dY + 0.25);
+        const magnitude = Math.sqrt(dX * dX + dY * dY + 4);
 
         const _x = dX / magnitude;
         const _y = dY / magnitude;
-        const _z = 0.5 / magnitude;
+        const _z = 2 / magnitude;
 
-        return v3_angleBetween(this.reference.x, this.reference.y, this.reference.z, _x, _y, _z);
+        const reference = this.reference;
+
+        const angle = v3_angleBetween(reference.x, reference.y, reference.z, _x, _y, _z);
+
+        return angle;
     }
 }

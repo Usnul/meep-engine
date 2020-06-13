@@ -38,9 +38,7 @@ const NormalMapShader = function () {
         uniforms: {
 
             "heightMap": { type: "t", value: null },
-            "resolution": { type: "v2", value: new THREE.Vector2(512, 512) },
-            "scale": { type: "v2", value: new THREE.Vector2(1, 1) },
-            "height": { type: "f", value: 0.05 }
+            "resolution": { type: "v2", value: new THREE.Vector2(512, 512) }
 
         },
 
@@ -57,9 +55,10 @@ const NormalMapShader = function () {
 
         ].join("\n"),
 
+        /**
+         * Reference: https://stackoverflow.com/questions/49640250/calculate-normals-from-heightmap
+         */
         fragmentShader: [
-
-            "uniform float height;",
             "uniform vec2 resolution;",
             "uniform sampler2D heightMap;",
 
@@ -71,37 +70,16 @@ const NormalMapShader = function () {
             "   float uStep = 1.0/resolution.x;",
             "   float vStep = 1.0/resolution.y;",
             //
-            "   float current = texture2D( heightMap, vUv ).x;",
             //
             "   float top = texture2D( heightMap, vUv + vec2(0, -vStep)).x;",
             "   float bottom = texture2D( heightMap, vUv + vec2(0, +vStep)).x;",
             "   float left = texture2D( heightMap, vUv + vec2(-uStep, 0)).x;",
             "   float right = texture2D( heightMap, vUv + vec2(+uStep, 0)).x;",
             //
-            "   float topLeft = texture2D( heightMap, vUv + vec2(-uStep, -vStep)).x;",
-            "   float topRight = texture2D( heightMap, vUv + vec2(uStep, -vStep)).x;",
-            "   float bottomLeft = texture2D( heightMap, vUv + vec2(-uStep, vStep)).x;",
-            "   float bottomRight = texture2D( heightMap, vUv + vec2(uStep, vStep)).x;",
-            //////
-            //"   float xm = (right - current) + (current - left) + (topRight - current) / sqrt2 + (current - topLeft) / sqrt2 + (bottomRight - current) / sqrt2 + (current - bottomLeft) / sqrt2;",
-            //"   float ym = (bottom - current) + (current - top) + (bottomLeft - current) / sqrt2 + (bottomRight - current) / sqrt2 + (current - topLeft) / sqrt2 + (current - topRight) / sqrt2;",
-            //////
-            //"   xm = xm/6.0;",
-            //"   ym = ym/6.0;",
-            //////
-            //"   float f = sqrt(xm*xm + ym*ym);",
-            //"   float a = acos(f);",
-            //"   float d = sin(a);",
-            //
-            //"   vec3 n = normalize( vec3( xm, ym, d  ) );",
-            ////
-            //"vec3 va =  vec3(uStep, 0.0, -xm) ;",
-            //"vec3 vb =  vec3(0.0, vStep, ym);",
-            //"vec3 n = normalize(cross(va,vb));",
-            //sobel filter
-            "   float dX = (topRight + 2.0 * right + bottomRight) - (topLeft + 2.0 * left + bottomLeft);",
-            "   float dY = (bottomLeft + 2.0 * bottom + bottomRight) - (topLeft + 2.0 * top + topRight);",
-            "   float dZ = 0.5;",
+
+            "   float dX = (right ) - ( left);",
+            "   float dY = (  bottom ) - (  top);",
+            "   float dZ = 2.0;",
             "   vec3 n = normalize(vec3(dX, dY, dZ));",
 
             "   gl_FragColor = vec4( n*0.5+0.5, 1.0 );",

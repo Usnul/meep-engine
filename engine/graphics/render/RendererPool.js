@@ -5,7 +5,15 @@ function WebGLRendererPool() {
 }
 
 WebGLRendererPool.prototype.get = function (options) {
-    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('webgl2', { antialias: false });
+
+    const renderer = new WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        context
+    });
+
     this.used.add(renderer);
     return renderer;
 };

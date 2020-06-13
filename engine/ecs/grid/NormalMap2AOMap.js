@@ -9,6 +9,7 @@ import sampler2D2Texture from '../../graphics/texture/sampler/Sampler2D2Texture.
 import AmbientOcclusionShader from '../../graphics/shaders/AmbientOcclusionShader.js';
 import GaussianBlurShader from '../../graphics/shaders/GaussianBlurShader.js';
 import ImageFilter from '../../graphics/filter/ImageFilter.js';
+import { sampler2DtoFloat32Texture } from "./sampler2DToFloat32Texture.js";
 
 function filterResult2Texture(data, width, height) {
     const result = new THREE.DataTexture();
@@ -35,17 +36,19 @@ function filterResult2Texture(data, width, height) {
  * @param {WebGLRenderer} renderer
  * @param {Sampler2D} heightMap
  * @param {Sampler2D} normalMap
- * @param {number} zRange
  * @param {Vector2} resultSize
  * @returns {Sampler2D}
  */
-function normalMap2OcclusionMap(renderer, heightMap, normalMap, zRange, resultSize) {
+function normalMap2OcclusionMap(renderer, heightMap, normalMap, resultSize) {
     const width = resultSize.x;
     const height = resultSize.y;
     const resolution = new THREE.Vector2(heightMap.width, heightMap.height);
     //
     const normalTexture = sampler2D2Texture(normalMap, 255, 0.5);
-    const heightTexture = sampler2D2Texture(heightMap, 255 / zRange, zRange / 2);
+
+    const heightTexture = sampler2DtoFloat32Texture(heightMap);
+
+
     //construct shader
     const shaderAO = new AmbientOcclusionShader();
     shaderAO.uniforms.heightMap.value = heightTexture;
@@ -62,7 +65,18 @@ function normalMap2OcclusionMap(renderer, heightMap, normalMap, zRange, resultSi
     const smoothAO = ImageFilter(renderer, width, height, shaderBlur);
 
     //create the sampler
-    return new Sampler2D(smoothAO.array, 4, width, height);
+    const result = new Sampler2D(new Uint8ClampedArray(width * height), 1, width, height);
+
+    //populate samples
+    const size = width * height;
+
+    for (let i = 0; i < size; i++) {
+        const i4 = i * 4;
+
+        result.data[i] = smoothAO.array[i4];
+    }
+
+    return result;
 }
 
 export default normalMap2OcclusionMap;

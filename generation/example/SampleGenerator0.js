@@ -242,8 +242,8 @@ const fTreeArea = CellFilterCache.from(
             // Filter areas with sharp slopes
             CellFilterOneMinus.from(
                 CellFilterSmoothStep.from(
-                    CellFilterConstant.from(Math.PI / 2.4),
-                    CellFilterConstant.from(Math.PI / 2.1),
+                    CellFilterConstant.from(Math.PI / 9),
+                    CellFilterConstant.from(Math.PI / 5),
                     CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
                 )
             )
@@ -280,8 +280,8 @@ const gFoliageLarge = GridTaskSequence.from([
 
 const fSharpSlope = CellFilterCache.from(
     CellFilterSmoothStep.from(
-        CellFilterConstant.from(Math.PI / 2.2),
-        CellFilterConstant.from(Math.PI / 2),
+        CellFilterConstant.from(Math.PI / 5),
+        CellFilterConstant.from(Math.PI / 3.5),
         CellFilterAngleToNormal.from(
             CellFilterReadGridLayer.from(MirGridLayers.Heights),
             Vector3.forward
