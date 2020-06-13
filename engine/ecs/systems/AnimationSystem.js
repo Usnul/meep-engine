@@ -14,7 +14,6 @@ import { CameraSystem } from '../../graphics/ecs/camera/CameraSystem.js';
 
 import {
     AnimationMixer as ThreeAnimationMixer,
-    Group as ThreeGroup,
     LoopOnce as ThreeLoopOnce,
     LoopRepeat as ThreeLoopRepeat,
     Matrix4 as ThreeMatrix4
@@ -49,6 +48,11 @@ function constructActionClips(mixer, mesh, actions) {
     }
 
     const animations = mesh.animations;
+
+    if (animations === undefined) {
+        console.warn('Mesh has no animations');
+    }
+
     if (animations !== undefined && animations.length > 0) {
         for (let i = 0; i < animations.length; i++) {
             const animation = animations[i];
@@ -132,10 +136,6 @@ function registerAnimation(component, model3d) {
 
     let mesh = model3d.mesh;
 
-    while (mesh instanceof ThreeGroup) {
-        //unwrap a group to get to the actual mesh
-        mesh = mesh.children[0];
-    }
     //find animation data
     if (component.mixer === undefined || component.mesh !== mesh) {
         component.mesh = mesh;
