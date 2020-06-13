@@ -1,11 +1,11 @@
 /**
  * Created by Alex on 10/11/2014.
  */
+import { Vector2 } from "three";
 
 
-import * as THREE from 'three';
+const samplesPerPixel = 37;
 
-const samplesPerPixel = 33;
 const AmbientOcclusionShader = function () {
     return {
 
@@ -13,7 +13,8 @@ const AmbientOcclusionShader = function () {
 
             "normalMap": { type: "t", value: null },
             "heightMap": { type: "t", value: null },
-            "resolution": { type: "v2", value: new THREE.Vector2(512, 512) }
+            "resolution": { type: "v2", value: new Vector2(512, 512) },
+            "rayLength":{type:'f',value: 17}
 
         },
 
@@ -35,8 +36,7 @@ const AmbientOcclusionShader = function () {
             "uniform vec2 resolution;",
             "uniform sampler2D normalMap;",
             "uniform sampler2D heightMap;",
-
-            "#define raylength 17.0;",
+            "uniform float rayLength;",
 
             "varying vec2 vUv;",
 
@@ -58,7 +58,7 @@ const AmbientOcclusionShader = function () {
             "   for(int i=1; i<" + samplesPerPixel + "; i++){",
             "     float s = float(i)/" + (samplesPerPixel - 1) + ".0;",
             "     float a = sqrt(s*512.0);",
-            "     float b = sqrt(s)*raylength;",
+            "     float b = sqrt(s)*rayLength;",
             "     float x = sin(a)*b;",
             "     float y = cos(a)*b;",
 

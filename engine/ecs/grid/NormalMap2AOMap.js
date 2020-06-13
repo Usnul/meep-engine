@@ -37,9 +37,16 @@ function filterResult2Texture(data, width, height) {
  * @param {Sampler2D} heightMap
  * @param {Sampler2D} normalMap
  * @param {Vector2} resultSize
+ * @param {number} [rayLength]
  * @returns {Sampler2D}
  */
-function normalMap2OcclusionMap(renderer, heightMap, normalMap, resultSize) {
+function normalMap2OcclusionMap(
+    renderer,
+    heightMap,
+    normalMap,
+    resultSize,
+    rayLength = 17
+) {
     const width = resultSize.x;
     const height = resultSize.y;
     const resolution = new THREE.Vector2(heightMap.width, heightMap.height);
@@ -54,6 +61,7 @@ function normalMap2OcclusionMap(renderer, heightMap, normalMap, resultSize) {
     shaderAO.uniforms.heightMap.value = heightTexture;
     shaderAO.uniforms.normalMap.value = normalTexture;
     shaderAO.uniforms.resolution.value = resolution;
+    shaderAO.uniforms.rayLength.value = rayLength;
     //perform filtering
     const rawAO = ImageFilter(renderer, width, height, shaderAO);
 

@@ -10,10 +10,10 @@ import {
     LinearFilter,
     NearestFilter,
     RedFormat,
+    UnsignedByteType,
     Vector2 as ThreeVector2
 } from 'three';
 import { Sampler2D } from '../../../graphics/texture/sampler/Sampler2D.js';
-import sampler2D2Texture from '../../../graphics/texture/sampler/Sampler2D2Texture.js';
 import heightMap2NormalMap from '../../grid/HeightMap2NormalMap.js';
 import normalMap2AOMap from '../../grid/NormalMap2AOMap.js';
 import rgbaData2valueSampler2D from '../../../graphics/texture/sampler/rgbaData2valueSampler2D.js';
@@ -39,19 +39,7 @@ import { SplatMaterial } from "../../../graphics/material/SplatMaterial.js";
 import { loadLegacyTerrainSplats, SplatMapping } from "./splat/SplatMapping.js";
 import { OffsetScaleTransform2D } from "./OffsetScaleTransform2D.js";
 import { GridTransformKind } from "./GridTransformKind.js";
-
-function makeLightTexture(sampler) {
-    const texture = sampler2D2Texture(sampler, 1, 0);
-    texture.needsUpdate = true;
-
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
-
-    texture.flipY = false;
-    texture.anisotropy = 4;
-
-    return texture;
-}
+import { clamp } from "../../../../core/math/MathUtils.js";
 
 /**
  *
@@ -107,45 +95,60 @@ function promiseSamplerHeight(zRange, heightMapURL, assetManager) {
     });
 }
 
-function promiseSamplerNormal(renderer, pSamplerHeight, zRange) {
-    return new Promise(function (resolve, reject) {
-        pSamplerHeight.then(function (sampler) {
-            console.time("generating normal map");
-            const normalSampler = heightMap2NormalMap(renderer, sampler, zRange);
-            console.timeEnd("generating normal map");
-            resolve(normalSampler);
-        }, reject);
-    });
+/**
+ *
+ * @param {WebGLRenderer} renderer
+ * @param {Sampler2D} sampler
+ * @returns {Promise<Sampler2D>}
+ */
+function promiseSamplerNormal(renderer, sampler) {
+
+    console.time("generating normal map");
+    const normalSampler = heightMap2NormalMap(renderer, sampler);
+    console.timeEnd("generating normal map");
+
+
+    return Promise.resolve(normalSampler);
 }
 
-function promiseSamplerAO(renderer, pSamplerNormal, pSamplerHeight, zRange, resolution) {
+/**
+ *
+ * @param {WebGLRenderer} renderer
+ * @param {Promise<Sampler2D>} pSamplerNormal
+ * @param {Sampler2D} samplerHeight
+ * @param {Vector2} resolution
+ * @param {number} rayLength
+ * @returns {Promise<unknown>}
+ */
+function promiseSamplerAO(
+    renderer,
+    pSamplerNormal,
+    samplerHeight,
+    resolution,
+    rayLength
+) {
     return new Promise(function (resolve, reject) {
-        Promise.all([pSamplerNormal, pSamplerHeight]).then(function (values) {
+        Promise.all([pSamplerNormal]).then(function (values) {
             const samplerNormal = values[0];
-            const samplerHeight = values[1];
             console.time("generating AO map");
-            const occlusionSampler = normalMap2AOMap(renderer, samplerHeight, samplerNormal, zRange, resolution);
+            const occlusionSampler = normalMap2AOMap(
+                renderer,
+                samplerHeight,
+                samplerNormal,
+                resolution,
+                rayLength
+            );
             console.timeEnd("generating AO map");
             //console.info(occlusionSampler);
             //
-            //debugSamplers(self);
+            // paintSamplerOnHTML(samplerHeight, 0, 0, 40, 3);
+            // paintSamplerOnHTML(samplerNormal, 1, 0, 128, 1);
+            // paintSamplerOnHTML(occlusionSampler, 2, 0, 1, 0);
             //
             //
             resolve(occlusionSampler);
         }, reject);
     });
-}
-
-function deepClone(obj) {
-    if (null === obj || "object" !== typeof obj) {
-        return obj;
-    }
-
-    const copy = obj.constructor();
-    for (let attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = deepClone(obj[attr]);
-    }
-    return copy;
 }
 
 /**
@@ -154,14 +157,10 @@ function deepClone(obj) {
  * @param {Vector2} resolution
  * @param {Sampler2D} heightSampler
  * @param {number} heightRange
+ * @param {number} [rayLength]
+ * @returns {Promise}
  */
-function buildLightTexture({ texture, heightSampler, heightRange, resolution }) {
-
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
-
-    texture.flipY = false;
-    texture.anisotropy = 4;
+function buildLightTexture({ texture, heightSampler, resolution, rayLength = 17 }) {
 
     const renderer = WebGLRendererPool.global.get();
 
@@ -169,16 +168,18 @@ function buildLightTexture({ texture, heightSampler, heightRange, resolution }) 
         resolution = new Vector2(texture.image.width, texture.image.height);
     }
 
-    const normal = promiseSamplerNormal(renderer, heightSampler, heightRange);
-    const ao = promiseSamplerAO(renderer, normal, heightSampler, heightRange, resolution);
+    const normal = promiseSamplerNormal(renderer, heightSampler);
+    const ao = promiseSamplerAO(renderer, normal, heightSampler, resolution, rayLength);
 
-    ao.then(sampler => {
+    const promise = ao.then(sampler => {
         writeSample2DDataToDataTexture(sampler, texture);
     });
 
     Promise.all([normal, ao]).finally(() => {
         WebGLRendererPool.global.release(renderer);
-    })
+    });
+
+    return promise;
 }
 
 /**
@@ -939,6 +940,42 @@ class Terrain {
         this.updateMaterial();
 
         this.updateTileImage();
+    }
+
+    buildLightMap() {
+
+
+        const size_x = this.size.x;
+        const size_y = this.size.y;
+
+        const light_texture_width = clamp(size_x, 16, 2048);
+        const light_texture_height = clamp(size_y, 16, 2048);
+
+        const textureData = new Uint8Array(light_texture_width * light_texture_height);
+        const texture = new DataTexture(textureData, light_texture_width, light_texture_height, RedFormat, UnsignedByteType);
+
+        texture.wrapT = ClampToEdgeWrapping;
+        texture.wrapS = ClampToEdgeWrapping;
+
+        texture.minFilter = NearestFilter;
+        texture.magFilter = LinearFilter;
+
+        texture.flipY = false;
+        texture.anisotropy = 4;
+
+        const promise = buildLightTexture({
+            texture,
+            heightSampler: this.samplerHeight
+        });
+
+        promise.then(() => {
+
+            this.material.aoMap = true;
+            this.material.needsUpdate = true;
+
+            this.material.uniforms.aoMap.value = texture;
+            this.material.uniforms.aoMapIntensity.value = 0.7;
+        });
     }
 
     toJSON() {
