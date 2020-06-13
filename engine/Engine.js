@@ -213,9 +213,6 @@ Engine.prototype.initialize = function () {
     });
 
     this.story = new StoryManager();
-    this.story.initialize({
-        engine: this
-    });
 
     this.effects = new EffectManager();
     this.effects.initialize({
@@ -258,6 +255,10 @@ Engine.prototype.initialize = function () {
      * @type {StaticKnowledgeDatabase}
      */
     this.staticKnowledge = new StaticKnowledgeDatabase();
+
+    this.story.initialize({
+        engine: this
+    });
 
     //Register game systems
     initializeSystems(this, em, ge, soundEngine, this.assetManager, this.grid, this.devices);
