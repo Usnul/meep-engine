@@ -208,7 +208,8 @@ const gDrawLayerMoisture = GridTaskActionRuleSet.from(GridActionRuleSet.from([
 //trees
 const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
 
-const matcher_not_play_area = CellMatcherNot.from(CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags));
+const matcher_play_area = CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags);
+const matcher_not_play_area = CellMatcherNot.from(matcher_play_area);
 
 const fTreeArea = CellFilterCache.from(
     CellFilterMultiply.from(
@@ -305,13 +306,16 @@ const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterCache.from(
             CellFilterMultiply.from(
-                CellFilterSubtract.from(
-                    CellFilterGaussianBlur.from(
-                        fSharpSlope,
-                        3,
-                        3
+                CellFilterMultiply.from(
+                    CellFilterSubtract.from(
+                        CellFilterGaussianBlur.from(
+                            fSharpSlope,
+                            3,
+                            3
+                        ),
+                        fSharpSlope
                     ),
-                    fSharpSlope
+                    CellFilterCellMatcher.from(matcher_not_play_area)
                 ),
                 CellFilterConstant.from(0.1)
             )
