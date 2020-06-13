@@ -3,7 +3,7 @@ import {
     Color,
     DataTexture,
     LinearFilter,
-    Mesh,
+    Mesh, MeshBasicMaterial,
     NearestFilter,
     Object3D,
     OrthographicCamera,
@@ -129,7 +129,16 @@ export class OutlineRenderer {
 
         this.__id_scene = new Scene();
 
-        this.__id_scene.onBeforeRender = () => {
+        //
+        const virtual_trigger_group = new Mesh(new PlaneBufferGeometry(0, 0), new MeshBasicMaterial());
+        virtual_trigger_group.frustumCulled = false;
+
+
+        /*
+        Three.js allows immediate rendering mode, but it assumes that this is done during scene rendering, so we create a proxy object to piggy back on via onBeforeRender callback
+         */
+        this.__id_scene.add(virtual_trigger_group);
+        virtual_trigger_group.onBeforeRender = () => {
             const group = this.__current_group;
             const elementList = group.elements;
 
