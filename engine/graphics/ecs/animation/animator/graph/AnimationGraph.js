@@ -336,6 +336,12 @@ export class AnimationGraph {
          */
         const animations = mesh.animations;
 
+        if (animations === undefined) {
+            throw new Error('Mesh.animations is undefined, no animations');
+        }
+
+        const animationCount = animations.length;
+
         main: for (let i = 0; i < nClips; i++) {
             /**
              *
@@ -343,7 +349,7 @@ export class AnimationGraph {
              */
             const animationClipDefinition = clipIndex[i];
 
-            for (let j = 0; j < animations.length; j++) {
+            for (let j = 0; j < animationCount; j++) {
                 const animation = animations[j];
 
                 if (animation.name === animationClipDefinition.name) {

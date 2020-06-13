@@ -87,6 +87,11 @@ export class AnimationGraphSystem extends System {
     handleMeshSetEvent({ component, entity }) {
         const ecd = this.entityManager.dataset;
 
+        if (!component.getFlag(MeshFlags.Loaded)) {
+            // mesh is not yet loaded
+            return;
+        }
+
         const graph = ecd.getComponent(entity, AnimationGraph);
 
         attach(graph, component.mesh, entity, ecd);
