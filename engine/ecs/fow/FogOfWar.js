@@ -1,5 +1,5 @@
 import { Sampler2D } from "../../graphics/texture/sampler/Sampler2D.js";
-import { ClampToEdgeWrapping, DataTexture, LinearFilter, LuminanceFormat, UnsignedByteType } from "three";
+import { ClampToEdgeWrapping, DataTexture, LinearFilter, LuminanceFormat, RedFormat, UnsignedByteType } from "three";
 import Vector1 from "../../../core/geom/Vector1.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import Vector3 from "../../../core/geom/Vector3.js";
@@ -340,7 +340,7 @@ export class FogOfWar {
 
         if (this.texture === null) {
 
-            const texture = new DataTexture(data, s.width, s.height, LuminanceFormat, UnsignedByteType);
+            const texture = new DataTexture(data, s.width, s.height, RedFormat, UnsignedByteType);
 
             texture.flipY = false;
             texture.wrapS = ClampToEdgeWrapping;

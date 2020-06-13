@@ -48,7 +48,7 @@ export class MinimapWorldGL {
          *
          * @type {OrthographicCamera}
          */
-        this.camera = new OrthographicCamera(-1,1,-1,1,0.1, 10);
+        this.camera = new OrthographicCamera(-1, 1, -1, 1, 0.1, 10);
         this.updateCameraFocus();
 
         /**
@@ -57,6 +57,10 @@ export class MinimapWorldGL {
          */
         this.renderer = null;
 
+        /**
+         *
+         * @type {HTMLCanvasElement}
+         */
         this.domElement = null;
 
         /**
@@ -93,8 +97,8 @@ export class MinimapWorldGL {
 
         const worldBounds = this.worldBounds;
 
-        const w = worldBounds.size.x ;
-        const h = worldBounds.size.y ;
+        const w = worldBounds.size.x;
+        const h = worldBounds.size.y;
 
         camera.left = -w / 2;
         camera.right = +w / 2;
@@ -102,7 +106,7 @@ export class MinimapWorldGL {
         camera.bottom = +h / 2;
 
         const v2worldCenter = new Vector2(
-            worldBounds.position.x + w / 2 ,
+            worldBounds.position.x + w / 2,
             worldBounds.position.y + h / 2
         );
 

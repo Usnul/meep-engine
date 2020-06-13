@@ -1,4 +1,4 @@
-import { RedFormat, RGBAFormat, RGBFormat, RGFormat } from "three";
+import { LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, RGFormat } from "three";
 
 /**
  *
@@ -7,7 +7,7 @@ import { RedFormat, RGBAFormat, RGBFormat, RGFormat } from "three";
  */
 export function writeSample2DDataToDataTexture(sampler, texture) {
     if (sampler.itemSize === 1) {
-        if (texture.format !== RedFormat) {
+        if (texture.format !== RedFormat && texture.format !== LuminanceFormat) {
             throw new Error('itemSize is 1 and texture.format is not RedFormat');
         }
     } else if (sampler.itemSize === 2) {

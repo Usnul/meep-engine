@@ -267,7 +267,7 @@ InstancedMeshGroup.prototype.setCount = function (size) {
     this.ensureCapacity(size);
 
     this.count = size;
-    this.__threeGeometry.maxInstancedCount = size;
+    this.__threeGeometry.instanceCount = size;
 };
 
 /**
@@ -374,7 +374,7 @@ InstancedMeshGroup.prototype.build = function () {
     const instance = this.__threeInstanceGeometry;
     const geometry = this.__threeGeometry;
 
-    geometry.maxInstancedCount = this.count;
+    geometry.instanceCount = this.count;
     geometry.dynamic = true;
 
     //copy instance attributes

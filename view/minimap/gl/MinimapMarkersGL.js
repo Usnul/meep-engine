@@ -33,7 +33,7 @@ function buildMaterial() {
     function vertexShader() {
         return `
             attribute float size;
-            attribute vec4 patch;
+            attribute vec4 aPatch;
             
 			varying vec4 vPatch;
 			
@@ -47,7 +47,7 @@ function buildMaterial() {
 			}
 			
 			void main() {
-			    vPatch = patch;
+			    vPatch = aPatch;
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 				
 				//extract scale
@@ -157,7 +157,7 @@ export class MinimapMarkersGL extends MinimapWorldLayer {
         particleSpecification
             .add(new ParticleAttribute("position", ParticleAttributeType.Vector3, ParticleDataType.Float32))
             .add(new ParticleAttribute("size", ParticleAttributeType.Scalar, ParticleDataType.Float32))
-            .add(new ParticleAttribute("patch", ParticleAttributeType.Vector4, ParticleDataType.Float32))
+            .add(new ParticleAttribute("aPatch", ParticleAttributeType.Vector4, ParticleDataType.Float32))
             .add(new ParticleAttribute("zIndex", ParticleAttributeType.Scalar, ParticleDataType.Float32));
 
         /**
