@@ -13,14 +13,21 @@ export class CellFilterCache extends CellFilterUnaryOperation {
          * @private
          */
         this.__cache = Sampler2D.float32(1, 1, 1);
+
+        /**
+         *
+         * @type {number}
+         */
+        this.scale = 1;
     }
 
     /**
      *
      * @param {CellFilter} source
+     * @param {number} [scale]
      * @returns {CellFilterCache}
      */
-    static from(source) {
+    static from(source, scale = 1) {
         assert.equal(source.isCellFilter, true, 'source.isCellFilter !== true');
 
         const r = new CellFilterCache();
@@ -33,16 +40,26 @@ export class CellFilterCache extends CellFilterUnaryOperation {
     initialize(grid, seed) {
         super.initialize(grid, seed);
 
-        const width = grid.width;
-        const height = grid.height;
+        const g_w = grid.width;
+        const g_h = grid.height;
 
-        this.__cache.resize(width, height);
+        const target_w = this.scale * g_w;
+        const target_h = this.scale * g_h;
+
+        this.__cache.resize(target_w, target_h);
+
+        const scale_1 = 1 / this.scale;
 
         console.time('Cache filter build');
 
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const sampleValue = this.source.execute(grid, x, y, 0);
+        for (let y = 0; y < target_h; y++) {
+            const g_y = y * scale_1;
+
+            for (let x = 0; x < target_w; x++) {
+
+                const g_x = x * scale_1;
+
+                const sampleValue = this.source.execute(grid, g_x, g_y, 0);
 
                 this.__cache.writeChannel(x, y, 0, sampleValue);
             }

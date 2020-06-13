@@ -56,6 +56,14 @@ export class CellFilterFXAA extends CellFilter {
         return r;
     }
 
+    initialize(grid, seed) {
+        super.initialize(grid, seed);
+
+        if (!this.source.initialized) {
+            this.source.initialize(grid, seed);
+        }
+    }
+
     execute(grid, x, y, rotation) {
 
         const valueNw = this.source.execute(grid, x - 1, y - 1, rotation);

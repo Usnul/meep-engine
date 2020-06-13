@@ -41,6 +41,7 @@ import { CellFilterNegate } from "../../filtering/math/algebra/CellFilterNegate.
 import { MarkerNodeActionWeightedElement } from "../../markers/actions/probability/MarkerNodeActionWeightedElement.js";
 import { MarkerNodeActionSelectWeighted } from "../../markers/actions/probability/MarkerNodeActionSelectWeighted.js";
 import { ParticleEmitter } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
+import { CellFilterCache } from "../../filtering/CellFilterCache.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -68,18 +69,18 @@ const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
 const ROAD_FILTER = CellFilterCellMatcher.from(matcher_tag_road);
 const ROAD_FILTER_AA = CellFilterFXAA.from(ROAD_FILTER);
 
-const filterRoad = CellFilterGaussianBlur.from(
+const filterRoad =
     CellFilterMultiply.from(
-        ROAD_FILTER_AA,
+            CellFilterCache.from(
+                CellFilterGaussianBlur.from(ROAD_FILTER, 1.2, 1.2, 5),
+                6
+            ),
         CellFilterLerp.from(
-            CellFilterConstant.from(0.6),
+            CellFilterConstant.from(0.4),
             CellFilterConstant.from(1),
             NOISE_10_a
         )
-    ),
-    1.2,
-    1.2
-);
+    );
 
 const filterNotRockAndNotRoad = CellFilterMultiply.from(
     CellFilterOneMinus.from(filterRoad),
