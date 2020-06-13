@@ -45,6 +45,8 @@ import { SampleGroundMoistureFilter } from "./filters/SampleGroundMoistureFilter
 import { GridTaskSequence } from "../grid/generation/GridTaskSequence.js";
 import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
 import { CellFilterCache } from "../filtering/CellFilterCache.js";
+import { CellFilterInverseLerp } from "../filtering/math/CellFilterInverseLerp.js";
+import { CellFilterClamp } from "../filtering/math/CellFilterClamp.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -215,7 +217,15 @@ const fTreeArea = CellFilterCache.from(
     CellFilterMultiply.from(
         CellFilterMultiply.from(
             SampleNoise20_0,
-            CellFilterReadGridLayer.from(MirGridLayers.Moisture)
+            CellFilterClamp.from(
+                CellFilterInverseLerp.from(
+                    CellFilterConstant.from(0.1),
+                    CellFilterConstant.from(0.5),
+                    CellFilterReadGridLayer.from(MirGridLayers.Moisture)
+                ),
+                CellFilterConstant.from(0),
+                CellFilterConstant.from(1)
+            )
         ),
         CellFilterMultiply.from(
             CellFilterMultiply.from(
@@ -249,13 +259,16 @@ const gFoliageLarge = GridTaskSequence.from([
         ),
         GridCellActionPlaceMarker.from({
             type: 'Tree-0',
-            size: 0.565,
+            size: 0.5,
             transformers: []
         }),
         new NumericInterval(1.21, 1.4)
     ),
     GridTaskDensityMarkerDistribution.from(
-        fTreeArea,
+        CellFilterMultiply.from(
+            fTreeArea,
+            CellFilterConstant.from(2)
+        ),
         GridCellActionPlaceMarker.from({
             type: 'Tree-1',
             size: 0.5,
@@ -276,10 +289,12 @@ const fSharpSlope = CellFilterCache.from(
     )
 );
 
+const filterMushroom = fTreeArea;
+
 const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
-            fTreeArea,
+            filterMushroom,
             CellFilterConstant.from(0.02)
         ),
         GridCellActionPlaceMarker.from({
@@ -292,7 +307,7 @@ const gFoliageSmall = GridTaskSequence.from([
     ),
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
-            fTreeArea,
+            filterMushroom,
             CellFilterConstant.from(0.05)
         ),
         GridCellActionPlaceMarker.from({
@@ -317,7 +332,7 @@ const gFoliageSmall = GridTaskSequence.from([
                     ),
                     CellFilterCellMatcher.from(matcher_not_play_area)
                 ),
-                CellFilterConstant.from(0.1)
+                CellFilterConstant.from(0.15)
             )
         ),
         GridCellActionPlaceMarker.from({

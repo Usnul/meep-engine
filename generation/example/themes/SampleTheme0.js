@@ -67,14 +67,14 @@ const filterRock = CellFilterClamp.from(
 const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
 
 const ROAD_FILTER = CellFilterCellMatcher.from(matcher_tag_road);
-const ROAD_FILTER_AA = CellFilterFXAA.from(ROAD_FILTER);
+const ROAD_FILTER_AA = CellFilterCache.from(CellFilterFXAA.from(ROAD_FILTER));
 
 const filterRoad =
     CellFilterMultiply.from(
-            CellFilterCache.from(
-                CellFilterGaussianBlur.from(ROAD_FILTER, 1.2, 1.2, 5),
-                6
-            ),
+        CellFilterCache.from(
+            CellFilterGaussianBlur.from(ROAD_FILTER_AA, 1.2, 1.2, 5),
+            6
+        ),
         CellFilterLerp.from(
             CellFilterConstant.from(0.4),
             CellFilterConstant.from(1),
