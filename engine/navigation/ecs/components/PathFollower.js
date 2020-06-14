@@ -5,8 +5,6 @@
 
 import Vector1 from "../../../../core/geom/Vector1.js";
 import { BooleanVector3 } from "../../../../core/model/BooleanVector3.js";
-import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
-import { BinaryClassUpgrader } from "../../../ecs/storage/binary/BinaryClassUpgrader.js";
 
 /**
  *
@@ -53,23 +51,30 @@ class PathFollower {
          * @type {number}
          */
         this.flags = PathFollowerFlags.Active;
+
+        /**
+         * Maximum distance that the follower can move along the path in a single step
+         * @type {number}
+         */
+        this.maxMoveDistance = 100000;
     }
 
-    get active(){
+    get active() {
         console.warn('PathFollower.active is deprecated, use flags instead');
         return this.getFlag(PathFollowerFlags.Active);
     }
 
-    set active(v){
+    set active(v) {
         console.warn('PathFollower.active is deprecated, use flags instead');
         this.writeFlag(PathFollowerFlags.Active, v);
     }
 
-    get lock(){
+    get lock() {
         console.warn('PathFollower.lock is deprecated, use flags instead');
         return this.getFlag(PathFollowerFlags.Locked);
     }
-    set lock(v){
+
+    set lock(v) {
         console.warn('PathFollower.lock is deprecated, use flags instead');
         this.writeFlag(PathFollowerFlags.Locked, v);
     }
@@ -159,65 +164,4 @@ PathFollower.typeName = "PathFollower";
 
 export default PathFollower;
 
-export class PathFollowerSerializationAdapter extends BinaryClassSerializationAdapter {
-    constructor() {
-        super();
 
-        this.klass = PathFollower;
-        this.version = 1;
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {PathFollower} value
-     */
-    serialize(buffer, value) {
-        buffer.writeUint8(value.flags);
-        buffer.writeFloat32(value.speed.getValue());
-        buffer.writeFloat32(value.rotationSpeed.getValue());
-
-        value.rotationAlignment.toBinaryBuffer(buffer);
-        value.positionWriting.toBinaryBuffer(buffer);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {PathFollower} value
-     */
-    deserialize(buffer, value) {
-        value.flags = buffer.readUint8();
-        value.speed.set(buffer.readFloat32());
-        value.rotationSpeed.set(buffer.readFloat32());
-
-        value.rotationAlignment.fromBinaryBuffer(buffer);
-        value.positionWriting.fromBinaryBuffer(buffer);
-    }
-}
-
-
-export class PathFollowerSerializationUpgrader_0_1 extends BinaryClassUpgrader {
-    constructor() {
-        super();
-
-        this.__startVersion = 0;
-        this.__targetVersion = 1;
-    }
-
-    upgrade(source, target) {
-
-        const active = source.readUint8() !== 0;
-        const speed = source.readFloat64();
-        const rotationAlignment = source.readUint8();
-        const rotationSpeed = source.readFloat64();
-
-        target.writeUint8(active ? PathFollowerFlags.Active : 0);
-
-        target.writeFloat32(speed);
-        target.writeFloat32(rotationSpeed);
-
-        target.writeUint8(rotationAlignment);
-        target.writeUint8(7); //position writing
-    }
-}

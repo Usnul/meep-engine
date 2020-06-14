@@ -10,6 +10,7 @@ import PathFollower, { PathFollowerEventType, PathFollowerFlags } from '../compo
 import Path from '../components/Path.js';
 import { Transform } from '../../../ecs/components/Transform.js';
 import Vector3 from "../../../../core/geom/Vector3.js";
+import { min2 } from "../../../../core/math/MathUtils.js";
 
 const v3_forward = new Vector3();
 const v3_temp1 = new Vector3();
@@ -24,93 +25,99 @@ const v3_temp2 = new Vector3();
  * @returns {number} remaining distance
  */
 function performStep(pathFollower, path, transform, timeDelta) {
-    const distance = pathFollower.speed.getValue() * timeDelta;
+    let remainingDistance = pathFollower.speed.getValue() * timeDelta;
 
+    while (remainingDistance > 0 && !path.isEmpty()) {
 
-    if (pathFollower.getFlag(PathFollowerFlags.Loop)) {
-        let d = distance;
+        const stepDistance = min2(remainingDistance, pathFollower.maxMoveDistance);
 
-        while (d > 0) {
-            const d0 = d;
+        remainingDistance -= stepDistance;
 
-            d = path.move(d0);
+        if (pathFollower.getFlag(PathFollowerFlags.Loop)) {
+            let d = stepDistance;
 
-            if (path.isComplete()) {
-                path.reset();
+            while (d > 0) {
+                const d0 = d;
+
+                d = path.move(d0);
+
+                if (path.isComplete()) {
+                    path.reset();
+                }
+
+                if (d0 === d) {
+                    //seems path can not advance, avoid infinite loop and exit
+                    break;
+                }
             }
 
-            if (d0 === d) {
-                //seems path can not advance, avoid infinite loop and exit
-                break;
-            }
+        } else {
+            path.move(stepDistance);
         }
 
-    } else {
-        path.move(distance);
-    }
+        /**
+         *
+         * @type {Vector3}
+         */
+        const nextPosition = v3_temp1;
 
-    /**
-     *
-     * @type {Vector3}
-     */
-    const nextPosition = v3_temp1;
-
-    try {
-        path.getCurrentPosition(nextPosition);
-    } catch (e) {
-        console.error("Failed to read current position", e);
-    }
-
-    const positionWriting = pathFollower.positionWriting;
-    const position = transform.position;
-
-    if (!positionWriting.x) {
-        nextPosition.setX(position.x);
-    }
-    if (!positionWriting.y) {
-        nextPosition.setY(position.y);
-    }
-    if (!positionWriting.z) {
-        nextPosition.setZ(position.z);
-    }
-
-    if (!nextPosition.equals(position)) {
-        const oldPosition = position;
-
-        const alignment = pathFollower.rotationAlignment;
-        if (alignment.x || alignment.y || alignment.z) {
-
-            //compute old facing direction vector
-            v3_forward.copy(Vector3.forward);
-
-            v3_forward.applyQuaternion(transform.rotation);
-
-            const positionDelta = v3_temp2;
-
-            positionDelta.subVectors(nextPosition, oldPosition);
-
-            if (!alignment.x) {
-                positionDelta.x = v3_forward.x;
-            }
-            if (!alignment.y) {
-                positionDelta.y = v3_forward.y;
-            }
-            if (!alignment.z) {
-                positionDelta.z = v3_forward.z;
-            }
-
-            positionDelta.normalize();
-
-            const angularLimit = pathFollower.rotationSpeed.getValue() * timeDelta;
-
-            // console.log("Angular limit:", angularLimit, positionDelta.toJSON());
-
-            Transform.adjustRotation(transform.rotation, positionDelta, angularLimit);
+        try {
+            path.getCurrentPosition(nextPosition);
+        } catch (e) {
+            console.error("Failed to read current position", e);
         }
 
-        position.copy(nextPosition);
-    }
+        const positionWriting = pathFollower.positionWriting;
+        const position = transform.position;
 
+        if (!positionWriting.x) {
+            nextPosition.setX(position.x);
+        }
+        if (!positionWriting.y) {
+            nextPosition.setY(position.y);
+        }
+        if (!positionWriting.z) {
+            nextPosition.setZ(position.z);
+        }
+
+        if (!nextPosition.equals(position)) {
+            const oldPosition = position;
+
+            const alignment = pathFollower.rotationAlignment;
+            if (alignment.x || alignment.y || alignment.z) {
+
+                //compute old facing direction vector
+                v3_forward.copy(Vector3.forward);
+
+                v3_forward.applyQuaternion(transform.rotation);
+
+                const positionDelta = v3_temp2;
+
+                positionDelta.subVectors(nextPosition, oldPosition);
+
+                if (!alignment.x) {
+                    positionDelta.x = v3_forward.x;
+                }
+                if (!alignment.y) {
+                    positionDelta.y = v3_forward.y;
+                }
+                if (!alignment.z) {
+                    positionDelta.z = v3_forward.z;
+                }
+
+                positionDelta.normalize();
+
+                const angularLimit = pathFollower.rotationSpeed.getValue() * timeDelta;
+
+                // console.log("Angular limit:", angularLimit, positionDelta.toJSON());
+
+                Transform.adjustRotation(transform.rotation, positionDelta, angularLimit);
+            }
+
+            position.copy(nextPosition);
+        }
+
+    }
 }
 
 class PathFollowingSystem extends System {
