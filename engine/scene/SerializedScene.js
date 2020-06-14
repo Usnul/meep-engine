@@ -1,11 +1,11 @@
-import Scene from "./Scene.js";
 import { GameAssetType } from "../asset/GameAssetType.js";
 import BinaryBufferDeSerializer from "../ecs/storage/BinaryBufferDeSerializer.js";
 import { EncodingBinaryBuffer } from "../../core/binary/EncodingBinaryBuffer.js";
 import { emptyTask } from "../../core/process/task/TaskUtils.js";
 import { assert } from "../../core/assert.js";
+import { MirScene } from "../../../model/game/scenes/MirScene.js";
 
-export class SerializedScene extends Scene {
+export class SerializedScene extends MirScene {
     /**
      *
      * @param {string} name Unique scene name

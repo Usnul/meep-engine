@@ -234,7 +234,7 @@ class EntityBuilder {
             const entity = this.entity;
 
             //check that the entity is the same as what we have built
-            assert.ok(checkExistingComponents(entity, this.element, dataset), `Signature of EntityBuilder does not match existing entity(id=${entity})`);
+            //assert.ok(checkExistingComponents(entity, this.element, dataset), `Signature of EntityBuilder does not match existing entity(id=${entity})`);
 
             dataset.removeEntityEventListener(entity, EventType.EntityRemoved, this.__handleEntityDestroyed, this);
 
