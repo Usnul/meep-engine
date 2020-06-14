@@ -22,6 +22,8 @@ export class SerializedScene extends MirScene {
         assert.typeOf(success, 'function', 'success');
         assert.typeOf(failure, 'function', 'failure');
 
+        this.__engine = engine;
+
         const ecd = this.dataset;
 
         //expand dataset to make sure it can take all components
