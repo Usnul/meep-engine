@@ -29,7 +29,15 @@ function performStep(pathFollower, path, transform, timeDelta) {
 
     while (remainingDistance > 0 && !path.isEmpty()) {
 
-        const stepDistance = min2(remainingDistance, pathFollower.maxMoveDistance);
+        let stepLimit = pathFollower.maxMoveDistance;
+
+        if (stepLimit <= 0) {
+            console.warn('pathFollower.maxMoveDistance <= 0, defaulting to 1');
+
+            stepLimit = 1;
+        }
+
+        const stepDistance = min2(remainingDistance, stepLimit);
 
         remainingDistance -= stepDistance;
 
