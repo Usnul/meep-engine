@@ -55,9 +55,9 @@ class Vector3 {
      * @returns {Vector3}
      */
     set(x, y, z) {
-        assert.typeOf(x, "number", 'x');
-        assert.typeOf(y, "number", 'y');
-        assert.typeOf(z, "number", 'z');
+        assert.isNumber(x, 'x');
+        assert.isNumber(y, 'y');
+        assert.isNumber(z, 'z');
 
         assert.notNaN(x, 'x');
         assert.notNaN(y, 'y');

@@ -107,11 +107,11 @@ Vector2.prototype.writeToArray = function (array, offset) {
  * @returns {Vector2}
  */
 Vector2.prototype.set = function (x, y) {
-    assert.equal(typeof x, "number", `X must be of type "number", instead was "${typeof x}"`);
-    assert.equal(typeof y, "number", `Y must be of type "number", instead was "${typeof y}"`);
+    assert.isNumber(x, 'x');
+    assert.isNumber(y, 'y');
 
-    assert.ok(!Number.isNaN(x), `X must be a valid number, instead was NaN`);
-    assert.ok(!Number.isNaN(y), `Y must be a valid number, instead was NaN`);
+    assert.notNaN(x, 'x');
+    assert.notNaN(y, 'y');
 
     const oldX = this.x;
     const oldY = this.y;
@@ -178,6 +178,15 @@ Vector2.prototype.floor = function () {
  */
 Vector2.prototype.ceil = function () {
     return this.set(Math.ceil(this.x), Math.ceil(this.y));
+};
+
+/**
+ * Round both components to nearest integer
+ */
+Vector2.prototype.round = function () {
+    const x = Math.round(this.x);
+    const y = Math.round(this.y);
+    this.set(x, y);
 };
 
 /**
