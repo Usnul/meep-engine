@@ -1,4 +1,5 @@
 import { WebGLRenderer } from 'three';
+import { assert } from "../../../core/assert.js";
 
 function WebGLRendererPool() {
     this.used = new Set();
@@ -6,13 +7,15 @@ function WebGLRendererPool() {
 
 WebGLRendererPool.prototype.get = function (options) {
     var canvas = document.createElement('canvas');
-    var context = canvas.getContext('webgl2', { antialias: false });
+    var context = canvas.getContext('webgl2', { antialias: true });
 
     const renderer = new WebGLRenderer({
-        antialias: true,
         alpha: true,
-        context
+        context,
+        canvas
     });
+
+    assert.equal(renderer.domElement, canvas, 'renderer.domElement !== canvas');
 
     this.used.add(renderer);
     return renderer;

@@ -120,6 +120,7 @@ export class MinimapWorldGL {
     startup() {
         const renderer = this.renderer = WebGLRendererPool.global.get();
         renderer.setClearColor(0, 0);
+
         renderer.setSize(this.canvasSize.x, this.canvasSize.y);
 
         this.layers.forEach(o => {

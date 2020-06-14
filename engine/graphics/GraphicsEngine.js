@@ -84,6 +84,9 @@ function configureThreeRenderer(webGLRenderer) {
 
     webGLRenderer.sortObjects = true;
 
+    //turn off automatic info reset, we use multi-pass rendering, so we manually reset the render info
+    webGLRenderer.info.autoReset = false;
+
     if (ENV_PRODUCTION) {
         //disable shader error checking in production build
         webGLRenderer.debug.checkShaderErrors = false;
@@ -111,7 +114,7 @@ function GraphicsEngine(camera, entityManger) {
         postRender: new Signal(),
 
         preComposite: new Signal(),
-       postComposite: new Signal(),
+        postComposite: new Signal(),
 
         buffersRendered: new Signal(),
         visibilityConstructionStarted: new Signal(),
@@ -538,6 +541,9 @@ GraphicsEngine.prototype.render = function (renderTarget) {
 
     const renderer = this.graphics;
 
+    //reset renderer statistics (used for debug)
+    renderer.info.reset();
+
     renderer.autoClear = false;
     renderer.clearAlpha = 0;
 
@@ -570,7 +576,7 @@ GraphicsEngine.prototype.render = function (renderTarget) {
 
         this.layerComposer.composite(renderer);
 
-        this.on.postComposite.send3(renderer,camera, scene);
+        this.on.postComposite.send3(renderer, camera, scene);
 
     } else {
 
@@ -582,7 +588,7 @@ GraphicsEngine.prototype.render = function (renderTarget) {
 
         this.layerComposer.composite(renderer);
 
-        this.on.postComposite.send3(renderer,camera, scene);
+        this.on.postComposite.send3(renderer, camera, scene);
 
         if (renderTarget !== undefined) {
             renderer.setRenderTarget(null);
