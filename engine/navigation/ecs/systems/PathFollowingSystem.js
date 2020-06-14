@@ -27,7 +27,7 @@ const v3_temp2 = new Vector3();
 function performStep(pathFollower, path, transform, timeDelta) {
     let remainingDistance = pathFollower.speed.getValue() * timeDelta;
 
-    while (remainingDistance > 0 && !path.isEmpty()) {
+    while (remainingDistance > 0) {
 
         let stepLimit = pathFollower.maxMoveDistance;
 
@@ -61,6 +61,11 @@ function performStep(pathFollower, path, transform, timeDelta) {
 
         } else {
             path.move(stepDistance);
+
+            if (path.isComplete()) {
+                //we reached the end with this step
+                remainingDistance = 0;
+            }
         }
 
         /**
