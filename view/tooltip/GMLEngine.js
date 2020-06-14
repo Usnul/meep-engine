@@ -1,4 +1,4 @@
-import { parseTooltipString, TooltipTokenType as TokenType } from "./TooltipParser.js";
+import { parseTooltipString} from "./TooltipParser.js";
 import View from "../View.js";
 import LabelView from "../common/LabelView.js";
 import EmptyView from "../elements/EmptyView.js";
@@ -12,6 +12,7 @@ import { LocalizedLabelView } from "../common/LocalizedLabelView.js";
 import { AfflictionTooltipView } from "../../../view/units/affliction/AfflictionTooltipView.js";
 import { TalentLevelDescriptionView } from "../../../view/units/talent/TalentLevelDescriptionView.js";
 import { prettyPrint } from "../../core/NumberFormat.js";
+import { TokenType } from "./parser/TooltipTokenType.js";
 
 /**
  *

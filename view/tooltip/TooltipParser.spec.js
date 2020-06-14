@@ -1,4 +1,7 @@
-import { parseTooltipString, readReferenceToken, readReferenceValueToken, TooltipTokenType } from "./TooltipParser.js";
+import { parseTooltipString} from "./TooltipParser.js";
+import { TooltipTokenType } from "./parser/TooltipTokenType.js";
+import { readReferenceValueToken } from "./parser/readReferenceValueToken.js";
+import { readReferenceToken } from "./parser/readReferenceToken.js";
 
 test('parse empty string', () => {
     const tokens = parseTooltipString('');
