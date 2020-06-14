@@ -1,6 +1,26 @@
 import Vector2 from "../../../../../core/geom/Vector2.js";
 import { GameAssetType } from "../../../../asset/GameAssetType.js";
 import { Sampler2D } from "../../../../graphics/texture/sampler/Sampler2D.js";
+import { Cache } from "../../../../../core/Cache.js";
+import { computeStringHash, computeUTF8StringByteSize } from "../../../../../core/primitives/strings/StringUtils.js";
+
+/**
+ *
+ * @type {Cache<String,Sampler2D>}
+ */
+const cache = new Cache({
+    maxWeight: 304857600,
+    keyHashFunction: computeStringHash,
+    keyWeigher: computeUTF8StringByteSize,
+    /**
+     *
+     * @param {Sampler2D} sampler
+     * @returns {number}
+     */
+    valueWeigher(sampler) {
+        return sampler.computeByteSize();
+    }
+});
 
 export class TerrainLayer {
     constructor() {
@@ -45,7 +65,27 @@ export class TerrainLayer {
      */
     loadTextureData(assetManager) {
 
-        const assetPromise = assetManager.promise(this.textureDiffuseURL, GameAssetType.Image);
+        const path = this.textureDiffuseURL;
+
+        /**
+         *
+         * @type {Sampler2D|null}
+         */
+        const cached = cache.get(path);
+
+        if (cached !== null) {
+
+            console.log('Using cached terrain layer data for ', path);
+
+            this.diffuse.resize(cached.width, cached.height, false);
+
+            this.diffuse.data.set(cached.data);
+
+            return Promise.resolve();
+
+        }
+
+        const assetPromise = assetManager.promise(path, GameAssetType.Image);
 
         return assetPromise
             .then(assert => {
@@ -72,6 +112,13 @@ export class TerrainLayer {
                     layerData[a3 + 1] = data[a4 + 1];
                     layerData[a3 + 2] = data[a4 + 2];
                 }
+
+                const cacheCopy = Sampler2D.uint8(3, image.width, image.height);
+
+                cacheCopy.data.set(layerData);
+
+                cache.put(path, cacheCopy);
+
             });
     }
 }
