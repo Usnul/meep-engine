@@ -5,6 +5,7 @@
 import { noop, passThrough, returnOne, returnZero, strictEquals } from "./function/Functions.js";
 import { HashMap } from "./collection/HashMap.js";
 import { collectIteratorValueToArray } from "./collection/IteratorUtils.js";
+import { assert } from "./assert.js";
 
 /**
  * @template Key, Value
@@ -53,6 +54,14 @@ export class Cache {
                     keyHashFunction = passThrough,
                     keyEqualityFunction = strictEquals
                 } = {}) {
+
+        assert.isNumber(maxWeight,'maxWeight');
+        assert.typeOf(keyWeigher,'function','keyWeigher');
+        assert.typeOf(valueWeigher,'function','valueWeigher');
+        assert.typeOf(removeListener,'function','removeListener');
+        assert.typeOf(keyHashFunction,'function','keyHashFunction');
+        assert.typeOf(keyEqualityFunction,'function','keyEqualityFunction');
+
         /**
          *
          * @type {number}

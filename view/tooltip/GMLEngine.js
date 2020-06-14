@@ -1,4 +1,3 @@
-import { parseTooltipString} from "./TooltipParser.js";
 import View from "../View.js";
 import LabelView from "../common/LabelView.js";
 import EmptyView from "../elements/EmptyView.js";
@@ -12,7 +11,8 @@ import { LocalizedLabelView } from "../common/LocalizedLabelView.js";
 import { AfflictionTooltipView } from "../../../view/units/affliction/AfflictionTooltipView.js";
 import { TalentLevelDescriptionView } from "../../../view/units/talent/TalentLevelDescriptionView.js";
 import { prettyPrint } from "../../core/NumberFormat.js";
-import { TokenType } from "./parser/TooltipTokenType.js";
+import { TooltipParser } from "./TooltipParser.js";
+import { TooltipTokenType } from "./parser/TooltipTokenType.js";
 
 /**
  *
@@ -416,6 +416,14 @@ export class GMLEngine {
          * @private
          */
         this.__tooltipsEnabled = true;
+
+
+        /**
+         *
+         * @type {TooltipParser}
+         * @private
+         */
+        this.__parser = new TooltipParser();
     }
 
     /**
@@ -542,13 +550,13 @@ export class GMLEngine {
             let v;
             const tokenType = t.type;
 
-            if (tokenType === TokenType.Reference) {
+            if (tokenType === TooltipTokenType.Reference) {
                 v = compileReferenceToken(t);
-            } else if (tokenType === TokenType.Text) {
+            } else if (tokenType === TooltipTokenType.Text) {
                 v = compileTextToken(t);
-            } else if (tokenType === TokenType.StyleStart) {
+            } else if (tokenType === TooltipTokenType.StyleStart) {
                 //do nothing
-            } else if (tokenType === TokenType.StyleEnd) {
+            } else if (tokenType === TooltipTokenType.StyleEnd) {
                 //do nothing
             } else {
                 throw new TypeError(`Unsupported token type '${tokenType}'`);
@@ -666,17 +674,20 @@ export class GMLEngine {
             }
         }
 
-        tokens.forEach(t => {
+        const tokenCount = tokens.length;
+
+        for (let i = 0; i < tokenCount; i++) {
+            let t = tokens[i];
             let childView;
             const tokenType = t.type;
 
-            if (tokenType === TokenType.Reference) {
+            if (tokenType === TooltipTokenType.Reference) {
                 childView = compileReferenceToken(t);
-            } else if (tokenType === TokenType.Text) {
+            } else if (tokenType === TooltipTokenType.Text) {
                 childView = compileTextToken(t);
-            } else if (tokenType === TokenType.StyleStart) {
+            } else if (tokenType === TooltipTokenType.StyleStart) {
                 pushStyle(t.value);
-            } else if (tokenType === TokenType.StyleEnd) {
+            } else if (tokenType === TooltipTokenType.StyleEnd) {
                 popStyle(t.value);
             } else {
                 throw new TypeError(`Unsupported token type '${tokenType}'`);
@@ -685,7 +696,7 @@ export class GMLEngine {
             if (childView !== undefined) {
                 containerElement.addChild(childView);
             }
-        });
+        }
 
         return target;
     }
@@ -720,7 +731,7 @@ export class GMLEngine {
         this.pushState();
 
         try {
-            const tokens = parseTooltipString(code);
+            const tokens = this.__parser.parse(code);
 
             const result = this.compileTokensToText(tokens);
 
@@ -751,7 +762,7 @@ export class GMLEngine {
             this.pushState();
 
             try {
-                const tokens = parseTooltipString(code);
+                const tokens = this.__parser.parse(code);
 
                 const view = this.compileTokensToVisual(tokens, target);
 

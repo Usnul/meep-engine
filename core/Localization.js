@@ -1,6 +1,6 @@
 import ObservedString from "./model/ObservedString.js";
 import levenshtein from "fast-levenshtein";
-import { parseTooltipString } from "../view/tooltip/TooltipParser.js";
+import { parseTooltipString } from "../view/tooltip/parser/parseTooltipString.js";
 
 const VARIABLE_REGEX = /\$\{([a-zA-Z0-9_]+)\}/gi;
 
