@@ -16,6 +16,9 @@ import TopDownCameraController from './TopDownCameraController.js';
 import { Euler as ThreeEuler } from 'three';
 import Quaternion from "../../../../core/geom/Quaternion.js";
 
+
+const v3 = new Vector3();
+
 class TopDownCameraControllerSystem extends System {
     constructor() {
         super();
@@ -28,9 +31,11 @@ class TopDownCameraControllerSystem extends System {
 
     update(timeDelta) {
         const em = this.entityManager;
-        //position
-        const position = new Vector3();
 
+        /**
+         *
+         * @type {EntityComponentDataset}
+         */
         const dataset = em.dataset;
 
         if (this.enabled.get() && dataset !== null) {
@@ -44,12 +49,12 @@ class TopDownCameraControllerSystem extends System {
                 const rotationAngle = control.yaw;
                 const tiltAngle = control.pitch;
 
-                computeCameraFacingVector(control.yaw, control.pitch, control.roll, position);
+                computeCameraFacingVector(control.yaw, control.pitch, control.roll, v3);
 
-                position.multiplyScalar(distance);
-                position.add(target);
+                v3.multiplyScalar(distance);
+                v3.add(target);
 
-                transform.position.copy(position);
+                transform.position.copy(v3);
                 euler.set(tiltAngle, rotationAngle, control.roll);
                 transform.rotation.__setFromEuler(euler.x, euler.y, euler.z, euler.order);
             });

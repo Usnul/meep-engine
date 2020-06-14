@@ -1,22 +1,39 @@
 import { BinaryBuffer } from "./BinaryBuffer.js";
 
-function Dictionary() {
-    this.forward = new Map();
-    this.backward = new Map();
+class Dictionary {
+    constructor() {
+        this.forward = new Map();
+        this.backward = new Map();
+    }
+
+    /**
+     *
+     * @param {*} value
+     * @param {number} address
+     */
+    add(value, address) {
+        this.forward.set(address, value);
+        this.backward.set(value, address);
+    }
+
+    /**
+     *
+     * @param {*} value
+     * @returns {number|undefined}
+     */
+    getAddress(value) {
+        return this.backward.get(value);
+    }
+
+    /**
+     *
+     * @param {number} address
+     * @returns {*}
+     */
+    getValue(address) {
+        return this.forward.get(address);
+    }
 }
-
-Dictionary.prototype.add = function (value, address) {
-    this.forward.set(address, value);
-    this.backward.set(value, address);
-};
-
-Dictionary.prototype.getAddress = function (value) {
-    return this.backward.get(value);
-};
-
-Dictionary.prototype.getValue = function (address) {
-    return this.forward.get(address);
-};
 
 
 function EncodingBinaryBuffer() {

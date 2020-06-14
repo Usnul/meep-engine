@@ -9,6 +9,45 @@ import { Transform } from '../../ecs/components/Transform.js';
 import { browserInfo } from "../../Platform.js";
 
 
+class Context {
+    constructor() {
+        /**
+         *
+         * @type {SoundListener}
+         */
+        this.listener = null;
+        /**
+         *
+         * @type {Transform}
+         */
+        this.transform = null;
+
+        /**
+         *
+         * @type {AudioContext}
+         */
+        this.audioContext = null;
+    }
+
+    link() {
+        this.transform.position.onChanged.add(this.updatePosition, this);
+    }
+
+    unlink() {
+        this.transform.position.onChanged.remove(this.updatePosition, this);
+    }
+
+    updatePosition() {
+        /**
+         *
+         * @type {AudioListener}
+         */
+        const listener = this.audioContext.listener;
+
+        setListenerPosition(listener, this.transform.position);
+    }
+}
+
 class SoundListenerSystem extends System {
     /**
      *
@@ -18,21 +57,39 @@ class SoundListenerSystem extends System {
     constructor(context) {
         super();
         this.componentClass = SoundListener;
-        this.dependencies = [SoundListener];
+        this.dependencies = [SoundListener, Transform];
         //
         this.webAudioContext = context;
+
+        /**
+         *
+         * @type {Context[]}
+         */
+        this.data = [];
     }
 
-    update(timeDelta) {
+    link(component, transform, entity) {
+        const ctx = new Context();
 
-        const context = this.webAudioContext;
-        const listener = context.listener;
-        const entityManager = this.entityManager;
-        entityManager.traverseEntities([SoundListener, Transform], function (soundListener, transform, entity) {
-            const p = transform.position;
-            setListenerPosition(listener, p);
-        });
+        ctx.transform = transform;
+        ctx.listener = component;
 
+        ctx.audioContext = this.webAudioContext;
+
+        ctx.link();
+
+        this.data[entity] = ctx;
+    }
+
+    unlink(component, transform, entity) {
+
+        const ctx = this.data[entity];
+
+        if (ctx !== undefined) {
+            delete this.data[entity];
+
+            ctx.unlink();
+        }
 
     }
 }

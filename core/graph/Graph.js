@@ -190,7 +190,7 @@ export class Graph {
     /**
      *
      * @param {N} node
-     * @param {Graph~visitor} visitor
+     * @param {function(N,Edge<N>)} visitor
      */
     traversePredecessors(node, visitor) {
         const edges = this.edges;

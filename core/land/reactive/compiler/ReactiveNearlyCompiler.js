@@ -20,6 +20,7 @@ import { ReactiveNegate } from "../../../model/reactive/model/arithmetic/Reactiv
 import { ReactiveGreaterThanOrEqual } from "../../../model/reactive/model/comparative/ReactiveGreaterThanOrEqual.js";
 import { assert } from "../../../assert.js";
 import { Cache } from "../../../Cache.js";
+import { computeStringHash } from "../../../primitives/strings/StringUtils.js";
 
 const compilers = {
     Reference: ({ value }) => new ReactiveReference(value.join('.')),
@@ -174,7 +175,8 @@ const rules = nearley.Grammar.fromCompiled(grammar);
  * @type {Cache<string, *>}
  */
 const parseCache = new Cache({
-    maxWeight: 100
+    maxWeight: 1000,
+    keyHashFunction: computeStringHash
 });
 
 

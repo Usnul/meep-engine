@@ -358,7 +358,7 @@ export class MaxRectanglesPacker {
         this.free.insertDatum(new QuadTreeDatum(box.x0, box.y0, box.x1, box.y1));
 
 
-        assert.ok(this.validate());
+        // assert.ok(this.validate());
 
 
         return true;
@@ -397,7 +397,7 @@ export class MaxRectanglesPacker {
             this.boxes.push(box);
         }
 
-        assert.ok(this.validate());
+        // assert.ok(this.validate());
 
         return success;
     }
@@ -408,7 +408,7 @@ export class MaxRectanglesPacker {
      * @returns {boolean}
      */
     addMany(boxes) {
-        assert.ok(this.validate());
+        // assert.ok(this.validate());
 
         const numBoxes = boxes.length;
 
@@ -482,7 +482,7 @@ export class MaxRectanglesPacker {
      */
     resize(width, height) {
 
-        assert.ok(this.validate());
+        // assert.ok(this.validate());
 
         const oldWidth = this.size.x;
         const oldHeight = this.size.y;
@@ -502,7 +502,7 @@ export class MaxRectanglesPacker {
             }
         }
 
-        assert.ok(this.validate());
+        // assert.ok(this.validate());
     }
 
     validate() {

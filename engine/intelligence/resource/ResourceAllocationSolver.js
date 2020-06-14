@@ -1,5 +1,19 @@
 import { assert } from "../../../core/assert.js";
 
+/**
+ *
+ * @param {ResourceAllocationBid} a
+ * @param {ResourceAllocationBid} b
+ * @returns {number}
+ */
+function byWeightedValue(a,b) {
+
+    const v0 = a.value * a.weight;
+    const v1 = b.value * b.weight;
+
+    return v1 - v0;
+}
+
 export class ResourceAllocationSolver {
     constructor() {
         /**
@@ -96,12 +110,7 @@ export class ResourceAllocationSolver {
         const bids = this.bids.slice();
 
         //sort bids by value
-        bids.sort((a, b) => {
-            const v0 = a.value * a.weight;
-            const v1 = b.value * b.weight;
-
-            return v1 - v0;
-        });
+        bids.sort(byWeightedValue);
 
         /**
          *
