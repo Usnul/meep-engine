@@ -1,3 +1,5 @@
+import { makeCubicCurve } from "../../core/math/MathUtils.js";
+
 /**
  *
  * @enum {function(x:number):number}
@@ -6,7 +8,8 @@ const TransitionFunctions = {
     Linear: linear,
     Sine: sine,
     EaseIn: easeInQuad,
-    EaseOut: easeOutQuad
+    EaseOut: easeOutQuad,
+    CubicEaseIn: makeCubicCurve(0, 1, 0.98, 1)
 };
 
 
