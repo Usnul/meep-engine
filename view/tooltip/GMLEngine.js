@@ -587,12 +587,27 @@ export class GMLEngine {
         /**
          *
          * @param {Token} token
+         * @param {View[]} result
          */
-        function compileTextToken(token) {
-            return new LabelView(token.value, { tag: 'span' });
+        function compileTextToken(token, result) {
+
+            /**
+             * @type {string}
+             */
+            const tokenValue = token.value;
+
+            const view = new LabelView(tokenValue, { tag: 'span' });
+
+            result.push(view);
+
         }
 
-        function compileReferenceToken(token) {
+        /**
+         *
+         * @param {Token} token
+         * @param {View[]} result
+         */
+        function compileReferenceToken(token, result) {
             /**
              * @type {TooltipReferenceValue}
              */
@@ -623,7 +638,7 @@ export class GMLEngine {
 
             view.addClass('reference-type-' + refType);
 
-            return view;
+            result.push(view);
         }
 
 
@@ -678,13 +693,18 @@ export class GMLEngine {
 
         for (let i = 0; i < tokenCount; i++) {
             let t = tokens[i];
-            let childView;
+
+            /**
+             * @type {View[]}
+             */
+            const childViews = [];
+
             const tokenType = t.type;
 
             if (tokenType === TooltipTokenType.Reference) {
-                childView = compileReferenceToken(t);
+                compileReferenceToken(t, childViews);
             } else if (tokenType === TooltipTokenType.Text) {
-                childView = compileTextToken(t);
+                compileTextToken(t, childViews);
             } else if (tokenType === TooltipTokenType.StyleStart) {
                 pushStyle(t.value);
             } else if (tokenType === TooltipTokenType.StyleEnd) {
@@ -693,9 +713,14 @@ export class GMLEngine {
                 throw new TypeError(`Unsupported token type '${tokenType}'`);
             }
 
-            if (childView !== undefined) {
+            const nChildren = childViews.length;
+
+            for (let j = 0; j < nChildren; j++) {
+                const childView = childViews[j];
+
                 containerElement.addChild(childView);
             }
+
         }
 
         return target;
