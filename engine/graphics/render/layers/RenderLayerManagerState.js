@@ -14,7 +14,7 @@ export class RenderLayerManagerState {
      * @param {RenderLayerManager} manager
      */
     write(manager) {
-        console.log('RenderLayerManagerState.write');
+        // console.log('RenderLayerManagerState.write');
 
         for (const [id, state] of this.layers) {
 
@@ -32,7 +32,7 @@ export class RenderLayerManagerState {
      */
     read(manager) {
 
-        console.log('RenderLayerManagerState.read');
+        // console.log('RenderLayerManagerState.read');
 
         this.layers.clear();
 

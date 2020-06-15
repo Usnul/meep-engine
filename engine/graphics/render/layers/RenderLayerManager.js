@@ -37,7 +37,7 @@ class RenderLayerManager {
      * @returns {RenderLayerManagerState}
      */
     pushState() {
-        console.warn('RenderLayerManager.pushState');
+        // console.warn('RenderLayerManager.pushState');
 
         const state = new RenderLayerManagerState();
 
@@ -49,7 +49,7 @@ class RenderLayerManager {
     }
 
     popState() {
-        console.warn('RenderLayerManager.popState');
+        // console.warn('RenderLayerManager.popState');
 
         if (this.__stateStack.isEmpty()) {
             return;
