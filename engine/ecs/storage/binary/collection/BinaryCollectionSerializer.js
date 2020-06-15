@@ -1,6 +1,15 @@
 import { assert } from "../../../../../core/assert.js";
 import { BinaryCollectionHeaderCodec, BinaryCollectionHeaderLayout } from "./BinaryCollectionHeaderCodec.js";
 import { HashMap } from "../../../../../core/collection/HashMap.js";
+import { returnEmptyArray } from "../../../../../core/function/Functions.js";
+
+/**
+ *
+ * @returns {Array}
+ */
+function makeEmptyArray() {
+    return [];
+}
 
 export class BinaryCollectionSerializer {
     constructor() {
@@ -115,18 +124,36 @@ export class BinaryCollectionSerializer {
         return this.elementCount;
     }
 
-    initialize() {
+    /**
+     *
+     * @param {function(string,Class, BinaryClassSerializationAdapter):[]} [adapterOptionsSupplier]
+     */
+    initialize({
+                   adapterOptionsSupplier = returnEmptyArray
+               }) {
+
+        assert.typeOf(adapterOptionsSupplier, 'function', 'adapterOptionsSupplier');
+
         const className = this.className;
 
         assert.typeOf(className, 'string', 'className');
 
         const registry = this.registry;
 
-        this.adapter = registry.getAdapter(className);
+        const adapter = registry.getAdapter(className);
 
-        if (this.adapter === undefined) {
+        if (adapter === undefined) {
             throw new Error(`No adapter for class '${className}'`);
         }
+
+        this.adapter = adapter;
+
+        const adapterOptions = adapterOptionsSupplier(className, adapter.getClass(), adapter);
+
+        assert.isArray(adapterOptions, 'adapterOptions');
+
+        //initialize adapter with options
+        this.adapter.initialize.apply(this.adapter, adapterOptions);
 
         this.elementCount = 0;
 
@@ -146,7 +173,7 @@ export class BinaryCollectionSerializer {
 
         this.startAddress = buffer.position;
 
-        const componentType = this.adapter.getClass();
+        const componentType = adapter.getClass();
 
         //determine if dictionary can be used
         this.__dictionaryEnabled = typeof componentType.prototype.hash === "function"
@@ -178,6 +205,9 @@ export class BinaryCollectionSerializer {
 
         //restore buffer position
         buffer.position = endAddress;
+
+        //finalize current adapter
+        this.adapter.finalize();
 
         //clear dictionary
         this.dictionary.clear();

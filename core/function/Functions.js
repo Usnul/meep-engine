@@ -43,6 +43,15 @@ export function returnOne() {
     return 1;
 }
 
+
+/**
+ * @template T
+ * @returns {T[]}
+ */
+export function returnEmptyArray() {
+    return [];
+}
+
 /**
  * @template A
  * @param {A} a

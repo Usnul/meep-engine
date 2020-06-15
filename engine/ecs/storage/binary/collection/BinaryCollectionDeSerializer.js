@@ -4,6 +4,7 @@ import { assert } from "../../../../../core/assert.js";
 import { IllegalStateException } from "../../../../../core/fsm/exceptions/IllegalStateException.js";
 import { objectKeyByValue } from "../../../../../core/model/ObjectUtils.js";
 import { executeBinaryClassUpgraderChain } from "../BinaryClassUpgrader.js";
+import { returnEmptyArray } from "../../../../../core/function/Functions.js";
 
 /**
  *
@@ -14,13 +15,6 @@ const State = {
     Ready: 1
 };
 
-/**
- *
- * @returns {Array}
- */
-function makeEmptyArray() {
-    return [];
-}
 
 export class BinaryCollectionDeSerializer {
     constructor() {
@@ -164,7 +158,7 @@ export class BinaryCollectionDeSerializer {
      *
      * @param {function(string,Class, BinaryClassSerializationAdapter):[]} [adapterOptionsSupplier]
      */
-    initialize({ adapterOptionsSupplier = makeEmptyArray } = {}) {
+    initialize({ adapterOptionsSupplier = returnEmptyArray } = {}) {
         assert.typeOf(adapterOptionsSupplier, 'function', 'adapterOptionsSupplier');
 
         if (this.state !== State.Initial) {
@@ -190,7 +184,7 @@ export class BinaryCollectionDeSerializer {
 
         const adapterOptions = adapterOptionsSupplier(className, adapter.getClass(), adapter);
 
-        assert.ok(Array.isArray(adapterOptions), 'adapterOptionsSupplier must produce an array, instead got something else');
+        assert.isArray(adapterOptions, 'adapterOptions');
 
         //initialize adapter with options
         this.adapter.initialize.apply(this.adapter, adapterOptions);

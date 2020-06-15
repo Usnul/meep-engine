@@ -3,6 +3,7 @@ import { assert } from "../../../core/assert.js";
 import { BinaryCollectionSerializer } from "./binary/collection/BinaryCollectionSerializer.js";
 import { COMPONENT_SERIALIZATION_TRANSIENT_FIELD } from "./COMPONENT_SERIALIZATION_TRANSIENT_FIELD.js";
 import { currentTimeInSeconds } from "../../Clock.js";
+import { BinaryObjectSerializationAdapter } from "./binary/object/BinaryObjectSerializationAdapter.js";
 
 
 class BinaryBufferSerialization {
@@ -38,9 +39,13 @@ class BinaryBufferSerialization {
 
         const collectionSerializer = new BinaryCollectionSerializer();
 
-        collectionSerializer.setRegistry(this.registry);
+        const registry = this.registry;
+
+        collectionSerializer.setRegistry(registry);
         collectionSerializer.setBuffer(buffer);
 
+        const objectAdapter = new BinaryObjectSerializationAdapter();
+        objectAdapter.initialize(registry);
 
         let numTypesWritten = 0;
 
@@ -56,7 +61,17 @@ class BinaryBufferSerialization {
 
 
             collectionSerializer.setClass(className);
-            collectionSerializer.initialize();
+            collectionSerializer.initialize({
+                /**
+                 *
+                 * @param {string} className
+                 * @param {Class} klass
+                 * @param {BinaryClassSerializationAdapter} adapter
+                 */
+                adapterOptionsSupplier(className, klass, adapter) {
+                    return [engine, objectAdapter];
+                }
+            });
 
             const __start_time = currentTimeInSeconds();
 
