@@ -7,7 +7,7 @@ import Water from './Water.js';
 import { Light } from '../light/Light.js';
 import { Transform } from '../../../ecs/components/Transform.js';
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
-import { buildPlanarRenderLayerClipPlaneComputationMethod } from "../../render/RenderLayerUtils.js";
+import { buildPlanarRenderLayerClipPlaneComputationMethod } from "../../render/layers/RenderLayerUtils.js";
 import ThreeFactory from "../../three/ThreeFactory.js";
 import { threeUpdateTransform } from "../../Utils.js";
 import { StandardFrameBuffers } from "../../GraphicsEngine.js";

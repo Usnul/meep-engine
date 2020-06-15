@@ -6,6 +6,7 @@ import TaskState from '../task/TaskState.js';
 import TaskSignal from '../task/TaskSignal.js';
 import { IllegalStateException } from "../../fsm/exceptions/IllegalStateException.js";
 import { objectKeyByValue } from "../../model/ObjectUtils.js";
+import { assert } from "../../assert.js";
 
 
 /**
@@ -58,6 +59,8 @@ class ConcurrentExecutor {
      * @param {TaskGroup} taskGroup
      */
     runGroup(taskGroup) {
+        assert.equal(taskGroup.isTaskGroup, true, 'taskGroup.isTaskGroup !== true');
+
         const currentState = taskGroup.state.getValue();
         if (currentState !== TaskState.INITIAL) {
             throw new IllegalStateException(`Expected task state INITIAL, instead got ${objectKeyByValue(TaskState, currentState)}`);

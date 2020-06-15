@@ -32,7 +32,7 @@ import View from "../../view/View.js";
 import EmptyView from "../../view/elements/EmptyView.js";
 import { assert } from "../../core/assert.js";
 import Vector2 from "../../core/geom/Vector2.js";
-import { RenderLayerManager } from "./render/RenderLayerManager.js";
+import { RenderLayerManager } from "./render/layers/RenderLayerManager.js";
 import { FrameBufferManager } from "./render/buffer/FrameBufferManager.js";
 import { VisibilityComputer } from "./render/visibility/VisibilityComputer.js";
 import { ColorAndDepthFrameBuffer } from "./render/buffer/buffers/ColorAndDepthFrameBuffer.js";

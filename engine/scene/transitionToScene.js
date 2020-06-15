@@ -1,4 +1,4 @@
-import { wrapTaskIgnoreFailure } from "../../core/process/task/TaskUtils.js";
+import { actionTask, delayTask, wrapTaskIgnoreFailure } from "../../core/process/task/TaskUtils.js";
 import { loadVisibleTerrainTiles } from "../../../model/game/scenes/SceneUtils.js";
 import TaskGroup from "../../core/process/task/TaskGroup.js";
 import Task from "../../core/process/task/Task.js";
@@ -31,7 +31,11 @@ export function transitionToScene({ tasks = [], scene, engine, name }) {
     const tWaitForVisibleTerrainTiles = wrapTaskIgnoreFailure(loadVisibleTerrainTiles(engine.entityManager, scene.dataset));
     tWaitForVisibleTerrainTiles.name = "Waiting for visible terrain tiles";
 
+    tWaitForVisibleTerrainTiles.addDependencies(tasks);
+
     const tWaitForMeshes = wrapTaskIgnoreFailure(createTaskWaitForMeshesToLoad(scene.dataset, 7000));
+
+    tWaitForMeshes.addDependencies(tasks);
 
     /**
      *
@@ -43,10 +47,47 @@ export function transitionToScene({ tasks = [], scene, engine, name }) {
     tCompileMaterials.addDependency(tWaitForVisibleTerrainTiles);
     tCompileMaterials.addDependency(tWaitForMeshes);
 
+
+    //hide all render layers during load
+    const renderLayerState = graphics.layers.pushState();
+    graphics.layers.hideAll();
+
+    function cleanup() {
+        graphics.layers.popState();
+    }
+
+    //render a frame
+    const tRender = actionTask(() => {
+        // push new state
+        graphics.layers.pushState();
+
+        // restore original state
+        renderLayerState.write(graphics.layers);
+
+        // tick simulation
+        engine.entityManager.simulate(0);
+
+        // render current scene
+        graphics.render();
+
+        // restore previous sate
+        graphics.layers.popState();
+    });
+
+    tRender.addDependency(tCompileMaterials);
+    tRender.addDependency(tWaitForMeshes);
+    tRender.addDependencies(tasks);
+
+    const tDelay = delayTask(30, 'delay');
+
+    tDelay.addDependency(tRender);
+
     const extraTasks = [
         tWaitForMeshes,
         tWaitForVisibleTerrainTiles,
-        tCompileMaterials
+        tCompileMaterials,
+        tRender,
+        tDelay
     ];
 
     const allTasks = tasks.concat(extraTasks);
@@ -55,18 +96,22 @@ export function transitionToScene({ tasks = [], scene, engine, name }) {
 
     Task.joinAll(allTasks,
         () => {
+            cleanup();
+
             taskGroup.state.set(TaskState.SUCCEEDED);
 
             taskGroup.on.completed.send0();
 
         },
         () => {
+
+            cleanup();
+
             taskGroup.state.set(TaskState.FAILED);
 
             taskGroup.on.failed.send0();
         }
     );
-
 
     const promise = engine.loadSlowTask(taskGroup);
 

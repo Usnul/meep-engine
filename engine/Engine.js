@@ -495,8 +495,6 @@ Engine.prototype.loadSlowTask = function (task) {
 
         function cleanup() {
             simulator.resume();
-            //restore render layer visibility
-            renderLayers.forEach((l) => l.layer.visible = l.state);
         }
 
         function success() {
@@ -510,16 +508,6 @@ Engine.prototype.loadSlowTask = function (task) {
             cleanup();
             reject();
         }
-
-        //hide all render layers during load
-        const renderLayers = engine.graphics.layers.map(function (layer) {
-            return {
-                layer,
-                state: layer.visible
-            }
-        });
-
-        renderLayers.forEach((l) => l.layer.visible = false);
 
         const simulator = engine.ticker;
         simulator.pause();

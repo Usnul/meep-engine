@@ -101,7 +101,7 @@ class Task {
 
     /**
      *
-     * @param {Task} task
+     * @param {Task|TaskGroup} task
      * @returns Task
      */
     addDependency(task) {
@@ -130,7 +130,7 @@ class Task {
 
     /**
      *
-     * @param {Task[]} tasks
+     * @param {(Task|TaskGroup)[]} tasks
      */
     addDependencies(tasks) {
         if (!Array.isArray(tasks)) {

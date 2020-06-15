@@ -1,5 +1,5 @@
-import Vector3 from "../../../core/geom/Vector3.js";
-import { compute3PlaneIntersection, computePointDistanceToPlane } from "../../../core/geom/Plane.js";
+import Vector3 from "../../../../core/geom/Vector3.js";
+import { compute3PlaneIntersection, computePointDistanceToPlane } from "../../../../core/geom/Plane.js";
 
 /**
  *
