@@ -67,6 +67,9 @@ export function transitionToScene({ tasks = [], scene, engine, name }) {
         // tick simulation
         engine.entityManager.simulate(0);
 
+        // update effects
+        engine.effects.update(0);
+
         // render current scene
         graphics.render();
 
