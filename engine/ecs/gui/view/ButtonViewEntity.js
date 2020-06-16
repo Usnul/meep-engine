@@ -3,6 +3,7 @@ import { LocalizedLabelView } from "../../../../view/common/LocalizedLabelView.j
 import { StoryAction } from "../../../../../model/game/story/action/StoryAction.js";
 import { MouseEvents } from "../../../input/devices/events/MouseEvents.js";
 import { TouchEvents } from "../../../input/devices/events/TouchEvents.js";
+import EmptyView from "../../../../view/elements/EmptyView.js";
 
 export class ButtonViewEntity extends ViewEntity {
     constructor() {
@@ -12,6 +13,14 @@ export class ButtonViewEntity extends ViewEntity {
 
         this.addClass('ui-button-view-entity');
         this.addClass('ui-button-view');
+
+        this.addChild(new EmptyView({
+            classList: ['foreground']
+        }));
+
+        this.addChild(new EmptyView({
+            classList: ['background']
+        }));
 
         this.actions = [];
 
