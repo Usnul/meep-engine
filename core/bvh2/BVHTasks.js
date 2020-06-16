@@ -16,9 +16,16 @@ export function buildTreeOptimizationTask(bvh, iterationLength) {
 
     let cycles = 0;
     let sameChangeCountCycles = 0;
+
     //optimize bvh
     const task = new Task({
         name: "Optimization of Bounding Volume Hierarchy",
+
+        initializer() {
+            cycles = 0;
+            sameChangeCountCycles = 0;
+            buffer.clear();
+        },
         cycleFunction() {
             const optimizationsDone = optimize(bvh, iterationLength);
             if (optimizationsDone > 0) {

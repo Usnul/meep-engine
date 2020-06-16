@@ -4,7 +4,7 @@
 
 
 import { System } from '../../ecs/System.js';
-import { SoundEmitter } from './SoundEmitter.js';
+import { SoundEmitter } from './emitter/SoundEmitter.js';
 import SoundController from './SoundController.js';
 
 /**

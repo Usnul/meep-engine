@@ -3,11 +3,12 @@
  */
 
 
-import List from '../../../core/collection/List.js';
-import Vector1 from "../../../core/geom/Vector1.js";
-import Signal from "../../../core/events/signal/Signal.js";
-import { BinaryClassSerializationAdapter } from "../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
-import { LeafNode } from "../../../core/bvh2/LeafNode.js";
+import List from '../../../../core/collection/List.js';
+import Vector1 from "../../../../core/geom/Vector1.js";
+import Signal from "../../../../core/events/signal/Signal.js";
+import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import { LeafNode } from "../../../../core/bvh2/LeafNode.js";
+import { clamp, inverseLerp } from "../../../../core/math/MathUtils.js";
 
 /**
  * Convert decibel to percentage volume
@@ -54,16 +55,19 @@ export class SoundTrack {
          * @type {String|null}
          */
         this.channel = "";
+
         /**
          * @private
          * @type {number}
          */
         this.__volume = 1;
+
         /**
          *
          * @type {boolean}
          */
         this.playing = false;
+
         /**
          *
          * @type {boolean}
@@ -145,7 +149,7 @@ export class SoundTrack {
             loop = false,
             time = 0,
             volume = 1,
-            channel,
+            channel=null,
             playing = false,
             startWhenReady = true
         }
@@ -231,13 +235,40 @@ export class SoundEmitter {
          */
         this.channel = null;
 
-        this.distanceMin = 1;
-        this.distanceMax = 10000;
-        this.distanceRolloff = 1;
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__distanceMin = 1;
+
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__distanceMax = 10000;
+
+        /**
+         * @deprecated
+         * @type {number}
+         * @private
+         */
+        this.__distanceRolloff = 1;
 
         const nodes = this.nodes = {
+            /**
+             * @type {GainNode}
+             */
             volume: null,
-            panner: null
+            /**
+             * @type {PannerNode}
+             */
+            panner: null,
+            /**
+             * @type {GainNode}
+             */
+            pannerVolume: null
         };
 
         this.volume = new Vector1(1);
@@ -255,7 +286,129 @@ export class SoundEmitter {
         this.__bvhLeaf = new LeafNode(this, 0, 0, 0, 0, 0, 0);
     }
 
-    stopAllTracks(){
+    /**
+     * @return {AudioNode}
+     */
+    getTargetNode(){
+        if(this.isPositioned){
+            return this.nodes.panner;
+        }else{
+            return this.nodes.volume;
+        }
+    }
+
+    /**
+     *
+     * @param {AudioContext} ctx
+     */
+    buildNodes(ctx){
+        const nodes = this.nodes;
+
+        nodes.volume = ctx.createGain();
+
+        if (this.isPositioned) {
+            nodes.panner = ctx.createPanner();
+
+
+            //
+            nodes.panner.panningModel = 'HRTF';
+
+            // we set up distance model in the most efficient way, since we are ignoring it anyway and use custom distance model via a GainNode instead
+            nodes.panner.distanceModel = 'linear';
+            nodes.panner.rolloffFactor = 0;
+            nodes.panner.refDistance = 0;
+            nodes.panner.maxDistance = 1;
+
+            nodes.pannerVolume = ctx.createGain();
+
+            //wire
+            nodes.pannerVolume.connect(nodes.panner);
+            nodes.volume.connect(nodes.pannerVolume);
+        }
+
+        nodes.volume.gain.setValueAtTime(this.volume.getValue(), 0);
+    }
+
+    /**
+     *
+     * @param {number} distance
+     */
+    writePannerVolume(distance) {
+        const normalizedDistance = clamp(
+            inverseLerp(this.__distanceMin, this.__distanceMax, distance),
+            0,
+            1
+        );
+
+        const invDistance = 1 - normalizedDistance;
+
+        const volume = invDistance * invDistance;
+
+        /**
+         *
+         * @type {GainNode}
+         */
+        const pv = this.nodes.pannerVolume;
+
+        if (pv !== null) {
+            pv.gain.setValueAtTime(volume, 0);
+        }
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    get distanceMin() {
+        return this.__distanceMin;
+    }
+
+    /**
+     * @param {number} v
+     */
+    set distanceMin(v) {
+        this.__distanceMin = v;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    get distanceMax() {
+        return this.__distanceMax;
+    }
+
+    /**
+     * @param {number} v
+     */
+    set distanceMax(v) {
+        this.__distanceMax = v;
+    }
+
+
+    /**
+     * @deprecated
+     * @returns {number}
+     */
+    get distanceRolloff() {
+        return this.__distanceRolloff;
+    }
+
+    /**
+     * @deprecated
+     * @param {number} v
+     */
+    set distanceRolloff(v) {
+        this.__distanceRolloff = v;
+
+        const panner = this.nodes.panner;
+
+        if (panner !== null) {
+            panner.rolloffFactor = v;
+        }
+    }
+
+    stopAllTracks() {
         const tracks = this.tracks;
         const n = tracks.length;
 

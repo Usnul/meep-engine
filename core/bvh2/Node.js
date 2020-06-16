@@ -52,9 +52,13 @@ Node.prototype.validateAncestorChain = function () {
 Node.prototype.computeDepth = function () {
     let d = 0;
     let node = this.parentNode;
+
     while (node !== null) {
         node = node.parentNode;
+
+        d++;
     }
+
     return d;
 };
 

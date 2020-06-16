@@ -1,6 +1,6 @@
 import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
 import { Transform } from "../../../engine/ecs/components/Transform.js";
-import { SoundEmitter } from "../../../engine/sound/ecs/SoundEmitter.js";
+import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { makeHelperSphereGeometry } from "./makeHelperSphereGeometry.js";
 import { Group, Line, LineBasicMaterial } from "three";
 import { buildThreeJSHelperEntity } from "./buildThreeJSHelperEntity.js";
@@ -63,7 +63,8 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
          */
         const t = builder.getComponent(Transform);
 
-        t.copy(transform);
+        t.position.copy(transform.position);
+        t.rotation.copy(transform.rotation);
 
         return builder;
     }

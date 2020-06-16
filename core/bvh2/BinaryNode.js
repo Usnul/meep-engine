@@ -10,6 +10,9 @@ import { aabb3_intersect_aabb3, boxSurfaceArea, boxSurfaceArea2, scoreBoxesSAH }
 import { BottomUpOptimizingRebuilder } from "./transform/BottomUpOptimizingRebuilder.js";
 import { assert } from "../assert.js";
 import { max2, min2 } from "../math/MathUtils.js";
+import { traverseBinaryNodeUsingVisitor } from "./traversal/traverseBinaryNodeUsingVisitor.js";
+import { BVHVisitor } from "./traversal/BVHVisitor.js";
+import { computeSampleStandardDeviation } from "../math/statistics/computeSampleStandardDeviation.js";
 
 
 /**
@@ -81,6 +84,14 @@ const BinaryNode = function () {
     this.right = null;
 
     this.modifiers = 0;
+
+    this.x0 = 0;
+    this.y0 = 0;
+    this.z0 = 0;
+
+    this.x1 = 0;
+    this.y1 = 0;
+    this.z1 = 0;
 };
 
 BinaryNode.Modifier = ModifierType;
@@ -156,56 +167,71 @@ BinaryNode.prototype.optimize = function () {
  * @returns {Node}
  */
 BinaryNode.prototype.findParentFor = function (box) {
-    const a = this.left;
-    const b = this.right;
+    let n = this;
 
-    if (a === null || b === null) {
-        //TODO: make sure this doesn't lead to bad tree
-        //unbalanced node, good candidate already
-        return this;
-    }
+    while (true) {
 
-    const aIsBinary = a.isBinaryNode;
-    const bIsBinary = b.isBinaryNode;
+        const a = n.left;
+        const b = n.right;
 
-    // handle protected nodes
-    if (aIsBinary && a.isProtected()) {
-        if (bIsBinary) {
-            if (b.isProtected()) {
-                return this;
+        if (a === null || b === null) {
+            //TODO: make sure this doesn't lead to bad tree
+            //unbalanced node, good candidate already
+            return this;
+        }
+
+        const aIsBinary = a.isBinaryNode;
+        const bIsBinary = b.isBinaryNode;
+
+        // handle protected nodes
+        if (aIsBinary && a.isProtected()) {
+            if (bIsBinary) {
+                if (b.isProtected()) {
+                    return this;
+                } else {
+                    n = b;
+
+                    continue;
+                }
             } else {
-                return b.findParentFor(box);
+                return b;
+            }
+        } else if (bIsBinary && b.isProtected()) {
+            if (aIsBinary) {
+                n = a;
+            } else {
+                return a;
+            }
+        }
+
+        let aCost = a.costForInclusion(box);
+        let bCost = b.costForInclusion(box);
+
+        if (aCost === bCost) {
+            //change costs to be surface areas instead
+            aCost = a.computeSurfaceArea();
+            bCost = b.computeSurfaceArea();
+        }
+
+        if (aCost === bCost) {
+            //still the same, toss a coin
+            aCost = Math.random();
+            bCost = 1 - aCost;
+        }
+
+        if (aCost < bCost) {
+            if (aIsBinary) {
+                n = a;
+            } else {
+                return a;
             }
         } else {
-            return b;
+            if (bIsBinary) {
+                n = b;
+            } else {
+                return b;
+            }
         }
-    } else if (bIsBinary && b.isProtected()) {
-        if (aIsBinary) {
-            return a.findParentFor(box);
-        } else {
-            return a;
-        }
-    }
-
-    let aCost = a.costForInclusion(box);
-    let bCost = b.costForInclusion(box);
-
-    if (aCost === bCost) {
-        //change costs to be surface areas instead
-        aCost = a.computeSurfaceArea();
-        bCost = b.computeSurfaceArea();
-    }
-
-    if (aCost < bCost) {
-        if (aIsBinary) {
-            return a.findParentFor(box);
-        } else {
-            return a;
-        }
-    } else if (aCost > bCost && bIsBinary) {
-        return b.findParentFor(box);
-    } else {
-        return b;
     }
 };
 
@@ -999,6 +1025,33 @@ BinaryNode.prototype.traverseRayLeafIntersections = function (startX, startY, st
             return true;
         }
     });
+};
+
+/**
+ * Fraction of balanced nodes in the tree (those that have both children)
+ * @returns {number}
+ */
+BinaryNode.prototype.computeBalanceFactor = function () {
+
+    const bvhVisitor = new BVHVisitor();
+
+
+    const depths = [];
+
+    bvhVisitor.visitLeaf = (leaf) => {
+        const depth = leaf.computeDepth();
+
+        depths.push(depth);
+    };
+
+    traverseBinaryNodeUsingVisitor(this, bvhVisitor)
+
+    if (depths.length === 0) {
+        return 1;
+    } else {
+        return computeSampleStandardDeviation(depths);
+    }
+
 };
 
 /**

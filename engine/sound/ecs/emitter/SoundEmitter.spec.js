@@ -1,4 +1,4 @@
-import { BinaryBuffer } from "../../../core/binary/BinaryBuffer.js";
+import { BinaryBuffer } from "../../../../core/binary/BinaryBuffer.js";
 import { SoundEmitter, SoundEmitterSerializationAdapter, SoundTrack } from "./SoundEmitter.js";
 
 test('binary serialization consistency', () => {

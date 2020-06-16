@@ -16,8 +16,8 @@ import { ActionBehavior } from "../intelligence/behavior/primitive/ActionBehavio
 import { AnimationBehavior } from "../../../model/game/util/behavior/AnimationBehavior.js";
 import AnimationTrackPlayback from "../animation/keyed2/AnimationTrackPlayback.js";
 import { BehaviorComponent } from "../intelligence/behavior/ecs/BehaviorComponent.js";
-import { SoundEmitter } from "../sound/ecs/SoundEmitter.js";
-import { SoundEmitterChannels } from "../sound/ecs/SoundEmitterSystem.js";
+import { SoundEmitter } from "../sound/ecs/emitter/SoundEmitter.js";
+import { SoundEmitterChannels } from "../sound/ecs/emitter/SoundEmitterSystem.js";
 import { Transform } from "../ecs/components/Transform.js";
 import { SerializationMetadata } from "../ecs/components/SerializationMetadata.js";
 import { globalMetrics } from "../metrics/GlobalMetrics.js";

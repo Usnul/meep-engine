@@ -5,13 +5,18 @@
  */
 
 
-import { System } from '../../ecs/System.js';
+import { System } from '../../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
-import { Transform } from '../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/components/Transform.js';
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
-import { SoundAssetManager } from "../../asset/loaders/SoundAssetManager.js";
-import { GameAssetType } from "../../asset/GameAssetType.js";
-import { BinaryNode } from "../../../core/bvh2/BinaryNode.js";
+import { SoundAssetManager } from "../../../asset/loaders/SoundAssetManager.js";
+import { GameAssetType } from "../../../asset/GameAssetType.js";
+import { BinaryNode } from "../../../../core/bvh2/BinaryNode.js";
+import SoundListener from "../SoundListener.js";
+import { IncrementalDeltaSet } from "../../../graphics/render/visibility/IncrementalDeltaSet.js";
+import { queryBinaryNode_SphereIntersections_Data } from "../../../../core/bvh2/traversal/queryBinaryNode_SphereIntersections.js";
+import { LeafNode } from "../../../../core/bvh2/LeafNode.js";
+import { tryRotateSingleNode } from "../../../../core/bvh2/transform/RotationOptimizer.js";
 
 /**
  * @readonly
@@ -22,6 +27,18 @@ export const SoundEmitterChannels = {
     Music: 'music',
     Ambient: 'ambient'
 };
+
+/**
+ *
+ * @type {Map<NodeDescription, number>}
+ */
+const leafCount = new Map();
+
+/**
+ *
+ * @type {SoundEmitterComponentContext[]}
+ */
+const positionalNodes = [];
 
 class SoundEmitterComponentContext {
     constructor() {
@@ -43,6 +60,25 @@ class SoundEmitterComponentContext {
          * @type {SoundEmitterSystem}
          */
         this.system = null;
+
+        /**
+         *
+         * @type {AudioNode}
+         */
+        this.targetNode = null;
+
+        /**
+         *
+         * @type {LeafNode}
+         */
+        this.leaf = new LeafNode(this, 0, 0, 0, 0, 0, 0);
+
+        /**
+         *
+         * @type {boolean}
+         * @private
+         */
+        this.__isConnected = false;
     }
 
     update() {
@@ -65,7 +101,7 @@ class SoundEmitterComponentContext {
          *
          * @type {LeafNode}
          */
-        const bvhLeaf = emitter.__bvhLeaf;
+        const bvhLeaf = this.leaf;
 
         const distanceMax = emitter.distanceMax;
 
@@ -100,6 +136,27 @@ class SoundEmitterComponentContext {
         unregisterTrack(track);
     }
 
+    connect() {
+        if (this.__isConnected) {
+            return;
+        }
+
+        const targetNode = this.emitter.getTargetNode();
+
+        targetNode.connect(this.targetNode);
+
+        this.__isConnected = true;
+    }
+
+    disconnect() {
+        if (!this.__isConnected) {
+            return;
+        }
+        this.emitter.getTargetNode().disconnect();
+
+        this.__isConnected = false;
+    }
+
     link() {
         this.transform.position.onChanged.add(this.update, this);
 
@@ -116,8 +173,13 @@ class SoundEmitterComponentContext {
         this.emitter.tracks.on.removed.remove(this.removeTrack, this);
 
         this.emitter.tracks.forEach(this.removeTrack, this);
+
+        this.disconnect();
     }
+
+
 }
+
 
 export class SoundEmitterSystem extends System {
     /**
@@ -162,11 +224,54 @@ export class SoundEmitterSystem extends System {
         this.data = [];
 
         /**
+         *
+         * @type {IncrementalDeltaSet<SoundEmitterComponentContext>}
+         */
+        this.activeSet = new IncrementalDeltaSet();
+
+        /**
          * Spatial index
          * @type {BinaryNode}
          * @private
          */
         this.__bvh = new BinaryNode();
+
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__optimizationPointer = 0;
+    }
+
+    startup(entityManager, readyCallback, errorCallback) {
+        this.activeSet.onAdded.add(this.handleContextActivation, this);
+        this.activeSet.onRemoved.add(this.handleContextDeactivation, this);
+
+        super.startup(entityManager, readyCallback, errorCallback);
+    }
+
+    shutdown(entityManager, readyCallback, errorCallback) {
+        this.activeSet.onAdded.remove(this.handleContextActivation, this);
+        this.activeSet.onRemoved.remove(this.handleContextDeactivation, this);
+
+        super.shutdown(entityManager, readyCallback, errorCallback);
+    }
+
+    /**
+     *
+     * @param {SoundEmitterComponentContext} ctx
+     */
+    handleContextActivation(ctx) {
+        ctx.connect();
+    }
+
+    /**
+     *
+     * @param {SoundEmitterComponentContext} ctx
+     */
+    handleContextDeactivation(ctx) {
+        ctx.disconnect();
     }
 
     /**
@@ -229,30 +334,18 @@ export class SoundEmitterSystem extends System {
         const targetNode = this.channels[channelName];
 
         const nodes = emitter.nodes;
-        nodes.volume = context.createGain();
 
-        if (emitter.isPositioned) {
-            nodes.panner = context.createPanner();
-            nodes.volume.connect(nodes.panner);
-            nodes.panner.connect(targetNode);
-            //
-            nodes.panner.panningModel = 'HRTF';
-            nodes.panner.rolloffFactor = emitter.distanceRolloff;
-            nodes.panner.refDistance = emitter.distanceMin;
-            nodes.panner.maxDistance = emitter.distanceMax;
-        } else {
-            nodes.volume.connect(targetNode);
+        if (nodes.volume === null) {
+            emitter.buildNodes(context);
         }
-
-
-        //volume
-        nodes.volume.gain.setValueAtTime(emitter.volume.getValue(), 0);
 
         const ctx = new SoundEmitterComponentContext();
 
         ctx.system = this;
         ctx.transform = transform;
         ctx.emitter = emitter;
+
+        ctx.targetNode = targetNode;
 
         ctx.link();
 
@@ -261,7 +354,9 @@ export class SoundEmitterSystem extends System {
         this.data[entity] = ctx;
 
         //attach bvh
-        this.__bvh.insertNode(emitter.__bvhLeaf);
+        this.__bvh.insertNode(ctx.leaf);
+
+        leafCount.clear();
     }
 
     /**
@@ -282,48 +377,155 @@ export class SoundEmitterSystem extends System {
 
             ctx.unlink();
 
+            ctx.leaf.disconnect();
+
         }
 
-        emitter.__bvhLeaf.disconnect();
 
-        const nodes = emitter.nodes;
-
-        if (nodes.panner !== null) {
-            //doesn't require destination
-            nodes.panner.disconnect();
-        } else if (nodes.volume !== null) {
-            //doesn't require destination
-            nodes.volume.disconnect();
-        }
-
+        leafCount.clear();
     }
 
     update(timeDelta) {
         const entityManager = this.entityManager;
         const ecd = entityManager.dataset;
 
-        /**
-         *
-         * @param {SoundTrack} track
-         */
-        function updateTrack(track) {
-            if (track.playing) {
-                track.time += timeDelta;
+        if (ecd === null) {
+            return;
+        }
+
+        const activeSet = this.activeSet;
+        activeSet.initializeUpdate();
+
+        const soundListener = ecd.getAnyComponent(SoundListener);
+
+        let listenerTransform;
+
+        if (soundListener.entity !== -1) {
+            listenerTransform = ecd.getComponent(soundListener.entity, Transform);
+
+            const listenerPosition = listenerTransform.position;
+
+            const matchCount = queryBinaryNode_SphereIntersections_Data(positionalNodes, 0, this.__bvh, listenerPosition.x, listenerPosition.y, listenerPosition.z, 0);
+
+            for (let i = 0; i < matchCount; i++) {
+                /**
+                 * @type {SoundEmitterComponentContext}
+                 */
+                const ctx = positionalNodes[i];
+
+                const emitter = ctx.emitter;
+
+                if (emitter.isPositioned) {
+                    const distance = listenerPosition.distanceTo(ctx.transform.position);
+
+                    if (distance > emitter.distanceMax) {
+                        //emitter is too far away
+                        continue;
+                    }
+
+                    emitter.writePannerVolume(distance);
+                }
+
+                activeSet.push(ctx);
+
+            }
+
+        }
+
+
+        for (let entity in this.data) {
+            /**
+             *
+             * @type {SoundEmitterComponentContext}
+             */
+            const ctx = this.data[entity];
+
+            /**
+             *
+             * @type {SoundEmitter}
+             */
+            const emitter = ctx.emitter;
+
+            if (!emitter.isPositioned) {
+                activeSet.push(ctx);
+            }
+
+            /**
+             *
+             * @type {List<SoundTrack>}
+             */
+            const tracks = emitter.tracks;
+
+            const trackCount = tracks.length;
+
+
+            //update play time
+            for (let i = 0; i < trackCount; i++) {
+                const soundTrack = tracks.get(i);
+
+                if (soundTrack.playing) {
+                    soundTrack.time += timeDelta;
+                }
+            }
+
+        }
+
+        activeSet.finalizeUpdate();
+
+        this.optimize(1);
+    }
+
+    optimize(budget) {
+        let ctx;
+
+        const data = this.data;
+        const length = data.length;
+
+        if (length === 0) {
+            return;
+        }
+
+        const t0 = performance.now();
+
+        while (true) {
+
+            //find next entity
+            this.__optimizationPointer++;
+
+            while ((ctx = data[this.__optimizationPointer]) === undefined) {
+                this.__optimizationPointer++
+
+                if (this.__optimizationPointer >= length) {
+                    this.__optimizationPointer = 0;
+                }
+
+            }
+
+            let n = ctx.leaf.parentNode;
+
+            while (n !== null) {
+
+                tryRotateSingleNode(n, leafCount);
+
+                if (Math.random() < 0.5) {
+                    //random exit
+                    break;
+                }
+
+                n = n.parentNode;
+            }
+
+            const t1 = performance.now();
+
+            const time = t1 - t0;
+
+            if(time > budget){
+                break;
             }
         }
-
-        /**
-         *
-         * @param {SoundEmitter} soundEmitter
-         */
-        function visitSoundEmitter(soundEmitter) {
-            soundEmitter.tracks.forEach(updateTrack);
-        }
-
-        if (ecd !== null) {
-            ecd.traverseComponents(SoundEmitter, visitSoundEmitter);
-        }
     }
+
+
 }
 
 

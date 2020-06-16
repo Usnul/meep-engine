@@ -2,11 +2,11 @@
  * Created by Alex on 02/04/2014.
  */
 import { Transform } from './ecs/components/Transform.js';
-import { SoundEmitter } from './sound/ecs/SoundEmitter.js';
+import { SoundEmitter } from './sound/ecs/emitter/SoundEmitter.js';
 import Timer from './ecs/components/Timer.js';
 import EntityBuilder from './ecs/EntityBuilder.js';
 import Vector3 from "../core/geom/Vector3.js";
-import { SoundEmitterChannels } from "./sound/ecs/SoundEmitterSystem.js";
+import { SoundEmitterChannels } from "./sound/ecs/emitter/SoundEmitterSystem.js";
 import { BehaviorComponent } from "./intelligence/behavior/ecs/BehaviorComponent.js";
 import { SequenceBehavior } from "./intelligence/behavior/composite/SequenceBehavior.js";
 import { DelayBehavior } from "../../model/game/util/behavior/DelayBehavior.js";

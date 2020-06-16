@@ -5,7 +5,7 @@
 
 import { BinaryNode } from '../../../../core/bvh2/BinaryNode.js';
 import { RenderPassType } from "../RenderPassType.js";
-import { VisibilitySet } from "../visibility/VisibilitySet.js";
+import { IncrementalDeltaSet } from "../visibility/IncrementalDeltaSet.js";
 import { BVHVisitor } from "../../../../core/bvh2/traversal/BVHVisitor.js";
 import { noop } from "../../../../core/function/Functions.js";
 import { ThreeFrustumsIntersectionBVHVisitor } from "../../../../core/bvh2/traversal/ThreeFrustumsIntersectionBVHVisitor.js";
@@ -103,9 +103,9 @@ class RenderLayer {
 
         /**
          *
-         * @type {VisibilitySet}
+         * @type {IncrementalDeltaSet<Object3D>}
          */
-        this.visibleSet = new VisibilitySet();
+        this.visibleSet = new IncrementalDeltaSet();
 
         /**
          *

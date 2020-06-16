@@ -24,6 +24,12 @@ export class RingBuffer {
         this.data = new Array(size);
     }
 
+    clear() {
+        this.head = 0
+        this.tail = 0;
+        this.count = 0;
+    }
+
     /**
      *
      * @param {V} element

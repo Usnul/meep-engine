@@ -143,6 +143,45 @@ AABB3.prototype.setInfiniteBounds = function () {
 
 /**
  *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @returns {number} Squared distance to point, value is negative if the point is inside the box
+ */
+AABB3.prototype.distanceToPoint2 = function (x, y, z) {
+    const _x0 = this.x0;
+    const _y0 = this.y0;
+    const _z0 = this.z0;
+    const _x1 = this.x1;
+    const _y1 = this.y1;
+    const _z1 = this.z1;
+
+    //do projection
+    const xp0 = _x0 - x;
+    const xp1 = x - _x1;
+    const yp0 = _y0 - y;
+    const yp1 = y - _y1;
+    const zp0 = _z0 - z;
+    const zp1 = z - _z1;
+
+    //calculate separation in each axis
+    const dx = Math.max(xp0, xp1);
+    const dy = Math.max(yp0, yp1);
+    const dz = Math.max(zp0, zp1);
+
+    //straight-line distance
+    const distance2 = dx * dx + dy * dy + dz * dz;
+
+    if (dx < 0 && dy < 0 && dz < 0) {
+        //penetration
+        return -distance2;
+    } else {
+        return distance2;
+    }
+};
+
+/**
+ *
  * @param {AABB3} box
  * @returns {number}
  */

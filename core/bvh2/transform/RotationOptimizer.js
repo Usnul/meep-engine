@@ -25,6 +25,13 @@ function countLeaves(node) {
 }
 
 /**
+ *
+ * @type {(BinaryNode|LeafNode)[]}
+ */
+const stack = [];
+let stackPointer = 0;
+
+/**
  *  * @param {BinaryNode} node
  * @param {Map.<NodeDescription,int>} leafCounts
  */
@@ -33,27 +40,66 @@ function getLeafCount(node, leafCounts) {
         return 1;
     }
 
+    let result = 0;
+
+    let n;
+
     const storedValue = leafCounts.get(node);
+
     if (storedValue !== undefined) {
         return storedValue;
-    } else {
-        const left = node.left;
-        const right = node.right;
-
-        let result = 0;
-        if (left !== null) {
-            result += getLeafCount(left, leafCounts);
-        }
-
-        if (right !== null) {
-            result += getLeafCount(right, leafCounts);
-        }
-
-        leafCounts.set(node, result);
-        return result;
     }
+
+    const stackOffset = stackPointer;
+
+    stack[stackPointer++] = node;
+
+    while (stackPointer-- > stackOffset) {
+
+        n = stack[stackPointer];
+
+
+        const storedValue = leafCounts.get(node);
+
+        if (storedValue !== undefined) {
+        result += storedValue;
+        continue;
+        }
+
+
+        if (n.isBinaryNode) {
+
+            if (n.right !== null) {
+                stack[stackPointer++] = n.right;
+            }
+
+            if (n.left !== null) {
+                stack[stackPointer++] = n.left;
+            }
+
+        } else {
+
+            result++;
+        }
+
+    }
+
+    //drop the stack frame
+    stackPointer = stackOffset;
+
+    leafCounts.set(node, result);
+
+    return result;
 }
 
+/**
+ *
+ * @param {Node} node
+ * @param {BinaryNode} parent
+ */
+function setParent(node, parent) {
+    node.parentNode = parent;
+}
 
 /**
  * Based on paper "Fast, Effective BVH Updates for Animated Scenes" Kopta et. al. (url: http://www.cs.utah.edu/~thiago/papers/rotations.pdf)
@@ -64,15 +110,11 @@ function getLeafCount(node, leafCounts) {
 function tryRotateSingleNode(node, leafCounts) {
 
 
-    function setParent(node, parent) {
-        node.parentNode = parent;
-    }
-
     const left = node.left;
     const right = node.right;
 
     if (left === null || right === null) {
-        return false;
+        return 0;
     }
 
     let bestRotation = 0;
@@ -160,8 +202,8 @@ function tryRotateSingleNode(node, leafCounts) {
             rightLeftArea = computeArea(rightLeft);
             rightRightArea = computeArea(rightRight);
 
-            rightLeftLeaves = countLeaves(rightLeft, leafCounts);
-            rightRightLeaves = countLeaves(rightRight, leafCounts);
+            rightLeftLeaves = getLeafCount(rightLeft, leafCounts);
+            rightRightLeaves = getLeafCount(rightRight, leafCounts);
 
             // (3)    N                     N        //
             //       / \                   / \       //

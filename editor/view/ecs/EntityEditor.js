@@ -62,7 +62,7 @@ function prepareComponentFactory(factory, editor) {
         .register('MinimapMarker', datify)
         .register('Camera', datify)
         .register('FacingDirection', datify)
-        .register('GridObstacle',()=> new GridObstacleController())
+        .register('GridObstacle', () => new GridObstacleController())
         .register('Terrain', () => new TerrainController(editor.engine.assetManager))
         .register('TopDownCameraController', datify)
         .register('Light', datify)
@@ -82,7 +82,7 @@ function prepareComponentFactory(factory, editor) {
             const particleEmitterSystem = em.getOwnerSystemByComponentClass(em.getComponentClassByName('ParticleEmitter'));
             return new ParticleEmitterController(particleEmitterSystem);
         })
-        .register('SoundEmitter', () => new SoundEmitterController())
+        .register('SoundEmitter', () => new SoundEmitterController(editor.engine))
         .register('GUIElement', () => new GUIElementController())
         .register('ViewportPosition', datify)
     ;

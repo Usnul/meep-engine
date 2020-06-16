@@ -49,9 +49,10 @@ StacklessTraverser.prototype.init = function (node) {
  *
  * Advanced traverser. Visitor will be invoked only on those advancements that produce a unique visit
  * @param {function(node:NodeDescription):boolean} visitor terminate branch and do no traverse descendants when visitor returns false
+ * @param {*} [thisArg]
  * @returns {boolean}
  */
-StacklessTraverser.prototype.advance = function (visitor) {
+StacklessTraverser.prototype.advance = function (visitor, thisArg) {
     let n;
 
     let state = this.state, current = this.current;
@@ -75,7 +76,7 @@ StacklessTraverser.prototype.advance = function (visitor) {
             }
             break;
         case StateFromSibling:
-            if (visitor(current) === false || isLeaf(current)) {
+            if (visitor.call(thisArg, current) === false || isLeaf(current)) {
                 current = parent(current);
                 state = StateFromChild;
             } else {
@@ -92,7 +93,7 @@ StacklessTraverser.prototype.advance = function (visitor) {
             }
             break;
         case StateFromParent:
-            if (visitor(current) === false || isLeaf(current)) {
+            if (visitor.call(thisArg, current) === false || isLeaf(current)) {
                 n = sibling(current);
                 if (n == null) {
                     //ascend

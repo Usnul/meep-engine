@@ -6,22 +6,34 @@ import { assert } from "../../../../core/assert.js";
  * @readonly
  * @enum {number}
  */
-const VisibilitySetState = {
+const IncrementalDeltaSetState = {
     Clear: 0,
     Building: 1,
     Ready: 2
 };
 
-export class VisibilitySet {
+/**
+ * accelerated Set data structure optimized for incremental re-building
+ * @template V
+ */
+export class IncrementalDeltaSet {
     constructor() {
         /**
          *
-         * @type {Object3D[]}
+         * @type {V[]}
          */
         this.elements = [];
 
+        /**
+         * Dirty flag set, used during the update to keep track of which elements are to be remove
+         * @type {BitSet}
+         */
         this.flags = new BitSet();
 
+        /**
+         * Number of currently held elements
+         * @type {number}
+         */
         this.size = 0;
 
         /**
@@ -44,9 +56,9 @@ export class VisibilitySet {
 
         /**
          *
-         * @type {VisibilitySetState|number}
+         * @type {IncrementalDeltaSetState|number}
          */
-        this.state = VisibilitySetState.Clear;
+        this.state = IncrementalDeltaSetState.Clear;
     }
 
     clear() {
@@ -54,18 +66,18 @@ export class VisibilitySet {
         this.size = 0;
         this.flags.reset();
 
-        this.state = VisibilitySetState.Clear;
+        this.state = IncrementalDeltaSetState.Clear;
     }
 
     initializeUpdate() {
         //mark all elements as dirty
         this.flags.setRange(0, this.size - 1);
 
-        this.state = VisibilitySetState.Building;
+        this.state = IncrementalDeltaSetState.Building;
     }
 
     finalizeUpdate() {
-        assert.equal(this.state, VisibilitySetState.Building, `Expected BUILDING state, instead got '${this.state}'`);
+        assert.equal(this.state, IncrementalDeltaSetState.Building, `Expected BUILDING state, instead got '${this.state}'`);
 
         let deletions = 0;
 
@@ -89,7 +101,7 @@ export class VisibilitySet {
 
         this.flags.reset();
 
-        this.state = VisibilitySetState.Ready;
+        this.state = IncrementalDeltaSetState.Ready;
 
         //dispatch notification
         this.onUpdateFinished.send0();
@@ -97,11 +109,11 @@ export class VisibilitySet {
 
     /**
      *
-     * @param {Object3D} element
+     * @param {V} element
      */
     push(element) {
         //check if element is already in the set
-        const i = this.elements.indexOf(element);
+        const i = this.elements.indexOf(element); //TODO this can probably be done faster. Maybe use a bloom filter? or some kind of a hash
 
         if (i === -1) {
             this.elements.push(element);
@@ -109,7 +121,7 @@ export class VisibilitySet {
 
             this.onAdded.send1(element);
         } else {
-            //clear dirty flag
+            //Existing element. We're keeping it. clear dirty flag
             this.flags.clear(i);
         }
 
