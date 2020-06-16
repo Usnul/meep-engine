@@ -38,7 +38,7 @@ import { makeParticleEmitterSymbolicDisplay } from "./symbolic/makeParticleEmitt
 import { ProcessState } from "../../core/process/ProcessState.js";
 import { assert } from "../../core/assert.js";
 import { makeSoundEmitterSymbolicDisplay } from "./symbolic/makeSoundEmitterSymbolicDisplay.js";
-
+import { SoundEmitter } from "../../engine/sound/ecs/emitter/SoundEmitter.js";
 
 /**
  *
@@ -528,6 +528,7 @@ class SymbolicDisplayProcess extends EditorProcess {
             makePositionedIconDisplaySymbol(engine, "data/textures/icons/editor/particles.png", ParticleEmitter),
             makePositionedIconDisplaySymbol(engine, "data/textures/icons/editor/camera.png", Camera),
             makePositionedIconDisplaySymbol(engine, "data/textures/icons/editor/light.png", Light),
+            makePositionedIconDisplaySymbol(engine, "data/textures/icons/editor/sound.png", SoundEmitter),
 
             makeCameraSymbolicDisplay(engine),
             makeLightSymbolicDisplay(engine),
