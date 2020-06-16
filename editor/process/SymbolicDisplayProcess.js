@@ -37,6 +37,7 @@ import { makeSocketsSymbolicDisplay } from "./symbolic/makeSocketsSymbolicDispla
 import { makeParticleEmitterSymbolicDisplay } from "./symbolic/makeParticleEmitterSymbolicDisplay.js";
 import { ProcessState } from "../../core/process/ProcessState.js";
 import { assert } from "../../core/assert.js";
+import { makeSoundEmitterSymbolicDisplay } from "./symbolic/makeSoundEmitterSymbolicDisplay.js";
 
 
 /**
@@ -275,6 +276,8 @@ function makePathSymbolicDisplay(engine) {
 
         function update() {
             pathObject.geometry = buildPathGeometry(path, q);
+
+            b.getComponent(Renderable).computeBoundsFromObject();
         }
 
         for (let i = 0; i < path.getPointCount(); i++) {
@@ -531,7 +534,8 @@ class SymbolicDisplayProcess extends EditorProcess {
             makeGridPositionSymbolDisplay(engine),
             makePathSymbolicDisplay(engine),
             makeSocketsSymbolicDisplay(engine),
-            makeParticleEmitterSymbolicDisplay(engine)
+            makeParticleEmitterSymbolicDisplay(engine),
+            makeSoundEmitterSymbolicDisplay(engine)
         ];
 
         this.displays.forEach(d => d.initialize(editor));

@@ -109,7 +109,9 @@ export function makeSocketsSymbolicDisplay(engine) {
 
         });
 
-        return buildThreeJSHelperEntity(group);
+        const builder = buildThreeJSHelperEntity(group);
+
+        return builder;
     }
 
     return make3DSymbolicDisplay({ engine, components: [AttachmentSockets, Transform], factory });

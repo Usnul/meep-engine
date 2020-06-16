@@ -1,9 +1,10 @@
 import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
 import { Transform } from "../../../engine/ecs/components/Transform.js";
-import { BoxBufferGeometry, DodecahedronBufferGeometry, Group, Mesh, MeshBasicMaterial } from "three";
+import { BoxBufferGeometry, Group, Line, LineBasicMaterial, Mesh, MeshBasicMaterial } from "three";
 import { EmissionShapeType } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleLayer.js";
 import { buildThreeJSHelperEntity } from "./buildThreeJSHelperEntity.js";
 import { ParticleEmitter } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
+import { makeHelperSphereGeometry } from "./makeHelperSphereGeometry.js";
 
 /**
  *
@@ -13,9 +14,19 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
 
     const wireframeMaterial = new MeshBasicMaterial({ wireframe: true, depthTest: true });
 
+    const lineMaterial = new LineBasicMaterial({
+        depthTest: true,
+        depthWrite: false,
+        transparent: true,
+        linewidth: 1,
+        fog: false,
+        color: '#FFFFFF',
+        opacity: 0.5
+    });
+
     const centerMaterial = new MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.2 });
 
-    const sphereBufferGeometry = new DodecahedronBufferGeometry(1, 1);
+    const sphereBufferGeometry = makeHelperSphereGeometry(1, 64);
 
     const boxGeometry = new BoxBufferGeometry(1, 1, 1, 1, 1, 1,);
 
@@ -27,13 +38,12 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
      * @param {Transform} transform
      * @param {number} entity
      * @param api
+     * @returns {EntityBuilder}
      */
     function factory([emitter, transform, entity], api) {
 
         const group = new Group();
         group.frustumCulled = false;
-
-        const ecd = engine.entityManager.dataset;
 
         emitter.traverseLayers(layer => {
             const emissionShape = layer.emissionShape;
@@ -45,15 +55,21 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             group.add(center);
 
             let geometry;
+            let mesh;
 
             if (emissionShape === EmissionShapeType.Box) {
+
                 geometry = boxGeometry;
+                mesh = new Mesh(geometry, wireframeMaterial);
+
             } else if (emissionShape === EmissionShapeType.Sphere) {
+
                 geometry = sphereBufferGeometry;
+                mesh = new Line(geometry, lineMaterial);
+
             }
 
-            if (geometry !== undefined) {
-                const mesh = new Mesh(geometry, wireframeMaterial);
+            if (mesh !== undefined) {
 
                 mesh.position.copy(layer.position);
                 mesh.scale.copy(layer.scale);
