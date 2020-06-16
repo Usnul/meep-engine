@@ -11,6 +11,7 @@ import { Transform } from '../../ecs/components/Transform.js';
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
 import { SoundAssetManager } from "../../asset/loaders/SoundAssetManager.js";
 import { GameAssetType } from "../../asset/GameAssetType.js";
+import { BinaryNode } from "../../../core/bvh2/BinaryNode.js";
 
 /**
  * @readonly
@@ -21,6 +22,102 @@ export const SoundEmitterChannels = {
     Music: 'music',
     Ambient: 'ambient'
 };
+
+class SoundEmitterComponentContext {
+    constructor() {
+
+        /**
+         *
+         * @type {SoundEmitter}
+         */
+        this.emitter = null;
+
+        /**
+         *
+         * @type {Transform}
+         */
+        this.transform = null;
+
+        /**
+         *
+         * @type {SoundEmitterSystem}
+         */
+        this.system = null;
+    }
+
+    update() {
+
+        const position = this.transform.position;
+
+        /**
+         *
+         * @type {SoundEmitter}
+         */
+        const emitter = this.emitter;
+
+        const x = position.x;
+        const y = position.y;
+        const z = position.z;
+
+        setEmitterPosition(emitter, x, y, z);
+
+        /**
+         *
+         * @type {LeafNode}
+         */
+        const bvhLeaf = emitter.__bvhLeaf;
+
+        const distanceMax = emitter.distanceMax;
+
+        bvhLeaf.resize(
+            x - distanceMax,
+            y - distanceMax,
+            z - distanceMax,
+            x + distanceMax,
+            y + distanceMax,
+            z + distanceMax
+        );
+    }
+
+    /**
+     *
+     * @param {SoundTrack} track
+     */
+    addTrack(track) {
+        const system = this.system;
+
+        const context = system.webAudioContext;
+        const assetManager = system.assetManager;
+
+        registerTrack(context, assetManager, this.emitter, track);
+    }
+
+    /**
+     *
+     * @param {SoundTrack} track
+     */
+    removeTrack(track) {
+        unregisterTrack(track);
+    }
+
+    link() {
+        this.transform.position.onChanged.add(this.update, this);
+
+        this.emitter.tracks.forEach(this.addTrack, this);
+
+        this.emitter.tracks.on.added.add(this.addTrack, this);
+        this.emitter.tracks.on.removed.add(this.removeTrack, this);
+    }
+
+    unlink() {
+        this.transform.position.onChanged.remove(this.update, this);
+
+        this.emitter.tracks.on.added.remove(this.addTrack, this);
+        this.emitter.tracks.on.removed.remove(this.removeTrack, this);
+
+        this.emitter.tracks.forEach(this.removeTrack, this);
+    }
+}
 
 export class SoundEmitterSystem extends System {
     /**
@@ -56,6 +153,20 @@ export class SoundEmitterSystem extends System {
         this.channels[SoundEmitterChannels.Music].gain.setValueAtTime(0.1, 0);
 
         assetManager.registerLoader(GameAssetType.Sound, new SoundAssetManager(context));
+
+
+        /**
+         *
+         * @type {SoundEmitterComponentContext[]}
+         */
+        this.data = [];
+
+        /**
+         * Spatial index
+         * @type {BinaryNode}
+         * @private
+         */
+        this.__bvh = new BinaryNode();
     }
 
     /**
@@ -114,11 +225,12 @@ export class SoundEmitterSystem extends System {
             channelName = SoundEmitterChannels.Effects;
 
         }
-        const targetNode = this.channels[channelName];
 
+        const targetNode = this.channels[channelName];
 
         const nodes = emitter.nodes;
         nodes.volume = context.createGain();
+
         if (emitter.isPositioned) {
             nodes.panner = context.createPanner();
             nodes.volume.connect(nodes.panner);
@@ -132,34 +244,24 @@ export class SoundEmitterSystem extends System {
             nodes.volume.connect(targetNode);
         }
 
-        const assetManager = this.assetManager;
-
-        function addTrack(track) {
-            registerTrack(context, assetManager, emitter, track);
-        }
-
-        emitter.tracks.forEach(addTrack);
-        emitter.tracks.on.added.add(addTrack);
-        emitter.tracks.on.removed.add(unregisterTrack);
 
         //volume
         nodes.volume.gain.setValueAtTime(emitter.volume.getValue(), 0);
 
-        function updatePosition(x, y, z) {
-            setEmitterPosition(emitter, x, y, z);
-        }
+        const ctx = new SoundEmitterComponentContext();
 
-        emitter.__data = {
-            handleTrackAdded: addTrack,
-            handlePositionChanged: updatePosition
-        };
+        ctx.system = this;
+        ctx.transform = transform;
+        ctx.emitter = emitter;
 
+        ctx.link();
 
-        const p = transform.position;
+        ctx.update();
 
-        setEmitterPosition(emitter, p.x, p.y, p.z);
+        this.data[entity] = ctx;
 
-        p.onChanged.add(updatePosition);
+        //attach bvh
+        this.__bvh.insertNode(emitter.__bvhLeaf);
     }
 
     /**
@@ -169,13 +271,23 @@ export class SoundEmitterSystem extends System {
      * @param {number} entity
      */
     unlink(emitter, transform, entity) {
-        transform.position.onChanged.remove(emitter.__data.handlePositionChanged);
+        //stop all tracks
+        emitter.stopAllTracks();
+
+        const ctx = this.data[entity];
+
+        if (ctx !== undefined) {
+
+            delete this.data[entity];
+
+            ctx.unlink();
+
+        }
+
+        emitter.__bvhLeaf.disconnect();
 
         const nodes = emitter.nodes;
-        //stop all tracks
-        emitter.tracks.forEach(function (track) {
-            track.playing = false;
-        });
+
         if (nodes.panner !== null) {
             //doesn't require destination
             nodes.panner.disconnect();
@@ -184,10 +296,6 @@ export class SoundEmitterSystem extends System {
             nodes.volume.disconnect();
         }
 
-        const data = emitter.__data;
-
-        emitter.tracks.on.added.remove(data.handleTrackAdded);
-        emitter.tracks.on.removed.remove(unregisterTrack);
     }
 
     update(timeDelta) {

@@ -7,6 +7,7 @@ import List from '../../../core/collection/List.js';
 import Vector1 from "../../../core/geom/Vector1.js";
 import Signal from "../../../core/events/signal/Signal.js";
 import { BinaryClassSerializationAdapter } from "../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import { LeafNode } from "../../../core/bvh2/LeafNode.js";
 
 /**
  * Convert decibel to percentage volume
@@ -246,6 +247,23 @@ export class SoundEmitter {
                 nodes.volume.gain.setValueAtTime(value, 0);
             }
         });
+
+        /**
+         *
+         * @type {LeafNode}
+         */
+        this.__bvhLeaf = new LeafNode(this, 0, 0, 0, 0, 0, 0);
+    }
+
+    stopAllTracks(){
+        const tracks = this.tracks;
+        const n = tracks.length;
+
+        for (let i = 0; i < n; i++) {
+            const soundTrack = tracks.get(i);
+
+            soundTrack.playing = false;
+        }
     }
 
     toJSON() {
