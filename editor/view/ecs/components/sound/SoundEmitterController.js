@@ -47,6 +47,11 @@ class SoundTrackController extends EmptyView {
 
             audio = new Audio(v);
         });
+
+        if (track.channel === null) {
+            track.channel = "";
+        }
+
         dat.add(track, 'loop');
         dat.add(track, 'time');
         dat.add(track, 'volume').step(0.001);

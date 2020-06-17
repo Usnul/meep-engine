@@ -42,6 +42,7 @@ import { MarkerNodeActionWeightedElement } from "../../markers/actions/probabili
 import { MarkerNodeActionSelectWeighted } from "../../markers/actions/probability/MarkerNodeActionSelectWeighted.js";
 import { ParticleEmitter } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
 import { CellFilterCache } from "../../filtering/CellFilterCache.js";
+import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -537,19 +538,30 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     }))
 }));
 
-const ebpBase = new EntityBlueprint();
-ebpBase.add(Mesh.fromJSON({
-    url: 'data/models/LowPolyTownshipSet/Large_house/model.gltf',
-    dropShadow: true,
-    receiveShadow: true
-}));
-ebpBase.add(Transform.fromJSON({}));
-ebpBase.add(GridPosition.fromJSON({}));
-
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Base'),
     transformers: [MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1))],
-    action: MarkerNodeActionEntityPlacement.from(ebpBase, Transform.fromJSON({
+    action: MarkerNodeActionEntityPlacement.from(EntityBlueprint.from([
+        Mesh.fromJSON({
+            url: 'data/models/LowPolyTownshipSet/Large_house/model.gltf',
+            dropShadow: true,
+            receiveShadow: true
+        }),
+        Transform.fromJSON({}),
+        GridPosition.fromJSON({}),
+        SoundEmitter.fromJSON({
+            isPositioned: true,
+            channel: 'ambient',
+            distanceMin: 6,
+            distanceMax: 35,
+            tracks: [
+                {
+                    url: "data/sounds/ambient/Universal Sound FX/AMBIENCES/Villages/AMBIENCES_Medieval_Village_loop_stereo.ogg",
+                    loop: true,
+                }
+            ]
+        })
+    ]), Transform.fromJSON({
         scale: { x: 2.2, y: 2.2, z: 2.2 },
         position: { x: 0, y: 0, z: 0 }
     }))
