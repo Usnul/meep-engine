@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import Tag from '../components/Tag.js';
-import { Transform } from '../components/Transform.js';
+import { Transform } from '../transform/Transform.js';
 import Renderable from '../components/Renderable.js';
 import MeshCollider from '../components/MeshCollider.js';
 import { Raycaster } from "three";

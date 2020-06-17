@@ -2,7 +2,7 @@ import { System } from "../../../ecs/System.js";
 import { ParticleEmitter } from "../particular/engine/emitter/ParticleEmitter.js";
 import { ParticularEngine } from "../particular/engine/ParticularEngine.js";
 import { StandardFrameBuffers } from "../../GraphicsEngine.js";
-import { Transform } from "../../../ecs/components/Transform.js";
+import { Transform } from "../../../ecs/transform/Transform.js";
 import { Frustum } from "three";
 import { ParticleEmitterFlag } from "../particular/engine/emitter/ParticleEmitterFlag.js";
 import { RenderPassType } from "../../render/RenderPassType.js";

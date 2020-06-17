@@ -2,7 +2,7 @@
  * Created by Alex on 29/10/2014.
  */
 import Vector3 from "../core/geom/Vector3.js";
-import { Transform } from './ecs/components/Transform.js';
+import { Transform } from './ecs/transform/Transform.js';
 import Hammer from 'Hammer';
 import { Euler as ThreeEuler, Vector2 as ThreeVector2, Vector3 as ThreeVector3 } from 'three';
 

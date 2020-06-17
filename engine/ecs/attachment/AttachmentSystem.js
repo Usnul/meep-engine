@@ -1,6 +1,6 @@
 import { System } from "../System.js";
 import { Attachment } from "./Attachment.js";
-import { Transform } from "../components/Transform.js";
+import { Transform } from "../transform/Transform.js";
 import { AttachmentSockets } from "../sockets/AttachmentSockets.js";
 import { assert } from "../../../core/assert.js";
 import Mesh from "../../graphics/ecs/mesh/Mesh.js";

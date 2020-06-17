@@ -14,7 +14,7 @@ import TopDownCameraController from "../../engine/graphics/ecs/camera/TopDownCam
 import { MinimapMarkersGL } from "./gl/MinimapMarkersGL.js";
 import Rectangle from "../../core/geom/Rectangle.js";
 import { EntityObserver } from "../../engine/ecs/EntityObserver.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import { MinimapWorldGL } from "./gl/MinimapWorldGL.js";
 import { MinimapCameraView } from "./dom/MinimapCameraView.js";
 import { MinimapFogOfWar } from "./gl/MinimapFogOfWar.js";

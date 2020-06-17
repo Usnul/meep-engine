@@ -5,7 +5,7 @@ import { BackSide, Plane, PlaneBufferGeometry, Vector3 as ThreeVector3 } from 't
 import { System } from '../../../ecs/System.js';
 import Water from './Water.js';
 import { Light } from '../light/Light.js';
-import { Transform } from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/transform/Transform.js';
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import { buildPlanarRenderLayerClipPlaneComputationMethod } from "../../render/layers/RenderLayerUtils.js";
 import ThreeFactory from "../../three/ThreeFactory.js";

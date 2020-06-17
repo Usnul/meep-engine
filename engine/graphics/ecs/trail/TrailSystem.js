@@ -4,7 +4,7 @@
 
 
 import { System } from '../../../ecs/System.js';
-import { Transform } from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/transform/Transform.js';
 import Vector3 from '../../../../core/geom/Vector3.js';
 
 import Trail from './Trail.js';

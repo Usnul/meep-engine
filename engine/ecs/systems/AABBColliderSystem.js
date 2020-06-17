@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import Tag from '../components/Tag.js';
-import { Transform } from '../components/Transform.js';
+import { Transform } from '../transform/Transform.js';
 import AABB from '../components/AABB.js';
 import AABBCollider from '../components/AABBCollider.js';
 

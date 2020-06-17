@@ -2,7 +2,7 @@ import { TerrainPaintTool } from "./TerrainPaintTool.js";
 import { clamp, inverseLerp, lerp } from "../../../core/math/MathUtils.js";
 import { PatchTerrainHeightAction } from "../../actions/concrete/PatchTerrainHeightAction.js";
 import { QuadTreeNode } from "../../../core/geom/2d/quad-tree/QuadTreeNode.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import TransformModifyAction from "../../actions/concrete/TransformModifyAction.js";
 import EditorEntity from "../../ecs/EditorEntity.js";
 

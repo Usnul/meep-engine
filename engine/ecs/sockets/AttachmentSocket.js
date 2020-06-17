@@ -1,4 +1,4 @@
-import { Transform } from "../components/Transform.js";
+import { Transform } from "../transform/Transform.js";
 
 export class AttachmentSocket {
     constructor() {

@@ -1,6 +1,6 @@
 import { GridCellAction } from "../placement/GridCellAction.js";
 import { MarkerNode } from "./MarkerNode.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import Vector2 from "../../core/geom/Vector2.js";
 import { assert } from "../../core/assert.js";
 

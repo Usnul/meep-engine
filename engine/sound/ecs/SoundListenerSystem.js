@@ -5,7 +5,7 @@
  */
 import { System } from '../../ecs/System.js';
 import SoundListener from './SoundListener.js';
-import { Transform } from '../../ecs/components/Transform.js';
+import { Transform } from '../../ecs/transform/Transform.js';
 import { browserInfo } from "../../Platform.js";
 
 

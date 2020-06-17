@@ -6,7 +6,7 @@
 import { System } from '../System.js';
 import PhysicalBody from '../components/PhysicalBody.js';
 import Motion from '../components/Motion.js';
-import { Transform } from '../components/Transform.js';
+import { Transform } from '../transform/Transform.js';
 import Steering, { SteeringEvents, SteeringFlags } from '../components/Steering.js';
 import { max2, min2, solveQuadratic } from "../../../core/math/MathUtils.js";
 import Vector3, { v3_dot } from "../../../core/geom/Vector3.js";

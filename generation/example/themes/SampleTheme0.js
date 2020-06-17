@@ -6,7 +6,7 @@ import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcher
 import { MarkerNodeActionEntityPlacement } from "../../markers/actions/MarkerNodeActionEntityPlacement.js";
 import { EntityBlueprint } from "../../../engine/ecs/EntityBlueprint.js";
 import Mesh from "../../../engine/graphics/ecs/mesh/Mesh.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";

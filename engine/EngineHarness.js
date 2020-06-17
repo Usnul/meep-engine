@@ -1,6 +1,6 @@
 import Engine from "./Engine.js";
 import { MouseEvents } from "./input/devices/events/MouseEvents.js";
-import { Transform } from "./ecs/components/Transform.js";
+import { Transform } from "./ecs/transform/Transform.js";
 import TopDownCameraController from "./graphics/ecs/camera/TopDownCameraController.js";
 import { Camera } from "./graphics/ecs/camera/Camera.js";
 import EntityBuilder from "./ecs/EntityBuilder.js";

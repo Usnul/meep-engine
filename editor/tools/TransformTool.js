@@ -3,7 +3,7 @@ import { Camera } from "../../engine/graphics/ecs/camera/Camera.js";
 
 import { Group, Object3D } from 'three';
 import { SignalBinding } from "../../core/events/signal/SignalBinding.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import Tool from "./engine/Tool.js";
 import { KeyCodes } from "../../engine/input/devices/KeyCodes.js";
 import TransformModifyAction from "../actions/concrete/TransformModifyAction.js";

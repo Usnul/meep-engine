@@ -3,7 +3,7 @@
  */
 import { System } from '../../../ecs/System.js';
 import { Euler as ThreeEuler, MaterialLoader, Mesh as ThreeMesh, Vector3 as ThreeVector3 } from 'three';
-import { Transform } from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/transform/Transform.js';
 import Mesh from '../mesh/Mesh.js';
 import Renderable from '../../../ecs/components/Renderable.js';
 import LoadMaterial from "../../material/LoadMaterial.js";

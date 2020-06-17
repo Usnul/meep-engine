@@ -15,7 +15,7 @@ import {
     ParticleDataType,
 } from "../../../engine/graphics/particles/particular/group/ParticleGroup.js";
 import { EntityObserver } from "../../../engine/ecs/EntityObserver.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import MinimapMarker from "../../../../model/game/ecs/component/minimap/MinimapMarker.js";
 import { MarkerGL } from "./MarkerGL.js";
 import { MarkerGLAttributes } from "./MarkerGLAttributes.js";

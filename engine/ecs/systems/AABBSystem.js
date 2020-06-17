@@ -3,7 +3,7 @@
  */
 import { System } from '../System.js';
 import AABB from '../components/AABB.js';
-import { Transform } from '../components/Transform.js';
+import { Transform } from '../transform/Transform.js';
 import { BinaryNode } from '../../../core/bvh2/BinaryNode.js';
 
 class AABBSystem extends System {

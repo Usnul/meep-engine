@@ -1,5 +1,5 @@
 import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { makeHelperSphereGeometry } from "./makeHelperSphereGeometry.js";
 import { Group, Line, LineBasicMaterial } from "three";

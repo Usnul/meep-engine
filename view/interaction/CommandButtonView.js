@@ -4,7 +4,7 @@ import { globalMetrics } from "../../engine/metrics/GlobalMetrics.js";
 import { MetricsCategory } from "../../engine/metrics/MetricsCategory.js";
 import EntityBuilder from "../../engine/ecs/EntityBuilder.js";
 import { SoundEmitter } from "../../engine/sound/ecs/emitter/SoundEmitter.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import { SoundEmitterChannels } from "../../engine/sound/ecs/emitter/SoundEmitterSystem.js";
 import { SerializationMetadata } from "../../engine/ecs/components/SerializationMetadata.js";
 import { BehaviorComponent } from "../../engine/intelligence/behavior/ecs/BehaviorComponent.js";

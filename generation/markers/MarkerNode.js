@@ -1,5 +1,5 @@
 import Vector2 from "../../core/geom/Vector2.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import { copyArray } from "../../core/collection/array/copyArray.js";
 import { circleIntersectsCircle } from "../../core/geom/2d/circle/circleIntersectsCircle.js";
 

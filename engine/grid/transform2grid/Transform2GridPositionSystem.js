@@ -1,7 +1,7 @@
 import { System } from "../../ecs/System.js";
 import { Transform2GridPosition } from "./Transform2GridPosition.js";
 import GridPosition from "../components/GridPosition.js";
-import { Transform } from "../../ecs/components/Transform.js";
+import { Transform } from "../../ecs/transform/Transform.js";
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import { Transform2GridPositionMode } from "./Transform2GridPositionMode.js";

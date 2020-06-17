@@ -1,4 +1,4 @@
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { Action } from "../Action.js";
 
 class TransformModifyAction extends Action {

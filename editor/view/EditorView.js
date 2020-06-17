@@ -24,7 +24,7 @@ import Vector2 from "../../core/geom/Vector2.js";
 import Vector3 from "../../core/geom/Vector3.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import Mesh from "../../engine/graphics/ecs/mesh/Mesh.js";
-import { Transform } from "../../engine/ecs/components/Transform.js";
+import { Transform } from "../../engine/ecs/transform/Transform.js";
 import { EventMeshSet } from "../../engine/graphics/ecs/mesh/MeshSystem.js";
 import SelectionClearAction from "../actions/concrete/SelectionClearAction.js";
 import EntityCreateAction from "../actions/concrete/EntityCreateAction.js";

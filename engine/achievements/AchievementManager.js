@@ -18,7 +18,7 @@ import AnimationTrackPlayback from "../animation/keyed2/AnimationTrackPlayback.j
 import { BehaviorComponent } from "../intelligence/behavior/ecs/BehaviorComponent.js";
 import { SoundEmitter } from "../sound/ecs/emitter/SoundEmitter.js";
 import { SoundEmitterChannels } from "../sound/ecs/emitter/SoundEmitterSystem.js";
-import { Transform } from "../ecs/components/Transform.js";
+import { Transform } from "../ecs/transform/Transform.js";
 import { SerializationMetadata } from "../ecs/components/SerializationMetadata.js";
 import { globalMetrics } from "../metrics/GlobalMetrics.js";
 import { MetricsCategory } from "../metrics/MetricsCategory.js";

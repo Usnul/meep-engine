@@ -5,7 +5,7 @@
  */
 import { System } from '../../System.js';
 import HeadsUpDisplay from './HeadsUpDisplay.js';
-import { Transform } from '../../components/Transform.js';
+import { Transform } from '../../transform/Transform.js';
 
 import { Matrix4 } from 'three';
 import { GraphicsEngine } from "../../../graphics/GraphicsEngine.js";

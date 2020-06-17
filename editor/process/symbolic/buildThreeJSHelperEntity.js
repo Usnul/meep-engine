@@ -1,6 +1,6 @@
 import EntityBuilder from "../../../engine/ecs/EntityBuilder.js";
 import Renderable from "../../../engine/ecs/components/Renderable.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import EditorEntity from "../../ecs/EditorEntity.js";
 import Script from "../../../engine/ecs/components/Script.js";
 

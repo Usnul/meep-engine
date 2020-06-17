@@ -3,7 +3,7 @@ import { FogOfWarRevealer } from "./FogOfWarRevealer.js";
 import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
 import { FogOfWar } from "./FogOfWar.js";
 import Team from "../../../../model/game/ecs/component/Team.js";
-import { Transform } from "../components/Transform.js";
+import { Transform } from "../transform/Transform.js";
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 

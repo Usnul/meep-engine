@@ -1,13 +1,9 @@
 import ClingToTerrainSystem from "./ClingToTerrainSystem.js";
 import { EntityManager } from "../../EntityManager.js";
-import TransformSystem from "../../systems/TransformSystem.js";
-
 
 function createEm() {
 
     const manager = new EntityManager();
-
-    manager.addSystem(new TransformSystem());
 
     return manager;
 }

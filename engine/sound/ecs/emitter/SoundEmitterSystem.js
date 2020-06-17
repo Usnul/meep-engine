@@ -7,7 +7,7 @@
 
 import { System } from '../../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
-import { Transform } from '../../../ecs/components/Transform.js';
+import { Transform } from '../../../ecs/transform/Transform.js';
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
 import { SoundAssetManager } from "../../../asset/loaders/SoundAssetManager.js";
 import { GameAssetType } from "../../../asset/GameAssetType.js";

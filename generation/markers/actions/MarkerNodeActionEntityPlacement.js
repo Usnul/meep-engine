@@ -1,6 +1,6 @@
 import { MarkerNodeAction } from "./MarkerNodeAction.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
-import { Transform } from "../../../engine/ecs/components/Transform.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { EntityBlueprint } from "../../../engine/ecs/EntityBlueprint.js";
 
 export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {

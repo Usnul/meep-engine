@@ -6,7 +6,7 @@ import GridPosition from '../components/GridPosition.js';
 import GridObstacle from '../components/GridObstacle.js';
 import PathFollower from '../../navigation/ecs/components/PathFollower.js';
 import Path from '../../navigation/ecs/components/Path.js';
-import { Transform } from '../../ecs/components/Transform.js';
+import { Transform } from '../../ecs/transform/Transform.js';
 import Steering from '../../ecs/components/Steering.js';
 
 

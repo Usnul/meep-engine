@@ -1,7 +1,7 @@
 import EntityBuilder from "../../EntityBuilder.js";
 import { loadFoliageLayer } from "./Foliage2System.js";
 import Mesh from "../../../graphics/ecs/mesh/Mesh.js";
-import { Transform } from "../../components/Transform.js";
+import { Transform } from "../../transform/Transform.js";
 import { Foliage2, FoliageLayer } from "./Foliage2.js";
 import { InstancedFoliage } from "../InstancedFoliage.js";
 import { buildTreeOptimizationTask } from "../../../../core/bvh2/BVHTasks.js";
