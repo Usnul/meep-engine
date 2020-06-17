@@ -17,6 +17,7 @@ import Quaternion from "../../../core/geom/Quaternion.js";
 import { ThreeFrustumsIntersectionBVHVisitor } from "../../../core/bvh2/traversal/ThreeFrustumsIntersectionBVHVisitor.js";
 import { FoliageVisibilitySetBuilder } from "./FoliageVisibilitySetBuilder.js";
 import { traverseBinaryNodeUsingVisitor } from "../../../core/bvh2/traversal/traverseBinaryNodeUsingVisitor.js";
+import { serializeBinaryNodeToBinaryBuffer } from "../../../core/bvh2/serialization/serializeBinaryNodeToBinaryBuffer.js";
 
 /**
  * @readonly
@@ -212,20 +213,29 @@ InstancedFoliage.prototype.setInstance = function (geometry, material) {
 
 };
 
+/**
+ *
+ * @param {BinaryBuffer} buffer
+ * @returns {number}
+ */
+function deserializeLeafValueUintVar(buffer) {
+    return buffer.readUintVar();
+}
+
 InstancedFoliage.prototype.deserialize = function (buffer) {
     deserializeRowFirstTable(buffer, this.data);
 
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @returns {number}
-     */
-    function deserializeLeafValueUintVar(buffer) {
-        return buffer.readUintVar();
-    }
-
     this.bvh.fromBinaryBuffer(buffer, deserializeLeafValueUintVar);
 };
+
+/**
+ *
+ * @param {BinaryBuffer} buffer
+ * @param {number} value
+ */
+function serializeLeafValueUintVar(buffer, value) {
+    buffer.writeUintVar(value);
+}
 
 InstancedFoliage.prototype.serialize = function (buffer) {
 
@@ -238,16 +248,8 @@ InstancedFoliage.prototype.serialize = function (buffer) {
         throw new Error(`Data is too large to be written (length=${numRows})`);
     }
 
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {number} value
-     */
-    function serializeLeafValueUintVar(buffer, value) {
-        buffer.writeUintVar(value);
-    }
 
-    this.bvh.toBinaryBuffer(buffer, serializeLeafValueUintVar);
+    serializeBinaryNodeToBinaryBuffer(this.bvh, buffer, serializeLeafValueUintVar);
 };
 
 

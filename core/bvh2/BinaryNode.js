@@ -5,7 +5,7 @@
 
 import { Node } from './Node.js';
 import { deserializeLeafNode, isLeaf, LeafNode, serializeLeafNode } from './LeafNode.js';
-import { deserializeAABB3, deserializeAABB3Encoded_v0, serializeAABB3, serializeAABB3Encoded_v0 } from "./AABB3.js";
+import { deserializeAABB3, serializeAABB3 } from "./AABB3.js";
 import { aabb3_intersect_aabb3, boxSurfaceArea, boxSurfaceArea2, scoreBoxesSAH } from "./AABB3Math.js";
 import { BottomUpOptimizingRebuilder } from "./transform/BottomUpOptimizingRebuilder.js";
 import { assert } from "../assert.js";
@@ -13,6 +13,8 @@ import { max2, min2 } from "../math/MathUtils.js";
 import { traverseBinaryNodeUsingVisitor } from "./traversal/traverseBinaryNodeUsingVisitor.js";
 import { BVHVisitor } from "./traversal/BVHVisitor.js";
 import { computeSampleStandardDeviation } from "../math/statistics/computeSampleStandardDeviation.js";
+import { serializeBinaryNodeToBinaryBuffer } from "./serialization/serializeBinaryNodeToBinaryBuffer.js";
+import { deserializeBinaryNodeFromBinaryBuffer } from "./serialization/deserializeBinaryNodeFromBinaryBuffer.js";
 
 
 /**
@@ -1165,177 +1167,22 @@ BinaryNode.prototype.clone = function (deep) {
 };
 
 /**
- *
+ * @deprecated use {@link deserializeBinaryNodeFromBinaryBuffer} directly instead
  * @param {BinaryBuffer} buffer
  * @param {function(buffer:BinaryBuffer):*} leafValueDeserializer
  */
 BinaryNode.prototype.fromBinaryBuffer = function (buffer, leafValueDeserializer) {
-    //read bounds
-    deserializeAABB3(buffer, this);
-
-    /**
-     *
-     * @param {BinaryNode} parent
-     * @returns {BinaryNode}
-     */
-    function readBinaryNode(parent) {
-
-        const node = new BinaryNode();
-
-        node.parentNode = parent;
-
-        //read bounds
-        deserializeAABB3Encoded_v0(buffer, node, parent.x0, parent.y0, parent.z0, parent.x1, parent.y1, parent.z1);
-
-        //read marker
-        const marker = buffer.readUint8();
-
-        if ((marker & 3) === 3) {
-            node.left = readBinaryNode(node);
-        } else if ((marker & 2) === 2) {
-            node.left = readLeafNode(node);
-        } else {
-            node.left = null;
-        }
-
-        if ((marker & 12) === 12) {
-            node.right = readBinaryNode(node);
-        } else if ((marker & 8) === 8) {
-            node.right = readLeafNode(node);
-        } else {
-            node.right = null;
-        }
-
-
-        return node;
-    }
-
-    /**
-     *
-     * @param {BinaryNode} parent
-     * @returns {LeafNode}
-     */
-    function readLeafNode(parent) {
-        const node = new LeafNode();
-
-        node.parentNode = parent;
-
-        //read bounds
-        deserializeAABB3Encoded_v0(buffer, node, parent.x0, parent.y0, parent.z0, parent.x1, parent.y1, parent.z1);
-
-        node.object = leafValueDeserializer(buffer);
-
-        return node;
-    }
-
-    //read marker
-    const marker = buffer.readUint8();
-
-    if ((marker & 3) === 3) {
-        this.left = readBinaryNode(this);
-    } else if ((marker & 2) === 2) {
-        this.left = readLeafNode(this);
-    } else {
-        this.left = null;
-    }
-
-    if ((marker & 12) === 12) {
-        this.right = readBinaryNode(this);
-    } else if ((marker & 8) === 8) {
-        this.right = readLeafNode(this);
-    } else {
-        this.right = null;
-    }
+    deserializeBinaryNodeFromBinaryBuffer(this, buffer, leafValueDeserializer);
 };
 
 /**
+ * @deprecated use {@link serializeBinaryNodeToBinaryBuffer} directly instead
  * Writing is lossy, all descendants have their bounds quantized to uin16
  * @param {BinaryBuffer} buffer
  * @param {function(buffer:BinaryBuffer, value:*):void} leafValueSerializer
  */
 BinaryNode.prototype.toBinaryBuffer = function (buffer, leafValueSerializer) {
-    const root = this;
-
-    //write initial size
-    serializeAABB3(buffer, root);
-
-    /**
-     *
-     * @param {BinaryNode} node
-     */
-    function buildNodeMarker(node) {
-
-        let result = 0;
-
-        if (node.right !== null) {
-            if (node.right.isLeafNode) {
-                result |= 8;
-            } else {
-                result |= 12;
-            }
-        }
-
-        if (node.left !== null) {
-            if (node.left.isLeafNode) {
-                result |= 2;
-            } else {
-                result |= 3;
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     *
-     * @param {BinaryNode} node
-     * @param {BinaryNode} parent
-     */
-    function writeBinaryNode(node, parent) {
-        serializeAABB3Encoded_v0(buffer, node, parent.x0, parent.y0, parent.z0, parent.x1, parent.y1, parent.z1);
-
-        const marker = buildNodeMarker(node);
-
-        buffer.writeUint8(marker);
-
-        if ((marker & 3) === 3) {
-            writeBinaryNode(node.left, node);
-        } else if ((marker & 2) === 2) {
-            writeLeafNode(node.left, node);
-        }
-
-        if ((marker & 12) === 12) {
-            writeBinaryNode(node.right, node);
-        } else if ((marker & 8) === 8) {
-            writeLeafNode(node.right, node);
-        }
-    }
-
-    /**
-     *
-     * @param {LeafNode} node
-     * @param {BinaryNode} parent
-     */
-    function writeLeafNode(node, parent) {
-        serializeAABB3Encoded_v0(buffer, node, parent.x0, parent.y0, parent.z0, parent.x1, parent.y1, parent.z1);
-        leafValueSerializer(buffer, node.object);
-    }
-
-    const marker = buildNodeMarker(root);
-
-    buffer.writeUint8(marker);
-
-    if ((marker & 3) === 3) {
-        writeBinaryNode(root.left, root);
-    } else if ((marker & 2) === 2) {
-        writeLeafNode(root.left, root);
-    }
-
-    if ((marker & 12) === 12) {
-        writeBinaryNode(root.right, root);
-    } else if ((marker & 8) === 8) {
-        writeLeafNode(root.right, root);
-    }
+    serializeBinaryNodeToBinaryBuffer(this, buffer, leafValueSerializer);
 };
 
 /**

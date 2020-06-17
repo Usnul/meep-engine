@@ -769,11 +769,15 @@ List.prototype.fromJSON = function (json, constructor) {
  * @param {BinaryBuffer} buffer
  */
 List.prototype.toBinaryBuffer = function (buffer) {
-    buffer.writeUint32(this.length);
+    const n = this.length;
 
-    this.forEach(function (item) {
+    buffer.writeUint32(n);
+
+    for (let i = 0; i < n; i++) {
+        const item = this.data[i];
+
         item.toBinaryBuffer(buffer);
-    });
+    }
 };
 
 /**

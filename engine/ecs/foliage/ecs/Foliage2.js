@@ -2,7 +2,6 @@ import ObservedString from "../../../../core/model/ObservedString.js";
 import List from "../../../../core/collection/List.js";
 import ObservedBoolean from "../../../../core/model/ObservedBoolean.js";
 import { InstancedFoliage } from "../InstancedFoliage.js";
-import { BinaryClassSerializationAdapter } from "../../storage/binary/BinaryClassSerializationAdapter.js";
 
 function FoliageLayer() {
     this.data = new InstancedFoliage();
@@ -88,31 +87,3 @@ Foliage2.prototype.fromJSON = function (data) {
 
 export { Foliage2, FoliageLayer };
 
-export class InstancedMeshSerializationAdapter extends BinaryClassSerializationAdapter{
-    constructor(){
-        super();
-
-        this.klass = Foliage2;
-        this.version = 0;
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {Foliage2} value
-     */
-    serialize(buffer, value) {
-
-        value.layers.toBinaryBuffer(buffer);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {Foliage2} value
-     */
-    deserialize(buffer, value) {
-
-        value.layers.fromBinaryBuffer(buffer, FoliageLayer);
-    }
-}
