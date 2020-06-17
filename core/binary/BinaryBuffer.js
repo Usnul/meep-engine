@@ -620,7 +620,7 @@ BinaryBuffer.prototype.writeUint32LE = function (value) {
 
 /**
  *
- * @param {Uint8Array|Uint8ClampedArray|number[]} array
+ * @param {Uint8Array|Uint8ClampedArray} array
  * @param {number} sourceOffset
  * @param {number} length
  */
@@ -633,14 +633,9 @@ BinaryBuffer.prototype.writeBytes = function (array, sourceOffset, length) {
 
     this.ensureCapacity(end);
 
-    const target = new Uint8Array(this.data);
+    const destination = new Uint8Array(this.data, targetAddress, length);
 
-    for (let i = 0; i < length; i++) {
-        const iT = targetAddress + i;
-        const iS = sourceOffset + i;
-
-        target[iT] = array[iS];
-    }
+    destination.set(array.subarray(sourceOffset, sourceOffset + length));
 
     this.position = end;
 };
