@@ -149,7 +149,7 @@ export class SoundTrack {
             loop = false,
             time = 0,
             volume = 1,
-            channel=null,
+            channel = null,
             playing = false,
             startWhenReady = true
         }
@@ -289,10 +289,10 @@ export class SoundEmitter {
     /**
      * @return {AudioNode}
      */
-    getTargetNode(){
-        if(this.isPositioned){
+    getTargetNode() {
+        if (this.isPositioned) {
             return this.nodes.panner;
-        }else{
+        } else {
             return this.nodes.volume;
         }
     }
@@ -301,7 +301,7 @@ export class SoundEmitter {
      *
      * @param {AudioContext} ctx
      */
-    buildNodes(ctx){
+    buildNodes(ctx) {
         const nodes = this.nodes;
 
         nodes.volume = ctx.createGain();
@@ -316,8 +316,8 @@ export class SoundEmitter {
             // we set up distance model in the most efficient way, since we are ignoring it anyway and use custom distance model via a GainNode instead
             nodes.panner.distanceModel = 'linear';
             nodes.panner.rolloffFactor = 0;
-            nodes.panner.refDistance = 0;
-            nodes.panner.maxDistance = 1;
+            nodes.panner.refDistance = this.distanceMin;
+            nodes.panner.maxDistance = this.distanceMax;
 
             nodes.pannerVolume = ctx.createGain();
 
