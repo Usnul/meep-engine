@@ -15,7 +15,7 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
 
     const material_distance_max = new LineBasicMaterial({
         depthTest: true,
-        depthWrite: false,
+        depthWrite: true,
         transparent: true,
         linewidth: 1,
         fog: false,
@@ -25,7 +25,7 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
 
     const material_distance_min = new LineBasicMaterial({
         depthTest: true,
-        depthWrite: false,
+        depthWrite: true,
         transparent: true,
         linewidth: 1,
         fog: false,
@@ -48,9 +48,13 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
 
         const mDistanceMax = new Line(sphereGeometry, material_distance_max);
         mDistanceMax.scale.setScalar(emitter.distanceMax);
+        //draw on top of everything else
+        mDistanceMax.renderOrder = 9999;
 
         const mDistanceMin = new Line(sphereGeometry, material_distance_min);
         mDistanceMin.scale.setScalar(emitter.distanceMin);
+        //draw on top of everything else
+        mDistanceMin.renderOrder = 9999;
 
         group.add(mDistanceMin);
         group.add(mDistanceMax);

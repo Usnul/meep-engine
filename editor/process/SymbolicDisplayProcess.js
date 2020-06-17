@@ -107,7 +107,7 @@ function makePositionedIconDisplaySymbol(engine, iconURL, ComponentClass) {
     const spriteMaterial = new SpriteMaterial();
     spriteMaterial.depthTest = false;
     spriteMaterial.transparent = true;
-    spriteMaterial.depthWrite = false;
+    spriteMaterial.depthWrite = true;
 
     assetManager.promise(iconURL, 'texture').then(asset => {
 
@@ -126,6 +126,8 @@ function makePositionedIconDisplaySymbol(engine, iconURL, ComponentClass) {
             const sprite = new Sprite(spriteMaterial);
             sprite.frustumCulled = false;
             sprite.matrixAutoUpdate = false;
+            //draw on top of everything else
+            sprite.renderOrder = 9999;
 
             const cR = new Renderable(sprite);
             const cT = new Transform();
