@@ -406,9 +406,36 @@ export function cubicCurve(t, p0, p1, p2, p3) {
      */
     const aX = p3 - p0 - cX - bX;
 
+    const t_2 = t * t;
 
-    return (aX * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t) + p0;
+    const t_3 = t_2 * t;
+
+    return (aX * t_3) + (bX * t_2) + (cX * t) + p0;
 }
+
+/**
+ * 3-rd degree bezier curve
+ * @param {number} t
+ * @param {number} p0 start point
+ * @param {number} p1 control point
+ * @param {number} p2 control point
+ * @param {number} p3 end point
+ * @returns {number}
+ */
+ function bezierCurve(t, p0, p1, p2, p3) {
+    const nt = 1 - t;
+
+    const nt_2 = nt * nt;
+
+    const nt_3 = nt_2 * nt;
+
+    const t_2 = t * t;
+
+    const t_3 = t_2 * t;
+
+    return nt_3 * p0 + 3 * nt_2 * t * p1 + 3 * nt * t_2 * p2 + t_3 * p3;
+}
+
 
 /**
  *

@@ -5,10 +5,11 @@
 
 import List from '../../../../core/collection/List.js';
 import Vector1 from "../../../../core/geom/Vector1.js";
-import Signal from "../../../../core/events/signal/Signal.js";
-import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
-import { LeafNode } from "../../../../core/bvh2/LeafNode.js";
-import { clamp, inverseLerp } from "../../../../core/math/MathUtils.js";
+import { SoundTrack } from "./SoundTrack.js";
+import { SoundEmitterFlags } from "./SoundEmitterFlags.js";
+import { SoundAttenuationFunction } from "./SoundAttenuationFunction.js";
+import { attenuateSoundLinear } from "./attenuateSoundLinear.js";
+import { attenuateSoundLogarithmic } from "./attenuateSoundLogarithmic.js";
 
 /**
  * Convert decibel to percentage volume
@@ -28,192 +29,6 @@ function volume2dB(volume) {
     return 20 * Math.log10(volume);
 }
 
-export class SoundTrack {
-    /**
-     *
-     * @constructor
-     */
-    constructor() {
-        /**
-         *
-         * @type {String|null}
-         */
-        this.url = null;
-        /**
-         *
-         * @type {boolean}
-         */
-        this.loop = false;
-        /**
-         *
-         * @type {number}
-         */
-        this.time = 0;
-
-        /**
-         * TODO this attribute is currently ignored, instead channel is common to entire emitter
-         * @type {String|null}
-         */
-        this.channel = "";
-
-        /**
-         * @private
-         * @type {number}
-         */
-        this.__volume = 1;
-
-        /**
-         *
-         * @type {boolean}
-         */
-        this.playing = false;
-
-        /**
-         *
-         * @type {boolean}
-         */
-        this.startWhenReady = true;
-
-        this.on = {
-            ended: new Signal()
-        };
-
-        /**
-         * @private
-         * @type {SoundTrackNodes}
-         */
-        this.nodes = null;
-    }
-
-    /**
-     *
-     * @param {number} v
-     */
-    set volume(v) {
-        this.__volume = v;
-
-        if (this.nodes !== null) {
-            this.nodes.volume.gain.setValueAtTime(v, 0);
-        }
-    }
-
-    /**
-     *
-     * @return {number}
-     */
-    get volume() {
-        return this.__volume;
-    }
-
-    /**
-     *
-     * @param {SoundTrack} other
-     */
-    copy(other) {
-        this.url = other.url;
-        this.loop = other.loop;
-        this.time = other.time;
-        this.channel = other.channel;
-        this.volume = other.volume;
-        this.playing = other.playing;
-        this.startWhenReady = other.startWhenReady;
-    }
-
-    /**
-     *
-     * @return {SoundTrack}
-     */
-    clone() {
-        const r = new SoundTrack();
-
-        r.copy(this);
-
-        return r;
-    }
-
-    toJSON() {
-        return {
-            url: this.url,
-            loop: this.loop,
-            time: this.time,
-            volume: this.volume,
-            channel: this.channel,
-            playing: this.playing,
-            startWhenReady: this.startWhenReady
-        };
-    }
-
-    fromJSON(
-        {
-            url,
-            loop = false,
-            time = 0,
-            volume = 1,
-            channel = null,
-            playing = false,
-            startWhenReady = true
-        }
-    ) {
-        this.url = url;
-
-        this.loop = loop;
-
-        this.time = time;
-
-        this.volume = volume;
-
-        this.channel = channel;
-
-        this.playing = playing;
-
-        this.startWhenReady = startWhenReady;
-    }
-
-    static fromJSON(json) {
-        const track = new SoundTrack();
-
-        track.fromJSON(json);
-
-        return track;
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     */
-    toBinaryBuffer(buffer) {
-        buffer.writeUTF8String(this.url);
-
-        buffer.writeUint8(this.loop ? 1 : 0);
-
-        buffer.writeFloat32(this.time);
-
-        buffer.writeUTF8String(this.channel);
-
-        buffer.writeUint8(this.playing ? 1 : 0);
-
-        buffer.writeUint8(this.startWhenReady ? 1 : 0);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     */
-    fromBinaryBuffer(buffer) {
-        this.url = buffer.readUTF8String();
-
-        this.loop = buffer.readUint8() !== 0;
-
-        this.time = buffer.readFloat32();
-
-        this.channel = buffer.readUTF8String();
-
-        this.playing = buffer.readUint8() !== 0;
-
-        this.startWhenReady = buffer.readUint8() !== 0;
-    }
-}
-
 export class SoundEmitter {
     /**
      *
@@ -226,8 +41,6 @@ export class SoundEmitter {
          * @type {List<SoundTrack>}
          */
         this.tracks = new List();
-
-        this.isPositioned = false;
 
         /**
          *
@@ -256,6 +69,18 @@ export class SoundEmitter {
          */
         this.__distanceRolloff = 1;
 
+        /**
+         * Type of attenuation used for sound fall-off, this is only used if Attenuation flag is set
+         * @type {SoundAttenuationFunction|number}
+         */
+        this.attenuation = SoundAttenuationFunction.Linear;
+
+        /**
+         *
+         * @type {number|SoundEmitterFlags}
+         */
+        this.flags = 0;
+
         const nodes = this.nodes = {
             /**
              * @type {GainNode}
@@ -268,9 +93,18 @@ export class SoundEmitter {
             /**
              * @type {GainNode}
              */
-            pannerVolume: null
+            attenuation: null,
+            /**
+             * One of the other nodes, depending on the configuration
+             * @type {AudioNode}
+             */
+            endpoint: null
         };
 
+        /**
+         *
+         * @type {Vector1}
+         */
         this.volume = new Vector1(1);
 
         this.volume.onChanged.add(function (value) {
@@ -279,22 +113,71 @@ export class SoundEmitter {
             }
         });
 
-        /**
-         *
-         * @type {LeafNode}
-         */
-        this.__bvhLeaf = new LeafNode(this, 0, 0, 0, 0, 0, 0);
+    }
+
+
+    /**
+     *
+     * @param {number|SoundEmitterFlags} flag
+     * @returns {void}
+     */
+    setFlag(flag) {
+        this.flags |= flag;
+    }
+
+    /**
+     *
+     * @param {number|SoundEmitterFlags} flag
+     * @returns {void}
+     */
+    clearFlag(flag) {
+        this.flags &= ~flag;
+    }
+
+    /**
+     *
+     * @param {number|SoundEmitterFlags} flag
+     * @param {boolean} value
+     */
+    writeFlag(flag, value) {
+        if (value) {
+            this.setFlag(flag);
+        } else {
+            this.clearFlag(flag);
+        }
+    }
+
+    /**
+     *
+     * @param {number|SoundEmitterFlags} flag
+     * @returns {boolean}
+     */
+    getFlag(flag) {
+        return (this.flags & flag) === flag;
+    }
+
+
+    /**
+     * @deprecated
+     * @param {boolean} v
+     */
+    set isPositioned(v) {
+        this.writeFlag(SoundEmitterFlags.Spatialization, v);
+    }
+
+    /**
+     * @deprecated
+     * @return {boolean}
+     */
+    get isPositioned() {
+        return this.getFlag(SoundEmitterFlags.Spatialization);
     }
 
     /**
      * @return {AudioNode}
      */
     getTargetNode() {
-        if (this.isPositioned) {
-            return this.nodes.panner;
-        } else {
-            return this.nodes.volume;
-        }
+        return this.nodes.endpoint;
     }
 
     /**
@@ -306,7 +189,11 @@ export class SoundEmitter {
 
         nodes.volume = ctx.createGain();
 
-        if (this.isPositioned) {
+        if (this.getFlag(SoundEmitterFlags.Attenuation)) {
+            nodes.attenuation = ctx.createGain();
+        }
+
+        if (this.getFlag(SoundEmitterFlags.Spatialization)) {
             nodes.panner = ctx.createPanner();
 
 
@@ -319,11 +206,24 @@ export class SoundEmitter {
             nodes.panner.refDistance = this.distanceMin;
             nodes.panner.maxDistance = this.distanceMax;
 
-            nodes.pannerVolume = ctx.createGain();
+        }
 
-            //wire
-            nodes.pannerVolume.connect(nodes.panner);
-            nodes.volume.connect(nodes.pannerVolume);
+        //do wiring
+        if (this.getFlag(SoundEmitterFlags.Attenuation | SoundEmitterFlags.Spatialization)) {
+            nodes.attenuation.connect(nodes.panner);
+            nodes.volume.connect(nodes.attenuation);
+
+            nodes.endpoint = nodes.panner;
+        } else if (this.getFlag(SoundEmitterFlags.Spatialization)) {
+            nodes.volume.connect(nodes.panner);
+
+            nodes.endpoint = nodes.panner;
+        } else if (this.getFlag(SoundEmitterFlags.Attenuation)) {
+            nodes.volume.connect(nodes.attenuation);
+
+            nodes.endpoint = nodes.attenuation;
+        } else {
+            nodes.endpoint = nodes.volume;
         }
 
         nodes.volume.gain.setValueAtTime(this.volume.getValue(), 0);
@@ -333,22 +233,24 @@ export class SoundEmitter {
      *
      * @param {number} distance
      */
-    writePannerVolume(distance) {
-        const normalizedDistance = clamp(
-            inverseLerp(this.__distanceMin, this.__distanceMax, distance),
-            0,
-            1
-        );
+    writeAttenuationVolume(distance) {
 
-        const invDistance = 1 - normalizedDistance;
+        let volume;
 
-        const volume = invDistance * invDistance;
+        if (this.attenuation === SoundAttenuationFunction.Linear) {
+            volume = attenuateSoundLinear(distance, this.__distanceMin, this.__distanceMax);
+        } else if (this.attenuation === SoundAttenuationFunction.Logarithmic) {
+            volume = attenuateSoundLogarithmic(distance, this.__distanceMin, this.__distanceMax);
+        } else {
+            //unsupported function, don't attenuate
+            volume = 1;
+        }
 
         /**
          *
          * @type {GainNode}
          */
-        const pv = this.nodes.pannerVolume;
+        const pv = this.nodes.attenuation;
 
         if (pv !== null) {
             pv.gain.setValueAtTime(volume, 0);
@@ -474,49 +376,4 @@ export class SoundEmitter {
 
 SoundEmitter.typeName = "SoundEmitter";
 
-SoundEmitter.Track = SoundTrack;
 
-
-export class SoundEmitterSerializationAdapter extends BinaryClassSerializationAdapter {
-    constructor() {
-        super();
-
-        this.klass = SoundEmitter;
-        this.version = 0;
-    }
-
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {SoundEmitter} value
-     */
-    serialize(buffer, value) {
-        buffer.writeUint8(value.isPositioned ? 1 : 0);
-        buffer.writeUTF8String(value.channel);
-
-        value.volume.toBinaryBuffer(buffer);
-        value.tracks.toBinaryBuffer(buffer);
-
-        buffer.writeFloat64(value.distanceMin);
-        buffer.writeFloat64(value.distanceMax);
-        buffer.writeFloat64(value.distanceRolloff);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {SoundEmitter} value
-     */
-    deserialize(buffer, value) {
-        value.isPositioned = buffer.readUint8() !== 0;
-        value.channel = buffer.readUTF8String();
-
-        value.volume.fromBinaryBuffer(buffer);
-        value.tracks.fromBinaryBuffer(buffer, SoundTrack);
-
-        value.distanceMin = buffer.readFloat64();
-        value.distanceMax = buffer.readFloat64();
-        value.distanceRolloff = buffer.readFloat64();
-    }
-}

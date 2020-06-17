@@ -22,7 +22,17 @@ class AnimationClip {
     constructor() {
         this.name = new ObservedString("");
         this.repeatCount = new ObservedInteger(1);
+
+        /**
+         *
+         * @type {Vector1}
+         */
         this.weight = new Vector1(1);
+
+        /**
+         *
+         * @type {Vector1}
+         */
         this.timeScale = new Vector1(1);
 
         /**

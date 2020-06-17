@@ -4,8 +4,10 @@ import DatGuiController from "../DatGuiController.js";
 import EmptyView from "../../../../../view/elements/EmptyView.js";
 import ButtonView from "../../../../../view/elements/button/ButtonView.js";
 import { NativeListController } from "../../../../../view/controller/controls/NativeListController.js";
-import { SoundTrack } from "../../../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { SoundEmitterChannels } from "../../../../../engine/sound/ecs/emitter/SoundEmitterSystem.js";
+import { SoundTrack } from "../../../../../engine/sound/ecs/emitter/SoundTrack.js";
+import { SoundAttenuationFunction } from "../../../../../engine/sound/ecs/emitter/SoundAttenuationFunction.js";
+import { SoundEmitterFlags } from "../../../../../engine/sound/ecs/emitter/SoundEmitterFlags.js";
 
 class SoundTrackController extends EmptyView {
     /**
@@ -44,7 +46,6 @@ class SoundTrackController extends EmptyView {
         });
         dat.add(track, 'loop');
         dat.add(track, 'time');
-        dat.add(track, 'channel');
         dat.add(track, 'volume');
         dat.add(track, 'startWhenReady');
 
@@ -79,11 +80,14 @@ export class SoundEmitterController extends View {
                 soundEmitter.channel = SoundEmitterChannels.Effects;
             }
 
-            d.addControl(soundEmitter, 'isPositioned');
             d.addControl(soundEmitter, 'channel');
             d.addControl(soundEmitter, 'distanceMin');
             d.addControl(soundEmitter, 'distanceMax');
-            d.addControl(soundEmitter, 'distanceRolloff');
+
+            d.addEnumRaw(soundEmitter, 'attenuation', SoundAttenuationFunction);
+
+            d.addBitFlag(soundEmitter, 'flags', SoundEmitterFlags.Spatialization, 'spatialization');
+            d.addBitFlag(soundEmitter, 'flags', SoundEmitterFlags.Attenuation, 'attenuation');
 
             this.addChild(d);
 

@@ -6,6 +6,7 @@
 import { System } from '../../ecs/System.js';
 import { SoundEmitter } from './emitter/SoundEmitter.js';
 import SoundController from './SoundController.js';
+import { SoundTrack } from "./emitter/SoundTrack.js";
 
 /**
  *
@@ -60,7 +61,7 @@ class SoundControllerSystem extends System {
                     console.error("Entity " + entity + " has no SoundEmitter to control");
                 }
 
-                const track = new SoundEmitter.Track();
+                const track = new SoundTrack();
 
                 const url = pickTackFromRule(rule);
 

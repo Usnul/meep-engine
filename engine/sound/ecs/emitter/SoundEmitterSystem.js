@@ -8,15 +8,15 @@
 import { System } from '../../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
 import { Transform } from '../../../ecs/transform/Transform.js';
-import { SoundTrackNodes } from "./SoundTrackNodes.js";
 import { SoundAssetManager } from "../../../asset/loaders/SoundAssetManager.js";
 import { GameAssetType } from "../../../asset/GameAssetType.js";
 import { BinaryNode } from "../../../../core/bvh2/BinaryNode.js";
 import SoundListener from "../SoundListener.js";
 import { IncrementalDeltaSet } from "../../../graphics/render/visibility/IncrementalDeltaSet.js";
 import { queryBinaryNode_SphereIntersections_Data } from "../../../../core/bvh2/traversal/queryBinaryNode_SphereIntersections.js";
-import { LeafNode } from "../../../../core/bvh2/LeafNode.js";
 import { tryRotateSingleNode } from "../../../../core/bvh2/transform/RotationOptimizer.js";
+import { SoundEmitterComponentContext } from "./SoundEmitterComponentContext.js";
+import { SoundEmitterFlags } from "./SoundEmitterFlags.js";
 
 /**
  * @readonly
@@ -39,151 +39,6 @@ const leafCount = new Map();
  * @type {SoundEmitterComponentContext[]}
  */
 const positionalNodes = [];
-
-class SoundEmitterComponentContext {
-    constructor() {
-
-        /**
-         *
-         * @type {SoundEmitter}
-         */
-        this.emitter = null;
-
-        /**
-         *
-         * @type {Transform}
-         */
-        this.transform = null;
-
-        /**
-         *
-         * @type {SoundEmitterSystem}
-         */
-        this.system = null;
-
-        /**
-         *
-         * @type {AudioNode}
-         */
-        this.targetNode = null;
-
-        /**
-         *
-         * @type {LeafNode}
-         */
-        this.leaf = new LeafNode(this, 0, 0, 0, 0, 0, 0);
-
-        /**
-         *
-         * @type {boolean}
-         * @private
-         */
-        this.__isConnected = false;
-    }
-
-    update() {
-
-        const position = this.transform.position;
-
-        /**
-         *
-         * @type {SoundEmitter}
-         */
-        const emitter = this.emitter;
-
-        const x = position.x;
-        const y = position.y;
-        const z = position.z;
-
-        setEmitterPosition(emitter, x, y, z);
-
-        /**
-         *
-         * @type {LeafNode}
-         */
-        const bvhLeaf = this.leaf;
-
-        const distanceMax = emitter.distanceMax;
-
-        bvhLeaf.resize(
-            x - distanceMax,
-            y - distanceMax,
-            z - distanceMax,
-            x + distanceMax,
-            y + distanceMax,
-            z + distanceMax
-        );
-    }
-
-    /**
-     *
-     * @param {SoundTrack} track
-     */
-    addTrack(track) {
-        const system = this.system;
-
-        const context = system.webAudioContext;
-        const assetManager = system.assetManager;
-
-        registerTrack(context, assetManager, this.emitter, track);
-    }
-
-    /**
-     *
-     * @param {SoundTrack} track
-     */
-    removeTrack(track) {
-        unregisterTrack(track);
-    }
-
-    connect() {
-        if (this.__isConnected) {
-            return;
-        }
-
-        const targetNode = this.emitter.getTargetNode();
-
-        targetNode.connect(this.targetNode);
-
-        this.__isConnected = true;
-    }
-
-    disconnect() {
-        if (!this.__isConnected) {
-            return;
-        }
-
-        const targetNode = this.emitter.getTargetNode();
-
-        if (targetNode !== null) {
-            targetNode.disconnect();
-        }
-
-        this.__isConnected = false;
-    }
-
-    link() {
-        this.transform.position.onChanged.add(this.update, this);
-
-        this.emitter.tracks.forEach(this.addTrack, this);
-
-        this.emitter.tracks.on.added.add(this.addTrack, this);
-        this.emitter.tracks.on.removed.add(this.removeTrack, this);
-    }
-
-    unlink() {
-        this.transform.position.onChanged.remove(this.update, this);
-
-        this.emitter.tracks.on.added.remove(this.addTrack, this);
-        this.emitter.tracks.on.removed.remove(this.removeTrack, this);
-
-        this.emitter.tracks.forEach(this.removeTrack, this);
-
-        this.disconnect();
-    }
-
-
-}
 
 
 export class SoundEmitterSystem extends System {
@@ -420,7 +275,12 @@ export class SoundEmitterSystem extends System {
 
                 const emitter = ctx.emitter;
 
-                if (emitter.isPositioned) {
+                if (emitter.tracks.isEmpty()) {
+                    // no tracks to play, don't render
+                    continue;
+                }
+
+                if (emitter.getFlag(SoundEmitterFlags.Attenuation)) {
                     const distance = listenerPosition.distanceTo(ctx.transform.position);
 
                     if (distance > emitter.distanceMax) {
@@ -428,7 +288,7 @@ export class SoundEmitterSystem extends System {
                         continue;
                     }
 
-                    emitter.writePannerVolume(distance);
+                    emitter.writeAttenuationVolume(distance);
                 }
 
                 activeSet.push(ctx);
@@ -450,10 +310,6 @@ export class SoundEmitterSystem extends System {
              * @type {SoundEmitter}
              */
             const emitter = ctx.emitter;
-
-            if (!emitter.isPositioned) {
-                activeSet.push(ctx);
-            }
 
             /**
              *
@@ -533,77 +389,3 @@ export class SoundEmitterSystem extends System {
 
 }
 
-
-/**
- *
- * @param {SoundTrack} soundTrack
- */
-function unregisterTrack(soundTrack) {
-    soundTrack.nodes.volume.disconnect();
-}
-
-/**
- *
- * @param {AudioContext} context
- * @param {AssetManager} assetManager
- * @param {SoundEmitter} soundEmitter
- * @param {SoundTrack} soundTrack
- */
-function registerTrack(context, assetManager, soundEmitter, soundTrack) {
-    const targetNode = soundEmitter.nodes.volume;
-
-    const nodes = soundTrack.nodes = new SoundTrackNodes(context);
-    //connect to target
-    nodes.volume.connect(targetNode);
-
-    nodes.source.loop = soundTrack.loop;
-    nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
-    //
-    assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
-        /**
-         *
-         * @type {AudioBuffer}
-         */
-        const buffer = asset.create();
-
-        // Make the sound source use the buffer and start playing it.
-        if (nodes.source.buffer !== buffer) {
-            nodes.source.buffer = buffer;
-        }
-
-        if (soundTrack.startWhenReady) {
-            //TODO: figure out a way to use AudioBuffer.playbackRate.value to control speed of playback
-            nodes.source.start(0, soundTrack.time);
-            soundTrack.playing = true;
-        }
-
-    }, function (error) {
-        console.error(`failed to load sound track '${soundTrack.url}' : `, error);
-    });
-
-    nodes.source.onended = function () {
-        if (!nodes.source.loop) {
-            soundTrack.playing = false;
-            soundTrack.on.ended.dispatch();
-
-            //remove track
-            soundEmitter.tracks.removeOneOf(soundTrack);
-        }
-    };
-}
-
-
-/**
- *
- * @param {SoundEmitter} emitter
- * @param {number} x
- * @param {number} y
- * @param {number} z
- */
-function setEmitterPosition(emitter, x, y, z) {
-    const nodes = emitter.nodes;
-    if (nodes.panner !== null) {
-        const panner = nodes.panner;
-        panner.setPosition(x, y, z);
-    }
-}
