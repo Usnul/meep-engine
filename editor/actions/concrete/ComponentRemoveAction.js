@@ -14,9 +14,19 @@ class ComponentRemoveAction extends Action {
     }
 
     apply(editor) {
-        const em = editor.engine.entityManager;
-        const systemId = em.getSystemIdByComponentClass(this.componentType);
-        this.component = em.removeComponentFromEntity(this.entity, systemId);
+        /**
+         * @type {Engine}
+         */
+        const engine = editor.engine;
+
+        const em = engine.entityManager;
+
+        /**
+         * @type {EntityComponentDataset}
+         */
+        const ecd = em.dataset;
+
+        this.component = ecd.removeComponentFromEntity(this.entity, this.componentType);
     }
 
     revert(editor) {

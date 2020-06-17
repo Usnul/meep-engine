@@ -152,7 +152,12 @@ class SoundEmitterComponentContext {
         if (!this.__isConnected) {
             return;
         }
-        this.emitter.getTargetNode().disconnect();
+
+        const targetNode = this.emitter.getTargetNode();
+
+        if (targetNode !== null) {
+            targetNode.disconnect();
+        }
 
         this.__isConnected = false;
     }
@@ -519,7 +524,7 @@ export class SoundEmitterSystem extends System {
 
             const time = t1 - t0;
 
-            if(time > budget){
+            if (time > budget) {
                 break;
             }
         }
