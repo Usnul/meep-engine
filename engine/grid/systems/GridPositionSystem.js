@@ -106,29 +106,4 @@ class GridPositionSystem extends System {
     }
 }
 
-/**
- *
- * @param {EntityComponentDataset} dataset
- * @param {number} x
- * @param {number} y
- * @param {number[]} result
- */
-export function getEntitiesAtGridPosition(dataset, x, y, result) {
-    /**
-     *
-     * @param {GridPosition} component
-     * @param {number} entity
-     */
-    function getEntitiesAtGridPosition_visitor(component, entity) {
-        if (component.x === x && component.y === y) {
-            result.push(entity);
-        }
-    }
-
-    dataset.traverseComponents(GridPosition, getEntitiesAtGridPosition_visitor);
-
-    return result;
-}
-
-
 export default GridPositionSystem;
