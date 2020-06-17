@@ -16,8 +16,12 @@ export function attenuateSoundLogarithmic(distance, min, max) {
         return 1;
     }
 
-    const x = inverseLerp(max, min, distance);
+    const x = inverseLerp(min, max, distance);
 
-    //approximating logarithmic curve with 5th degree polynomial curve
-    return Math.pow(x, 5);
+    //approximating logarithmic curve with 4th degree polynomial curve, curve fitted from sound pressure table up to 10 meters
+    const x2 = x * x;
+    const x3 = x2 * x;
+    const x4 = x3 * x;
+
+    return 0.998869 - 5.533849 * x + 14.0474 * x2 - 15.6441 * x3 + 6.132812 * x4;
 }
