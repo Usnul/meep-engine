@@ -26,7 +26,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
 
     const centerMaterial = new MeshBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.2 });
 
-    const sphereBufferGeometry = makeHelperSphereGeometry(1, 64);
+    const sphereBufferGeometry = makeHelperSphereGeometry(0.5, 64);
 
     const boxGeometry = new BoxBufferGeometry(1, 1, 1, 1, 1, 1,);
 
@@ -37,7 +37,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
      * @param {ParticleEmitter} emitter
      * @param {Transform} transform
      * @param {number} entity
-     * @param api
+     * @param {SymbolicDisplayInternalAPI} api
      * @returns {EntityBuilder}
      */
     function factory([emitter, transform, entity], api) {
@@ -69,12 +69,29 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
 
             }
 
+            function updateScale() {
+                mesh.scale.set(
+                    layer.scale.x * transform.scale.x,
+                    layer.scale.y * transform.scale.y,
+                    layer.scale.z * transform.scale.z
+                );
+            }
+
+            function updatePosition() {
+                mesh.position.copy(layer.position);
+            }
+
             if (mesh !== undefined) {
 
-                mesh.position.copy(layer.position);
-                mesh.scale.copy(layer.scale);
+                updateScale();
+                updatePosition();
 
                 group.add(mesh);
+
+                api.bind(layer.position.onChanged, updatePosition);
+
+                api.bind(layer.scale.onChanged, updateScale);
+                api.bind(transform.scale.onChanged, updateScale);
             }
 
         });
@@ -87,7 +104,19 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
          */
         const t = builder.getComponent(Transform);
 
-        t.copy(transform);
+        function updatePosition() {
+            t.position.copy(transform.position);
+        }
+
+        function updateRotation() {
+            t.rotation.copy(transform.rotation);
+        }
+
+        api.bind(transform.position.onChanged, updatePosition);
+        api.bind(transform.rotation.onChanged, updateRotation);
+
+        updatePosition();
+        updateRotation();
 
         return builder;
     }

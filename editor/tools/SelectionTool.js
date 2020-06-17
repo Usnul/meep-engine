@@ -113,8 +113,10 @@ class SelectionTool extends Tool {
          */
         function visitCamera(c) {
             if (!c.active) {
-
+                //skip inactive camera
+                return true;
             }
+
             camera = c.object;
             //TODO check assumption that first camera is the right one
             return false;
@@ -242,6 +244,23 @@ function dereferenceEntity(entity, dataset) {
     }
 }
 
+/**
+ *
+ * @param {LeafNode|BinaryNode} node
+ * @returns {number|undefined}
+ */
+function findEntityOfNode(node) {
+    const entity = node.entity;
+    if (typeof entity === "number") {
+        return entity;
+    } else {
+        const parentNode = node.parentNode;
+        if (parentNode !== null) {
+            return findEntityOfNode(parentNode);
+        }
+    }
+}
+
 
 /**
  *
@@ -291,23 +310,6 @@ export function pickingEntitySelection(point, engine, camera) {
             }
 
             bestCandidate = entity;
-        }
-    }
-
-    /**
-     *
-     * @param {LeafNode|BinaryNode} node
-     * @returns {number|undefined}
-     */
-    function findEntityOfNode(node) {
-        const entity = node.entity;
-        if (typeof entity === "number") {
-            return entity;
-        } else {
-            const parentNode = node.parentNode;
-            if (parentNode !== null) {
-                return findEntityOfNode(parentNode);
-            }
         }
     }
 
@@ -412,7 +414,7 @@ function marqueeSelection(box, editor, camera) {
         layer.bvh.threeTraverseFrustumsIntersections([frustum], function (leaf, fullyInside) {
 
             if (leaf.hasOwnProperty("entity") && selection.indexOf(leaf.entity) === -1) {
-                let entity = leaf.entity;
+                let entity = findEntityOfNode(leaf);
 
                 entity = dereferenceEntity(entity, dataset);
 

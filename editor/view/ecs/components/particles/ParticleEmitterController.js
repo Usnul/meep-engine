@@ -1,10 +1,11 @@
-import GuiControl from "../../../../../view/controller/controls/GuiControl.js";
 import DatGuiController from "../DatGuiController.js";
 import { BlendingType } from "../../../../../engine/graphics/texture/sampler/BlendingType.js";
 import { ParticleLayer } from "../../../../../engine/graphics/particles/particular/engine/emitter/ParticleLayer.js";
-import ListController from "../../../../../view/controller/controls/ListController.js";
 import ParticleLayerController from "./ParticleLayerController.js";
 import { ParticleEmitterFlag } from "../../../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitterFlag.js";
+import { NativeListController } from "../../../../../view/controller/controls/NativeListController.js";
+import EmptyView from "../../../../../view/elements/EmptyView.js";
+import ObservedValue from "../../../../../core/model/ObservedValue.js";
 
 
 /**
@@ -37,7 +38,7 @@ function applyEmitterChanges(emitter, system) {
     particleEngine.add(emitter);
 }
 
-export class ParticleEmitterController extends GuiControl {
+export class ParticleEmitterController extends EmptyView {
     /**
      *
      * @param {ParticleEmitterSystem2} particleEmitterSystem
@@ -46,92 +47,9 @@ export class ParticleEmitterController extends GuiControl {
     constructor(particleEmitterSystem) {
         super();
 
+        this.model = new ObservedValue(null);
+
         const self = this;
-
-        const emitterSurrogate = {
-            preWarm: false,
-            depthRead: true,
-            depthSoft: true,
-            velocityAlign: false,
-            blendingMode: Object.keys(BlendingType)[0],
-            update: function () {
-                applyChanges();
-            },
-            dump: function () {
-                console.log(JSON.stringify(self.model.toJSON(), 3, 3));
-            }
-        };
-
-
-        this.vDat = new DatGuiController();
-
-        const dat = this.vDat;
-
-
-        const cPreWarm = dat.addControl(emitterSurrogate, 'preWarm').onChange(function (value) {
-            const emitter = self.model.getValue();
-
-            /**
-             * @type {ParticleEmitter}
-             */
-            emitter.writeFlag(ParticleEmitterFlag.PreWarm, value);
-
-            applyChanges();
-        });
-
-        const cDepthRead = dat.addControl(emitterSurrogate, 'depthRead').onChange(function (value) {
-            const emitter = self.model.getValue();
-
-            /**
-             * @type {ParticleEmitter}
-             */
-            emitter.writeFlag(ParticleEmitterFlag.DepthReadDisabled, !value);
-
-            applyChanges();
-        });
-
-        const cDepthSoft = dat.addControl(emitterSurrogate, 'depthSoft').onChange(function (value) {
-            const emitter = self.model.getValue();
-
-            /**
-             * @type {ParticleEmitter}
-             */
-            emitter.writeFlag(ParticleEmitterFlag.DepthSoftDisabled, !value);
-
-            applyChanges();
-        });
-
-        const cVelocityAlign = dat.addControl(emitterSurrogate, 'velocityAlign').onChange(function (value) {
-            const emitter = self.model.getValue();
-
-            /**
-             * @type {ParticleEmitter}
-             */
-            emitter.writeFlag(ParticleEmitterFlag.AlignOnVelocity, value);
-
-            applyChanges();
-        });
-
-        const cBlendingMode = dat.addControl(emitterSurrogate, 'blendingMode', Object.keys(BlendingType)).onChange(function (blendModeName) {
-            self.model.getValue().blendingMode = BlendingType[blendModeName];
-            applyChanges();
-        });
-
-        //layers
-        const cLayers = new ListController(
-            function () {
-                return new ParticleLayer();
-            },
-            function () {
-                return new ParticleLayerController();
-            }
-        );
-
-        dat.addControl(emitterSurrogate, 'update').name('Apply Changes');
-        dat.addControl(emitterSurrogate, 'dump').name('Dump JSON');
-
-        this.addChild(this.vDat);
-        this.addChild(cLayers);
 
 
         function applyChanges() {
@@ -142,7 +60,6 @@ export class ParticleEmitterController extends GuiControl {
             }
         }
 
-        const signalBindings = [];
 
         /**
          *
@@ -150,28 +67,92 @@ export class ParticleEmitterController extends GuiControl {
          * @param oldEmitter
          */
         function modelSet(emitter, oldEmitter) {
-            if (oldEmitter !== null) {
 
-                signalBindings.forEach(b => b.unlink());
-                signalBindings.splice(0, signalBindings.length);
-
-                cLayers.model.set(null);
-            }
+            self.removeAllChildren();
 
             if (emitter !== null) {
-                emitterSurrogate.preWarm = emitter.getFlag(ParticleEmitterFlag.PreWarm);
-                emitterSurrogate.depthRead = !emitter.getFlag(ParticleEmitterFlag.DepthReadDisabled);
-                emitterSurrogate.depthSoft = !emitter.getFlag(ParticleEmitterFlag.DepthSoftDisabled);
-                emitterSurrogate.velocityAlign = emitter.getFlag(ParticleEmitterFlag.AlignOnVelocity);
 
-                emitterSurrogate.blendingMode = enumNameByValue(emitter.blendingMode, BlendingType);
+                const emitterSurrogate = {
+                    preWarm: emitter.getFlag(ParticleEmitterFlag.PreWarm),
+                    depthRead: !emitter.getFlag(ParticleEmitterFlag.DepthReadDisabled),
+                    depthSoft: !emitter.getFlag(ParticleEmitterFlag.DepthSoftDisabled),
+                    velocityAlign: emitter.getFlag(ParticleEmitterFlag.AlignOnVelocity),
+                    blendingMode: enumNameByValue(emitter.blendingMode, BlendingType),
+                    update: function () {
+                        applyChanges();
+                    }
+                };
 
-                cPreWarm.setValue(emitterSurrogate.preWarm);
-                cDepthRead.setValue(emitterSurrogate.depthRead);
-                cDepthSoft.setValue(emitterSurrogate.depthSoft);
-                cBlendingMode.setValue(emitterSurrogate.blendingMode);
 
-                cLayers.model.set(emitter.layers);
+                const dat = new DatGuiController();
+
+                self.addChild(dat);
+
+
+                dat.addControl(emitterSurrogate, 'preWarm').onChange(function (value) {
+                    const emitter = self.model.getValue();
+
+                    /**
+                     * @type {ParticleEmitter}
+                     */
+                    emitter.writeFlag(ParticleEmitterFlag.PreWarm, value);
+
+                    applyChanges();
+                });
+
+                dat.addControl(emitterSurrogate, 'depthRead').onChange(function (value) {
+                    const emitter = self.model.getValue();
+
+                    /**
+                     * @type {ParticleEmitter}
+                     */
+                    emitter.writeFlag(ParticleEmitterFlag.DepthReadDisabled, !value);
+
+                    applyChanges();
+                });
+
+                dat.addControl(emitterSurrogate, 'depthSoft').onChange(function (value) {
+                    const emitter = self.model.getValue();
+
+                    /**
+                     * @type {ParticleEmitter}
+                     */
+                    emitter.writeFlag(ParticleEmitterFlag.DepthSoftDisabled, !value);
+
+                    applyChanges();
+                });
+
+                dat.addControl(emitterSurrogate, 'velocityAlign').onChange(function (value) {
+                    const emitter = self.model.getValue();
+
+                    /**
+                     * @type {ParticleEmitter}
+                     */
+                    emitter.writeFlag(ParticleEmitterFlag.AlignOnVelocity, value);
+
+                    applyChanges();
+                });
+
+                dat.addControl(emitterSurrogate, 'blendingMode', Object.keys(BlendingType)).onChange(function (blendModeName) {
+                    self.model.getValue().blendingMode = BlendingType[blendModeName];
+                    applyChanges();
+                });
+
+                dat.addControl(emitterSurrogate, 'update').name('Apply Changes');
+
+                self.addChild(new NativeListController({
+                    model: emitter.layers,
+                    elementViewFactory(layer) {
+                        const c = new ParticleLayerController();
+
+                        c.model.set(layer);
+
+                        return c;
+                    },
+                    elementFactory() {
+                        return new ParticleLayer();
+                    }
+                }))
 
             }
         }
