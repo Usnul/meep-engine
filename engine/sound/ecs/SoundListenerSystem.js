@@ -56,9 +56,9 @@ class Context {
          */
         const listener = this.audioContext.listener;
 
-        listener.forwardX.setValueAtTime(v3.x, 0);
-        listener.forwardY.setValueAtTime(v3.y, 0);
-        listener.forwardZ.setValueAtTime(v3.z, 0);
+        listener.forwardX.value = v3.x;
+        listener.forwardY.value = v3.y;
+        listener.forwardZ.value = v3.z;
     }
 
     updatePosition() {

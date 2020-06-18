@@ -2,6 +2,7 @@ import { LeafNode } from "../../../../core/bvh2/LeafNode.js";
 import { SoundTrackNodes } from "./SoundTrackNodes.js";
 import { GameAssetType } from "../../../asset/GameAssetType.js";
 import { SoundEmitterFlags } from "./SoundEmitterFlags.js";
+import { SoundTrackFlags } from "./SoundTrackFlags.js";
 
 
 /**
@@ -18,7 +19,7 @@ function registerTrack(context, assetManager, soundEmitter, soundTrack) {
     //connect to target
     nodes.volume.connect(targetNode);
 
-    nodes.source.loop = soundTrack.loop;
+    nodes.source.loop = soundTrack.getFlag(SoundTrackFlags.Loop);
     nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
     //
     assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
@@ -33,10 +34,10 @@ function registerTrack(context, assetManager, soundEmitter, soundTrack) {
             nodes.source.buffer = buffer;
         }
 
-        if (soundTrack.startWhenReady) {
+        if (soundTrack.getFlag(SoundTrackFlags.StartWhenReady)) {
             //TODO: figure out a way to use AudioBuffer.playbackRate.value to control speed of playback
             nodes.source.start(0, soundTrack.time);
-            soundTrack.playing = true;
+            soundTrack.setFlag(SoundTrackFlags.Playing);
         }
 
     }, function (error) {
@@ -45,7 +46,8 @@ function registerTrack(context, assetManager, soundEmitter, soundTrack) {
 
     nodes.source.onended = function () {
         if (!nodes.source.loop) {
-            soundTrack.playing = false;
+            soundTrack.clearFlag(SoundTrackFlags.Playing);
+
             soundTrack.on.ended.dispatch();
 
             //remove track

@@ -70,15 +70,21 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             }
 
             function updateScale() {
+                center.scale.set(
+                    1 / transform.scale.x,
+                    1 / transform.scale.y,
+                    1 / transform.scale.z
+                );
+
                 mesh.scale.set(
-                    layer.scale.x * transform.scale.x,
-                    layer.scale.y * transform.scale.y,
-                    layer.scale.z * transform.scale.z
+                    layer.scale.x,
+                    layer.scale.y,
+                    layer.scale.z
                 );
             }
 
             function updatePosition() {
-                mesh.position.copy(layer.position);
+                mesh.position.copy(layer.position.x);
             }
 
             if (mesh !== undefined) {
@@ -112,11 +118,17 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             t.rotation.copy(transform.rotation);
         }
 
+        function updateScale() {
+            t.scale.copy(transform.scale);
+        }
+
         api.bind(transform.position.onChanged, updatePosition);
         api.bind(transform.rotation.onChanged, updateRotation);
+        api.bind(transform.scale.onChanged, updateScale);
 
         updatePosition();
         updateRotation();
+        updateScale();
 
         return builder;
     }

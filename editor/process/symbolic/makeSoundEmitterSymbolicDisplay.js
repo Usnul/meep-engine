@@ -37,7 +37,7 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
      * @param {SoundEmitter} emitter
      * @param {Transform} transform
      * @param {number} entity
-     * @param api
+     * @param {SymbolicDisplayInternalAPI} api
      * @returns {EntityBuilder}
      */
     function factory([emitter, transform, entity], api) {
@@ -67,8 +67,17 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
          */
         const t = builder.getComponent(Transform);
 
-        t.position.copy(transform.position);
-        t.rotation.copy(transform.rotation);
+        function update() {
+            t.position.copy(transform.position);
+            t.rotation.copy(transform.rotation);
+        }
+
+        update();
+
+        api.bind(transform.position.onChanged, update);
+        api.bind(transform.rotation.onChanged, update);
+        api.bind(transform.scale.onChanged, update);
+
 
         return builder;
     }

@@ -324,9 +324,7 @@ export class SoundEmitterSystem extends System {
             for (let i = 0; i < trackCount; i++) {
                 const soundTrack = tracks.get(i);
 
-                if (soundTrack.playing) {
-                    soundTrack.time += timeDelta;
-                }
+                soundTrack.time += timeDelta;
             }
 
         }
