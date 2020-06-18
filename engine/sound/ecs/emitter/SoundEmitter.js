@@ -10,6 +10,8 @@ import { SoundEmitterFlags } from "./SoundEmitterFlags.js";
 import { SoundAttenuationFunction } from "./SoundAttenuationFunction.js";
 import { attenuateSoundLinear } from "./attenuateSoundLinear.js";
 import { attenuateSoundLogarithmic } from "./attenuateSoundLogarithmic.js";
+import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
+import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
 
 /**
  * Convert decibel to percentage volume
@@ -181,6 +183,35 @@ export class SoundEmitter {
     }
 
     /**
+     * @returns {boolean}
+     * @param {SoundEmitter} other
+     */
+    equals(other) {
+        return this.channel === other.channel
+        && this.flags === other.flags
+        && this.__distanceMin === other.__distanceMin
+        && this.__distanceMax === other.__distanceMax
+        && this.attenuation === other.attenuation
+        && this.tracks.equals(other.tracks)
+        ;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    hash(){
+        return computeHashIntegerArray(
+            computeStringHash(this.channel),
+            this.flags,
+            computeHashFloat(this.__distanceMin),
+            computeHashFloat(this.__distanceMax),
+            this.attenuation,
+            this.tracks.hash()
+        );
+    }
+
+    /**
      *
      * @param {AudioContext} ctx
      */
@@ -323,34 +354,43 @@ export class SoundEmitter {
 
     toJSON() {
         return {
-            isPositioned: this.isPositioned,
+            isPositioned: this.getFlag(SoundEmitterFlags.Spatialization),
+            isAttenuated: this.getFlag(SoundEmitterFlags.Attenuation),
             channel: this.channel,
             volume: this.volume.toJSON(),
             tracks: this.tracks.toJSON(),
             distanceMin: this.distanceMin,
-            distanceMax: this.distanceMax,
-            distanceRolloff: this.distanceRolloff
+            distanceMax: this.distanceMax
         };
     }
 
     fromJSON(json) {
         if (json.isPositioned !== undefined) {
-            this.isPositioned = json.isPositioned;
+            this.writeFlag(SoundEmitterFlags.Spatialization, json.isPositioned);
+        } else {
+            this.clearFlag(SoundEmitterFlags.Spatialization);
         }
+
         if (json.channel !== undefined) {
             this.channel = json.channel;
         }
+
         if (json.volume !== undefined) {
             this.volume.fromJSON(json.volume);
         }
+
         if (typeof json.distanceMin === "number") {
             this.distanceMin = json.distanceMin;
         }
+
         if (typeof json.distanceMax === "number") {
             this.distanceMax = json.distanceMax;
         }
-        if (typeof json.distanceRolloff === "number") {
-            this.distanceRolloff = json.distanceRolloff;
+
+        if (typeof json.isAttenuated === "boolean") {
+            this.writeFlag(SoundEmitterFlags.Attenuation, json.isAttenuated);
+        } else {
+            this.setFlag(SoundEmitterFlags.Attenuation);
         }
 
         //tracks

@@ -28,7 +28,7 @@ import { downloadAsFile } from "../core/binary/ByteArrayTools.js";
 import BinaryBufferSerialization from "../engine/ecs/storage/BinaryBufferSerializer.js";
 import { EncodingBinaryBuffer } from "../core/binary/EncodingBinaryBuffer.js";
 import { EntityComponentDataset } from "../engine/ecs/EntityComponentDataset.js";
-import { resetMusicTracks } from "../../view/game/options/OptionsView.js";
+import { resetSoundEmitterTracks } from "../../view/game/options/OptionsView.js";
 import InputControllerSystem from "../engine/input/ecs/systems/InputControllerSystem.js";
 import { assert } from "../core/assert.js";
 
@@ -372,7 +372,7 @@ function Editor() {
             });
 
             // Set music tracks back to time=0
-            resetMusicTracks(dataset);
+            resetSoundEmitterTracks(dataset);
 
             const serializer = new BinaryBufferSerialization();
             serializer.registry = engine.binarySerializationRegistry;

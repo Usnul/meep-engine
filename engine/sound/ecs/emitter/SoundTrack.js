@@ -1,5 +1,7 @@
 import Signal from "../../../../core/events/signal/Signal.js";
 import { SoundTrackFlags } from "./SoundTrackFlags.js";
+import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
+import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 
 const DEFAULT_FLAGS = SoundTrackFlags.StartWhenReady;
 
@@ -166,9 +168,34 @@ export class SoundTrack {
     copy(other) {
         this.url = other.url;
         this.time = other.time;
-        this.channel = other.channel;
         this.volume = other.volume;
         this.flags = other.flags;
+    }
+
+    /**
+     *
+     * @param {SoundTrack} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.url === other.url
+            && this.time === other.time
+            && this.__volume === other.__volume
+            && this.flags === other.flags
+            ;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    hash() {
+        return computeHashIntegerArray(
+            computeStringHash(this.url),
+            computeHashFloat(this.time),
+            computeHashFloat(this.__volume),
+            this.flags
+        );
     }
 
     /**
@@ -186,12 +213,11 @@ export class SoundTrack {
     toJSON() {
         return {
             url: this.url,
-            loop: this.loop,
+            loop: this.getFlag(SoundTrackFlags.Loop),
             time: this.time,
             volume: this.volume,
-            channel: this.channel,
-            playing: this.playing,
-            startWhenReady: this.startWhenReady
+            playing: this.getFlag(SoundTrackFlags.Playing),
+            startWhenReady: this.getFlag(SoundTrackFlags.StartWhenReady)
         };
     }
 
@@ -201,24 +227,21 @@ export class SoundTrack {
             loop = false,
             time = 0,
             volume = 1,
-            channel = null,
             playing = false,
             startWhenReady = true
         }
     ) {
         this.url = url;
 
-        this.loop = loop;
+        this.writeFlag(SoundTrackFlags.Loop, loop);
 
         this.time = time;
 
         this.volume = volume;
 
-        this.channel = channel;
+        this.writeFlag(SoundTrackFlags.Playing, playing);
 
-        this.playing = playing;
-
-        this.startWhenReady = startWhenReady;
+        this.writeFlag(SoundTrackFlags.StartWhenReady, startWhenReady);
     }
 
     static fromJSON(json) {
