@@ -12,6 +12,7 @@ import { attenuateSoundLinear } from "./attenuateSoundLinear.js";
 import { attenuateSoundLogarithmic } from "./attenuateSoundLogarithmic.js";
 import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
+import { objectKeyByValue } from "../../../../core/model/ObjectUtils.js";
 
 /**
  * Convert decibel to percentage volume
@@ -188,19 +189,19 @@ export class SoundEmitter {
      */
     equals(other) {
         return this.channel === other.channel
-        && this.flags === other.flags
-        && this.__distanceMin === other.__distanceMin
-        && this.__distanceMax === other.__distanceMax
-        && this.attenuation === other.attenuation
-        && this.tracks.equals(other.tracks)
-        ;
+            && this.flags === other.flags
+            && this.__distanceMin === other.__distanceMin
+            && this.__distanceMax === other.__distanceMax
+            && this.attenuation === other.attenuation
+            && this.tracks.equals(other.tracks)
+            ;
     }
 
     /**
      *
      * @return {number}
      */
-    hash(){
+    hash() {
         return computeHashIntegerArray(
             computeStringHash(this.channel),
             this.flags,
@@ -360,7 +361,8 @@ export class SoundEmitter {
             volume: this.volume.toJSON(),
             tracks: this.tracks.toJSON(),
             distanceMin: this.distanceMin,
-            distanceMax: this.distanceMax
+            distanceMax: this.distanceMax,
+            attenuation: objectKeyByValue(SoundAttenuationFunction, this.attenuation)
         };
     }
 
@@ -391,6 +393,18 @@ export class SoundEmitter {
             this.writeFlag(SoundEmitterFlags.Attenuation, json.isAttenuated);
         } else {
             this.setFlag(SoundEmitterFlags.Attenuation);
+        }
+
+        if (typeof json.attenuation === "string") {
+            const attenuation = SoundAttenuationFunction[json.attenuation];
+
+            if (attenuation === undefined) {
+                throw new Error(`Unknown attenuation type '${json.attenuation}', valid types are: ${Object.keys(SoundAttenuationFunction)}`);
+            }
+
+            this.attenuation = attenuation;
+        } else {
+            this.attenuation = SoundAttenuationFunction.Linear;
         }
 
         //tracks

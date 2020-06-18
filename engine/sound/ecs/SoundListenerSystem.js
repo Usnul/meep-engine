@@ -7,7 +7,9 @@ import { System } from '../../ecs/System.js';
 import SoundListener from './SoundListener.js';
 import { Transform } from '../../ecs/transform/Transform.js';
 import { browserInfo } from "../../Platform.js";
+import Vector3 from "../../../core/geom/Vector3.js";
 
+const v3 = new Vector3();
 
 class Context {
     constructor() {
@@ -31,10 +33,32 @@ class Context {
 
     link() {
         this.transform.position.onChanged.add(this.updatePosition, this);
+        this.transform.rotation.onChanged.add(this.updateRotation, this);
+
+        this.updatePosition();
+        this.updateRotation();
     }
 
     unlink() {
         this.transform.position.onChanged.remove(this.updatePosition, this);
+        this.transform.rotation.onChanged.remove(this.updateRotation, this);
+    }
+
+    updateRotation() {
+
+        v3.copy(Vector3.forward);
+
+        v3.applyQuaternion(this.transform.rotation);
+
+        /**
+         *
+         * @type {AudioListener}
+         */
+        const listener = this.audioContext.listener;
+
+        listener.forwardX.setValueAtTime(v3.x, 0);
+        listener.forwardY.setValueAtTime(v3.y, 0);
+        listener.forwardZ.setValueAtTime(v3.z, 0);
     }
 
     updatePosition() {
@@ -45,6 +69,7 @@ class Context {
         const listener = this.audioContext.listener;
 
         setListenerPosition(listener, this.transform.position);
+
     }
 }
 
