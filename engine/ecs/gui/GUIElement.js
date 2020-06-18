@@ -6,6 +6,9 @@ import ObservedBoolean from "../../../core/model/ObservedBoolean.js";
 import { BinaryClassSerializationAdapter } from "../storage/binary/BinaryClassSerializationAdapter.js";
 import { COMPONENT_SERIALIZATION_TRANSIENT_FIELD } from "../storage/COMPONENT_SERIALIZATION_TRANSIENT_FIELD.js";
 import { assert } from "../../../core/assert.js";
+import { computeHashIntegerArray } from "../../../core/math/MathUtils.js";
+import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
+import { objectDeepEquals } from "../../../core/model/ObjectUtils.js";
 
 /**
  *
@@ -122,6 +125,57 @@ class GUIElement {
      */
     getFlag(flag) {
         return (this.flags & flag) === flag;
+    }
+
+    /**
+     *
+     * @param {GUIElement} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        if (this.flags !== other.flags) {
+            return false;
+        }
+
+        if (this.klass !== other.klass) {
+            return false;
+        }
+
+        if (!this.getFlag(GUIElementFlag.Managed) && this.view !== other.view) {
+            return false;
+        }
+
+        if (!this.anchor.equals(other.anchor)) {
+            return false;
+        }
+
+        if (this.group !== other.group) {
+            return false;
+        }
+
+        if (!this.visible.equals(other.visible)) {
+            return false;
+        }
+
+        if (!objectDeepEquals(this.parameters, other.parameters)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    hash() {
+        return computeHashIntegerArray(
+            this.flags,
+            computeStringHash(this.klass),
+            this.anchor.hashCode(),
+            computeStringHash(this.group),
+            this.visible.hashCode()
+        )
     }
 
     /**

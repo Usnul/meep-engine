@@ -5,6 +5,7 @@
 import Vector2 from "../../../core/geom/Vector2.js";
 import ObservedBoolean from "../../../core/model/ObservedBoolean.js";
 import { BinaryClassSerializationAdapter } from "../storage/binary/BinaryClassSerializationAdapter.js";
+import { computeHashFloat, computeHashIntegerArray } from "../../../core/math/MathUtils.js";
 
 /**
  * @readonly
@@ -75,6 +76,34 @@ class ViewportPosition {
         if (offset !== void 0) {
             this.offset.copy(offset);
         }
+    }
+
+    /**
+     *
+     * @param {ViewportPosition} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.position.equals(other.position)
+            && this.offset.equals(other.offset)
+            && this.anchor.equals(other.anchor)
+            && this.resolveGuiCollisions === other.resolveGuiCollisions
+            && this.screenEdgeWidth === other.screenEdgeWidth
+            && this.stickToScreenEdge === other.stickToScreenEdge
+            && this.enabled.equals(other.enabled)
+            ;
+    }
+
+    hash() {
+        return computeHashIntegerArray(
+            this.position.hashCode(),
+            this.offset.hashCode(),
+            this.anchor.hashCode(),
+            this.resolveGuiCollisions ? 1 : 0,
+            computeHashFloat(this.screenEdgeWidth),
+            this.stickToScreenEdge ? 1 : 0,
+            this.enabled.hashCode()
+        );
     }
 
     fromJSON(

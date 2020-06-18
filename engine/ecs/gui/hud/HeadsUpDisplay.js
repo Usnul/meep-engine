@@ -7,21 +7,18 @@
 
 import Vector3 from '../../../../core/geom/Vector3.js';
 import { HeadsUpDisplayFlag } from "./HeadsUpDisplayFlag.js";
+import { computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 
 class HeadsUpDisplay {
     /**
      *
-     * @param worldOffset
      */
-    constructor({
-                    worldOffset = new Vector3()
-                } = {}) {
-
+    constructor() {
         /**
          *
          * @type {Vector3}
          */
-        this.worldOffset = worldOffset;
+        this.worldOffset = new Vector3();
 
         /**
          *
@@ -70,6 +67,28 @@ class HeadsUpDisplay {
         return (this.flags & flag) === flag;
     }
 
+    /**
+     *
+     * @param {HeadsUpDisplay} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.flags === other.flags
+            && this.worldOffset.equals(other.worldOffset)
+            ;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    hash() {
+        return computeHashIntegerArray(
+            this.flags,
+            this.worldOffset.hash()
+        );
+    }
+
     toJSON() {
         return {
             worldOffset: this.worldOffset.toJSON(),
@@ -82,6 +101,14 @@ class HeadsUpDisplay {
         this.worldOffset.fromJSON(worldOffset);
         this.writeFlag(HeadsUpDisplayFlag.TransformWorldOffset, transformWorldOffset);
         this.writeFlag(HeadsUpDisplayFlag.PerspectiveRotation, perspectiveRotation);
+    }
+
+    static fromJSON(j){
+        const r = new HeadsUpDisplay();
+
+        r.fromJSON(j);
+
+        return r;
     }
 }
 

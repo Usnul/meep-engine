@@ -75,6 +75,14 @@ class ObservedBoolean extends Boolean{
 
     /**
      *
+     * @return {number}
+     */
+    hashCode(){
+        return this.__value?1:0;
+    }
+
+    /**
+     *
      * @param {function} f
      */
     process(f) {
