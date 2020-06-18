@@ -7,7 +7,7 @@ export class SoundEmitterSerializationAdapter extends BinaryClassSerializationAd
         super();
 
         this.klass = SoundEmitter;
-        this.version = 1;
+        this.version = 2;
     }
 
 
@@ -37,6 +37,7 @@ export class SoundEmitterSerializationAdapter extends BinaryClassSerializationAd
             buffer.writeUint8(soundTrack.flags);
             buffer.writeUTF8String(soundTrack.url);
             buffer.writeFloat64(soundTrack.time);
+            buffer.writeFloat32(soundTrack.volume);
         }
     }
 
@@ -74,6 +75,7 @@ export class SoundEmitterSerializationAdapter extends BinaryClassSerializationAd
             track.flags = buffer.readUint8();
             track.url = buffer.readUTF8String();
             track.time = buffer.readFloat64();
+            track.volume = buffer.readFloat32();
 
             value.tracks.add(track);
         }

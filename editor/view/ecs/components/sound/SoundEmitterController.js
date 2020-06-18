@@ -4,7 +4,10 @@ import DatGuiController from "../DatGuiController.js";
 import EmptyView from "../../../../../view/elements/EmptyView.js";
 import ButtonView from "../../../../../view/elements/button/ButtonView.js";
 import { NativeListController } from "../../../../../view/controller/controls/NativeListController.js";
-import { SoundEmitterChannels } from "../../../../../engine/sound/ecs/emitter/SoundEmitterSystem.js";
+import {
+    SoundEmitterChannels,
+    SoundEmitterSystem
+} from "../../../../../engine/sound/ecs/emitter/SoundEmitterSystem.js";
 import { SoundTrack } from "../../../../../engine/sound/ecs/emitter/SoundTrack.js";
 import { SoundAttenuationFunction } from "../../../../../engine/sound/ecs/emitter/SoundAttenuationFunction.js";
 import { SoundEmitterFlags } from "../../../../../engine/sound/ecs/emitter/SoundEmitterFlags.js";
@@ -46,7 +49,7 @@ class SoundTrackController extends EmptyView {
         });
         dat.add(track, 'loop');
         dat.add(track, 'time');
-        dat.add(track, 'volume');
+        dat.add(track, 'volume').step(0.001);
         dat.add(track, 'startWhenReady');
 
         this.addChild(dat);
@@ -80,7 +83,22 @@ export class SoundEmitterController extends View {
                 soundEmitter.channel = SoundEmitterChannels.Effects;
             }
 
-            d.addControl(soundEmitter, 'channel');
+            const channel_enum = {};
+
+            /**
+             *
+             * @type {SoundEmitterSystem}
+             */
+            const soundEmitterSystem = engine.entityManager.getSystem(SoundEmitterSystem);
+
+            for (const channelName in soundEmitterSystem.channels) {
+                channel_enum[channelName] = channelName;
+            }
+
+            d.addEnumRaw(soundEmitter, 'channel', channel_enum);
+
+            d.add(soundEmitter, 'volume');
+
             d.addControl(soundEmitter, 'distanceMin');
             d.addControl(soundEmitter, 'distanceMax');
 
