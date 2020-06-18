@@ -5,8 +5,8 @@ export class SoundEmitterSerializationUpgrader_1_2 extends BinaryClassUpgrader {
     constructor() {
         super();
 
-        this.__startVersion = 0;
-        this.__targetVersion = 1;
+        this.__startVersion = 1;
+        this.__targetVersion = 2;
     }
 
     upgrade(source, target) {
