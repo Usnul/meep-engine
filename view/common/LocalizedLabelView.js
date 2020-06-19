@@ -56,10 +56,22 @@ export class LocalizedLabelView extends View {
         this.needsUpdate = true;
 
         this.on.linked.add(() => {
+            if (this.localization !== null && this.localization.locale.getValue() !== this.__localeKey) {
+                //locale key has changed
+                this.needsUpdate = true;
+            }
+
             if (this.needsUpdate) {
                 this.update();
             }
         });
+
+        /**
+         * Cached locale key
+         * @type {String}
+         * @private
+         */
+        this.__localeKey = null;
 
         // watch for locale changes
         this.setLocalization(localization);
@@ -118,6 +130,8 @@ export class LocalizedLabelView extends View {
         assert.notEqual(localization, null, 'localization is null');
 
         const value = localization.getString(id, seed);
+
+        this.__localeKey = localization.locale.getValue();
 
         if (gml === undefined) {
             $el.text(value);

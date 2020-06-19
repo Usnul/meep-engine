@@ -24,6 +24,10 @@ export class TooltipParser {
 
     }
 
+    resetCache() {
+        this.__cache.clear();
+    }
+
     /**
      *
      * @param {string} code
