@@ -7,6 +7,7 @@ import { AnimationGraphFlag } from "./AnimationGraphFlag.js";
 import { computeHashFloat, computeHashIntegerArray } from "../../../../../../core/math/MathUtils.js";
 import { writeAnimationGraphDefinitionToJSON } from "./definition/serialization/writeAnimationGraphDefinitionToJSON.js";
 import { readAnimationGraphDefinitionFromJSON } from "./definition/serialization/readAnimationGraphDefinitionFromJSON.js";
+import { assert } from "../../../../../../core/assert.js";
 
 export class AnimationGraph {
     constructor() {
@@ -88,7 +89,7 @@ export class AnimationGraph {
 
         /**
          *
-         * @type {Mesh}
+         * @type {Object3D}
          * @private
          */
         this.__mesh = null;
@@ -306,9 +307,14 @@ export class AnimationGraph {
 
     /**
      *
-     * @param {Mesh} mesh
+     * @param {Object3D} mesh
      */
     attach(mesh) {
+
+        assert.defined(mesh, 'mesh');
+        assert.notNull(mesh, 'mesh');
+        assert.equal(mesh.isObject3D, true, 'Mesh.isMesh !== true');
+
         if (this.__mesh === mesh) {
             return;
         }
@@ -367,6 +373,16 @@ export class AnimationGraph {
     }
 
     link(entity, ecd) {
+        if (this.getFlag(AnimationGraphFlag.Linked)) {
+            //already linked
+            if (this.__entity === entity && this.__dataset === ecd) {
+                //everything is the same, nothing to do
+                return;
+            } else {
+                throw new Error('Graph is already linked to another source, must call .unlink first');
+            }
+        }
+
         this.__entity = entity;
         this.__dataset = ecd;
 

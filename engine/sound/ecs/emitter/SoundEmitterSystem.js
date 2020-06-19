@@ -8,7 +8,7 @@
 import { System } from '../../../ecs/System.js';
 import { SoundEmitter } from './SoundEmitter.js';
 import { Transform } from '../../../ecs/transform/Transform.js';
-import { SoundAssetManager } from "../../../asset/loaders/SoundAssetManager.js";
+import { SoundAssetLoader } from "../../../asset/loaders/SoundAssetLoader.js";
 import { GameAssetType } from "../../../asset/GameAssetType.js";
 import { BinaryNode } from "../../../../core/bvh2/BinaryNode.js";
 import SoundListener from "../SoundListener.js";
@@ -74,7 +74,7 @@ export class SoundEmitterSystem extends System {
         this.channels[SoundEmitterChannels.Effects].gain.setValueAtTime(1.2, 0);
         this.channels[SoundEmitterChannels.Music].gain.setValueAtTime(0.1, 0);
 
-        assetManager.registerLoader(GameAssetType.Sound, new SoundAssetManager(context));
+        assetManager.registerLoader(GameAssetType.Sound, new SoundAssetLoader(context));
 
 
         /**

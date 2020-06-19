@@ -59,9 +59,10 @@ function setMeshFromAsset(entity, dataset, asset, component) {
         );
     }
 
-    setMesh(dataset, entity, component, mesh, component.center);
+    component.setFlag(MeshFlags.Loaded);
 
-    component.isLoaded = true;
+    setMesh(dataset, entity, component, mesh);
+
 }
 
 /**
@@ -413,6 +414,7 @@ export class MeshSystem extends System {
             if (actualComponent === component) {
                 // scene.remove(component.mesh);
                 setMeshFromAsset(entity, dataset, asset, component);
+
             } else {
                 //component is no longer in the manager. do nothing.
                 //console.warn("component is no longer in the manager");
@@ -680,9 +682,8 @@ function loaderNameByURL(url) {
  * @param entity
  * @param {Mesh} component
  * @param {Object3D} mesh
- * @param {boolean} [wrapFlag=false]
  */
-function setMesh(dataset, entity, component, mesh, wrapFlag = false) {
+function setMesh(dataset, entity, component, mesh) {
 
     mesh.traverse(o => {
         o.castShadow = component.castShadow;
@@ -690,11 +691,6 @@ function setMesh(dataset, entity, component, mesh, wrapFlag = false) {
     });
 
     let object = mesh;
-    if (wrapFlag) {
-        console.warn('wrapped mesh', dataset.getAllComponents(entity));
-
-        object = wrapMeshInGroupAndCenterOnOrigin(mesh);
-    }
 
     /*
         disable auto updates. We know when transform changes and thus we can avoid unnecessary matrix computations

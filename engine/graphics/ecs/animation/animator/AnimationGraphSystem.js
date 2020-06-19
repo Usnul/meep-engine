@@ -23,7 +23,6 @@ function attach(graph, mesh, entity, ecd) {
 
     graph.link(entity, ecd);
 
-
 }
 
 /**
@@ -94,7 +93,15 @@ export class AnimationGraphSystem extends System {
 
         const graph = ecd.getComponent(entity, AnimationGraph);
 
-        attach(graph, component.mesh, entity, ecd);
+        if (graph.getFlag(AnimationGraphFlag.Linked)) {
+            //unlink the graph to clear out animation clip bindings
+            graph.unlink();
+        }
+
+        graph.attach(component.mesh);
+
+        //re-link the graph
+        graph.link(entity, ecd);
     }
 
     /**
@@ -107,10 +114,13 @@ export class AnimationGraphSystem extends System {
         const ecd = this.entityManager.dataset;
 
         if (mesh.getFlag(MeshFlags.Loaded)) {
-            attach(graph, mesh.mesh, entity, ecd);
-        } else {
-            ecd.addEntityEventListener(entity, EventMeshSet, this.handleMeshSetEvent, this);
+
+            graph.attach(mesh.mesh);
+
+            graph.link(entity, ecd);
         }
+
+        ecd.addEntityEventListener(entity, EventMeshSet, this.handleMeshSetEvent, this);
     }
 
     /**

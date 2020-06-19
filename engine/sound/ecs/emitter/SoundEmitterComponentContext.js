@@ -4,58 +4,6 @@ import { GameAssetType } from "../../../asset/GameAssetType.js";
 import { SoundEmitterFlags } from "./SoundEmitterFlags.js";
 import { SoundTrackFlags } from "./SoundTrackFlags.js";
 
-
-/**
- *
- * @param {AudioContext} context
- * @param {AssetManager} assetManager
- * @param {SoundEmitter} soundEmitter
- * @param {SoundTrack} soundTrack
- */
-function registerTrack(context, assetManager, soundEmitter, soundTrack) {
-    const targetNode = soundEmitter.nodes.volume;
-
-    const nodes = soundTrack.nodes = new SoundTrackNodes(context);
-    //connect to target
-    nodes.volume.connect(targetNode);
-
-    nodes.source.loop = soundTrack.getFlag(SoundTrackFlags.Loop);
-    nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
-    //
-    assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
-        /**
-         *
-         * @type {AudioBuffer}
-         */
-        const buffer = asset.create();
-
-        // Make the sound source use the buffer and start playing it.
-        if (nodes.source.buffer !== buffer) {
-            nodes.source.buffer = buffer;
-        }
-
-        if (soundTrack.getFlag(SoundTrackFlags.StartWhenReady)) {
-            //TODO: figure out a way to use AudioBuffer.playbackRate.value to control speed of playback
-            nodes.source.start(0, soundTrack.time);
-            soundTrack.setFlag(SoundTrackFlags.Playing);
-        }
-
-    }, function (error) {
-        console.error(`failed to load sound track '${soundTrack.url}' : `, error);
-    });
-
-    nodes.source.onended = function () {
-        if (!nodes.source.loop) {
-            soundTrack.clearFlag(SoundTrackFlags.Playing);
-
-            soundTrack.on.ended.dispatch();
-
-            //remove track
-            soundEmitter.tracks.removeOneOf(soundTrack);
-        }
-    };
-}
-
 export class SoundEmitterComponentContext {
     constructor() {
 
@@ -146,15 +94,56 @@ export class SoundEmitterComponentContext {
 
     /**
      *
-     * @param {SoundTrack} track
+     * @param {SoundTrack} soundTrack
      */
-    addTrack(track) {
+    addTrack(soundTrack) {
         const system = this.system;
+
+        const emitter = this.emitter;
 
         const context = system.webAudioContext;
         const assetManager = system.assetManager;
+        const targetNode = emitter.nodes.volume;
 
-        registerTrack(context, assetManager, this.emitter, track);
+        const nodes = soundTrack.nodes = new SoundTrackNodes(context);
+
+        //connect to target
+        nodes.volume.connect(targetNode);
+
+        nodes.source.loop = soundTrack.getFlag(SoundTrackFlags.Loop);
+        nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
+
+        //
+        assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
+            /**
+             *
+             * @type {AudioBuffer}
+             */
+            const buffer = asset.create();
+
+            // Make the sound source use the buffer and start playing it.
+            if (nodes.source.buffer !== buffer) {
+                nodes.source.buffer = buffer;
+            }
+
+            if (soundTrack.getFlag(SoundTrackFlags.StartWhenReady)) {
+                //TODO: figure out a way to use AudioBuffer.playbackRate.value to control speed of playback
+                nodes.source.start(0, soundTrack.time);
+                soundTrack.setFlag(SoundTrackFlags.Playing);
+            }
+
+        }, console.error);
+
+        nodes.source.onended = function () {
+            if (!nodes.source.loop) {
+                soundTrack.clearFlag(SoundTrackFlags.Playing);
+
+                soundTrack.on.ended.dispatch();
+
+                //remove track
+                emitter.tracks.removeOneOf(soundTrack);
+            }
+        };
     }
 
     /**

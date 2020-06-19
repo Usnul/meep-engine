@@ -18,9 +18,9 @@ export class AssetLoader {
     /**
      *
      * @param {string} path
-     * @param {function} success
+     * @param {function(Asset)} success
      * @param {function} failure
-     * @param {function} progress
+     * @param {function(current:number, total:number)} progress
      */
     load(path, success, failure, progress) {
 

@@ -1,7 +1,7 @@
 import { AssetLoader } from "./AssetLoader.js";
 import { Asset } from "../Asset.js";
 
-export class SoundAssetManager extends AssetLoader {
+export class SoundAssetLoader extends AssetLoader {
     /**
      *
      * @param {AudioContext} context
@@ -36,7 +36,7 @@ export class SoundAssetManager extends AssetLoader {
                 }, byteSize);
 
                 success(asset);
-            });
+            }, failure);
         };
 
         request.onerror = failure;

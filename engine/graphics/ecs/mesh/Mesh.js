@@ -1,7 +1,6 @@
 /**
  * Created by Alex Goldring on 25.02.2015.
  */
-import Vector3 from "../../../../core/geom/Vector3.js";
 import { AABB3 } from "../../../../core/bvh2/AABB3.js";
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
@@ -15,44 +14,15 @@ export const MeshFlags = {
     InView: 8
 };
 
-class Mesh {
-    constructor(options) {
-        if (options !== undefined) {
-            console.error('Passing arguments into Mesh constructor is deprecated');
-        } else {
-            options = {};
-        }
+const DEFAULT_FLAGS = 0;
 
+class Mesh {
+    constructor() {
         /**
          *
          * @type {string|null}
          */
-        this.url = options.url !== undefined ? options.url : null;
-
-        if (options.size !== void 0) {
-            /**
-             * @deprecated
-             * @type {Vector3}
-             */
-            this.size = new Vector3(0, 0, 0);
-
-            if (typeof (options.size) === "number") {
-                this.size.set(options.size, options.size, options.size);
-            } else {
-                this.size.copy(options.size);
-            }
-        }
-
-        /**
-         *
-         * @type {*|boolean}
-         */
-        this.castShadow = options.castShadow || false;
-        /**
-         *
-         * @type {boolean}
-         */
-        this.receiveShadow = options.receiveShadow || false;
+        this.url = null;
 
         /**
          *
@@ -61,16 +31,10 @@ class Mesh {
         this.mesh = null;
 
         /**
-         * @deprecated
-         * @type {boolean}
-         */
-        this.center = options.center !== undefined ? options.center : false;
-
-        /**
          *
          * @type {number}
          */
-        this.opacity = options.opacity !== undefined ? options.opacity : 1;
+        this.opacity = 1;
 
         /**
          *
@@ -88,7 +52,15 @@ class Mesh {
          *
          * @type {number}
          */
-        this.flags = 0;
+        this.flags = DEFAULT_FLAGS;
+    }
+
+    set center(v) {
+        throw new Error('Mesh.center is deprecated');
+    }
+
+    get center() {
+        throw new Error('Mesh.center is deprecated');
     }
 
     /**
@@ -183,20 +155,11 @@ class Mesh {
         if (obj.url !== undefined) {
             this.url = obj.url;
         }
-        if (obj.size !== undefined) {
-            if (this.size === undefined) {
-                this.size = new Vector3(0, 0, 0);
-            }
-            this.size.fromJSON(obj.size);
-        }
         if (obj.castShadow !== undefined) {
             this.castShadow = obj.castShadow;
         }
         if (obj.receiveShadow !== undefined) {
             this.receiveShadow = obj.receiveShadow;
-        }
-        if (obj.center !== undefined) {
-            this.center = obj.center;
         }
         if (obj.opacity !== undefined) {
             this.opacity = obj.opacity;
@@ -208,14 +171,8 @@ class Mesh {
             url: this.url,
             castShadow: this.castShadow,
             receiveShadow: this.receiveShadow,
-            center: this.center,
             opacity: this.opacity
         };
-
-        if (this.size !== undefined) {
-            //deprecated attribute
-            result.size = this.size.toJSON();
-        }
 
         return result;
     }
@@ -226,7 +183,6 @@ class Mesh {
             urlHash,
             this.castShadow ? 1 : 0,
             this.receiveShadow ? 1 : 0,
-            this.center ? 1 : 0,
             computeHashFloat(this.opacity)
         );
     }
@@ -238,20 +194,9 @@ class Mesh {
     copy(other) {
         this.url = other.url;
 
-        if (other.size !== undefined) {
-            //deprecated attribute
-            if (this.size === undefined) {
-                this.size = other.size.clone();
-            } else {
-                this.size.copy(other.size);
-            }
-        } else {
-            delete this.size;
-        }
-
         this.castShadow = other.castShadow;
         this.receiveShadow = other.receiveShadow;
-        this.center = other.center;
+
         this.opacity = other.opacity;
     }
 
@@ -304,7 +249,9 @@ export class MeshSerializationAdapter extends BinaryClassSerializationAdapter {
         buffer.writeUTF8String(value.url);
         buffer.writeUint8(value.castShadow ? 1 : 0);
         buffer.writeUint8(value.receiveShadow ? 1 : 0);
-        buffer.writeUint8(value.center ? 1 : 0);
+
+        buffer.writeUint8(0); // deprecated "center" flag
+
         buffer.writeFloat32(value.opacity);
     }
 
@@ -317,7 +264,9 @@ export class MeshSerializationAdapter extends BinaryClassSerializationAdapter {
         value.url = buffer.readUTF8String();
         value.castShadow = buffer.readUint8() !== 0;
         value.receiveShadow = buffer.readUint8() !== 0;
-        value.center = buffer.readUint8() !== 0;
+
+        const deprecated_centerFlag = buffer.readUint8();
+
         value.opacity = buffer.readFloat32();
     }
 
