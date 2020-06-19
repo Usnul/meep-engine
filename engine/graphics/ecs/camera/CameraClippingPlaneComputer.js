@@ -48,7 +48,7 @@ export class CameraClippingPlaneComputer {
      * @private
      */
     __processLayer(layer) {
-        if (!layer.visible) {
+        if (!layer.state.visible) {
             return;
         }
 

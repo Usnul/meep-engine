@@ -740,45 +740,50 @@ AABB3.prototype.computePlaneSide = function computePlaneSide(plane) {
     return result;
 };
 
+/**
+ *
+ * @param {Plane} plane
+ * @return {boolean}
+ */
+AABB3.prototype.isBelowPlane = function (plane) {
+    let p0x, p0y, p0z, p1x, p1y, p1z;
 
-AABB3.prototype.isBelowPlane = function () {
-    const p1 = new Vector3(),
-        p2 = new Vector3();
+    const normal = plane.normal;
 
-    function isBelowPlane(plane) {
-        const normal = plane.normal;
+    const nx = normal.x;
+    const ny = normal.y;
+    const nz = normal.z;
 
-        if (normal.x > 0) {
-            p1.x = this.x0;
-            p2.x = this.x1;
-        } else {
-            p1.x = this.x1;
-            p2.x = this.x0;
-        }
-
-        if (normal.y > 0) {
-            p1.y = this.y0;
-            p2.y = this.y1;
-        } else {
-            p1.y = this.y1;
-            p2.y = this.y0;
-        }
-
-        if (normal.z > 0) {
-            p1.z = this.z0;
-            p2.z = this.z1;
-        } else {
-            p1.z = this.z1;
-            p2.z = this.z0;
-        }
-
-        const planeConstant = -plane.constant;
-
-        return (p1.dot(normal) < planeConstant) && (p2.dot(normal) < planeConstant);
+    if (nx > 0) {
+        p0x = this.x0;
+        p1x = this.x1;
+    } else {
+        p0x = this.x1;
+        p1x = this.x0;
     }
 
-    return isBelowPlane;
-}();
+    if (ny > 0) {
+        p0y = this.y0;
+        p1y = this.y1;
+    } else {
+        p0y = this.y1;
+        p1y = this.y0;
+    }
+
+    if (nz > 0) {
+        p0z = this.z0;
+        p1z = this.z1;
+    } else {
+        p0z = this.z1;
+        p1z = this.z0;
+    }
+
+    const planeConstant = -plane.constant;
+
+    return (v3_dot(p0x, p0y, p0z, nx, ny, nz) < planeConstant)
+        && (v3_dot(p1x, p1y, p1z, nx, ny, nz) < planeConstant)
+        ;
+};
 
 AABB3.prototype.intersectSpace = function (clippingPlanes) {
     let i = 0;
