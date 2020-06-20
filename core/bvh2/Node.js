@@ -133,6 +133,8 @@ Node.prototype.disconnect = function () {
     } else {
         throw new Error("impostor child");
     }
+
+    node.updateLeafNodeCount();
 };
 
 /**

@@ -6,26 +6,6 @@ import { StacklessTraverser } from "../StacklessTraverser.js";
 
 /**
  *
- * @param node
- */
-function countLeaves(node) {
-    if (isLeaf(node)) {
-        return 1;
-    }
-
-    let result = 0;
-
-    node.traversePreOrderUsingStack(function (node) {
-        if (isLeaf(node)) {
-            result++;
-        }
-    });
-
-    return result;
-}
-
-/**
- *
  * @type {(BinaryNode|LeafNode)[]}
  */
 const stack = [];
@@ -62,8 +42,8 @@ function getLeafCount(node, leafCounts) {
         const storedValue = leafCounts.get(node);
 
         if (storedValue !== undefined) {
-        result += storedValue;
-        continue;
+            result += storedValue;
+            continue;
         }
 
 
@@ -124,8 +104,8 @@ function tryRotateSingleNode(node, leafCounts) {
     const leftArea = computeArea(left);
     const rightArea = computeArea(right);
 
-    const leftLeaves = getLeafCount(left, leafCounts);
-    const rightLeaves = getLeafCount(right, leafCounts);
+    const leftLeaves = left.leafNodeCount;
+    const rightLeaves = right.leafNodeCount;
 
 
     let bestCost = sah(
@@ -165,8 +145,8 @@ function tryRotateSingleNode(node, leafCounts) {
             leftLeftArea = computeArea(leftLeft);
             leftRightArea = computeArea(leftRight);
 
-            leftLeftLeaves = getLeafCount(leftLeft, leafCounts);
-            leftRightLeaves = getLeafCount(leftRight, leafCounts);
+            leftLeftLeaves = leftLeft.leafNodeCount;
+            leftRightLeaves = leftRight.leafNodeCount;
 
             // (1)    N                     N      //
             //       / \                   / \     //
@@ -202,8 +182,8 @@ function tryRotateSingleNode(node, leafCounts) {
             rightLeftArea = computeArea(rightLeft);
             rightRightArea = computeArea(rightRight);
 
-            rightLeftLeaves = getLeafCount(rightLeft, leafCounts);
-            rightRightLeaves = getLeafCount(rightRight, leafCounts);
+            rightLeftLeaves = rightLeft.leafNodeCount;
+            rightRightLeaves = rightRight.leafNodeCount;
 
             // (3)    N                     N        //
             //       / \                   / \       //
@@ -284,7 +264,7 @@ function tryRotateSingleNode(node, leafCounts) {
 
             left.refit();
             //update leaf count
-            leafCounts.set(node.left, rightLeaves + leftRightLeaves);
+            node.left.updateLeafNodeCount();
             break;
         case 2:
             node.right = leftRight;
@@ -294,7 +274,7 @@ function tryRotateSingleNode(node, leafCounts) {
 
             left.refit();
             //update leaf count
-            leafCounts.set(node.left, leftLeftLeaves + rightLeaves);
+            node.left.updateLeafNodeCount();
             break;
         case 3:
             node.left = rightLeft;
@@ -304,7 +284,7 @@ function tryRotateSingleNode(node, leafCounts) {
 
             right.refit();
             //update leaf count
-            leafCounts.set(node.right, leftLeaves + rightRightLeaves);
+            node.right.updateLeafNodeCount();
             break;
         case 4:
             node.left = rightRight;
@@ -314,7 +294,7 @@ function tryRotateSingleNode(node, leafCounts) {
 
             right.refit();
             //update leaf count
-            leafCounts.set(node.left, rightLeftLeaves + leftLeaves);
+            node.right.updateLeafNodeCount();
             break;
         case 5:
             left.right = rightLeft;
@@ -326,8 +306,8 @@ function tryRotateSingleNode(node, leafCounts) {
             right.refit();
 
             //update leaf count
-            leafCounts.set(node.left, leftLeftLeaves + rightLeftLeaves);
-            leafCounts.set(node.right, leftRightLeaves + rightRightLeaves);
+            node.left.updateLeafNodeCount();
+            node.right.updateLeafNodeCount();
             break;
         case 6:
             left.right = rightRight;
@@ -338,8 +318,8 @@ function tryRotateSingleNode(node, leafCounts) {
             left.refit();
             right.refit();
             //update leaf count
-            leafCounts.set(node.left, leftLeftLeaves + rightRightLeaves);
-            leafCounts.set(node.right, rightLeftLeaves + leftRightLeaves);
+            node.left.updateLeafNodeCount();
+            node.right.updateLeafNodeCount();
             break;
     }
 

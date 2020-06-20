@@ -45,6 +45,7 @@ export function deserializeBinaryNodeFromBinaryBuffer(root, buffer, leafValueDes
             node.right = null;
         }
 
+        node.updateLeafNodeCount();
 
         return node;
     }

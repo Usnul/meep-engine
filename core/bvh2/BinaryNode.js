@@ -6,8 +6,7 @@
 import { Node } from './Node.js';
 import { deserializeLeafNode, isLeaf, LeafNode, serializeLeafNode } from './LeafNode.js';
 import { deserializeAABB3, serializeAABB3 } from "./AABB3.js";
-import { aabb3_intersect_aabb3, boxSurfaceArea, boxSurfaceArea2, scoreBoxesSAH } from "./AABB3Math.js";
-import { BottomUpOptimizingRebuilder } from "./transform/BottomUpOptimizingRebuilder.js";
+import { aabb3_intersect_aabb3, boxSurfaceArea2 } from "./AABB3Math.js";
 import { assert } from "../assert.js";
 import { max2, min2 } from "../math/MathUtils.js";
 import { traverseBinaryNodeUsingVisitor } from "./traversal/traverseBinaryNodeUsingVisitor.js";
@@ -76,16 +75,22 @@ const BinaryNode = function () {
 
     /**
      *
-     * @type {null|BinaryNode|LeafNode}
+     * @type {null|Node|LeafNode|BinaryNode}
      */
     this.left = null;
     /**
      *
-     * @type {null|BinaryNode|LeafNode}
+     * @type {null|Node|LeafNode|BinaryNode}
      */
     this.right = null;
 
     this.modifiers = 0;
+
+    /**
+     * Number of leaf nodes in the hierarchy
+     * @type {number}
+     */
+    this.leafNodeCount = 0;
 
     this.x0 = 0;
     this.y0 = 0;
@@ -131,37 +136,28 @@ BinaryNode.prototype.isProtected = function () {
 BinaryNode.prototype.reset = function () {
     this.left = null;
     this.right = null;
+
+    this.leafNodeCount = 0;
+
     this.setNegativelyInfiniteBounds();
 };
 
 /**
  *
- * @param {Node} left
- * @param {Node} right
+ * @param {Node|BinaryNode} left
+ * @param {Node|BinaryNode} right
  */
 BinaryNode.prototype.setChildren = function (left, right) {
     this.left = left;
     this.right = right;
+
+    this.updateLeafNodeCount()
 
     this.refitFor2();
 
     left.parentNode = this;
     right.parentNode = this;
 };
-
-/**
- * Optimize the entire tree
- */
-BinaryNode.prototype.optimize = function () {
-    const rebuilder = new BottomUpOptimizingRebuilder();
-
-    rebuilder.init(this);
-
-    while (!rebuilder.compute(1000)) {
-        //
-    }
-};
-
 
 /**
  *
@@ -177,9 +173,8 @@ BinaryNode.prototype.findParentFor = function (box) {
         const b = n.right;
 
         if (a === null || b === null) {
-            //TODO: make sure this doesn't lead to bad tree
             //unbalanced node, good candidate already
-            return this;
+            return n;
         }
 
         const aIsBinary = a.isBinaryNode;
@@ -189,7 +184,7 @@ BinaryNode.prototype.findParentFor = function (box) {
         if (aIsBinary && a.isProtected()) {
             if (bIsBinary) {
                 if (b.isProtected()) {
-                    return this;
+                    return n;
                 } else {
                     n = b;
 
@@ -409,6 +404,7 @@ BinaryNode.prototype.refitFor2 = function () {
     this.x0 = min2(a.x0, b.x0);
     this.y0 = min2(a.y0, b.y0);
     this.z0 = min2(a.z0, b.z0);
+
     this.x1 = max2(a.x1, b.x1);
     this.y1 = max2(a.y1, b.y1);
     this.z1 = max2(a.z1, b.z1);
@@ -481,51 +477,15 @@ BinaryNode.prototype.refit = function () {
     }
 };
 
+/**
+ *
+ * @param {Node} n0
+ * @param {Node} n1
+ * @return {number}
+ */
 function sortMortonCodes(n0, n1) {
     return n0._mortonCode - n1._mortonCode;
 }
-
-BinaryNode.prototype.tryOptimizeNode = function () {
-    const self = this;
-    const left = this.left;
-
-    const right = this.right;
-
-    if (right !== null && left !== null) {
-        const rightLeft = right.left;
-        if (rightLeft !== null && rightLeft !== undefined) {
-            //consider left rotation
-            //compute total surface area right now
-            const rightSAH = boxSurfaceArea(right.x0, right.y0, right.z0, right.x1, right.y1, right.z1);
-            const rotationLeftSAH = scoreBoxesSAH(left, rightLeft);
-            if (rotationLeftSAH < rightSAH) {
-                //good rotation
-                this.rotateLeft();
-                //
-                return true;
-            }
-        }
-    }
-};
-
-/**
- *
- * @param {number} n
- * @returns {number} number of changes performed on the tree
- */
-BinaryNode.prototype.tryRandomOptimizeMany = function (n) {
-    let result = 0;
-    for (let i = 0; i < n; i++) {
-        const count = this.tryOptimize();
-        if (count > 0) {
-            result += count;
-        } else if (count === 0) {
-            //no optimizations made, stop here
-            break;
-        }
-    }
-    return result;
-};
 
 BinaryNode.prototype.sumSurfaceArea = function () {
     let result = 0;
@@ -566,18 +526,6 @@ function countLeaves(node) {
     return result;
 }
 
-
-BinaryNode.prototype.countLeaves = function () {
-    let result = 0;
-    this.traversePreOrderUsingStack(function (node) {
-        if (isLeaf(node)) {
-            result++;
-        }
-    });
-
-    return result;
-};
-
 BinaryNode.prototype.computeSAH = function () {
     let leftLeaves, rightLeaves, leftArea, rightArea;
     if (this.left === null) {
@@ -601,11 +549,50 @@ BinaryNode.prototype.computeSAH = function () {
     return surfaceAreaHeuristic(thisArea, leftArea, rightArea, leftLeaves, rightLeaves);
 };
 
+BinaryNode.prototype.updateLeafNodeCount = function () {
+    let n = 0;
+
+    const right = this.right;
+
+    if (right !== null) {
+        if (right.isLeafNode) {
+            n++;
+        } else {
+            n += right.leafNodeCount;
+        }
+    }
+
+    const left = this.left;
+
+    if (left !== null) {
+        if (left.isLeafNode) {
+            n++;
+        } else {
+            n += left.leafNodeCount;
+        }
+    }
+
+    this.leafNodeCount = n;
+
+    // propagate update up the tree
+    let parentNode = this.parentNode;
+
+    if (parentNode !== null) {
+        // bubble up
+        parentNode.updateLeafNodeCount();
+    }
+}
+
 
 /**
  * As a result of rotation, this node 'becomes' the right node, and left node get's replaced by the right node with necessary adjustments
  */
 BinaryNode.prototype.rotateLeft = function () {
+
+    /**
+     *
+     * @type {BinaryNode}
+     */
     const r = this.right;
 
     const l = this.left;
@@ -627,6 +614,7 @@ BinaryNode.prototype.rotateLeft = function () {
 
     r.right = rL;
 
+    r.updateLeafNodeCount();
 
     r.bubbleRefit();
 };
@@ -649,6 +637,8 @@ BinaryNode.prototype.rotateRight = function () {
     }
 
     l.left = lR;
+
+    l.updateLeafNodeCount();
 
     l.bubbleRefit();
 };
@@ -680,12 +670,14 @@ BinaryNode.prototype.insertManyBoxes2 = function (leafFactory, numNodes) {
             n.setChildren(a, b);
             nodes[i >> 1] = n;
         }
+
         const numNodesMod2 = numNodes % 2;
 
         if (numNodesMod2 !== 0) {
             //shift remaining node up so it will be considered later
             nodes[i >> 1] = nodes[i];
         }
+
         numNodes = (numNodes >> 1) + numNodesMod2;
         //nodes.length = numNodes;
     }
@@ -1074,8 +1066,15 @@ BinaryNode.prototype.insert = function (x0, y0, z0, x1, y1, z1, value) {
     return leaf;
 };
 
+/**
+ *
+ * @param {Node} node
+ * @param {Node} child
+ * @return {BinaryNode}
+ */
 function transplantNewCommonParent(node, child) {
     const bNode = new BinaryNode();
+
     //
     const parent = node.parentNode;
     if (node === parent.left) {
@@ -1085,15 +1084,18 @@ function transplantNewCommonParent(node, child) {
     } else {
         throw new Error("Not a child of specified parent node(impostor)");
     }
+
     bNode.setChildren(node, child);
     bNode.parentNode = parent;
+
     parent.bubbleExpandToFit(bNode);
+
     return bNode;
 }
 
 /**
  *
- * @param {Node} child
+ * @param {Node|BinaryNode|LeafNode} child
  */
 BinaryNode.prototype.insertNode = function (child) {
     assert.notEqual(child, null, 'child node is null');
@@ -1105,7 +1107,7 @@ BinaryNode.prototype.insertNode = function (child) {
 
     let bNode;
 
-    if (node instanceof BinaryNode) {
+    if (node.isBinaryNode) {
         if ((node.isProtected() && node !== this)) {
             transplantNewCommonParent(node, child);
         } else if (node.left === null) {
@@ -1125,10 +1127,15 @@ BinaryNode.prototype.insertNode = function (child) {
             bNode.parentNode = node;
             node.bubbleExpandToFit(bNode);
         }
+
+        node.updateLeafNodeCount();
     } else {
         //need to do transplanting and introduce a new common parent
-        transplantNewCommonParent(node, child);
+        bNode = transplantNewCommonParent(node, child);
+
+        bNode.updateLeafNodeCount();
     }
+
 };
 
 /**
@@ -1144,6 +1151,8 @@ BinaryNode.prototype.clone = function (deep) {
     clone.x1 = this.x1;
     clone.y1 = this.y1;
     clone.z1 = this.z1;
+
+    clone.leafNodeCount = this.leafNodeCount;
 
     clone.parentNode = this.parentNode;
 
@@ -1243,6 +1252,8 @@ function deserializeBinaryNode(buffer, node, leafValueDeserializer) {
 
     node.left = leftNode;
     node.right = rightNode;
+
+    node.updateLeafNodeCount();
 }
 
 
