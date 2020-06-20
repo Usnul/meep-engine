@@ -205,9 +205,20 @@ BinaryNode.prototype.findParentFor = function (box) {
         let bCost = b.costForInclusion(box);
 
         if (aCost === bCost) {
+
+            if (a.isLeafNode) {
+
+                return a;
+
+            } else if (b.isLeafNode) {
+
+                return b;
+
+            }
+
             //change costs to be surface areas instead
-            aCost = a.computeSurfaceArea();
-            bCost = b.computeSurfaceArea();
+            aCost = a.computeSAH();
+            bCost = b.computeSAH();
         }
 
         if (aCost === bCost) {
@@ -526,14 +537,19 @@ function countLeaves(node) {
     return result;
 }
 
+/**
+ *
+ * @return {number}
+ */
 BinaryNode.prototype.computeSAH = function () {
     let leftLeaves, rightLeaves, leftArea, rightArea;
+
     if (this.left === null) {
         leftArea = 0;
         leftLeaves = 0;
     } else {
         leftArea = boxSurfaceArea2(this.left);
-        leftLeaves = countLeaves(this.left);
+        leftLeaves = this.left.leafNodeCount;
     }
 
     if (this.right === null) {
@@ -541,7 +557,7 @@ BinaryNode.prototype.computeSAH = function () {
         rightLeaves = 0;
     } else {
         rightArea = boxSurfaceArea2(this.right);
-        rightLeaves = countLeaves(this.right);
+        rightLeaves = this.right.leafNodeCount;
     }
 
     const thisArea = boxSurfaceArea2(this);

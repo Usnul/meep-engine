@@ -47,6 +47,13 @@ LeafNode.prototype = Object.create(Node.prototype);
 LeafNode.prototype.isLeafNode = true;
 
 /**
+ * Useful shortcut, to avoid having to distinguish between leaf and intermediate nodes
+ * @readonly
+ * @type {number}
+ */
+LeafNode.prototype.leafNodeCount = 1;
+
+/**
  *
  * @param {number} dx
  * @param {number} dy
