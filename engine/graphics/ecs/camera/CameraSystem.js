@@ -292,12 +292,18 @@ export class CameraSystem extends System {
     /**
      *
      * @param {EntityComponentDataset} ecd
-     * @returns {Camera|null}
+     * @returns {{component:(Camera|undefined), entity: number}}
      */
     static getFirstActiveCamera(ecd) {
-        let r = null;
+        const r = {
+            entity: -1,
+            component: undefined
+        };
 
-        this.traverseActiveCameras(ecd, c => r = c);
+        this.traverseActiveCameras(ecd, (c, e) => {
+            r.entity = e;
+            r.component = c;
+        });
 
         return r;
     }

@@ -246,9 +246,9 @@ class AnimationSystem extends System {
             return;
         }
 
-        const firstActiveCamera = CameraSystem.getFirstActiveCamera(ecd);
+        const firstActiveCamera = CameraSystem.getFirstActiveCamera(ecd).component;
 
-        if (firstActiveCamera === null) {
+        if (firstActiveCamera === undefined) {
             //no active camera found
             return;
         }

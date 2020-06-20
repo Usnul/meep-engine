@@ -290,9 +290,9 @@ export class AnimationGraphSystem extends System {
         this.__meshSystemId = meshSystemId;
 
 
-        const firstActiveCamera = CameraSystem.getFirstActiveCamera(ecd);
+        const firstActiveCamera = CameraSystem.getFirstActiveCamera(ecd).component;
 
-        if (firstActiveCamera === null) {
+        if (firstActiveCamera === undefined) {
             //no active camera found
             return;
         }
