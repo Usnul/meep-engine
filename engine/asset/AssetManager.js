@@ -141,6 +141,18 @@ AssetManager.prototype.get = function (path, type, callback, failure, progress) 
  *
  * @param {string} path
  * @param {string} type
+ * @param {Asset} asset
+ */
+AssetManager.prototype.insert = function (path, type, asset) {
+    const assetDescription = new AssetDescription(path, type);
+
+    this.assets.set(assetDescription, asset);
+};
+
+/**
+ *
+ * @param {string} path
+ * @param {string} type
  * @param {AssetRequest} request
  * @private
  */

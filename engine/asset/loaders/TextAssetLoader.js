@@ -1,4 +1,4 @@
-import xhr from "../xhr.js";
+import xhr from "../../network/xhr.js";
 import { AssetLoader } from "./AssetLoader.js";
 
 export class TextAssetLoader extends AssetLoader {

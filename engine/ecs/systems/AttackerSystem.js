@@ -10,7 +10,6 @@ class AttackerSystem extends System {
     constructor() {
         super();
         this.componentClass = Attacker;
-        this.entityManager = null;
 
         this.dependencies = [Attacker];
     }
@@ -22,6 +21,10 @@ class AttackerSystem extends System {
     }
 
     update(timeDelta) {
+        /**
+         *
+         * @type {EntityManager}
+         */
         const em = this.entityManager;
 
         /**

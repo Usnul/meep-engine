@@ -51,6 +51,17 @@ import { ClassRegistry } from "../core/model/ClassRegistry.js";
 import { StoryManager } from "../../model/game/story/dialogue/StoryManager.js";
 import { GameSaveStateManager } from "../../view/game/save/GameSaveStateManager.js";
 import { BinarySerializationRegistry } from "./ecs/storage/binary/BinarySerializationRegistry.js";
+import AfflictionDescriptionDatabase
+    from "../../model/game/logic/combat/unit/afflictions/AfflictionDescriptionDatabase.js";
+import CombatUnitDescriptionDatabase from "../../model/game/logic/combat/unit/CombatUnitDescriptionDatabase.js";
+import TalentDescriptionDatabase from "../../model/game/logic/combat/unit/talent/TalentDescriptionDatabase.js";
+import { TalentTreeDatabase } from "../../model/game/logic/combat/unit/talent/tree/TalentTreeDatabase.js";
+import { UnitActionDescriptionDatabase } from "../../model/game/logic/combat/unit/actions/UnitActionDescriptionDatabase.js";
+import ItemDescriptionDatabase from "../../model/game/logic/combat/unit/items/ItemDescriptionDatabase.js";
+import { EquipmentSetDescriptionDatabase } from "../../model/game/logic/combat/unit/items/equipment/set/EquipmentSetDescriptionDatabase.js";
+import { QuestDescriptionDatabase } from "../../model/game/ecs/component/quest/QuestDescriptionDatabase.js";
+import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/events/WorldEventDescriptionDatabase.js";
+import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
 
 
 //gui
@@ -255,6 +266,17 @@ Engine.prototype.initialize = function () {
      * @type {StaticKnowledgeDatabase}
      */
     this.staticKnowledge = new StaticKnowledgeDatabase();
+
+    this.staticKnowledge.add('afflictions', 'data/database/afflictions/data.json', new AfflictionDescriptionDatabase());
+    this.staticKnowledge.add('units', 'data/database/creatures.json', new CombatUnitDescriptionDatabase());
+    this.staticKnowledge.add('talents', 'data/database/talents/data.json', new TalentDescriptionDatabase());
+    this.staticKnowledge.add('talentTrees', 'data/database/talents/trees/data.json', new TalentTreeDatabase());
+    this.staticKnowledge.add('actions', 'data/database/actions/data.json', new UnitActionDescriptionDatabase());
+    this.staticKnowledge.add('items', 'data/database/items/data.json', new ItemDescriptionDatabase());
+    this.staticKnowledge.add('itemSets', 'data/database/itemSets/data.json', new EquipmentSetDescriptionDatabase());
+    this.staticKnowledge.add('quests', 'data/database/quests/data.json', new QuestDescriptionDatabase());
+    this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
+    this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
 
     this.story.initialize({
         engine: this
