@@ -331,11 +331,17 @@ export class SoundEmitterSystem extends System {
 
         activeSet.finalizeUpdate();
 
-        this.optimize(1);
+        this.optimize(1, 50);
     }
 
-    optimize(budget) {
+    /**
+     *
+     * @param {number} timeout In milliseconds
+     * @param {number} iterations Maximum number of steps the optimizer can take
+     */
+    optimize(timeout, iterations) {
         let ctx;
+        let i = 0;
 
         const data = this.data;
         const length = data.length;
@@ -346,10 +352,12 @@ export class SoundEmitterSystem extends System {
 
         const t0 = performance.now();
 
+
         while (true) {
 
             //find next entity
             this.__optimizationPointer++;
+
 
             while ((ctx = data[this.__optimizationPointer]) === undefined) {
                 this.__optimizationPointer++
@@ -357,7 +365,6 @@ export class SoundEmitterSystem extends System {
                 if (this.__optimizationPointer >= length) {
                     this.__optimizationPointer = 0;
                 }
-
             }
 
             let n = ctx.leaf.parentNode;
@@ -365,6 +372,8 @@ export class SoundEmitterSystem extends System {
             while (n !== null) {
 
                 tryRotateSingleNode(n, leafCount);
+
+                i++
 
                 if (Math.random() < 0.5) {
                     //random exit
@@ -378,7 +387,8 @@ export class SoundEmitterSystem extends System {
 
             const time = t1 - t0;
 
-            if (time > budget) {
+            if (time > timeout || i > iterations) {
+
                 break;
             }
         }
