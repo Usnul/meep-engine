@@ -32,7 +32,8 @@ class TileGridView extends View {
      * @param {boolean} [enableDragAndDrop]
      * @param {Vector2} [tileSize]
      * @param {Vector2} [tileSpacing]
-     * @param {function} [hookTileAdded]
+     * @param {function(View, Rectangle)} [hookTileAdded]
+     * @param {function(View, Rectangle)} [hookTileRemoved]
      * @param {boolean} [captureEventTap]
      * @constructor
      */
@@ -44,6 +45,7 @@ class TileGridView extends View {
             tileSize = new Vector2(50, 50),
             tileSpacing = Vector2.zero,
             hookTileAdded,
+            hookTileRemoved,
             captureEventTap = true,
         }
     ) {
@@ -85,6 +87,13 @@ class TileGridView extends View {
          * @private
          */
         this.__hookTileAdded = hookTileAdded;
+
+        /**
+         *
+         * @type {Function}
+         * @private
+         */
+        this.__hookTileRemoved = hookTileRemoved;
         /**
          *
          * @type {boolean}
@@ -385,6 +394,11 @@ class TileGridView extends View {
     removeTile(tile) {
         const view = this.findTileView(tile);
         this.removeChild(view);
+
+        if (typeof this.__hookTileRemoved === "function") {
+            this.__hookTileRemoved(view, tile);
+        }
+
     }
 
     /**
