@@ -62,7 +62,6 @@ import { EquipmentSetDescriptionDatabase } from "../../model/game/logic/combat/u
 import { QuestDescriptionDatabase } from "../../model/game/ecs/component/quest/QuestDescriptionDatabase.js";
 import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/events/WorldEventDescriptionDatabase.js";
 import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
-import { TownAdviser } from "../../model/game/logic/strategy/ai/adviser/TownAdviser.js";
 
 
 //gui
@@ -75,8 +74,6 @@ function EngineSettings() {
     this.simulation_speed = new Vector1(1);
     this.input_mouse_sensitivity = new Vector1(5);
 }
-
-const a = new TownAdviser();
 
 /**
  *
