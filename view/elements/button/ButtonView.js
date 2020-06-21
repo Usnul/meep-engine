@@ -69,7 +69,7 @@ class ButtonView extends View {
             });
         }
 
-        if (icon !== undefined) {
+        if (icon !== undefined && icon !== null) {
             const vIcon = new ImageView(icon);
             this.addChild(vIcon);
         }

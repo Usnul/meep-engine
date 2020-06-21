@@ -44,6 +44,7 @@ export class LocalizedLabelView extends View {
          */
         this.key = id;
 
+
         const $el = domify(tag);
 
         this.$el = $el;
