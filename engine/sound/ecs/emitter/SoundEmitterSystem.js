@@ -311,6 +311,10 @@ export class SoundEmitterSystem extends System {
              */
             const emitter = ctx.emitter;
 
+            if (emitter === undefined) {
+                console.error('Context.emitter is undefined. Context: ', ctx);
+            }
+
             /**
              *
              * @type {List<SoundTrack>}

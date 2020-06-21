@@ -868,6 +868,8 @@ List.prototype.last = function () {
  * @param {List} other
  */
 List.prototype.equals = function (other) {
+    assert.defined(other, 'other');
+
     const length = this.length;
 
     if (length !== other.length) {
