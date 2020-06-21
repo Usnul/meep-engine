@@ -15,11 +15,14 @@ import { SerializationMetadata } from "../../../ecs/components/SerializationMeta
 class KeyboardCameraController {
     /**
      *
-     * @param {TopDownCameraController} topDownCameraController
      * @constructor
+     * @param {{component:TopDownCameraController, entity: number}} cameraController
+     * @param {EntityComponentDataset} ecd
      */
-    constructor(topDownCameraController) {
-        assert.notEqual(topDownCameraController, undefined, 'controller is undefined');
+    constructor(cameraController, ecd) {
+        const controller = cameraController.component;
+
+        assert.notEqual(controller, undefined, 'controller is undefined');
 
         const cameraPanSpeed = new Vector2(0, 0);
 
@@ -46,7 +49,12 @@ class KeyboardCameraController {
 
                 inputController.mapping.add({
                     path: "keyboard/keys/" + keyName + "/down",
-                    listener: () => object[propertyName] = true
+                    listener: () => {
+                        object[propertyName] = true;
+
+                        //send interaction event
+                        ecd.sendEvent(cameraController.entity, 'user-input');
+                    }
                 });
                 inputController.mapping.add({
                     path: "keyboard/keys/" + keyName + "/up",
@@ -84,7 +92,7 @@ class KeyboardCameraController {
             }
 
             let displacement = cameraPanSpeed.clone().multiplyScalar(keyboardPanSpeed * timeDelta);
-            topDownCameraController.target._add(displacement.x, 0, displacement.y);
+            controller.target._add(displacement.x, 0, displacement.y);
         });
 
         const builder = new EntityBuilder();
