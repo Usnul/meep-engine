@@ -2,6 +2,9 @@
  * Created by Alex on 26/02/2017.
  */
 
+import { arrayPickBestElement } from "../../core/collection/ArrayUtils.js";
+import { GameSaveStateMetadata } from "../../../view/game/save/GameSaveStateMetadata.js";
+
 class GameStateLoader {
     /**
      *
@@ -62,6 +65,10 @@ class GameStateLoader {
 
         gameSaves.update()
             .then(() => {
+                /**
+                 *
+                 * @type {Array<GameSaveStateMetadata>}
+                 */
                 const matches = gameSaves.data.filter(m => {
 
                     if (m.locked) {
@@ -75,9 +82,9 @@ class GameStateLoader {
                     }
                 });
 
-                matches.sort((a, b) => b.timestamp - a.timestamp);
+                //find most recent
+                const mostRecent = arrayPickBestElement(matches, m => m.timestamp);
 
-                const mostRecent = matches[0];
 
                 if (mostRecent === undefined) {
                     //try legacy

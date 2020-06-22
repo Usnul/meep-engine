@@ -1,5 +1,6 @@
 import { ReactiveExpression } from "../ReactiveExpression.js";
 import { assert } from "../../../../assert.js";
+import DataType from "../../../../parser/simple/DataType.js";
 
 
 /**
@@ -100,6 +101,13 @@ ReactiveReference.from = function (source, name = 'undefined') {
     const r = new ReactiveReference(name);
 
     r.connect(source);
+
+    //copy source data type
+    if (source.isObservedBoolean) {
+        r.dataType = DataType.Boolean;
+    } else {
+        r.dataType = DataType.Number;
+    }
 
     return r;
 };

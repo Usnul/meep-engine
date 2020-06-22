@@ -15,11 +15,11 @@ export class InteractionCommand {
         assert.typeOf(id, 'string', 'id');
         assert.typeOf(action, 'function', 'action');
 
-        assert.notEqual(enabled, undefined, 'enabled is undefined');
+        assert.defined(enabled, 'enabled');
         assert.notEqual(enabled, null, 'enabled is null');
         assert.ok(enabled.isObservedBoolean || (enabled.isReactiveExpression && enabled.dataType === DataType.Boolean), `enabled is not an ObservedBoolean`);
 
-        assert.ok(Array.isArray(features), 'features is not an array');
+        assert.isArray(features, 'features');
 
         /**
          *

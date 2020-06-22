@@ -64,6 +64,12 @@ export function binarySearchLowIndex(array, el, compareFunction, minIndex = 0, m
     return currentIndex;
 }
 
+/**
+ * @template T,R
+ * @param {T[]} first
+ * @param {R[]} second
+ * @return {boolean}
+ */
 export function isArrayEqual(first, second) {
 
     const il = first.length;
