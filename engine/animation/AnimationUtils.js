@@ -379,7 +379,14 @@ export function removeEntityWithEffect({ entity, ecd, emitter, soundEffect, time
             whenEntityDestroyed(eAnimation),
             entityStopped
         ])
-            .then(() => ecd.removeEntity(entity));
+            .then(() => {
+
+                //check that the entity exists
+                if (ecd.entityExists(entity)) {
+                    ecd.removeEntity(entity);
+                }
+
+            });
 
         const t = new Transform();
         t.copy(transform);
