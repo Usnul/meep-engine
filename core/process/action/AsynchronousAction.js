@@ -44,7 +44,9 @@ export class AsynchronousAction {
                 this.on.finished.add(resolve);
 
                 this.on.failed.add(reject);
-                this.on.cancelled.add(reject);
+                this.on.cancelled.add((reason) => {
+                    reject(`Action cancelled. Reason: ${reason}`);
+                });
 
             });
         }
