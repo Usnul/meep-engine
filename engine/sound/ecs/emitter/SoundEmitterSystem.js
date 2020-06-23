@@ -40,6 +40,11 @@ const leafCount = new Map();
  */
 const positionalNodes = [];
 
+/**
+ *
+ * @type {number}
+ */
+const OPTIMIZATION_LOOP_LIMIT = 10000;
 
 export class SoundEmitterSystem extends System {
     /**
@@ -102,6 +107,13 @@ export class SoundEmitterSystem extends System {
          * @private
          */
         this.__optimizationPointer = 0;
+
+        /**
+         * Number of currently linked entities
+         * @type {number}
+         * @private
+         */
+        this.__linkedCount = 0;
     }
 
     startup(entityManager, readyCallback, errorCallback) {
@@ -217,6 +229,8 @@ export class SoundEmitterSystem extends System {
         this.__bvh.insertNode(ctx.leaf);
 
         leafCount.clear();
+
+        this.__linkedCount++;
     }
 
     /**
@@ -243,6 +257,8 @@ export class SoundEmitterSystem extends System {
 
 
         leafCount.clear();
+
+        this.__linkedCount--;
     }
 
     update(timeDelta) {
@@ -345,30 +361,38 @@ export class SoundEmitterSystem extends System {
      */
     optimize(timeout, iterations) {
         let ctx;
+
         let i = 0;
+        let j = 0;
+
+        if (this.__linkedCount <= 0) {
+            //nothing to optimize
+            return;
+        }
 
         const data = this.data;
         const length = data.length;
 
-        if (length === 0) {
-            return;
-        }
-
         const t0 = performance.now();
 
 
-        while (true) {
+        LOOP_MAIN: while (j < OPTIMIZATION_LOOP_LIMIT) {
+
+            j++;
 
             //find next entity
-            this.__optimizationPointer++;
+            while (((ctx = data[this.__optimizationPointer]) === undefined)) {
 
+                this.__optimizationPointer++;
 
-            while ((ctx = data[this.__optimizationPointer]) === undefined) {
-                this.__optimizationPointer++
+                j++;
 
                 if (this.__optimizationPointer >= length) {
                     this.__optimizationPointer = 0;
+
+                    continue LOOP_MAIN;
                 }
+
             }
 
             let n = ctx.leaf.parentNode;
@@ -386,6 +410,8 @@ export class SoundEmitterSystem extends System {
 
                 n = n.parentNode;
             }
+
+            this.__optimizationPointer++;
 
             const t1 = performance.now();
 
