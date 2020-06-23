@@ -282,11 +282,11 @@ GUIEngine.prototype.createModal = function ({ content, title, priority = 0 }) {
 /**
  *
  * @param {string} title
- * @param {string} text
  * @param {View} content
+ * @param {ObservedBoolean|ReactiveExpression} [confirmationEnabled]
  * @returns {Promise<any>}
  */
-GUIEngine.prototype.createModalConfirmation = function ({ title, content }) {
+GUIEngine.prototype.createModalConfirmation = function ({ title, content, confirmationEnabled }) {
 
     const self = this;
 
@@ -318,7 +318,8 @@ GUIEngine.prototype.createModalConfirmation = function ({ title, content }) {
             [{
                 name: "yes",
                 displayName: self.localization.getString("system_confirmation_confirm"),
-                callback: callbackYes
+                callback: callbackYes,
+                enabled: confirmationEnabled
             }, {
                 name: "no",
                 displayName: self.localization.getString("system_confirmation_cancel"),

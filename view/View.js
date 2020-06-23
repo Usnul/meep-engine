@@ -712,6 +712,8 @@ class View {
      * @param {string} name
      */
     addClass(name) {
+        assert.typeOf(name, 'string', 'name');
+
         this.el.classList.add(name);
     }
 

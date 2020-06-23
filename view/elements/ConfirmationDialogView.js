@@ -13,6 +13,7 @@ import EmptyView from "./EmptyView.js";
  * @property {string} name
  * @property {string} displayName
  * @property {function} callback
+ * @property {ObservedBoolean|ReactiveExpression} [enabled]
  */
 
 class ConfirmationDialogView extends View {
@@ -22,7 +23,7 @@ class ConfirmationDialogView extends View {
      * @constructor
      */
     constructor(content, options) {
-        super(content, options);
+        super();
 
         const dRoot = dom("div").addClass("ui-confirmation-dialog-view");
 
@@ -34,7 +35,9 @@ class ConfirmationDialogView extends View {
 
         const vButtonArea = new EmptyView({ classList: ['button-area'] });
 
-        for (let i = 0; i < options.length; i++) {
+        const optionCount = options.length;
+
+        for (let i = 0; i < optionCount; i++) {
             const option = options[i];
 
             const className = "button-" + option.name.replace(' ', '-');
@@ -49,6 +52,20 @@ class ConfirmationDialogView extends View {
                 },
                 classList: [className, "ui-confirmation-dialog-button", 'ui-button-rectangular']
             });
+
+            /**
+             *
+             * @type {ObservedBoolean|ReactiveExpression}
+             */
+            const enabled = option.enabled;
+
+            if (enabled !== undefined) {
+                const update = () => vButton.enabled = enabled.getValue();
+
+                vButton.on.linked.add(update)
+
+                vButton.bindSignal(enabled.onChanged, update);
+            }
 
             vButton.size.set(115, 36);
 

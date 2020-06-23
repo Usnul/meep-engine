@@ -46,10 +46,7 @@ class ButtonView extends View {
             this.css(css);
         }
 
-        for (let i = 0, l = classList.length; i < l; i++) {
-            const className = classList[i];
-            dRoot.addClass(className);
-        }
+        this.addClasses(classList);
 
         this.el.addEventListener('click', (event) => {
             if (this.__enabled) {
