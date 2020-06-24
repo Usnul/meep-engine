@@ -18,6 +18,14 @@ export class EnginePlatform {
     }
 
     /**
+     * @param {string[]} options
+     * @returns {string}
+     */
+    pickDefaultLocale(options) {
+        throw new Error('Not implemented');
+    }
+
+    /**
      * @returns {Promise}
      */
     startup() {
