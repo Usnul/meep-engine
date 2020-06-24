@@ -130,7 +130,7 @@ export class SplatMapping {
          * Weights of materials identified by material texture. Larger weight causes material to appear more prominently
          * @type {DataTexture2DArray}
          */
-        this.weightTexture = new DataTexture2DArray(new Uint8ClampedArray(width * height), width, height, 1);
+        this.weightTexture = new DataTexture2DArray(new Uint8Array(width * height), width, height, 1);
         this.weightTexture.generateMipmaps = false;
         this.weightTexture.format = RedFormat;
         this.weightTexture.type = UnsignedByteType;
@@ -141,7 +141,7 @@ export class SplatMapping {
          * stores indices of materials participating in the splat mix
          * @type {DataTexture}
          */
-        this.materialTexture = new DataTexture(new Uint8ClampedArray(width * height * 4), width, height);
+        this.materialTexture = new DataTexture(new Uint8Array(width * height * 4), width, height);
     }
 
     /**
@@ -456,7 +456,7 @@ export class SplatMapping {
 
             materialImage.width = width;
             materialImage.height = height;
-            materialImage.data = new Uint8ClampedArray(width * height * 4);
+            materialImage.data = new Uint8Array(width * height * 4);
 
             const source = new Sampler2D(oldMaterialData, 4, oldWidth, oldHeight);
             const target = new Sampler2D(materialImage.data, 4, width, height);
@@ -478,7 +478,7 @@ export class SplatMapping {
             weightImage.width = width;
             weightImage.height = height;
             weightImage.depth = depth;
-            weightImage.data = new Uint8ClampedArray(newLayerSize * depth);
+            weightImage.data = new Uint8Array(newLayerSize * depth);
 
             for (let d = 0; d < min2(depth, oldDepth); d++) {
 
