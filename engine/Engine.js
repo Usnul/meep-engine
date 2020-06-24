@@ -39,12 +39,10 @@ import { StaticKnowledgeDatabase } from "../../model/game/database/StaticKnowled
 import Ticker from "./simulation/Ticker.js";
 import { Localization } from "../core/Localization.js";
 import { TutorialManager } from "../../model/game/tutorial/TutorialManager.js";
-import { IndexedDBStorage } from "./save/storage/IndexedDBStorage.js";
 import { launchElementIntoFullscreen } from "./graphics/Utils.js";
 import { globalMetrics } from "./metrics/GlobalMetrics.js";
 import { MetricsCategory } from "./metrics/MetricsCategory.js";
 import { AchievementManager } from "./achievements/AchievementManager.js";
-import { StorageAchievementGateway } from "./achievements/gateway/StorageAchievementGateway.js";
 import { HelpManager } from "../../model/game/help/HelpManager.js";
 import { EffectManager } from "../../model/game/util/effects/script/EffectManager.js";
 import { ClassRegistry } from "../core/model/ClassRegistry.js";
@@ -75,20 +73,547 @@ function EngineSettings() {
     this.input_mouse_sensitivity = new Vector1(5);
 }
 
-/**
- *
- * @constructor
- */
-const Engine = function () {
-    this.initialize();
-    this.__datGui = gui;
+class Engine {
+    /**
+     *
+     * @param {EnginePlatform} platform
+     * @constructor
+     */
+    constructor(platform) {
+        assert.defined(platform, 'platform');
 
-    if (!ENV_PRODUCTION) {
-        document.body.appendChild(gui.domElement);
+        /**
+         *
+         * @type {EnginePlatform}
+         */
+        this.platform = platform;
+
+        this.initialize();
+        this.__datGui = gui;
+
+        if (!ENV_PRODUCTION) {
+            document.body.appendChild(gui.domElement);
+        }
+
+        gui.domElement.classList.add('ui-dev-menu');
     }
 
-    gui.domElement.classList.add('ui-dev-menu');
-};
+    initialize() {
+
+        /**
+         *
+         * @type {OptionGroup}
+         */
+        this.options = makeEngineOptionsModel(this);
+
+        /**
+         *
+         * @type {ClassRegistry}
+         */
+        this.classRegistry = new ClassRegistry();
+
+        /**
+         * @readonly
+         * @type {BinarySerializationRegistry}
+         */
+        this.binarySerializationRegistry = new BinarySerializationRegistry();
+
+        this.settings = new EngineSettings();
+
+        this.executor = new ConcurrentExecutor(0, 10);
+
+        this.services = {
+            compression: new CompressionService()
+        };
+
+        /**
+         *
+         * @type {Storage}
+         */
+        this.storage = this.platform.getStorage();
+
+        /**
+         *
+         * @type {AssetManager}
+         */
+        this.assetManager = new AssetManager();
+        initAssetManager(this.assetManager);
+
+        this.localization = new Localization();
+        this.localization.setAssetManager(this.assetManager);
+
+        this.help = new HelpManager();
+
+        //setup entity component system
+        const em = this.entityManager = new EntityManager();
+
+
+        const innerWidth = window.innerWidth / 3;
+        const innerHeight = window.innerHeight / 3;
+
+        this.camera = new ThreePerspectiveCamera(45, innerWidth / innerHeight, 1, 50);
+
+
+        /**
+         *
+         * @type {GraphicsEngine}
+         */
+        const ge = this.graphics = new GraphicsEngine(this.camera, em);
+
+        try {
+            ge.start();
+        } catch (e) {
+            console.log("Failed to start GraphicEngine: ", e);
+        }
+
+        this.inputEngine = new InputEngine(ge.domElement, window);
+
+        //sound engine
+        const soundEngine = new SoundEngine();
+        soundEngine.volume = 1;
+
+        /**
+         *
+         * @type {SoundEngine}
+         */
+        this.sound = soundEngine;
+
+        /**
+         * Graphical User Interface engine
+         * @type {GUIEngine}
+         */
+        this.gui = new GUIEngine();
+
+        /**
+         *
+         * @type {TutorialManager}
+         */
+        this.tutorial = new TutorialManager();
+        this.tutorial.attachGUI(this.gui);
+        this.tutorial.setLocalization(this.localization);
+
+        this.achievements = new AchievementManager();
+        this.achievements.initialize({
+            assetManager: this.assetManager,
+            gateway: this.platform.getAchievementGateway(),
+            localization: this.localization,
+            entityManager: this.entityManager
+        });
+
+        this.story = new StoryManager();
+
+        this.effects = new EffectManager();
+        this.effects.initialize({
+            entityManager: this.entityManager,
+            assetManager: this.assetManager,
+        });
+
+        this.ticker = new Ticker(em);
+        this.ticker.subscribe(timeDelta => {
+            this.entityManager.simulate(timeDelta);
+            this.story.update(timeDelta);
+            this.effects.update(timeDelta);
+        });
+
+        /**
+         * @readonly
+         * @type {SceneManager}
+         */
+        this.sceneManager = new SceneManager(this.entityManager, this.ticker.clock);
+
+        /**
+         * @readonly
+         * @type {GameSaveStateManager}
+         */
+        this.gameSaves = new GameSaveStateManager();
+        this.gameSaves.initialize({ storage: this.storage, registry: this.binarySerializationRegistry });
+
+        //
+        this.grid = new Grid(this);
+        this.levelEngine = new LevelEngine(this.assetManager, this);
+
+        this.devices = {
+            pointer: new PointerDevice(window),
+            keyboard: new KeyboardDevice(window)
+        };
+        this.initializeViews();
+
+        /**
+         *
+         * @type {StaticKnowledgeDatabase}
+         */
+        this.staticKnowledge = new StaticKnowledgeDatabase();
+
+        this.staticKnowledge.add('afflictions', 'data/database/afflictions/data.json', new AfflictionDescriptionDatabase());
+        this.staticKnowledge.add('units', 'data/database/creatures.json', new CombatUnitDescriptionDatabase());
+        this.staticKnowledge.add('talents', 'data/database/talents/data.json', new TalentDescriptionDatabase());
+        this.staticKnowledge.add('talentTrees', 'data/database/talents/trees/data.json', new TalentTreeDatabase());
+        this.staticKnowledge.add('actions', 'data/database/actions/data.json', new UnitActionDescriptionDatabase());
+        this.staticKnowledge.add('items', 'data/database/items/data.json', new ItemDescriptionDatabase());
+        this.staticKnowledge.add('itemSets', 'data/database/itemSets/data.json', new EquipmentSetDescriptionDatabase());
+        this.staticKnowledge.add('quests', 'data/database/quests/data.json', new QuestDescriptionDatabase());
+        this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
+        this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
+
+        this.story.initialize({
+            engine: this
+        });
+
+        //Register game systems
+        initializeSystems(this, em, ge, soundEngine, this.assetManager, this.grid, this.devices);
+
+        //init level engine
+        this.initDATGUI();
+
+        this.devices.pointer.start();
+        this.devices.keyboard.start();
+
+        //process settings
+        this.initializeSettings();
+
+        console.log("engine initialized");
+
+        this.gameStateLoader = new GameStateLoader(this);
+
+        /**
+         * Toggles GraphicsEngine rendering on and off
+         * @type {boolean}
+         */
+        this.renderingEnabled = true;
+    }
+
+    initializeViews() {
+
+        const viewport = this.graphics.viewport;
+
+        const gameView = new EmptyView();
+
+        gameView.addClass('game-view');
+
+        gameView.css({
+            left: 0,
+            top: 0,
+            position: "absolute",
+            pointerEvents: "none"
+        });
+
+        viewport.css({
+            pointerEvents: "auto"
+        });
+
+        this.gameView = gameView;
+
+        gameView.addChild(viewport);
+
+        this.viewStack = new ViewStack();
+        this.viewStack.push(gameView);
+
+        //bind size of renderer viewport to game view
+        viewport.bindSignal(gameView.size.onChanged, viewport.size.set.bind(viewport.size));
+        gameView.on.linked.add(function () {
+            viewport.size.copy(gameView.size);
+        });
+    }
+
+    initializeSettings() {
+        console.log('Initializing engine settings...');
+
+        const engine = this;
+
+        function setViewportToWindowSize() {
+            engine.viewStack.size.set(window.innerWidth, window.innerHeight);
+        }
+
+        this.settings.graphics_control_viewport_size.process(function (value) {
+            if (value) {
+                setViewportToWindowSize();
+                window.addEventListener("resize", setViewportToWindowSize, false);
+            } else {
+                window.removeEventListener("resize", setViewportToWindowSize);
+            }
+        });
+
+        console.log('Engine settings initilized.');
+    }
+
+    benchmark() {
+        const duration = 2000;
+        let count = 0;
+        const t0 = Date.now();
+        let t1;
+        while (true) {
+            this.entityManager.simulate(0.0000000001);
+            t1 = Date.now();
+            if (t1 - t0 > duration) {
+                break;
+            }
+            count++;
+        }
+        //normalize
+        const elapsed = (t1 - t0) / 1000;
+        const rate = (count / elapsed);
+        return rate;
+    }
+
+    initDATGUI() {
+        const self = this;
+
+        const ge = this.graphics;
+        const fGraphics = gui.addFolder("Graphics");
+        fGraphics.add(ge, "postprocessingEnabled").name("Enable post-processing");
+
+
+        fGraphics.add({
+            fullScreen: function () {
+                launchElementIntoFullscreen(document.documentElement);
+            }
+        }, 'fullScreen');
+        ge.initGUI(fGraphics);
+        //
+        const clock = this.ticker.clock;
+        const fClock = gui.addFolder("Clock");
+        fClock.add(clock, "multiplier", 0, 5, 0.025);
+        fClock.add(clock, "pause");
+        fClock.add(clock, "start");
+        //
+        gui.add(this.sound, "volume", 0, 1, 0.025).name("Sound Volume");
+        //
+
+        const functions = {
+            benchmark: function () {
+                const result = self.benchmark();
+                window.alert("Benchmark result: " + result + " ticks per second.");
+            }
+        };
+        gui.add(functions, "benchmark").name("Run Benchmark");
+        //
+        const scenes = {
+            combat: function () {
+                self.sceneManager.set("combat");
+            },
+            strategy: function () {
+                self.sceneManager.set("strategy");
+            }
+        };
+        gui.add(scenes, "combat").name("Combat Scene");
+        gui.add(scenes, "strategy").name("Strategy Scene");
+
+        const datFileLevel = dat_makeFileField(function setLevelAsCurrent(base64URI) {
+            function success() {
+
+            }
+
+            function failure() {
+                console.error("failed to load level")
+            }
+
+            const sm = self.sceneManager;
+            sm.set("strategy");
+            sm.clear();
+
+            const combatScene = new StrategyScene();
+            combatScene.setup(self, {
+                levelURL: base64URI
+            }, function () {
+                //restore scene
+                success();
+            }, failure);
+        });
+        gui.add(datFileLevel, "load").name("Load level from disk");
+        //
+        let entityManager = this.entityManager;
+        gui.close();
+    }
+
+    /**
+     * Returns preloader object
+     * @param {String} listURL
+     */
+    loadAssetList(listURL) {
+        const preloader = new Preloader();
+        const assetManager = this.assetManager;
+        assetManager.get(listURL, "json", function (asset) {
+            preloader.addAll(asset.create());
+            preloader.load(assetManager);
+        });
+        return preloader;
+    }
+
+    render() {
+        if (this.graphics && this.renderingEnabled) {
+            this.graphics.render();
+        }
+    }
+
+    makeLoadingScreen(task) {
+        const localization = this.localization;
+
+        const taskProgressView = new TaskProgressView({ task, localization });
+        taskProgressView.el.classList.add('loading-screen');
+
+        //add asset manager loading progress
+        const loaderStatusView = new AssetLoaderStatusView({ assetManager: this.assetManager, localization });
+        taskProgressView.addChild(loaderStatusView);
+        taskProgressView.link();
+
+        let __renderingEnabled = this.renderingEnabled;
+        this.renderingEnabled = false;
+
+
+        const domParent = document.body;
+
+        domParent.appendChild(taskProgressView.el);
+
+        const cleanup = () => {
+            domParent.removeChild(taskProgressView.el);
+
+            taskProgressView.unlink();
+
+            this.renderingEnabled = __renderingEnabled;
+        };
+
+        task.join(cleanup, printError);
+    }
+
+    /**
+     *
+     * @param {Task|TaskGroup} task
+     * @returns {Promise<any>}
+     */
+    loadSlowTask(task) {
+        assert.notEqual(task, undefined, 'task was undefined');
+        assert.notEqual(task, null, 'task was null');
+
+        const engine = this;
+
+        return new Promise(function (resolve, reject) {
+
+            function cleanup() {
+                simulator.resume();
+            }
+
+            function success() {
+                console.log("Task finished");
+                cleanup();
+                resolve();
+            }
+
+            function failure(e) {
+                printError(e);
+                cleanup();
+                reject();
+            }
+
+            const simulator = engine.ticker;
+            simulator.pause();
+
+            task.join(success, failure);
+
+            engine.makeLoadingScreen(task);
+        });
+    }
+
+    /**
+     * Startup
+     * @returns {Promise}
+     */
+    start() {
+        const self = this;
+
+        function promiseEntityManager() {
+            return new Promise(function (resolve, reject) {
+                //initialize entity manager
+                self.entityManager.startup(resolve, reject);
+            });
+        }
+
+        return Promise.all([
+            this.sound.start()
+                .then(promiseEntityManager),
+            this.staticKnowledge.load(this.assetManager, this.executor),
+            this.tutorial.load(this.assetManager),
+            this.help.load(this.assetManager),
+            this.gui.startup(this),
+            this.achievements.startup(),
+            this.effects.startup(),
+            this.story.startup()
+        ]).then(function () {
+            self.tutorial.link();
+
+            let frameCount = 0;
+            let renderTimeTotal = 0;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                frameCount++;
+                const t0 = performance.now();
+                self.render();
+                const t1 = performance.now();
+                renderTimeTotal += (t1 - t0) / 1000;
+            }
+
+            /**
+             * Starting the engine
+             */
+            requestAnimationFrame(animate);
+            const frameAccumulationTime = 20;
+            setInterval(function () {
+                const fpsCPU = frameCount / renderTimeTotal;
+                const fpsGPU = frameCount / frameAccumulationTime;
+                console.warn("FPS: " + fpsGPU + " [GPU] " + fpsCPU + " [CPU] ");
+
+                //record metric
+                const roundedFPS = Math.round(fpsGPU);
+
+                if (roundedFPS > 0) {
+                    //only record values where FPS is non-zero
+                    globalMetrics.record("frame-rate", {
+                        category: MetricsCategory.System,
+                        label: roundedFPS.toString(),
+                        value: roundedFPS
+                    });
+                }
+
+                frameCount = 0;
+                renderTimeTotal = 0;
+            }, frameAccumulationTime * 1000);
+            //start simulation
+            self.ticker.start({ maxTimeout: 200 });
+            //self.uiController.init(self);
+
+            //load options
+            self.options.attachToStorage('lazykitty.komrade.options', self.storage);
+
+            console.log("engine started");
+        }, function (e) {
+            console.error("Engine Failed to start.", e);
+        });
+
+    }
+
+    exit() {
+        window.close();
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    requestExit() {
+        return this.gui.confirmTextDialog({
+            title: this.localization.getString('system_confirm_exit_to_system.title'),
+            text: this.localization.getString('system_confirm_exit_to_system.text')
+        }).then(() => {
+            this.exit();
+        });
+    }
+}
+
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+Engine.prototype.isEngine = true;
 
 function dat_makeFileField(callback) {
     const el = document.createElement('input');
@@ -114,524 +639,8 @@ function dat_makeFileField(callback) {
     return result;
 }
 
-/**
- * @readonly
- * @type {boolean}
- */
-Engine.prototype.isEngine = true;
-
-Engine.prototype.initialize = function () {
-
-    /**
-     *
-     * @type {OptionGroup}
-     */
-    this.options = makeEngineOptionsModel(this);
-
-    /**
-     *
-     * @type {ClassRegistry}
-     */
-    this.classRegistry = new ClassRegistry();
-
-    /**
-     * @readonly
-     * @type {BinarySerializationRegistry}
-     */
-    this.binarySerializationRegistry = new BinarySerializationRegistry();
-
-    this.settings = new EngineSettings();
-
-    this.executor = new ConcurrentExecutor(0, 10);
-
-    this.services = {
-        compression: new CompressionService()
-    };
-
-    /**
-     *
-     * @type {Storage}
-     */
-    this.storage = new IndexedDBStorage("com.lazykitty.komrade.game.state", this.services);
-    this.storage.compressionEnabled = false;
-
-    /**
-     *
-     * @type {AssetManager}
-     */
-    this.assetManager = new AssetManager();
-    initAssetManager(this.assetManager);
-
-    this.localization = new Localization();
-    this.localization.setAssetManager(this.assetManager);
-
-    this.help = new HelpManager();
-
-    //setup entity component system
-    const em = this.entityManager = new EntityManager();
-
-
-    const innerWidth = window.innerWidth / 3;
-    const innerHeight = window.innerHeight / 3;
-
-    this.camera = new ThreePerspectiveCamera(45, innerWidth / innerHeight, 1, 50);
-
-
-    /**
-     *
-     * @type {GraphicsEngine}
-     */
-    const ge = this.graphics = new GraphicsEngine(this.camera, em);
-
-    try {
-        ge.start();
-    } catch (e) {
-        console.log("Failed to start GraphicEngine: ", e);
-    }
-
-    this.inputEngine = new InputEngine(ge.domElement, window);
-
-    //sound engine
-    const soundEngine = new SoundEngine();
-    soundEngine.volume = 1;
-
-    /**
-     *
-     * @type {SoundEngine}
-     */
-    this.sound = soundEngine;
-
-    /**
-     * Graphical User Interface engine
-     * @type {GUIEngine}
-     */
-    this.gui = new GUIEngine();
-
-    /**
-     *
-     * @type {TutorialManager}
-     */
-    this.tutorial = new TutorialManager();
-    this.tutorial.attachGUI(this.gui);
-    this.tutorial.setLocalization(this.localization);
-
-    this.achievements = new AchievementManager();
-    this.achievements.initialize({
-        assetManager: this.assetManager,
-        gateway: new StorageAchievementGateway(this.storage),
-        localization: this.localization,
-        entityManager: this.entityManager
-    });
-
-    this.story = new StoryManager();
-
-    this.effects = new EffectManager();
-    this.effects.initialize({
-        entityManager: this.entityManager,
-        assetManager: this.assetManager,
-    });
-
-    this.ticker = new Ticker(em);
-    this.ticker.subscribe(timeDelta => {
-        this.entityManager.simulate(timeDelta);
-        this.story.update(timeDelta);
-        this.effects.update(timeDelta);
-    });
-
-    /**
-     * @readonly
-     * @type {SceneManager}
-     */
-    this.sceneManager = new SceneManager(this.entityManager, this.ticker.clock);
-
-    /**
-     * @readonly
-     * @type {GameSaveStateManager}
-     */
-    this.gameSaves = new GameSaveStateManager();
-    this.gameSaves.initialize({ storage: this.storage, registry: this.binarySerializationRegistry });
-
-    //
-    this.grid = new Grid(this);
-    this.levelEngine = new LevelEngine(this.assetManager, this);
-
-    this.devices = {
-        pointer: new PointerDevice(window),
-        keyboard: new KeyboardDevice(window)
-    };
-    this.initializeViews();
-
-    /**
-     *
-     * @type {StaticKnowledgeDatabase}
-     */
-    this.staticKnowledge = new StaticKnowledgeDatabase();
-
-    this.staticKnowledge.add('afflictions', 'data/database/afflictions/data.json', new AfflictionDescriptionDatabase());
-    this.staticKnowledge.add('units', 'data/database/creatures.json', new CombatUnitDescriptionDatabase());
-    this.staticKnowledge.add('talents', 'data/database/talents/data.json', new TalentDescriptionDatabase());
-    this.staticKnowledge.add('talentTrees', 'data/database/talents/trees/data.json', new TalentTreeDatabase());
-    this.staticKnowledge.add('actions', 'data/database/actions/data.json', new UnitActionDescriptionDatabase());
-    this.staticKnowledge.add('items', 'data/database/items/data.json', new ItemDescriptionDatabase());
-    this.staticKnowledge.add('itemSets', 'data/database/itemSets/data.json', new EquipmentSetDescriptionDatabase());
-    this.staticKnowledge.add('quests', 'data/database/quests/data.json', new QuestDescriptionDatabase());
-    this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
-    this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
-
-    this.story.initialize({
-        engine: this
-    });
-
-    //Register game systems
-    initializeSystems(this, em, ge, soundEngine, this.assetManager, this.grid, this.devices);
-
-    //init level engine
-    this.initDATGUI();
-
-    this.devices.pointer.start();
-    this.devices.keyboard.start();
-
-    //process settings
-    this.initializeSettings();
-
-    console.log("engine initialized");
-
-    this.gameStateLoader = new GameStateLoader(this);
-
-    /**
-     * Toggles GraphicsEngine rendering on and off
-     * @type {boolean}
-     */
-    this.renderingEnabled = true;
-};
-
-Engine.prototype.initializeViews = function () {
-
-    const viewport = this.graphics.viewport;
-
-    const gameView = new EmptyView();
-
-    gameView.addClass('game-view');
-
-    gameView.css({
-        left: 0,
-        top: 0,
-        position: "absolute",
-        pointerEvents: "none"
-    });
-
-    viewport.css({
-        pointerEvents: "auto"
-    });
-
-    this.gameView = gameView;
-
-    gameView.addChild(viewport);
-
-    this.viewStack = new ViewStack();
-    this.viewStack.push(gameView);
-
-    //bind size of renderer viewport to game view
-    viewport.bindSignal(gameView.size.onChanged, viewport.size.set.bind(viewport.size));
-    gameView.on.linked.add(function () {
-        viewport.size.copy(gameView.size);
-    });
-};
-
-Engine.prototype.initializeSettings = function () {
-    console.log('Initializing engine settings...');
-
-    const engine = this;
-
-    function setViewportToWindowSize() {
-        engine.viewStack.size.set(window.innerWidth, window.innerHeight);
-    }
-
-    this.settings.graphics_control_viewport_size.process(function (value) {
-        if (value) {
-            setViewportToWindowSize();
-            window.addEventListener("resize", setViewportToWindowSize, false);
-        } else {
-            window.removeEventListener("resize", setViewportToWindowSize);
-        }
-    });
-
-    console.log('Engine settings initilized.');
-};
-
-Engine.prototype.benchmark = function () {
-    const duration = 2000;
-    let count = 0;
-    const t0 = Date.now();
-    let t1;
-    while (true) {
-        this.entityManager.simulate(0.0000000001);
-        t1 = Date.now();
-        if (t1 - t0 > duration) {
-            break;
-        }
-        count++;
-    }
-    //normalize
-    const elapsed = (t1 - t0) / 1000;
-    const rate = (count / elapsed);
-    return rate;
-};
-
-Engine.prototype.initDATGUI = function () {
-    const self = this;
-
-    const ge = this.graphics;
-    const fGraphics = gui.addFolder("Graphics");
-    fGraphics.add(ge, "postprocessingEnabled").name("Enable post-processing");
-
-
-    fGraphics.add({
-        fullScreen: function () {
-            launchElementIntoFullscreen(document.documentElement);
-        }
-    }, 'fullScreen');
-    ge.initGUI(fGraphics);
-    //
-    const clock = this.ticker.clock;
-    const fClock = gui.addFolder("Clock");
-    fClock.add(clock, "multiplier", 0, 5, 0.025);
-    fClock.add(clock, "pause");
-    fClock.add(clock, "start");
-    //
-    gui.add(this.sound, "volume", 0, 1, 0.025).name("Sound Volume");
-    //
-
-    const functions = {
-        benchmark: function () {
-            const result = self.benchmark();
-            window.alert("Benchmark result: " + result + " ticks per second.");
-        }
-    };
-    gui.add(functions, "benchmark").name("Run Benchmark");
-    //
-    const scenes = {
-        combat: function () {
-            self.sceneManager.set("combat");
-        },
-        strategy: function () {
-            self.sceneManager.set("strategy");
-        }
-    };
-    gui.add(scenes, "combat").name("Combat Scene");
-    gui.add(scenes, "strategy").name("Strategy Scene");
-
-    const datFileLevel = dat_makeFileField(function setLevelAsCurrent(base64URI) {
-        function success() {
-
-        }
-
-        function failure() {
-            console.error("failed to load level")
-        }
-
-        const sm = self.sceneManager;
-        sm.set("strategy");
-        sm.clear();
-
-        const combatScene = new StrategyScene();
-        combatScene.setup(self, {
-            levelURL: base64URI
-        }, function () {
-            //restore scene
-            success();
-        }, failure);
-    });
-    gui.add(datFileLevel, "load").name("Load level from disk");
-    //
-    let entityManager = this.entityManager;
-    gui.close();
-};
-
-/**
- * Returns preloader object
- * @param {String} listURL
- */
-Engine.prototype.loadAssetList = function (listURL) {
-    const preloader = new Preloader();
-    const assetManager = this.assetManager;
-    assetManager.get(listURL, "json", function (asset) {
-        preloader.addAll(asset.create());
-        preloader.load(assetManager);
-    });
-    return preloader;
-};
-
-Engine.prototype.render = function () {
-    if (this.graphics && this.renderingEnabled) {
-        this.graphics.render();
-    }
-};
-
 function printError(reason) {
     console.error.apply(console, arguments);
 }
-
-Engine.prototype.makeLoadingScreen = function (task) {
-    const localization = this.localization;
-
-    const taskProgressView = new TaskProgressView({ task, localization });
-    taskProgressView.el.classList.add('loading-screen');
-
-    //add asset manager loading progress
-    const loaderStatusView = new AssetLoaderStatusView({ assetManager: this.assetManager, localization });
-    taskProgressView.addChild(loaderStatusView);
-    taskProgressView.link();
-
-    let __renderingEnabled = this.renderingEnabled;
-    this.renderingEnabled = false;
-
-
-    const domParent = document.body;
-
-    domParent.appendChild(taskProgressView.el);
-
-    const cleanup = () => {
-        domParent.removeChild(taskProgressView.el);
-
-        taskProgressView.unlink();
-
-        this.renderingEnabled = __renderingEnabled;
-    };
-
-    task.join(cleanup, printError);
-};
-
-/**
- *
- * @param {Task|TaskGroup} task
- * @returns {Promise<any>}
- */
-Engine.prototype.loadSlowTask = function (task) {
-    assert.notEqual(task, undefined, 'task was undefined');
-    assert.notEqual(task, null, 'task was null');
-
-    const engine = this;
-
-    return new Promise(function (resolve, reject) {
-
-        function cleanup() {
-            simulator.resume();
-        }
-
-        function success() {
-            console.log("Task finished");
-            cleanup();
-            resolve();
-        }
-
-        function failure(e) {
-            printError(e);
-            cleanup();
-            reject();
-        }
-
-        const simulator = engine.ticker;
-        simulator.pause();
-
-        task.join(success, failure);
-
-        engine.makeLoadingScreen(task);
-    });
-};
-
-/**
- * Startup
- * @returns {Promise}
- */
-Engine.prototype.start = function () {
-    const self = this;
-
-    function promiseEntityManager() {
-        return new Promise(function (resolve, reject) {
-            //initialize entity manager
-            self.entityManager.startup(resolve, reject);
-        });
-    }
-
-    return Promise.all([
-        this.sound.start()
-            .then(promiseEntityManager),
-        this.staticKnowledge.load(this.assetManager, this.executor),
-        this.tutorial.load(this.assetManager),
-        this.help.load(this.assetManager),
-        this.gui.startup(this),
-        this.achievements.startup(),
-        this.effects.startup(),
-        this.story.startup()
-    ]).then(function () {
-        self.tutorial.link();
-
-        let frameCount = 0;
-        let renderTimeTotal = 0;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            frameCount++;
-            const t0 = performance.now();
-            self.render();
-            const t1 = performance.now();
-            renderTimeTotal += (t1 - t0) / 1000;
-        }
-
-        /**
-         * Starting the engine
-         */
-        requestAnimationFrame(animate);
-        const frameAccumulationTime = 20;
-        setInterval(function () {
-            const fpsCPU = frameCount / renderTimeTotal;
-            const fpsGPU = frameCount / frameAccumulationTime;
-            console.warn("FPS: " + fpsGPU + " [GPU] " + fpsCPU + " [CPU] ");
-
-            //record metric
-            const roundedFPS = Math.round(fpsGPU);
-
-            if (roundedFPS > 0) {
-                //only record values where FPS is non-zero
-                globalMetrics.record("frame-rate", {
-                    category: MetricsCategory.System,
-                    label: roundedFPS.toString(),
-                    value: roundedFPS
-                });
-            }
-
-            frameCount = 0;
-            renderTimeTotal = 0;
-        }, frameAccumulationTime * 1000);
-        //start simulation
-        self.ticker.start({ maxTimeout: 200 });
-        //self.uiController.init(self);
-
-        //load options
-        self.options.attachToStorage('lazykitty.komrade.options', self.storage);
-
-        console.log("engine started");
-    }, function (e) {
-        console.error("Engine Failed to start.", e);
-    });
-
-};
-
-Engine.prototype.exit = function () {
-    window.close();
-};
-
-/**
- * @returns {Promise}
- */
-Engine.prototype.requestExit = function () {
-    return this.gui.confirmTextDialog({
-        title: this.localization.getString('system_confirm_exit_to_system.title'),
-        text: this.localization.getString('system_confirm_exit_to_system.text')
-    }).then(() => {
-        this.exit();
-    });
-};
 
 export default Engine;

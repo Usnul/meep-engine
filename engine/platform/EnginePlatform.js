@@ -1,0 +1,34 @@
+export class EnginePlatform {
+    constructor() {
+    }
+
+
+    /**
+     * @returns {Storage}
+     */
+    getStorage() {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * @returns {AchievementGateway}
+     */
+    getAchievementGateway() {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    startup() {
+        return Promise.resolve();
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    shutdown() {
+        return Promise.resolve();
+    }
+
+}
