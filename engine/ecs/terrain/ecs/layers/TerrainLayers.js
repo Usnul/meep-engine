@@ -282,7 +282,7 @@ export class TerrainLayers {
             //layer's data matches texture dimensions, we can just copy the data directly
             arrayData.set(layerSampler.data, address);
         } else {
-            const scaledLayerSampler = new Sampler2D(new Uint8ClampedArray(resolution.x * resolution.y * 3), 3, resolution.x, resolution.y);
+            const scaledLayerSampler = new Sampler2D(new Uint8Array(resolution.x * resolution.y * 3), 3, resolution.x, resolution.y);
 
             scaleSampler2D(layerSampler, scaledLayerSampler);
 
