@@ -12,6 +12,7 @@ import Water from "./graphics/ecs/water/Water.js";
 import InputController from "./input/ecs/components/InputController.js";
 import { decodeMouseEventButtons } from "./input/devices/PointerDevice.js";
 import { loadGameClassRegistry } from "../../model/game/GameClassRegistry.js";
+import { WebEnginePlatform } from "./platform/WebEnginePlatform.js";
 
 /**
  *
@@ -61,7 +62,7 @@ export class EngineHarness {
          *
          * @type {Engine}
          */
-        this.engine = new Engine();
+        this.engine = new Engine(new WebEnginePlatform());
 
         window.engine = this.engine;
 
