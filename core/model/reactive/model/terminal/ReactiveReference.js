@@ -93,7 +93,7 @@ ReactiveReference.prototype.isReference = true;
 
 /**
  *
- * @param {ObservedBoolean|Vector1} source
+ * @param {ObservedBoolean|Vector1|ObservedInteger} source
  * @param {string} [name]
  * @returns {ReactiveReference}
  */

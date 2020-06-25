@@ -105,6 +105,33 @@ class GameStateLoader {
             }).then(resolve, reject);
     }
 
+    /**
+     *
+     * @param {string} name
+     * @param {function(number)} resolve
+     * @param {function} reject
+     */
+    count(name, resolve, reject) {
+        const engine = this.engine;
+
+        const gameSaves = engine.gameSaves;
+
+        gameSaves.update()
+            .then(() => {
+
+                const matches = gameSaves.data.filter(m => m.name === name);
+
+                resolve(matches.length);
+
+            });
+    }
+
+    /**
+     *
+     * @param {string} name
+     * @param {function(boolean)} resolve
+     * @param {function} reject
+     */
     exists(name, resolve, reject) {
         const engine = this.engine;
 
