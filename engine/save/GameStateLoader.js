@@ -57,6 +57,13 @@ class GameStateLoader {
         this.storage.contains(name, resolve, reject);
     }
 
+    /**
+     *
+     * @param {string} name
+     * @param {function(ArrayBuffer)} resolve
+     * @param {function(reason:*)} reject
+     * @param {function(number)} [progress]
+     */
     load(name, resolve, reject, progress) {
         const engine = this.engine;
 
