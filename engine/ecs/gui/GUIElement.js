@@ -209,6 +209,10 @@ class GUIElement {
     }
 
     fromJSON({ klass, parameters = {}, anchor = Vector2.zero, group = null, visible = true }) {
+        if (group !== null && typeof group !== "string") {
+            throw new Error(`Expected group to be null or string, instead was '${typeof group}'`);
+        }
+
         this.klass = klass;
         this.parameters = parameters;
         this.anchor.fromJSON(anchor);
