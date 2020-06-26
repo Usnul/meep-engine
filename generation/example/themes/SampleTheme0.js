@@ -44,6 +44,7 @@ import { ParticleEmitter } from "../../../engine/graphics/particles/particular/e
 import { CellFilterCache } from "../../filtering/CellFilterCache.js";
 import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { SampleGroundMoistureFilter } from "../filters/SampleGroundMoistureFilter.js";
+import GeneratedArmy from "../../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -390,6 +391,138 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     }))
 }));
 
+const bpEnemy = EntityBlueprint.from([
+    Mesh.fromJSON({
+        url: 'data/models/snaps/cube_red.gltf',
+        castShadow: true,
+        receiveShadow: true
+    }),
+    Transform.fromJSON({}),
+    GridPosition.fromJSON({}),
+    ParticleEmitter.fromJSON({
+        "position": {
+            "x": 98.68055555555556,
+            "y": -8.027018978786145,
+            "z": 130.90277777777777
+        },
+        "scale": {
+            "x": 0.7010682225227356,
+            "y": 0.7010682225227356,
+            "z": 0.7010682225227356
+        },
+        "rotation": {
+            "x": -0.026957150015659802,
+            "y": 0.9057820884686629,
+            "z": -0.06290001670320629,
+            "w": -0.41818142973010747
+        },
+        "parameters": [
+            {
+                "name": "scale",
+                "itemSize": 1,
+                "defaultTrackValue": {
+                    "itemSize": 1,
+                    "data": [
+                        1
+                    ],
+                    "positions": [
+                        0
+                    ]
+                }
+            },
+            {
+                "name": "color",
+                "itemSize": 4,
+                "defaultTrackValue": {
+                    "itemSize": 4,
+                    "data": [
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    "positions": [
+                        0
+                    ]
+                }
+            }
+        ],
+        "preWarm": false,
+        "readDepth": true,
+        "softDepth": true,
+        "velocityAlign": false,
+        "blendingMode": 0,
+        "layers": [
+            {
+                "imageURL": "data/textures/particle/UETools/Spiral_08.png",
+                "particleLife": {
+                    "min": 999999999,
+                    "max": 999999999
+                },
+                "particleSize": {
+                    "min": 2,
+                    "max": 2
+                },
+                "particleRotation": {
+                    "min": 0,
+                    "max": 0
+                },
+                "particleRotationSpeed": {
+                    "min": -1,
+                    "max": -1
+                },
+                "emissionShape": 3,
+                "emissionFrom": 1,
+                "emissionRate": 0,
+                "emissionImmediate": 1,
+                "parameterTracks": [
+                    {
+                        "name": "color",
+                        "track": {
+                            "itemSize": 4,
+                            "data": [
+                                1,
+                                0.3607843220233917,
+                                0.0117647061124444,
+                                1
+                            ],
+                            "positions": [
+                                0
+                            ]
+                        }
+                    }
+                ],
+                "position": {
+                    "x": 0,
+                    "y": 1,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                },
+                "particleVelocityDirection": {
+                    "direction": {
+                        "x": 0,
+                        "y": 1,
+                        "z": 0
+                    },
+                    "angle": 0
+                },
+                "particleSpeed": {
+                    "min": 0,
+                    "max": 0
+                }
+            }
+        ]
+    })
+]);
+
+bpEnemy.addJSON(GeneratedArmy, {
+    value: '$power'
+});
+
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Enemy'),
     transformers: [
@@ -407,136 +540,13 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
             -PI_HALF
         )
     ],
-    action: MarkerNodeActionEntityPlacement.from(EntityBlueprint.from([
-        Mesh.fromJSON({
-            url: 'data/models/snaps/cube_red.gltf',
-            castShadow: true,
-            receiveShadow: true
-        }),
-        Transform.fromJSON({}),
-        GridPosition.fromJSON({}),
-        ParticleEmitter.fromJSON({
-            "position": {
-                "x": 98.68055555555556,
-                "y": -8.027018978786145,
-                "z": 130.90277777777777
-            },
-            "scale": {
-                "x": 0.7010682225227356,
-                "y": 0.7010682225227356,
-                "z": 0.7010682225227356
-            },
-            "rotation": {
-                "x": -0.026957150015659802,
-                "y": 0.9057820884686629,
-                "z": -0.06290001670320629,
-                "w": -0.41818142973010747
-            },
-            "parameters": [
-                {
-                    "name": "scale",
-                    "itemSize": 1,
-                    "defaultTrackValue": {
-                        "itemSize": 1,
-                        "data": [
-                            1
-                        ],
-                        "positions": [
-                            0
-                        ]
-                    }
-                },
-                {
-                    "name": "color",
-                    "itemSize": 4,
-                    "defaultTrackValue": {
-                        "itemSize": 4,
-                        "data": [
-                            1,
-                            1,
-                            1,
-                            1
-                        ],
-                        "positions": [
-                            0
-                        ]
-                    }
-                }
-            ],
-            "preWarm": false,
-            "readDepth": true,
-            "softDepth": true,
-            "velocityAlign": false,
-            "blendingMode": 0,
-            "layers": [
-                {
-                    "imageURL": "data/textures/particle/UETools/Spiral_08.png",
-                    "particleLife": {
-                        "min": 999999999,
-                        "max": 999999999
-                    },
-                    "particleSize": {
-                        "min": 2,
-                        "max": 2
-                    },
-                    "particleRotation": {
-                        "min": 0,
-                        "max": 0
-                    },
-                    "particleRotationSpeed": {
-                        "min": -1,
-                        "max": -1
-                    },
-                    "emissionShape": 3,
-                    "emissionFrom": 1,
-                    "emissionRate": 0,
-                    "emissionImmediate": 1,
-                    "parameterTracks": [
-                        {
-                            "name": "color",
-                            "track": {
-                                "itemSize": 4,
-                                "data": [
-                                    1,
-                                    0.3607843220233917,
-                                    0.0117647061124444,
-                                    1
-                                ],
-                                "positions": [
-                                    0
-                                ]
-                            }
-                        }
-                    ],
-                    "position": {
-                        "x": 0,
-                        "y": 1,
-                        "z": 0
-                    },
-                    "scale": {
-                        "x": 1,
-                        "y": 1,
-                        "z": 1
-                    },
-                    "particleVelocityDirection": {
-                        "direction": {
-                            "x": 0,
-                            "y": 1,
-                            "z": 0
-                        },
-                        "angle": 0
-                    },
-                    "particleSpeed": {
-                        "min": 0,
-                        "max": 0
-                    }
-                }
-            ]
+    action: MarkerNodeActionEntityPlacement.from(
+        bpEnemy,
+        Transform.fromJSON({
+            scale: { x: 0.3, y: 0.5, z: 0.3 },
+            position: { x: 0, y: 0.5, z: 0 }
         })
-    ]), Transform.fromJSON({
-        scale: { x: 0.3, y: 0.5, z: 0.3 },
-        position: { x: 0, y: 0.5, z: 0 }
-    }))
+    )
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({

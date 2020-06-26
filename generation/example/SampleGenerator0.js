@@ -49,6 +49,11 @@ import { CellFilterInverseLerp } from "../filtering/math/CellFilterInverseLerp.j
 import { CellFilterClamp } from "../filtering/math/CellFilterClamp.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 import { GridPatternMatcherCell } from "../rules/cell/GridPatternMatcherCell.js";
+import { MarkerNodeTransformerRecordProperty } from "../markers/transform/MarkerNodeTransformerRecordProperty.js";
+import { CellFilterAdd } from "../filtering/math/algebra/CellFilterAdd.js";
+import { CellFilterDivide } from "../filtering/math/algebra/CellFilterDivide.js";
+import { CellFilterCubicFunction } from "../filtering/math/poly/CellFilterCubicFunction.js";
+import { CellFilterMax2 } from "../filtering/math/CellFilterMax2.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -115,9 +120,56 @@ const pNoEnemyIn3 = new CellMatcherGridPattern();
 
 pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
 
+
 const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({
     type: 'Enemy',
-    size: 0.5
+    size: 0.5,
+    transformers: [
+        MarkerNodeTransformerRecordProperty.from(
+            'power',
+            CellFilterAdd.from(
+                CellFilterMultiply.from(
+                    CellFilterCubicFunction.from(
+                        CellFilterMax2.from(
+                            CellFilterSubtract.from(
+                                CellFilterMultiply.from(
+                                    CellFilterDivide.from(
+                                        CellFilterReadGridLayer.from(MirGridLayers.DistanceFromStart),
+                                        //increase level by 1 for each X tiles distance
+                                        CellFilterConstant.from(20)
+                                    ),
+                                    //add a bit of noise to difficulty distribution
+                                    CellFilterMultiply.from(
+                                        CellFilterSmoothStep.from(
+                                            CellFilterConstant.from(20),
+                                            CellFilterConstant.from(50),
+                                            CellFilterReadGridLayer.from(MirGridLayers.DistanceFromStart)
+                                        ),
+                                        CellFilterLerp.from(
+                                            CellFilterConstant.from(0.9),
+                                            CellFilterConstant.from(2),
+                                            CellFilterMultiply.from(
+                                                CellFilterSimplexNoise.from(111.1134, 111.1134, 12319518),
+                                                CellFilterSimplexNoise.from(25.4827, 25.4827, 4512371)
+                                            )
+                                        )
+                                    )
+                                ),
+                                CellFilterConstant.from(1)
+                            ),
+                            CellFilterConstant.from(0)
+                        ),
+                        0,
+                        1, //linear factor
+                        0.05, //quadratic factor (good for estimating branching)
+                        0.01 //cubic factor
+                    ),
+                    CellFilterConstant.from(100)
+                ),
+                CellFilterConstant.from(50)
+            )
+        )
+    ]
 });
 const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied, MirGridLayers.Tags);
 
