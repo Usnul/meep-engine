@@ -1,4 +1,4 @@
-import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
@@ -32,7 +32,7 @@ const BUFF_OBJECT_TYPE_DEFENSE = 'Buff Object :: Defense Increase';
 const BUFF_OBJECT_TYPE_WELL = 'Buff Object :: Well';
 const BUFF_OBJECT_TYPE_CAMPFIRE = 'Buff Object :: Campfire';
 
-const pMatcherNextToWall = new GridPatternMatcher();
+const pMatcherNextToWall = new CellMatcherGridPattern();
 
 pMatcherNextToWall.addRule(0, 1, matcher_tag_not_traversable);
 pMatcherNextToWall.addRule(0, 0, matcher_tag_traversable_unoccupied);
@@ -133,7 +133,7 @@ const placeMarkerWell = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_
 placeMarkerWell.addTag(TAG_BUFF_OBJECT);
 placeMarkerWell.addTag(TAG_MINOR);
 
-const matchEmpty3x3 = new GridPatternMatcher();
+const matchEmpty3x3 = new CellMatcherGridPattern();
 
 matchEmpty3x3.addRule(-1, -1, matcher_tag_traversable_unoccupied);
 matchEmpty3x3.addRule(0, -1, matcher_tag_traversable_unoccupied);

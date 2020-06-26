@@ -1,7 +1,7 @@
 import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
-import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
 import { CellMatcherAnd } from "../../rules/logic/CellMatcherAnd.js";
@@ -17,7 +17,7 @@ import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 const matcher_tag_road = CellMatcherLayerBitMaskTest.from(GridTags.Road, MirGridLayers.Tags);
 
-const matchBend90 = new GridPatternMatcher();
+const matchBend90 = new CellMatcherGridPattern();
 
 matchBend90.addRule(0, 0, CellMatcherAnd.from(
     matcher_tag_traversable_unoccupied,

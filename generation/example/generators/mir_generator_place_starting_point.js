@@ -6,13 +6,13 @@ import { GridTags } from "../../GridTags.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { GridTaskExecuteRuleTimes } from "../../grid/generation/GridTaskExecuteRuleTimes.js";
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
-import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 
 const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
 
 
-const pattern = new GridPatternMatcher();
+const pattern = new CellMatcherGridPattern();
 
 pattern.addRule(0, 0, matcher_tag_traversable_unoccupied);
 pattern.addRule(0, 0, CellMatcherNot.from(MATCH_STARTING_POINT));

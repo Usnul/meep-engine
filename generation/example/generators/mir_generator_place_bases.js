@@ -1,6 +1,6 @@
 import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
-import { GridPatternMatcher } from "../../rules/cell/GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
@@ -13,7 +13,7 @@ import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlac
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 
-const pMatcher = new GridPatternMatcher();
+const pMatcher = new CellMatcherGridPattern();
 
 pMatcher.addRule(0, 0, matcher_tag_traversable_unoccupied);
 pMatcher.addRule(1, 0, matcher_tag_traversable_unoccupied);

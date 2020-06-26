@@ -1,4 +1,4 @@
-import { GridPatternMatcher } from "./GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "./CellMatcherGridPattern.js";
 import { GridData } from "../../grid/GridData.js";
 import { CellMatcherLayerBitMaskTest } from "../CellMatcherLayerBitMaskTest.js";
 import { GridDataLayer } from "../../grid/layers/GridDataLayer.js";
@@ -10,11 +10,11 @@ const R_270 = Math.PI * (3 / 2);
 
 
 test('constructor does not throw', () => {
-    new GridPatternMatcher();
+    new CellMatcherGridPattern();
 });
 
 test('always matches empty rule set', () => {
-    const pattern = new GridPatternMatcher();
+    const pattern = new CellMatcherGridPattern();
 
     const data = new GridData();
 
@@ -27,7 +27,7 @@ test('always matches empty rule set', () => {
 });
 
 test('exact single point match', () => {
-    const pattern = new GridPatternMatcher();
+    const pattern = new CellMatcherGridPattern();
 
     pattern.addRule(0, 0, CellMatcherLayerBitMaskTest.from(1, 'a'));
 

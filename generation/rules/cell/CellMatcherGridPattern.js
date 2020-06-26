@@ -2,7 +2,7 @@ import { CellMatcherAnd } from "../logic/CellMatcherAnd.js";
 import { GridPatternMatcherCell } from "./GridPatternMatcherCell.js";
 import { CellMatcher } from "../CellMatcher.js";
 
-export class GridPatternMatcher extends CellMatcher {
+export class CellMatcherGridPattern extends CellMatcher {
     constructor() {
         super();
         /**
@@ -10,6 +10,19 @@ export class GridPatternMatcher extends CellMatcher {
          * @type {GridPatternMatcherCell[]}
          */
         this.rules = [];
+    }
+
+    /**
+     *
+     * @param {GridPatternMatcherCell[]} rules
+     * @returns {CellMatcherGridPattern}
+     */
+    static from(rules) {
+        const r = new CellMatcherGridPattern();
+
+        r.rules = rules;
+
+        return r;
     }
 
     initialize(grid, seed) {

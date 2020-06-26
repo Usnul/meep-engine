@@ -43,6 +43,7 @@ import { MarkerNodeActionSelectWeighted } from "../../markers/actions/probabilit
 import { ParticleEmitter } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
 import { CellFilterCache } from "../../filtering/CellFilterCache.js";
 import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
+import { SampleGroundMoistureFilter } from "../filters/SampleGroundMoistureFilter.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -995,22 +996,276 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         }))
 }));
 
+const filterAridArea = CellFilterClamp.from(
+    CellFilterInverseLerp.from(
+        CellFilterConstant.from(0.5),
+        CellFilterConstant.from(0.1),
+        SampleGroundMoistureFilter
+    ),
+    CellFilterConstant.from(0),
+    CellFilterConstant.from(1)
+);
+
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
-    matcher: MarkerNodeMatcherByType.from('Tree-0'),
-    action: MarkerNodeActionEntityPlacement.from(
-        EntityBlueprint.from([
-            Mesh.fromJSON({
-                url: 'data/models/LowPolyTownshipSet/Tree_2/Tree_2.gltf',
-                dropShadow: true,
-                receiveShadow: true
-            }),
-            Transform.fromJSON({}),
-            new ClingToTerrain()
-        ]),
-        Transform.fromJSON({
-            scale: { x: 1.2, y: 1.2, z: 1.2 },
-            position: { x: 0, y: 0, z: 0 }
-        }))
+    matcher: MarkerNodeMatcherByType.from('Tree-Flatland-Large'),
+    action: MarkerNodeActionSelectWeighted.from([
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_01.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 23, y: 23, z: 23 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 30, 1000)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_02.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 21, y: 21, z: 21 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 30, 8000512)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_03.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 20, y: 20, z: 20 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(37, 30, 5817512),
+                filterAridArea
+            )
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_04.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 27, y: 27, z: 27 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 33, 23985417)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_05.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 24, y: 24, z: 24 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(27, 33, 7512839),
+                filterAridArea
+            )
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_06.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 20, y: 20, z: 20 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(27, 33, 681230)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_07.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 22, y: 22, z: 22 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(27, 33, 9124715712),
+                filterAridArea
+            )
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_08.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 23, y: 23, z: 23 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(27, 33, 1581273)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_09.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 26, y: 26, z: 26 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(27, 33, 1912851723)
+        )
+    ])
+}));
+
+SampleTheme0.nodes.add(MarkerProcessingRule.from({
+    matcher: MarkerNodeMatcherByType.from('Tree-Flatland-Small'),
+    action: MarkerNodeActionSelectWeighted.from([
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_Small_01.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 32, y: 32, z: 32 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 30, 1000)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_Small_02.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 31, y: 31, z: 31 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 30, 8000512)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_Small_03.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 31, y: 31, z: 31 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterMultiply.from(
+                CellFilterSimplexNoise.from(27, 33, 9124715712),
+                filterAridArea
+            )
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_Small_04.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 27, y: 27, z: 27 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(30, 33, 23985417)
+        ),
+        MarkerNodeActionWeightedElement.from(
+            MarkerNodeActionEntityPlacement.from(
+                EntityBlueprint.from([
+                    Mesh.fromJSON({
+                        url: 'data/models/MOBA and Tower Defense/Tree_Small_05.gltf',
+                        dropShadow: true,
+                        receiveShadow: true
+                    }),
+                    Transform.fromJSON({}),
+                    new ClingToTerrain()
+                ]),
+                Transform.fromJSON({
+                    scale: { x: 24, y: 24, z: 24 },
+                    position: { x: 0, y: 0, z: 0 }
+                })),
+            CellFilterSimplexNoise.from(27, 33, 7512839)
+        )
+    ])
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({

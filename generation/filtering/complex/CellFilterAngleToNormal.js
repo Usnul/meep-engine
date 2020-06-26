@@ -25,9 +25,9 @@ export class CellFilterAngleToNormal extends CellFilter {
     /**
      *
      * @param {CellFilter} surface
-     * @param {Vector3} [reference=Vector3.up]
+     * @param {Vector3} [reference=Vector3.forward]
      */
-    static from(surface, reference = Vector3.up) {
+    static from(surface, reference = Vector3.forward) {
         assert.equal(surface.isCellFilter, true, 'surface.isCellFilter !== true');
 
         const r = new CellFilterAngleToNormal();

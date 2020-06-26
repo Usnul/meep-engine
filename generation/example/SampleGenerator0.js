@@ -1,6 +1,6 @@
 import { GridGenerator } from "../GridGenerator.js";
 import { GridCellPlacementRule } from "../placement/GridCellPlacementRule.js";
-import { GridPatternMatcher } from "../rules/cell/GridPatternMatcher.js";
+import { CellMatcherGridPattern } from "../rules/cell/CellMatcherGridPattern.js";
 import { CellMatcherLayerBitMaskTest } from "../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../GridTags.js";
 import { CellMatcherNot } from "../rules/logic/CellMatcherNot.js";
@@ -47,11 +47,13 @@ import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract
 import { CellFilterCache } from "../filtering/CellFilterCache.js";
 import { CellFilterInverseLerp } from "../filtering/math/CellFilterInverseLerp.js";
 import { CellFilterClamp } from "../filtering/math/CellFilterClamp.js";
+import { MarkerNodeTransformerYRotateByFilter } from "../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
+import { GridPatternMatcherCell } from "../rules/cell/GridPatternMatcherCell.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
 
-const pTreasureCorner = new GridPatternMatcher();
+const pTreasureCorner = new CellMatcherGridPattern();
 
 const MATCH_EMPTY = CellMatcherLayerBitMaskTest.from(GridTags.Traversable, MirGridLayers.Tags);
 const MATCH_TREASURE = CellMatcherLayerBitMaskTest.from(GridTags.Treasure, MirGridLayers.Tags);
@@ -64,7 +66,7 @@ pTreasureCorner.addRule(0, 1, MATCH_NOT_EMPTY);
 
 pTreasureCorner.addRule(0, 0, matcher_tag_traversable_unoccupied);
 
-const pNoTreasureIn3 = new GridPatternMatcher();
+const pNoTreasureIn3 = new CellMatcherGridPattern();
 pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithinRadius.from(
     MarkerNodeMatcherByType.from('Treasure'), 3
 )));
@@ -94,7 +96,7 @@ gConnectRooms.addDependency(gMakeEmpty);
 const gRuleSet1 = GridTaskActionRuleSet.from(GridActionRuleSet.from([chestPlacementRule]));
 
 
-const pNearTreasure = new GridPatternMatcher();
+const pNearTreasure = new CellMatcherGridPattern();
 pNearTreasure.addRule(0, 0,
     CellMatcherAnd.from(
         matcher_tag_traversable_unoccupied,
@@ -109,7 +111,7 @@ const MATCH_ENEMY_IN_3 = CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMa
 
 const MATCH_NO_ENEMY_IN_3 = CellMatcherNot.from(MATCH_ENEMY_IN_3);
 
-const pNoEnemyIn3 = new GridPatternMatcher();
+const pNoEnemyIn3 = new CellMatcherGridPattern();
 
 pNoEnemyIn3.addRule(0, 0, MATCH_NO_ENEMY_IN_3);
 
@@ -251,30 +253,89 @@ const fTreeArea = CellFilterCache.from(
     )
 );
 
+const fFlatlandTrees = CellFilterCache.from(
+    CellFilterMultiply.from(
+        fTreeArea,
+        CellFilterClamp.from(
+            CellFilterInverseLerp.from(
+                CellFilterConstant.from(0.2),
+                CellFilterConstant.from(0),
+                CellFilterCache.from(
+                    CellFilterGaussianBlur.from(
+                        CellFilterAngleToNormal.from(fReadHeight),
+                        2.3,
+                        2.3
+                    )
+                )
+            ),
+            CellFilterConstant.from(0),
+            CellFilterConstant.from(1)
+        )
+    )
+);
+
+const matcher_non_play_area_3x3 = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_not_play_area, -1, -1),
+    GridPatternMatcherCell.from(matcher_not_play_area, 0, -1),
+    GridPatternMatcherCell.from(matcher_not_play_area, 1, -1),
+    GridPatternMatcherCell.from(matcher_not_play_area, -1, 0),
+    GridPatternMatcherCell.from(matcher_not_play_area, 0, 0),
+    GridPatternMatcherCell.from(matcher_not_play_area, 1, 0),
+    GridPatternMatcherCell.from(matcher_not_play_area, -1, 1),
+    GridPatternMatcherCell.from(matcher_not_play_area, 0, 1),
+    GridPatternMatcherCell.from(matcher_not_play_area, 1, 1),
+]);
+
+const filterNonPlayableArea_3x3 = CellFilterCellMatcher.from(matcher_non_play_area_3x3);
+
 const gFoliageLarge = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
-        CellFilterMultiply.from(
-            fTreeArea,
-            CellFilterConstant.from(0.05)
+        CellFilterCache.from(
+            CellFilterMultiply.from(
+                CellFilterMultiply.from(
+                    fFlatlandTrees,
+                    //trees take up quite a bit of space, make sure they are far enough from play area
+                    filterNonPlayableArea_3x3
+                ),
+                CellFilterConstant.from(10)
+            )
         ),
         GridCellActionPlaceMarker.from({
-            type: 'Tree-0',
+            type: 'Tree-Flatland-Large',
             size: 0.5,
-            transformers: []
+            transformers: [
+                MarkerNodeTransformerYRotateByFilter.from(
+                    CellFilterMultiply.from(
+                        CellFilterSimplexNoise.from(
+                            3.1234, 3.1234, 90127151
+                        ),
+                        CellFilterConstant.from(123421)
+                    )
+                )
+            ]
         }),
-        new NumericInterval(1.21, 1.4)
+        new NumericInterval(2.7, 3.4)
     ),
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
-            fTreeArea,
-            CellFilterConstant.from(2)
+            fFlatlandTrees,
+            CellFilterConstant.from(20)
         ),
         GridCellActionPlaceMarker.from({
-            type: 'Tree-1',
+            type: 'Tree-Flatland-Small',
             size: 0.5,
-            transformers: []
+            transformers: [
+                MarkerNodeTransformerYRotateByFilter.from(
+                    CellFilterMultiply.from(
+                        CellFilterSimplexNoise.from(
+                            3.1234, 3.1234, 90127151
+                        ),
+                        CellFilterConstant.from(123421)
+                    )
+                )
+            ]
         }),
-        new NumericInterval(0.77, 1.2)
+        new NumericInterval(1.7, 2)
     )
 ]);
 
@@ -348,7 +409,7 @@ const gFoliageSmall = GridTaskSequence.from([
 
 //heights
 
-const mHeightArea = new GridPatternMatcher();
+const mHeightArea = new CellMatcherGridPattern();
 
 mHeightArea.addRule(0, -2, matcher_not_play_area);
 
@@ -387,8 +448,10 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
                             )
                         ),
                         CellFilterGaussianBlur.from(
-                            CellFilterCellMatcher.from(
-                                mHeightArea
+                            CellFilterCache.from(
+                                CellFilterCellMatcher.from(
+                                    mHeightArea
+                                )
                             ),
                             1.5,
                             1.5
