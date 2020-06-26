@@ -41,7 +41,7 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
     execute(grid, ecd, node) {
         const blueprint = this.entity;
 
-        const entityBuilder = blueprint.buildEntityBuilder();
+        const entityBuilder = blueprint.buildEntityBuilder(node.properties);
 
         /**
          *
