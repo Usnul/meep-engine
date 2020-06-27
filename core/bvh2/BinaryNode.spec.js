@@ -211,7 +211,7 @@ test("serialization deserialization consistency", () => {
     const buffer = new BinaryBuffer();
 
     serializeBinaryNode(buffer, expected, function (buffer, value) {
-        const byteArray = jsonToStringToByteArray(value);
+        const byteArray = new Uint8Array(jsonToStringToByteArray(value));
         const numBytes = byteArray.length;
         buffer.writeUint32(numBytes);
         buffer.writeBytes(byteArray, 0, numBytes);
@@ -248,7 +248,7 @@ test("serialization deserialization consistency via to/fromBinaryBuffer", () => 
     const buffer = new BinaryBuffer();
 
     expected.toBinaryBuffer(buffer, function (buffer, value) {
-        const byteArray = jsonToStringToByteArray(value);
+        const byteArray = new Uint8Array(jsonToStringToByteArray(value));
         const numBytes = byteArray.length;
         buffer.writeUint32(numBytes);
         buffer.writeBytes(byteArray, 0, numBytes);

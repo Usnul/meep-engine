@@ -1,5 +1,5 @@
 import { BinaryBuffer } from "../../../../core/binary/BinaryBuffer.js";
-import { SoundEmitter} from "./SoundEmitter.js";
+import { SoundEmitter } from "./SoundEmitter.js";
 import { SoundTrack } from "./SoundTrack.js";
 import { SoundEmitterSerializationAdapter } from "./SoundEmitterSerializationAdapter.js";
 
@@ -40,12 +40,10 @@ test('binary serialization consistency', () => {
     expect(emitter1.channel).toEqual(emitter0.channel);
     expect(emitter1.isPositioned).toEqual(emitter0.isPositioned);
 
-    expect(emitter1.distanceMin).toEqual(emitter0.distanceMin);
-    expect(emitter1.distanceMax).toEqual(emitter0.distanceMax);
+    expect(emitter1.distanceMin).toBeCloseTo(emitter0.distanceMin);
+    expect(emitter1.distanceMax).toBeCloseTo(emitter0.distanceMax);
 
-    expect(emitter1.distanceRolloff).toEqual(emitter0.distanceRolloff);
-
-    expect(emitter1.volume.getValue()).toEqual(emitter0.volume.getValue());
+    expect(emitter1.volume.getValue()).toBeCloseTo(emitter0.volume.getValue());
 
     expect(emitter1.tracks.equals(emitter0.tracks));
 });

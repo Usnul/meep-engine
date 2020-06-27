@@ -130,7 +130,7 @@ export class BinaryCollectionSerializer {
      */
     initialize({
                    adapterOptionsSupplier = returnEmptyArray
-               }) {
+               } = {}) {
 
         assert.typeOf(adapterOptionsSupplier, 'function', 'adapterOptionsSupplier');
 
