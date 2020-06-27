@@ -150,8 +150,13 @@ export class CameraShake {
 
         const r = seededRandom(1);
 
-        this.noiseRotataion = new SimplexNoise(r);
-        this.noiseOffset = new SimplexNoise(r);
+        this.noiseRotataionX = new SimplexNoise(r);
+        this.noiseRotataionY = new SimplexNoise(r);
+        this.noiseRotataionZ = new SimplexNoise(r);
+
+        this.noiseOffsetX = new SimplexNoise(r);
+        this.noiseOffsetY = new SimplexNoise(r);
+        this.noiseOffsetZ = new SimplexNoise(r);
 
     }
 
@@ -166,20 +171,24 @@ export class CameraShake {
 
         const t = time;
 
-        const nR = this.noiseRotataion;
+        const nRX = this.noiseRotataionX;
+        const nRY = this.noiseRotataionY;
+        const nRZ = this.noiseRotataionZ;
 
         rotation.set(
-            this.limitsRotation.x * value * (nR.noise2D(t, 1) * 2 - 1),
-            this.limitsRotation.y * value * (nR.noise2D(t, 2) * 2 - 1),
-            this.limitsRotation.z * value * (nR.noise2D(t, 3) * 2 - 1),
+            this.limitsRotation.x * value * (nRX.noise2D(t, 1) * 2 - 1),
+            this.limitsRotation.y * value * (nRY.noise2D(t, 2) * 2 - 1),
+            this.limitsRotation.z * value * (nRZ.noise2D(t, 3) * 2 - 1),
         );
 
-        const nO = this.noiseOffset;
+        const nOX = this.noiseOffsetX;
+        const nOY = this.noiseOffsetY;
+        const nOZ = this.noiseOffsetZ;
 
         offset.set(
-            this.limitsOffset.x * value * (nO.noise2D(t, 1) * 2 - 1),
-            this.limitsOffset.y * value * (nO.noise2D(t, 2) * 2 - 1),
-            this.limitsOffset.z * value * (nO.noise2D(t, 3) * 2 - 1)
+            this.limitsOffset.x * value * (nOX.noise2D(t, 1) * 2 - 1),
+            this.limitsOffset.y * value * (nOY.noise2D(t, 2) * 2 - 1),
+            this.limitsOffset.z * value * (nOZ.noise2D(t, 3) * 2 - 1)
         );
     }
 
