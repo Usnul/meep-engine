@@ -2,7 +2,7 @@ import List from "../../collection/List.js";
 import Vector1 from "../../geom/Vector1.js";
 import LinearModifier from "./LinearModifier.js";
 import { assert } from "../../assert.js";
-import { max2 } from "../../math/MathUtils.js";
+import { EPSILON, epsilonEquals, max2 } from "../../math/MathUtils.js";
 import { chainFunctions } from "../../function/Functions.js";
 
 /**
@@ -187,7 +187,12 @@ Stat.applyModifiers = applyModifiers;
  * @returns {boolean}
  */
 Stat.prototype.equals = function (other) {
-    return this.getValue() === other.getValue();
+
+    const v0 = this.getValue();
+    const b1 = other.getValue();
+
+    // use small tolerance to allow for numeric error resulting from the order in which stat modifiers are combined
+    return epsilonEquals(v0, b1, EPSILON);
 };
 
 /**
