@@ -4,6 +4,7 @@
 
 
 import {
+    ACESFilmicToneMapping,
     CubeTextureLoader,
     DepthTexture,
     Group,
@@ -12,7 +13,6 @@ import {
     RGBFormat,
     Scene as ThreeScene,
     sRGBEncoding,
-    Uncharted2ToneMapping,
     UnsignedShortType,
     Vector3 as ThreeVector3,
     VSMShadowMap,
@@ -75,7 +75,7 @@ function configureThreeRenderer(webGLRenderer) {
     webGLRenderer.autoClear = false;
     webGLRenderer.setClearColor(0xBBBBFF, 0.0);
     webGLRenderer.outputEncoding = sRGBEncoding;
-    webGLRenderer.toneMapping = Uncharted2ToneMapping;
+    webGLRenderer.toneMapping = ACESFilmicToneMapping;
 
     webGLRenderer.state.setFlipSided(false);
 
