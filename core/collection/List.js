@@ -644,8 +644,9 @@ List.prototype.reset = function () {
  *
  * @param {List<T>} other
  * @param {function} [removeCallback]
+ * @param {*} [thisArg] Used on removeCallback
  */
-List.prototype.deepCopy = function (other, removeCallback) {
+List.prototype.deepCopy = function (other, removeCallback, thisArg) {
     assert.notEqual(other, undefined, 'other is undefined');
     assert.notEqual(other, null, 'other is null');
 
@@ -666,7 +667,7 @@ List.prototype.deepCopy = function (other, removeCallback) {
         if (index !== -1) {
             newData[index] = a;
         } else if (typeof removeCallback === "function") {
-            removeCallback(a);
+            removeCallback.call(thisArg, a);
         }
     }
 
