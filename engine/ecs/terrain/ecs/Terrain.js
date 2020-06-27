@@ -728,7 +728,8 @@ class Terrain {
         this.material.uniforms.diffuseMaps.value = this.layers.texture;
 
         this.material.uniforms.splatWeightMap.value = this.splat.weightTexture;
-        this.material.uniforms.splatMaterialMap.value = this.splat.materialTexture;
+
+        this.material.uniforms.splatLayerCount.value = this.layers.count();
 
         this.material.uniforms.materialScalesMap.value = this.layers.scalesTexture;
 

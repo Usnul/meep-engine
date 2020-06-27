@@ -138,6 +138,7 @@ export class SplatMapping {
         this.weightTexture.minFilter = NearestFilter;
 
         /**
+         * @deprecated No longer used due to poor blending results
          * stores indices of materials participating in the splat mix
          * @type {DataTexture}
          */

@@ -145,12 +145,12 @@ export function SplatMaterial(
         UniformsLib.lights,
         {
             "splatWeightMap": { type: "t", value: null },
-            "splatMaterialMap": { type: "t", value: null },
+            "splatLayerCount": { type: "f", value: 4 },
             "splatResolution": { type: 'v2', value: new Vector2(1, 1) },
 
             "gridResolution": { type: "v2", value: new Vector2(1, 1) },
-            uGridTransform:{
-                type:'v4',
+            uGridTransform: {
+                type: 'v4',
                 value: new ThreeVector4()
             },
             "gridBorderWidth": { type: "f", value: 0.1 },

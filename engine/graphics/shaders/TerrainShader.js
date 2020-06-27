@@ -93,7 +93,8 @@ function fragment() {
     precision highp sampler2DArray;
     
     uniform sampler2DArray splatWeightMap;
-    uniform sampler2D splatMaterialMap;
+    uniform float splatLayerCount;
+    
     uniform vec2 splatResolution;
     
     out vec4 out_FragColor;
@@ -258,33 +259,29 @@ function fragment() {
     }
     
     vec4 computeSplatMix(vec2 uv){
-        vec4 materials_1 = texture2D(splatMaterialMap, uv);
-
-        vec4 material = materials_1 * 255.0;
         
-        vec2 scale_0 = texture2D(materialScalesMap, vec2(materials_1.x, 0.0) ).xy;
-        vec2 scale_1 = texture2D(materialScalesMap, vec2(materials_1.y, 0.0) ).xy;
-        vec2 scale_2 = texture2D(materialScalesMap, vec2(materials_1.z, 0.0) ).xy;
-        vec2 scale_3 = texture2D(materialScalesMap, vec2(materials_1.w, 0.0) ).xy;
+        float weightSum = 0.0;
+        vec4 colorSum = vec4(0.0);
         
-        vec2 uv_0 = vUv* scale_0;
-        vec2 uv_1 = vUv* scale_1;
-        vec2 uv_2 = vUv* scale_2;
-        vec2 uv_3 = vUv* scale_3;
+        float m = 1.0 / splatLayerCount ;
         
-        vec4 diffuseData0 = texture(diffuseMaps, vec3(uv_0, material.x) );
-        vec4 diffuseData1 = texture(diffuseMaps, vec3(uv_1, material.y) );
-        vec4 diffuseData2 = texture(diffuseMaps, vec3(uv_2, material.z) );
-        vec4 diffuseData3 = texture(diffuseMaps, vec3(uv_3, material.w) );
+        for( float i = 0.0; i < splatLayerCount; i++){
+               
+            float nI = i * m;
+               
+            vec2 scale = texture2D(materialScalesMap, vec2(nI, 0.0) ).xy;
+            
+            vec2 layerUv = vUv * scale;
+            
+            vec4 diffuseData = texture(diffuseMaps, vec3(layerUv, i) );
+            
+            float weight = texture(splatWeightMap, vec3(uv, i)).x;
         
-        float weight0 = texture(splatWeightMap, vec3(uv, material.x)).x;
-        float weight1 = texture(splatWeightMap, vec3(uv, material.y)).x;
-        float weight2 = texture(splatWeightMap, vec3(uv, material.z)).x;
-        float weight3 = texture(splatWeightMap, vec3(uv, material.w)).x;
-          
-        vec4 weights = normalize(vec4(weight0, weight1, weight2, weight3));
-          
-        return blendSplatTextures(diffuseData0, diffuseData1, diffuseData2, diffuseData3, weights);  
+            weightSum += weight;
+            colorSum += diffuseData*weight;
+        }
+        
+        return colorSum / weightSum;  
     }
     
     ${ShaderChunks.clouds_pars_fragment}

@@ -167,10 +167,24 @@ export class TerrainLayers {
      * @param {number} terrainHeight
      */
     updateLayerScales(terrainWidth, terrainHeight) {
-        const data = this.scalesTexture.image.data;
-
         const terrainLayers = this.layers;
         const n = terrainLayers.length;
+
+        const texture = this.scalesTexture;
+
+        const image = texture.image;
+
+        const scaleTextureDataLength = n * 2;
+
+        if (image.data.length !== scaleTextureDataLength) {
+            image.data = new Float32Array(scaleTextureDataLength);
+
+            image.height = 1;
+            image.width = n;
+        }
+
+        const data = image.data;
+
 
         for (let i = 0; i < n; i++) {
             const layer = terrainLayers.get(i);
@@ -185,7 +199,7 @@ export class TerrainLayers {
             data[index2 + 1] = scale_y;
         }
 
-        this.scalesTexture.needsUpdate = true;
+        texture.needsUpdate = true;
     }
 
     /**
