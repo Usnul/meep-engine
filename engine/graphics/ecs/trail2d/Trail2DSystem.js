@@ -425,6 +425,7 @@ class Trail2DSystem extends System {
     /**
      *
      * @param {Trail2D} trail
+     * @returns {Material}
      */
     obtainMaterial(trail) {
         let material = this.materialCache.get(trail);
@@ -536,7 +537,7 @@ class Trail2DSystem extends System {
         const age = attributes.age;
         const ageArray = age.array;
 
-        const ageOffset = max2(0,trail.maxAge - trail.time);
+        const ageOffset = max2(0, trail.maxAge - trail.time);
 
         if (trail.getFlag(Trail2DFlags.Spawning)) {
             const refitTimeDelta = trail.maxAge / trail.ribbon.length;
