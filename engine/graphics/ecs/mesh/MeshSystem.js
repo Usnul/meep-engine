@@ -525,26 +525,34 @@ export class MeshSystem extends System {
      * @throws {Error} if no such bone exists
      */
     static getBonePosition(component, boneType, result = new Vector3()) {
-        const skeletonBone = getSkeletonBoneByType(component, boneType);
-
-        if (skeletonBone === null) {
-            console.warn("Couldn't find bone '" + boneType + "', using mesh origin instead");
-
-            const mesh = component.mesh;
-
-            if (mesh !== null) {
-                result.copy(mesh.position);
-            } else {
-                //no mesh loaded
-                result.set(0, 0, 0);
-            }
+        if (!component.getFlag(MeshFlags.Loaded)) {
+            // mesh is not loaded yet, return origin instead
+            result.set(0, 0, 0);
 
         } else {
-            const matrixWorld = skeletonBone.matrixWorld;
 
-            threeV3.setFromMatrixPosition(matrixWorld);
+            const skeletonBone = getSkeletonBoneByType(component, boneType);
 
-            return result.copy(threeV3);
+            if (skeletonBone === null) {
+                console.warn("Couldn't find bone '" + boneType + "', using mesh origin instead");
+
+                const mesh = component.mesh;
+
+                if (mesh !== null) {
+                    result.copy(mesh.position);
+                } else {
+                    //no mesh loaded
+                    result.set(0, 0, 0);
+                }
+
+            } else {
+                const matrixWorld = skeletonBone.matrixWorld;
+
+                threeV3.setFromMatrixPosition(matrixWorld);
+
+                return result.copy(threeV3);
+            }
+
         }
 
         return result;
