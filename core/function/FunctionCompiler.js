@@ -123,6 +123,7 @@ export class FunctionCompiler {
      */
     compile({ code, args = [], name }) {
         assert.typeOf(code, 'string', 'code');
+        assert.isArray(args, 'args');
 
         const fd = new FunctionDefinition({ body: code, args, name });
 

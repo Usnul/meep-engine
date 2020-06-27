@@ -60,6 +60,8 @@ import { EquipmentSetDescriptionDatabase } from "../../model/game/logic/combat/u
 import { QuestDescriptionDatabase } from "../../model/game/ecs/component/quest/QuestDescriptionDatabase.js";
 import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/events/WorldEventDescriptionDatabase.js";
 import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
+import { CombatAbilityDescriptionDatabase } from "../../model/game/ability/description/CombatAbilityDescriptionDatabase.js";
+import { CombatCellActionDescriptionDatabase } from "../../model/game/ability/cell/CombatCellActionDescriptionDatabase.js";
 
 
 //gui
@@ -254,6 +256,8 @@ class Engine {
         this.staticKnowledge.add('quests', 'data/database/quests/data.json', new QuestDescriptionDatabase());
         this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
         this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
+        this.staticKnowledge.add('abilities', 'data/database/abilities/data.json', new CombatAbilityDescriptionDatabase());
+        this.staticKnowledge.add('combat-cell-actions', 'data/database/combat-cell-actions/data.json', new CombatCellActionDescriptionDatabase());
 
         this.story.initialize({
             engine: this
