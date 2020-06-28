@@ -33,7 +33,7 @@ function seedTemplate(template, seed) {
 function validationMockSeed(template) {
 
     const result = template.replace(VARIABLE_REGEX, function (match, varName) {
-        return "mock";
+        return "0";
     });
 
     return result;
@@ -68,7 +68,7 @@ export class Localization {
 
     /**
      * @returns {boolean}
-     * @param {function(key:string,error:*)} errorConsumer
+     * @param {function(key:string, error:*, original: string)} errorConsumer
      */
     validate(errorConsumer) {
         let result = true;
@@ -82,7 +82,7 @@ export class Localization {
                 parseTooltipString(seededValue);
             } catch (e) {
                 result = false;
-                errorConsumer(key, e);
+                errorConsumer(key, e, value);
             }
         }
 
