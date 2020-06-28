@@ -4,11 +4,11 @@
 
 
 import {
-    ACESFilmicToneMapping,
     CubeTextureLoader,
     DepthTexture,
     Group,
     NearestFilter,
+    NoToneMapping,
     Raycaster as ThreeRaycaster,
     RGBFormat,
     Scene as ThreeScene,
@@ -75,7 +75,8 @@ function configureThreeRenderer(webGLRenderer) {
     webGLRenderer.autoClear = false;
     webGLRenderer.setClearColor(0xBBBBFF, 0.0);
     webGLRenderer.outputEncoding = sRGBEncoding;
-    webGLRenderer.toneMapping = ACESFilmicToneMapping;
+    webGLRenderer.toneMapping = NoToneMapping;
+    // webGLRenderer.toneMappingExposure = 1.3;
 
     webGLRenderer.state.setFlipSided(false);
 
