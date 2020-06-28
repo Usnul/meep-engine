@@ -130,7 +130,15 @@ export class LocalizedLabelView extends View {
         assert.notEqual(localization, undefined, 'localization is undefined');
         assert.notEqual(localization, null, 'localization is null');
 
-        const value = localization.getString(id, seed);
+        let value;
+
+        try {
+            value = localization.getString(id, seed);
+        } catch (e) {
+            console.error(e);
+
+            value = `failed to localize @${id}`;
+        }
 
         this.__localeKey = localization.locale.getValue();
 
