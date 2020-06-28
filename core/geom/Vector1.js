@@ -263,4 +263,16 @@ Vector1.prototype.fromBinaryBuffer = function (buffer) {
     this.set(x);
 };
 
+/**
+ * @readonly
+ * @type {Vector1}
+ */
+Vector1.zero = Object.freeze(new Vector1(0));
+
+/**
+ * @readonly
+ * @type {Vector1}
+ */
+Vector1.one = Object.freeze(new Vector1(1));
+
 export default Vector1;
