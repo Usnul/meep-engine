@@ -257,7 +257,6 @@ class Engine {
         this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
         this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
         this.staticKnowledge.add('abilities', 'data/database/abilities/data.json', new CombatAbilityDescriptionDatabase());
-        this.staticKnowledge.add('combat-cell-actions', 'data/database/combat-cell-actions/data.json', new CombatCellActionDescriptionDatabase());
 
         this.story.initialize({
             engine: this
