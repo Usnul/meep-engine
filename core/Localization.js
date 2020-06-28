@@ -54,18 +54,21 @@ export class Localization {
 
     /**
      * @returns {boolean}
-     * @param {function(string,string,string)} errorConsumer
+     * @param {function(key:string,error:*)} errorConsumer
      */
     validate(errorConsumer) {
         let result = true;
 
         for (let key in this.json) {
             const value = this.json[key];
+
+            const seededValue = seedTemplate(value, {});
+
             try {
-                parseTooltipString(value);
+                parseTooltipString(seededValue);
             } catch (e) {
                 result = false;
-                errorConsumer(e, key, value);
+                errorConsumer(key, e);
             }
         }
 
