@@ -25,6 +25,20 @@ function seedTemplate(template, seed) {
     return result;
 }
 
+/**
+ * Validation utility method
+ * @param {string} template
+ * @return {string}
+ */
+function validationMockSeed(template) {
+
+    const result = template.replace(VARIABLE_REGEX, function (match, varName) {
+        return "mock";
+    });
+
+    return result;
+}
+
 const FAILURE_MESSAGE_CACHE = {};
 
 export class Localization {
@@ -62,7 +76,7 @@ export class Localization {
         for (let key in this.json) {
             const value = this.json[key];
 
-            const seededValue = seedTemplate(value, {});
+            const seededValue = validationMockSeed(value);
 
             try {
                 parseTooltipString(seededValue);
