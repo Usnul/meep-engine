@@ -665,9 +665,9 @@ ShaderManager.prototype.buildMaterial = function (emitter) {
 			    }
 			    
 			    if(inputDepth <= 0.5){
-			        zFade = 0.5 * pow(saturate(2.0*inputDepth), 2.0);
+			        zFade = 0.5 * pow( clamp(2.0*inputDepth, 0.0, 1.0), 2.0);
 			    }else{
-			        zFade = 1.0 - 0.5 * pow(saturate(2.0*(1.0 - inputDepth)), 2.0);
+			        zFade = 1.0 - 0.5 * pow( clamp(2.0*(1.0 - inputDepth), 0.0, 1.0), 2.0);
 			    }
 			    
 			    return zFade;
