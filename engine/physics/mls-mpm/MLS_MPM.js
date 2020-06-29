@@ -1,67 +1,12 @@
 import { clamp } from "../../../core/math/MathUtils.js";
 
-function add2D(a, b) {
-    return [a[0] + b[0], a[1] + b[1]]
-}
-
 /**
  *
- * @param {number[]} a
- * @param {number[]} r
- * @param {number} t
- * @return {number[]}
+ * @param {number[]} a 2d matrix
+ * @returns {number}
  */
-function v2_multiply_scalar(r, a, t) {
-    const x = a[0] * t;
-    const y = a[1] * t;
-
-    r[0] = x;
-    r[1] = y;
-}
-
-/**
- *
- *
- * @param {number[]} a
- * @param {number[]} r
- */
-function v2_floor(r, a) {
-    const x = a[0] | 0;
-    const y = a[1] | 0;
-
-    r[0] = x;
-    r[1] = y;
-}
-
-/**
- *
- * @param {number[]} r
- * @param {number[]} a
- * @param {number[]} b
- * @return {number[]}
- */
-function v2_subtract(r, a, b) {
-    const x = a[0] - b[0];
-    const y = a[1] - b[1];
-
-    r[0] = x;
-    r[1] = y;
-}
-
-function add3D(a, b) {
-    return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
-}
-
-function sca3D(a, t) {
-    return [a[0] * t, a[1] * t, a[2] * t]
-}
-
 function determinant(a) {
     return a[0] * a[3] - a[1] * a[2]
-}
-
-function transposed(a) {
-    return [a[0], a[2], a[1], a[3]]
 }
 
 /**
@@ -139,42 +84,6 @@ function m2_add(r, a, b) {
 
 
 /**
- *
- * @param {number[]} r
- * @param {number[]} a
- * @param {number[]} b
- */
-function m2_sub(r, a, b) {
-    const v0 = a[0] - b[0];
-    const v1 = a[1] - b[1];
-    const v2 = a[2] - b[2];
-    const v3 = a[3] - b[3];
-
-    r[0] = v0;
-    r[1] = v1;
-    r[2] = v2;
-    r[3] = v3;
-}
-
-/**
- * Trasposes second matrix before subtraction
- * @param {number[]} r
- * @param {number[]} a
- * @param {number[]} b
- */
-function m2_sub_tb(r, a, b) {
-    const v0 = a[0] - b[0];
-    const v1 = a[1] - b[2];
-    const v2 = a[2] - b[1];
-    const v3 = a[3] - b[3];
-
-    r[0] = v0;
-    r[1] = v1;
-    r[2] = v2;
-    r[3] = v3;
-}
-
-/**
  * Trasposes second matrix before subtraction
  * @param {number[]} r
  * @param {number[]} a
@@ -190,13 +99,6 @@ function m2_sub_ta(r, a, b) {
     r[1] = v1;
     r[2] = v2;
     r[3] = v3;
-}
-
-function outer_product(a, b) { // transposed, as for taichi's convention
-    return [
-        a[0] * b[0], a[1] * b[0],
-        a[0] * b[1], a[1] * b[1]
-    ]
 }
 
 
@@ -310,20 +212,6 @@ function svd(U, S, V, sig, m) { // transposed as in taichi
     m2_multiply(U, U, V);
 }
 
-/**
- * @description Hadamard product of vectors
- * @param {number[]} r
- * @param {number[]} a
- * @param {number[]} b
- */
-function had2D(r, a, b) {
-    const x = a[0] * b[0];
-    const y = a[1] * b[1];
-
-    r[0] = x;
-    r[1] = y;
-}
-
 const dimensions = 2;
 
 const m2_indentity = [1, 0, 0, 1];
@@ -333,14 +221,14 @@ export class MLS_MPMSolver {
 
         this.particles = [];
 
-        const d = n+1;
+        const d = n + 1;
         /**
          * velocity + mass, node_res = cell_res + 1
          *
          * [velocity_x, velocity_y, mass]
          * @type {Float32Array}
          */
-        this.grid = new Float32Array(d*d*3);
+        this.grid = new Float32Array(d * d * 3);
 
     }
 
@@ -412,8 +300,19 @@ export class MLS_MPMSolver {
          */
         const svd_v = [];
 
+        const grid_width = n + 1;
+        const grid_height = n + 1;
+
+        const particleCount = particles.length;
+
         // 1. Particles to grid
-        for (let p of particles) {
+        for (let particle_index = 0; particle_index < particleCount; particle_index++) {
+
+            /**
+             * @type {Particle}
+             */
+            const p = particles[particle_index];
+
             const particle_position = p.x;
 
             const particle_position_x = particle_position[0];
@@ -485,39 +384,40 @@ export class MLS_MPMSolver {
             mv[1] = p.v[1] * particle_mass;
             mv[2] = particle_mass;
 
-            for (let i = 0; i < 3; i++) {
-                const grid_x = base_coordinate_x + i;
+            // scatter to grid
+            for (let j = 0; j < 3; j++) {
 
-                if (grid_x < 0 || grid_x >= n) {
+                const grid_y = base_coordinate_y + j;
+
+
+                if (grid_y < 0 || grid_y >= n) {
                     continue;
                 }
 
-                const i2 = i * 2;
-                const dpos_x = (i - fx_x) * dx;
+                const j2 = j * 2;
 
+                const dpos_y = (j - fx_y) * dx;
 
-                for (let j = 0; j < 3; j++) { // scatter to grid
+                for (let i = 0; i < 3; i++) {
+                    const grid_x = base_coordinate_x + i;
 
-                    const grid_y = base_coordinate_y + j;
-
-
-                    if (grid_y < 0 || grid_y >= n) {
+                    if (grid_x < 0 || grid_x >= n) {
                         continue;
                     }
 
-                    const j2 = j * 2;
+                    const i2 = i * 2;
+                    const dpos_x = (i - fx_x) * dx;
 
-                    const dpos_y = (j - fx_y) * dx;
 
-                    const cell_index = gridIndex(grid_x, grid_y);
+                    const cell_index = grid_x + grid_y * grid_width;
 
-                    const cell_address = cell_index*3;
+                    const cell_address = cell_index * 3;
 
                     const weight = w[i2] * w[j2 + 1];
 
                     grid[cell_address] = grid[cell_address] + (mv[0] + affine[0] * dpos_x + affine[2] * dpos_y) * weight;
-                    grid[cell_address+1] = grid[cell_address+1] + (mv[1] + affine[1] * dpos_x + affine[3] * dpos_y) * weight;
-                    grid[cell_address+2] = grid[cell_address+2] + mv[2] * weight;
+                    grid[cell_address + 1] = grid[cell_address + 1] + (mv[1] + affine[1] * dpos_x + affine[3] * dpos_y) * weight;
+                    grid[cell_address + 2] = grid[cell_address + 2] + mv[2] * weight;
 
                 }
             }
@@ -525,22 +425,28 @@ export class MLS_MPMSolver {
 
         // Modify grid velocities to respect boundaries
         const boundary = 0.05;
-        for (let i = 0; i <= n; i++) {
-            for (let j = 0; j <= n; j++) { // for all grid nodes
-                const cell_index = gridIndex(i, j);
-                const cell_address = cell_index*3;
 
-                const cell_mass = grid[cell_address+2];
+        for (let j = 0; j < grid_height; j++) {
+
+            for (let i = 0; i < grid_width; i++) {
+
+
+                // for all grid nodes
+
+                const cell_index = i + j * grid_width;
+                const cell_address = cell_index * 3;
+
+                const cell_mass = grid[cell_address + 2];
 
                 if (cell_mass > 0) { // no need for epsilon here
 
                     // normalize by mass
                     grid[cell_address] = grid[cell_address] / cell_mass;
-                    grid[cell_address+1] = grid[cell_address+1] / cell_mass;
-                    grid[cell_address+2] = grid[cell_address+2] / cell_mass;
+                    grid[cell_address + 1] = grid[cell_address + 1] / cell_mass;
+                    grid[cell_address + 2] = grid[cell_address + 2] / cell_mass;
 
                     // add gravity
-                    grid[cell_address+1] = grid[cell_address+1] - 200 * dt;
+                    grid[cell_address + 1] = grid[cell_address + 1] - 200 * dt;
 
                     const x = i / n;
                     const y = j / n; // boundary thickness, node coord
@@ -548,20 +454,25 @@ export class MLS_MPMSolver {
                     // stick
                     if (x < boundary || x > 1 - boundary || y > 1 - boundary) {
                         grid[cell_address] = 0;
-                        grid[cell_address+1] = 0;
-                        grid[cell_address+2] = 0;
+                        grid[cell_address + 1] = 0;
+                        grid[cell_address + 2] = 0;
                     }
 
                     // separate
-                    if (y < boundary && grid[cell_address+1] < 0) {
-                        grid[cell_address+1] = 0.0;
+                    if (y < boundary && grid[cell_address + 1] < 0) {
+                        grid[cell_address + 1] = 0.0;
                     }
                 }
             }
         }
 
         // 2. Grid to particle
-        for (let p of particles) {
+        for (let particle_index = 0; particle_index < particleCount; particle_index++) {
+
+            /**
+             * @type {Particle}
+             */
+            const p = particles[particle_index];
 
             const particle_position = p.x;
 
@@ -605,23 +516,28 @@ export class MLS_MPMSolver {
             p.v[0] = 0;
             p.v[1] = 0;
 
-            for (let i = 0; i < 3; i++) {
-                const i2 = i * 2;
-                const dpos_x = i - fx_x;
+            for (let j = 0; j < 3; j++) {
+                const j2 = j * 2;
+                const dpos_y = j - fx_y;
 
-                for (let j = 0; j < 3; j++) {
+                const grid_y = base_coordinate_y + j;
 
-                    const j2 = j * 2;
-                    const dpos_y = j - fx_y;
+                for (let i = 0; i < 3; i++) {
 
-                    const cell_index = gridIndex(base_coordinate_x + i, base_coordinate_y + j);
-                    const cell_address = cell_index*3;
+                    const i2 = i * 2;
+                    const dpos_x = i - fx_x;
+
+                    const grid_x = base_coordinate_x + i;
+
+                    const cell_index = grid_x + grid_width * grid_y;
+
+                    const cell_address = cell_index * 3;
 
                     const weight = w[i2] * w[j2 + 1];
 
                     // velocity
                     const wx = grid[cell_address] * weight;
-                    const wy = grid[cell_address+1] * weight;
+                    const wy = grid[cell_address + 1] * weight;
 
                     p.v[0] = p.v[0] + wx;
                     p.v[1] = p.v[1] + wy;
@@ -669,7 +585,15 @@ export class MLS_MPMSolver {
 
         for (let i = 0; i < 1000; i++) {
             // Randomly sample 1000 particles in the square
-            particles.push(new Particle(add2D([(Math.random() * 2 - 1) * 0.08, (Math.random() * 2 - 1) * 0.08], center), c));
+            particles.push(
+                new Particle(
+                    [
+                        (Math.random() * 2 - 1) * 0.08 + center[0],
+                        (Math.random() * 2 - 1) * 0.08 + center[1]
+                    ],
+                    c
+                )
+            );
         }
     }
 }
@@ -689,42 +613,40 @@ const mu_0 = E / (2 * (1 + nu)); // Shear modulus (or Dynamic viscosity in fluid
 const lambda_0 = E * nu / ((1 + nu) * (1 - 2 * nu)); // Lamé's 1st parameter \lambda=K-(2/3)\mu, where K is the Bulk modulus
 const plastic = 1; // whether (1=true) or not (0=false) to simulate plasticity
 
-function Particle(x, c) {
-    /**
-     * Position
-     */
-    this.x = x;
+class Particle {
+    constructor(x, c) {
+        /**
+         * Position
+         */
+        this.x = x;
 
-    /**
-     * velocity
-     * @type {number[]}
-     */
-    this.v = [0, 0];
+        /**
+         * velocity
+         * @type {number[]}
+         */
+        this.v = [0, 0];
 
-    // Deformation tensor (gradient)
-    this.F = [1, 0, 0, 1];
+        // Deformation tensor (gradient)
+        this.F = [1, 0, 0, 1];
 
-    /**
-     * Affine momentum from APIC
-     * Cauchy tensor
-     * @type {number[]}
-     */
-    this.C = [0, 0, 0, 0];
+        /**
+         * Affine momentum from APIC
+         * Cauchy tensor
+         * @type {number[]}
+         */
+        this.C = [0, 0, 0, 0];
 
-    /**
-     * Determinant of the deformation gradient (i.e. volume)
-     * Jacobian determinant (scalar)
-     * @type {number}
-     */
-    this.Jp = 1;
+        /**
+         * Determinant of the deformation gradient (i.e. volume)
+         * Jacobian determinant (scalar)
+         * @type {number}
+         */
+        this.Jp = 1;
 
-    /**
-     * color (int)
-     */
-    this.c = c;
-}
-
-function gridIndex(i, j) {
-    return i + (n + 1) * j;
+        /**
+         * color (int)
+         */
+        this.c = c;
+    }
 }
 
