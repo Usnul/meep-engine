@@ -57,9 +57,9 @@ solver.add_rnd_square([0.55, 0.85], 0x168587);
 enableTiming && console.timeEnd('setup');
 
 step();
-//
-// console.time('simulation');
-// for (let i = 0; i < 1000; i++) {
-//     solver.advance(0.0001);
-// }
-// console.timeEnd('simulation');
+
+console.time('simulation');
+for (let i = 0; i < 1000; i++) {
+    solver.advance(0.0001);
+}
+console.timeEnd('simulation');
