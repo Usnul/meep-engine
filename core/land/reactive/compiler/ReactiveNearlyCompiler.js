@@ -1,6 +1,3 @@
-import nearley from "nearley";
-
-import grammar from '../nearley/ReactiveNearley.js';
 import { ReactiveReference } from "../../../model/reactive/model/terminal/ReactiveReference.js";
 import { ReactiveLiteralNumber } from "../../../model/reactive/model/terminal/ReactiveLiteralNumber.js";
 import { ReactiveAdd } from "../../../model/reactive/model/arithmetic/ReactiveAdd.js";
@@ -18,9 +15,7 @@ import { ReactiveLiteralBoolean } from "../../../model/reactive/model/terminal/R
 import { ReactiveNot } from "../../../model/reactive/model/logic/ReactiveNot.js";
 import { ReactiveNegate } from "../../../model/reactive/model/arithmetic/ReactiveNegate.js";
 import { ReactiveGreaterThanOrEqual } from "../../../model/reactive/model/comparative/ReactiveGreaterThanOrEqual.js";
-import { assert } from "../../../assert.js";
-import { Cache } from "../../../Cache.js";
-import { computeStringHash } from "../../../primitives/strings/StringUtils.js";
+import { ReactiveParser } from "./ReactiveParser.js";
 
 const compilers = {
     Reference: ({ value }) => new ReactiveReference(value.join('.')),
@@ -167,18 +162,6 @@ function compile(node) {
     return compiler(node);
 }
 
-const rules = nearley.Grammar.fromCompiled(grammar);
-
-
-/**
- * Parser cache
- * @type {Cache<string, *>}
- */
-const parseCache = new Cache({
-    maxWeight: 1000,
-    keyHashFunction: computeStringHash
-});
-
 
 /**
  *
@@ -186,29 +169,7 @@ const parseCache = new Cache({
  * @returns {ReactiveExpression}
  */
 export function compileReactiveExpression(code) {
-    const trimmedCode = code.trim();
-
-    assert.notEqual(trimmedCode, "", 'code is empty');
-
-    //check cache
-    let parseTree = parseCache.get(trimmedCode);
-
-    if (parseTree === null) {
-        const parser = new nearley.Parser(rules);
-
-        parser.feed(trimmedCode);
-
-        const results = parser.results;
-
-        if (results.length > 1) {
-            console.warn(`Multiple parses of '${trimmedCode}'`, results);
-        }
-
-        parseTree = results[0];
-
-        //cache compiled expression
-        parseCache.put(trimmedCode, parseTree);
-    }
+    const parseTree = ReactiveParser.INSTANCE.parse(code);
 
     const expression = compile(parseTree);
 
