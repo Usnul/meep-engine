@@ -61,7 +61,6 @@ import { QuestDescriptionDatabase } from "../../model/game/ecs/component/quest/Q
 import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/events/WorldEventDescriptionDatabase.js";
 import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
 import { CombatAbilityDescriptionDatabase } from "../../model/game/ability/description/CombatAbilityDescriptionDatabase.js";
-import { CombatCellActionDescriptionDatabase } from "../../model/game/ability/cell/CombatCellActionDescriptionDatabase.js";
 
 
 //gui
