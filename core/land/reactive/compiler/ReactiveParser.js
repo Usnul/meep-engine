@@ -49,6 +49,23 @@ export class ReactiveParser {
 
         return parseTree;
     }
+
+    /**
+     *
+     * @param {string} code
+     * @param errorConsumer
+     */
+    validate(code, errorConsumer) {
+        try {
+            this.parse(code);
+        } catch (e) {
+            errorConsumer(e);
+
+            return false;
+        }
+
+        return true;
+    }
 }
 
 /**
