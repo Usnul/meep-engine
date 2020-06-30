@@ -8,7 +8,7 @@ import { ProcessState } from "../../core/process/ProcessState.js";
  * @param {EditorProcess} process
  */
 function tryInitialize(editor, process) {
-    if (process.state.getValue() !== ProcessState.New) {
+    if (process.__state.getValue() !== ProcessState.New) {
         //process already initialized, ignore
         return;
     }
@@ -54,7 +54,7 @@ class ProcessEngine extends EditorProcess {
     add(process) {
         this.processes.add(process);
 
-        if (this.state.getValue() !== ProcessState.New && this.state.getValue() !== ProcessState.Stopped) {
+        if (this.__state.getValue() !== ProcessState.New && this.__state.getValue() !== ProcessState.Stopped) {
             tryInitialize(this.editor, process);
         }
     }
@@ -63,7 +63,7 @@ class ProcessEngine extends EditorProcess {
         const self = this;
         //shutdown any running processes
         this.processes.forEach(function (process) {
-            if (process.state.getValue() === ProcessState.Running) {
+            if (process.__state.getValue() === ProcessState.Running) {
                 process.shutdown();
                 //record process as suspended
                 self.__suspendedList.add(process);
@@ -77,8 +77,8 @@ class ProcessEngine extends EditorProcess {
      * @param {EditorProcess} process
      */
     startProcess(process) {
-        if (process.state.getValue() !== ProcessState.Running) {
-            if (this.state.getValue() !== ProcessState.Running) {
+        if (process.__state.getValue() !== ProcessState.Running) {
+            if (this.__state.getValue() !== ProcessState.Running) {
                 //record as suspended
                 this.__suspendedList.add(process);
             } else {
@@ -114,7 +114,7 @@ class ProcessEngine extends EditorProcess {
             return;
         }
 
-        if (process.state.getValue() === ProcessState.Running) {
+        if (process.__state.getValue() === ProcessState.Running) {
             process.shutdown();
         }
     }

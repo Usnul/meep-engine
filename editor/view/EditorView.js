@@ -361,7 +361,7 @@ class EditorView extends View {
             elementFactory: function (process) {
                 const toolView = new ProcessView(process);
                 toolView.el.addEventListener('click', function () {
-                    if (process.state.getValue() !== ProcessState.Running) {
+                    if (process.__state.getValue() !== ProcessState.Running) {
                         editor.processEngine.startByName(process.name);
                     } else {
                         editor.processEngine.stopByName(process.name);

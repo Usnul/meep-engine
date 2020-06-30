@@ -480,7 +480,7 @@ function makeGridPositionSymbolDisplay(engine) {
     });
 
 
-    display.state.onChanged.add((s0, s1) => {
+    display.__state.onChanged.add((s0, s1) => {
         if (s0 === ProcessState.Running) {
             //started
             engine.executor.run(tTerrainWaiter);

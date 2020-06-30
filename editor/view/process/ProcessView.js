@@ -16,7 +16,7 @@ function processState2ClassName(state) {
 class ProcessView extends View {
     /**
      *
-     * @param {Process} process
+     * @param {BaseProcess} process
      * @constructor
      */
     constructor(process) {
@@ -38,7 +38,7 @@ class ProcessView extends View {
         const lName = new LabelView(process.name);
         this.addChild(lName);
 
-        this.bindSignal(process.state.onChanged, function (newValue, oldValue) {
+        this.bindSignal(process.getState().onChanged, function (newValue, oldValue) {
             dRoot.removeClass(processState2ClassName(oldValue));
             dRoot.addClass(processState2ClassName(newValue));
         });
@@ -53,7 +53,7 @@ class ProcessView extends View {
         });
 
         //set active status class
-        $el.addClass(processState2ClassName(this.model.state.getValue()));
+        $el.addClass(processState2ClassName(this.model.getState().getValue()));
 
         super.link();
     }

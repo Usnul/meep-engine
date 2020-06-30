@@ -10,37 +10,44 @@ export class BaseProcess {
          * @readonly
          * @type {ObservedEnum.<ProcessState>}
          */
-        this.state = new ObservedEnum(ProcessState.New, ProcessState);
+        this.__state = new ObservedEnum(ProcessState.New, ProcessState);
+    }
+
+    /**
+     * @returns {ObservedEnum<ProcessState>}
+     */
+    getState() {
+        return this.__state;
     }
 
     initialize() {
 
-        const currentState = this.state.getValue();
+        const currentState = this.__state.getValue();
 
         if (currentState !== ProcessState.New && currentState !== ProcessState.Finalized) {
             throw new IllegalStateException(`Expected New or Finalized state, instead got ${objectKeyByValue(ProcessState, currentState)}`);
         }
 
 
-        this.state.set(ProcessState.Initialized);
+        this.__state.set(ProcessState.Initialized);
 
     }
 
     finalize() {
-        this.state.set(ProcessState.Finalized);
+        this.__state.set(ProcessState.Finalized);
     }
 
     startup() {
-        const currentState = this.state.getValue();
+        const currentState = this.__state.getValue();
 
         if (currentState !== ProcessState.Initialized && currentState !== ProcessState.Stopped) {
             throw new IllegalStateException(`Expected Initial state, instead got ${objectKeyByValue(ProcessState, currentState)}`);
         }
 
-        this.state.set(ProcessState.Running);
+        this.__state.set(ProcessState.Running);
     }
 
     shutdown() {
-        this.state.set(ProcessState.Stopped);
+        this.__state.set(ProcessState.Stopped);
     }
 }
