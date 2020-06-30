@@ -34,7 +34,17 @@ export class BaseProcess {
     }
 
     finalize() {
-        this.__state.set(ProcessState.Finalized);
+        const state = this.__state;
+
+        if (state.getValue() === ProcessState.Running) {
+            this.shutdown();
+        }
+
+        if (state.getValue() !== ProcessState.Stopped && state.getValue() !== ProcessState.New) {
+            throw new IllegalStateException(`Expected New or Stopped state, instead got ${objectKeyByValue(ProcessState, state.getValue())}`);
+        }
+
+        state.set(ProcessState.Finalized);
     }
 
     startup() {
