@@ -112,3 +112,13 @@ export function chainFunctions(...processes) {
 export function compareNumbersAscending(a, b) {
     return a - b;
 }
+
+/**
+ *
+ * @param {number} a
+ * @param {number} b
+ * @return {number}
+ */
+export function compareNumbersDescending(a, b) {
+    return b - a;
+}
