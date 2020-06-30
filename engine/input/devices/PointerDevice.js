@@ -31,6 +31,17 @@ export function decodeMouseEventButtons(value) {
 }
 
 /**
+ * Prevent default context menu from showing up
+ * @param {Event} event
+ */
+function supressContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    return false;
+}
+
+/**
  *
  * @param {TouchList} touchList
  * @param {function(Touch,number)} callback
@@ -409,6 +420,9 @@ PointerDevice.prototype.start = function () {
     see https://www.chromestatus.com/features/6662647093133312
      */
     domElement.addEventListener(MouseEvents.Wheel, this.eventHandlerWheel, { passive: false });
+
+
+    domElement.addEventListener('contextmenu',supressContextMenu);
 };
 
 PointerDevice.prototype.stop = function () {
@@ -435,6 +449,9 @@ PointerDevice.prototype.stop = function () {
     window.removeEventListener(TouchEvents.End, this.eventHandlerGlobalTouchEnd);
 
     domElement.removeEventListener(MouseEvents.Wheel, this.eventHandlerWheel);
+
+
+    domElement.removeEventListener('contextmenu',supressContextMenu);
 };
 
 export { PointerDevice };
