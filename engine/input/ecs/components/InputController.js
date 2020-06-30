@@ -8,23 +8,44 @@ import Signal from "../../../../core/events/signal/Signal.js";
 import { InputBinding } from "../InputBinding.js";
 
 
-/**
- *
- * @param {Array} bindings
- * @constructor
- */
-function InputController(bindings = []) {
-    assert.ok(Array.isArray(bindings), 'Expected bindings to be an array, instead got something else');
+class InputController {
+    /**
+     *
+     * @param {Array} bindings
+     * @constructor
+     */
+    constructor(bindings = []) {
+        assert.ok(Array.isArray(bindings), 'Expected bindings to be an array, instead got something else');
 
-    this.mapping = new List();
+        this.mapping = new List();
 
-    const inputControllerBindings = bindings.map(b => new InputBinding(b));
+        const inputControllerBindings = bindings.map(b => new InputBinding(b));
 
-    this.mapping.addAll(inputControllerBindings);
+        this.mapping.addAll(inputControllerBindings);
 
-    this.on = {
-        unlinked: new Signal()
-    };
+        this.on = {
+            unlinked: new Signal()
+        };
+    }
+
+    /**
+     *
+     * @param {[]} bindings
+     */
+    static from(bindings) {
+        const ic = new InputController();
+
+        const n = bindings.length;
+        for (let i = 0; i < n; i++) {
+            const binding = bindings[i];
+
+            const inputBinding = new InputBinding(binding);
+
+            ic.mapping.add(inputBinding);
+        }
+
+        return ic;
+    }
 }
 
 InputController.typeName = "InputController";
