@@ -119,7 +119,17 @@ function resolvePath(object, path, missingPropertyHandler) {
             if (typeof missingPropertyHandler === "function") {
                 missingPropertyHandler(current, part, i, l);
             } else {
-                throw new Error('failed to resolve path ' + path + "' at part " + i + " [" + part + "]");
+                const options = Object.keys(current);
+
+                const n = options.length;
+                const limit = 10;
+
+                if (n > limit) {
+                    options.splice(0, limit);
+                    options.push(`[... ${n - limit} more options]`);
+                }
+
+                throw new Error(`failed to resolve path '${path}' at part ${i} [${part}]. Existing keys: ${options.join(', ')}`);
             }
         }
         current = current[part];
