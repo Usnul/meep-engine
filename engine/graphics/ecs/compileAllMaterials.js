@@ -51,6 +51,7 @@ export function compileAllMaterials({ graphics, timeout = 0, includeHiddenLayers
 
     const task = new Task({
         name: 'Compiling materials',
+        estimatedDuration: 5,
         initializer() {
             //extract all materials
             graphics.layers.traverse(renderLayer => {

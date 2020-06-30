@@ -35,7 +35,7 @@ export function createTaskWaitForMeshesToLoad(ecd, timeout) {
     let startTime = 0;
     let currentTime = 0;
 
-    const estimatedDuration = timeout / 1000;
+    const estimatedDuration = timeout / 300;
 
     const task = new Task({
         name: 'Waiting for meshes to load',

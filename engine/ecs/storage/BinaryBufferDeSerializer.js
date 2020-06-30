@@ -188,7 +188,7 @@ function deserializeTask(
         return result;
     }
 
-    const estimatedDuration = buffer.length / 100000;
+    const estimatedDuration = buffer.length / 2857142;
 
     return new Task({
         name: 'Entity deserialization',
