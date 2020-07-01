@@ -3,6 +3,8 @@ import { BinaryBuffer } from "../binary/BinaryBuffer.js";
 import { byteArrayToString, jsonToStringToByteArray } from "../binary/ByteArrayTools.js";
 import { isLeaf, LeafNode } from "./LeafNode.js";
 import { validateNode, validateTree } from "./NodeValidator.js";
+import { deserializeBinaryNodeFromBinaryBuffer } from "./serialization/deserializeBinaryNodeFromBinaryBuffer.js";
+import { serializeBinaryNodeToBinaryBuffer } from "./serialization/serializeBinaryNodeToBinaryBuffer.js";
 
 /**
  *
@@ -247,7 +249,7 @@ test("serialization deserialization consistency via to/fromBinaryBuffer", () => 
 
     const buffer = new BinaryBuffer();
 
-    expected.toBinaryBuffer(buffer, function (buffer, value) {
+    serializeBinaryNodeToBinaryBuffer(expected, buffer, function (buffer, value) {
         const byteArray = new Uint8Array(jsonToStringToByteArray(value));
         const numBytes = byteArray.length;
         buffer.writeUint32(numBytes);
@@ -260,7 +262,7 @@ test("serialization deserialization consistency via to/fromBinaryBuffer", () => 
     //
     const actual = new BinaryNode();
 
-    actual.fromBinaryBuffer(buffer, function (buffer) {
+    deserializeBinaryNodeFromBinaryBuffer(actual, buffer, function (buffer) {
         const numBytes = buffer.readUint32();
         const uint8Array = new Uint8Array(numBytes);
         buffer.readBytes(uint8Array, 0, numBytes);

@@ -12,8 +12,6 @@ import { max2, min2 } from "../math/MathUtils.js";
 import { traverseBinaryNodeUsingVisitor } from "./traversal/traverseBinaryNodeUsingVisitor.js";
 import { BVHVisitor } from "./traversal/BVHVisitor.js";
 import { computeSampleStandardDeviation } from "../math/statistics/computeSampleStandardDeviation.js";
-import { serializeBinaryNodeToBinaryBuffer } from "./serialization/serializeBinaryNodeToBinaryBuffer.js";
-import { deserializeBinaryNodeFromBinaryBuffer } from "./serialization/deserializeBinaryNodeFromBinaryBuffer.js";
 
 
 /**
@@ -1191,24 +1189,6 @@ BinaryNode.prototype.clone = function (deep) {
     return clone;
 };
 
-/**
- * @deprecated use {@link deserializeBinaryNodeFromBinaryBuffer} directly instead
- * @param {BinaryBuffer} buffer
- * @param {function(buffer:BinaryBuffer):*} leafValueDeserializer
- */
-BinaryNode.prototype.fromBinaryBuffer = function (buffer, leafValueDeserializer) {
-    deserializeBinaryNodeFromBinaryBuffer(this, buffer, leafValueDeserializer);
-};
-
-/**
- * @deprecated use {@link serializeBinaryNodeToBinaryBuffer} directly instead
- * Writing is lossy, all descendants have their bounds quantized to uin16
- * @param {BinaryBuffer} buffer
- * @param {function(buffer:BinaryBuffer, value:*):void} leafValueSerializer
- */
-BinaryNode.prototype.toBinaryBuffer = function (buffer, leafValueSerializer) {
-    serializeBinaryNodeToBinaryBuffer(this, buffer, leafValueSerializer);
-};
 
 /**
  *

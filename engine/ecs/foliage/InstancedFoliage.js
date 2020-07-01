@@ -18,6 +18,7 @@ import { ThreeFrustumsIntersectionBVHVisitor } from "../../../core/bvh2/traversa
 import { FoliageVisibilitySetBuilder } from "./FoliageVisibilitySetBuilder.js";
 import { traverseBinaryNodeUsingVisitor } from "../../../core/bvh2/traversal/traverseBinaryNodeUsingVisitor.js";
 import { serializeBinaryNodeToBinaryBuffer } from "../../../core/bvh2/serialization/serializeBinaryNodeToBinaryBuffer.js";
+import { deserializeBinaryNodeFromBinaryBuffer } from "../../../core/bvh2/serialization/deserializeBinaryNodeFromBinaryBuffer.js";
 
 /**
  * @readonly
@@ -225,7 +226,7 @@ function deserializeLeafValueUintVar(buffer) {
 InstancedFoliage.prototype.deserialize = function (buffer) {
     deserializeRowFirstTable(buffer, this.data);
 
-    this.bvh.fromBinaryBuffer(buffer, deserializeLeafValueUintVar);
+    deserializeBinaryNodeFromBinaryBuffer(this.bvh,buffer, deserializeLeafValueUintVar);
 };
 
 /**
