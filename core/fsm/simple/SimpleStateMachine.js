@@ -163,6 +163,35 @@ export class SimpleStateMachine {
     }
 
     /**
+     * Performs navigation to target state via shortest path
+     * @param {number} targetState
+     */
+    navigateTo(targetState) {
+
+        const currentState = this.getState();
+
+        if (currentState === targetState) {
+            // already in the target state
+            return;
+        }
+
+        const description = this.description;
+
+        const path = description.findPath(currentState, targetState);
+
+        if (path === null) {
+            throw new Error(`No path exists from current state '${currentState}' to target state '${targetState}'`);
+        }
+
+        const n = path.length;
+        for (let i = 1; i < n; i++) {
+            const next = path[i];
+
+            this.setState(next);
+        }
+    }
+
+    /**
      * @template X
      * @param {X} [input] value will be fed into selector
      * @param {function} [preStateChangeHook]

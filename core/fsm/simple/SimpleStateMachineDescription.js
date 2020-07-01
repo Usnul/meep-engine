@@ -144,8 +144,8 @@ export class SimpleStateMachineDescription {
      * @returns {number[]}
      */
     findPath(start, goal) {
-        // assert.ok(this.stateExists(start), `start state ${start} doesn't exist`);
-        // assert.ok(this.stateExists(goal), `goal state ${goal} doesn't exist`);
+        assert.ok(this.stateExists(start), `start state ${start} doesn't exist`);
+        assert.ok(this.stateExists(goal), `goal state ${goal} doesn't exist`);
 
         const open = new Set();
         open.add(start);
