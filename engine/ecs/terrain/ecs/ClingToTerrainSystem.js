@@ -180,7 +180,7 @@ const v3_up = new Vector3();
 const q_temp = new Quaternion();
 
 /**
- *
+ * TODO look into "swing-twist decomposition"
  * @param {Quaternion} rotation
  * @param {Vector3} direction
  * @param {number} angularLimit
@@ -224,6 +224,7 @@ export function alignToVector(rotation, direction, angularLimit, up = Vector3.up
 
     const t = clamp(angularLimit / angle, 0, 1);
 
+    // TODO Consider replacing this with slerp
     rotation.lerp(q_temp, t);
 }
 
