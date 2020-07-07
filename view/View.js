@@ -138,11 +138,19 @@ function setElementTransform(domElement, position, scale, rotation) {
     style.webkitTransform = style.oTransform = style.transform = transform;
 }
 
+/**
+ *
+ * @param {HTMLElement} domElement
+ * @param {boolean} visibility
+ */
 function setElementVisibility(domElement, visibility) {
-    const value = visibility ? "block" : "none";
     const style = domElement.style;
-    if (style.display !== value) {
-        style.display = value;
+
+    if (!visibility) {
+        style.display = 'none';
+    } else {
+        // remove display property, this allows style re-flow whereby previous display type is assumed
+        style.removeProperty('display');
     }
 }
 
@@ -267,6 +275,7 @@ class View {
     set visible(v) {
         if (v === this.getFlag(ViewFlags.Visible)) {
             //do nothing
+            return;
         }
 
         this.writeFlag(ViewFlags.Visible, v);
@@ -514,7 +523,7 @@ class View {
      * @returns {boolean}
      */
     hasChild(child) {
-        return (this.children.indexOf(child) !== -1);
+        return this.children.indexOf(child) !== -1;
     }
 
     removeAllChildren() {
