@@ -7,12 +7,15 @@ class JavascriptAsset extends Asset {
     constructor(code) {
         super();
 
-        this.byteSize = 0;
-        this.program = FunctionCompiler.INSTANCE.compile({ code });
+        this.code = code;
+
+        this.byteSize = 128;
+
     }
 
-    create() {
-        return this.program;
+    create(args) {
+
+        return FunctionCompiler.INSTANCE.compile({ code: this.code, args });
     }
 }
 

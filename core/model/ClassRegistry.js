@@ -60,7 +60,7 @@ export class ClassRegistry {
     /**
      * @template T
      * @param {String} name
-     * @param {Class<T>} klass
+     * @param {{RequireOne: (ParallelBehaviorPolicy|number), RequireAll: (ParallelBehaviorPolicy|number)}} klass
      * @returns {boolean}
      */
     addClass(name, klass) {
