@@ -511,6 +511,20 @@ class Vector3 {
 
     /**
      *
+     * @param {Matrix4} matrix4
+     */
+    threejs_setFromMatrixPosition(matrix4) {
+        const e = matrix4.elements;
+
+        const _x = e[12];
+        const _y = e[13];
+        const _z = e[14];
+
+        this.set(_x, _y, _z);
+    }
+
+    /**
+     *
      * @param {Vector3} other
      * @returns {boolean}
      */
