@@ -55,7 +55,7 @@ export class RectangularPieProgressView extends View {
         const center_x = size_x / 2;
         const center_y = size_y / 2;
 
-        const radius = size_x + size_y;
+        const radius = size_x + size_y + 1;
 
         const angle = (1 - fraction) * Math.PI * 2 + Math.PI / 2;
 
