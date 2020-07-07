@@ -61,6 +61,7 @@ import { QuestDescriptionDatabase } from "../../model/game/ecs/component/quest/Q
 import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/events/WorldEventDescriptionDatabase.js";
 import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
 import { CombatAbilityDescriptionDatabase } from "../../model/game/ability/description/CombatAbilityDescriptionDatabase.js";
+import { CombatAbilityAnimationSequenceDescriptionDatabase } from "../../model/game/scenes/combat/animation/system/CombatAbilityAnimationSequenceDescriptionDatabase.js";
 
 
 //gui
@@ -256,6 +257,7 @@ class Engine {
         this.staticKnowledge.add('worldEvents', 'data/database/world-events/data.json', new WorldEventDescriptionDatabase());
         this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
         this.staticKnowledge.add('abilities', 'data/database/abilities/data.json', new CombatAbilityDescriptionDatabase());
+        this.staticKnowledge.add('ability-animations', 'data/database/ability-animations/data.json', new CombatAbilityAnimationSequenceDescriptionDatabase());
 
         this.story.initialize({
             engine: this
