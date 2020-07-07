@@ -41,7 +41,14 @@ export class RectangularPieProgressView extends View {
         const v0 = this.model.getValue();
         const v1 = this.max.getValue();
 
-        const fraction = v0 / v1;
+        let fraction;
+
+
+        if (v1 === 0) {
+            fraction = 1;
+        } else {
+            fraction = v0 / v1;
+        }
 
         const size = this.size;
 
