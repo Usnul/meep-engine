@@ -6,6 +6,7 @@ import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
 import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import { getSkeletonBoneByType } from "./SkeletonUtils.js";
 
 export const MeshFlags = {
     CastShadow: 1,
@@ -223,6 +224,42 @@ class Mesh {
         result.fromJSON(json);
 
         return result;
+    }
+
+    /**
+     *
+     * @param {Vector3} result
+     * @param {HumanoidBoneType} boneType
+     */
+    getBonePositionByType(result, boneType) {
+        if (!this.getFlag(MeshFlags.Loaded)) {
+            // mesh is not loaded yet, return origin instead
+            result.set(0, 0, 0);
+
+        } else {
+
+            const skeletonBone = getSkeletonBoneByType(this, boneType);
+
+            if (skeletonBone === null) {
+                console.warn("Couldn't find bone '" + boneType + "', using mesh origin instead");
+
+                const mesh = this.mesh;
+
+                if (mesh !== null) {
+                    result.copy(mesh.position);
+                } else {
+                    //no mesh loaded
+                    result.set(0, 0, 0);
+                }
+
+            } else {
+                const matrixWorld = skeletonBone.matrixWorld;
+
+
+                result.threejs_setFromMatrixPosition(matrixWorld);
+            }
+
+        }
     }
 }
 
