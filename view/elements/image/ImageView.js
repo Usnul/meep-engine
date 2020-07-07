@@ -57,6 +57,10 @@ function buildImageElement(key) {
     const styles = key.style;
     const stylesSize = styles.length;
 
+    /**
+     *
+     * @type {CSSStyleDeclaration}
+     */
     const styleDeclaration = el.style;
 
     for (let i = 0; i < stylesSize; i++) {
