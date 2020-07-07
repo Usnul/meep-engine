@@ -229,7 +229,7 @@ class Mesh {
     /**
      *
      * @param {Vector3} result
-     * @param {HumanoidBoneType} boneType
+     * @param {HumanoidBoneType|string} boneType
      */
     getBonePositionByType(result, boneType) {
         if (!this.getFlag(MeshFlags.Loaded)) {

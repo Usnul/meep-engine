@@ -1352,6 +1352,8 @@ function dispatchEventListenersByHash(hash, entity, name, event) {
 EntityComponentDataset.prototype.sendEvent = function (entity, name, event) {
     // console.log("sendEvent", entity, name, event);
 
+    assert.typeOf(name, 'string', 'name');
+
     dispatchEntityEventListeners(this.__entityEventListeners, entity, name, event);
 };
 
