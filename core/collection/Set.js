@@ -22,6 +22,11 @@ class Set {
             added: new Signal(),
             removed: new Signal()
         };
+
+        /**
+         *
+         * @type {T[]}
+         */
         this.data = [];
 
         this.length = 0;
@@ -147,6 +152,14 @@ class Set {
         for (let i = 0; i < this.length; i++) {
             visitor(this.data[i]);
         }
+    }
+
+    /**
+     *
+     * @returns {T[]}
+     */
+    asArray() {
+        return this.data;
     }
 }
 
