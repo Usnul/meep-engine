@@ -6,36 +6,9 @@ const edge1 = new Vector3();
 const edge2 = new Vector3();
 const normal = new Vector3();
 
-
 /**
- *
- * @param {Vector3} result
- * @param {Vector3} a
- * @param {Vector3} b
- */
-function subVectors(result, a, b) {
-    result.set(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-
-/**
- *
- * @param {Vector3} result
- * @param {Vector3} a
- * @param {Vector3} b
- */
-function crossVectors(result, a, b) {
-    const ax = a.x, ay = a.y, az = a.z;
-    const bx = b.x, by = b.y, bz = b.z;
-
-    const x = ay * bz - az * by;
-    const y = az * bx - ax * bz;
-    const z = ax * by - ay * bx;
-
-    return result.set(x, y, z);
-}
-
-/**
- *
+ * NOTE: adapted from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+ * @source https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm (Möller and Trumbore, « Fast, Minimum Storage Ray-Triangle Intersection », Journal of Graphics Tools, vol. 2,‎ 1997, p. 21–28)
  * @param {Vector3} result
  * @param {Vector3} rayOrigin
  * @param {Vector3} rayDirection
@@ -46,13 +19,11 @@ function crossVectors(result, a, b) {
  */
 export function rayTriangleIntersection(result, rayOrigin, rayDirection, a, b, c) {
 
-    // from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+    edge1.subVectors(b, a);
+    edge2.subVectors(c, a);
 
 
-    subVectors(edge1, b, a);
-    subVectors(edge2, c, a);
-
-    crossVectors(normal, edge1, edge2);
+    normal.crossVectors(edge1, edge2);
 
     // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
     // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
@@ -79,9 +50,9 @@ export function rayTriangleIntersection(result, rayOrigin, rayDirection, a, b, c
 
     }
 
-    subVectors(diff, rayOrigin, a);
+    diff.subVectors(rayOrigin, a);
 
-    crossVectors(edge2, diff, edge2);
+    edge2.crossVectors(diff, edge2);
 
     const DdQxE2 = sign * rayDirection.dot(edge2);
 
@@ -121,7 +92,9 @@ export function rayTriangleIntersection(result, rayOrigin, rayDirection, a, b, c
     // Ray intersects triangle.
     const t = QdN / DdN;
 
-    result.copy(rayDirection).multiplyScalar(t).add(rayOrigin);
+    result.copy(rayDirection);
+    result.multiplyScalar(t);
+    result.add(rayOrigin);
 
     return true;
 }
