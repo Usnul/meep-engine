@@ -108,7 +108,9 @@ WorkerBuilder.prototype.build = function () {
         '   }',
 
         '   function sendError(error){',
-        '       globalScope.postMessage({methodName: methodName, id: requestId, error: {message: error.message, stack: error.stack.split("\\n") }});',
+        '       let stack = "";',
+        '       try{stack = error.stack.split("\\n")}catch(e){}',
+        '       globalScope.postMessage({methodName: methodName, id: requestId, error: {message: error.message, stack: stack }});',
         '   }',
 
         '   if(method === undefined){',
