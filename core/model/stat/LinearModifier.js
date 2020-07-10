@@ -1,6 +1,5 @@
 import { assert } from "../../assert.js";
 import { computeHashFloat } from "../../math/MathUtils.js";
-import { CombatUnitBonusSourceType } from "../../../../model/game/logic/combat/CombatUnitBonusSourceType.js";
 
 
 /**
@@ -33,9 +32,9 @@ class LinearModifier {
 
         /**
          *
-         * @type {CombatUnitBonusSourceType|number}
+         * @type {number}
          */
-        this.source = CombatUnitBonusSourceType.Unknown;
+        this.source = 0;
 
         /**
          * Whenever this modifier is grated by another persistent effect
@@ -102,7 +101,7 @@ class LinearModifier {
     fromJSON({
                  a = 1,
                  b = 0,
-                 source = CombatUnitBonusSourceType.Unknown,
+                 source = 0,
                  transient = false
              }) {
         this.a = a;
