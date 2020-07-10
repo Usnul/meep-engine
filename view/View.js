@@ -651,6 +651,7 @@ class View {
     }
 
     destroy() {
+        assert.ok(this instanceof View, 'this is not a View');
         assert.notOk(this.isLinked, 'view is linked, linked view may not be destroyed');
 
         const children = this.children;
