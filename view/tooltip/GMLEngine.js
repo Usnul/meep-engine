@@ -2,7 +2,7 @@ import View from "../View.js";
 import LabelView from "../common/LabelView.js";
 import EmptyView from "../elements/EmptyView.js";
 import { assert } from "../../core/assert.js";
-import UnitAffliction from "../../../model/game/logic/combat/unit/afflictions/UnitAffliction.js";
+import UnitAffliction from "../../../model/game/unit/afflictions/UnitAffliction.js";
 import AfflictionView from "../../../view/units/affliction/AfflictionView.js";
 import { AfflictionDescriptionView } from "../../../view/units/affliction/AfflictionDescriptionView.js";
 import ItemView from "../../../view/game/items/ItemView.js";

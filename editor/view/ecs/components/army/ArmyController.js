@@ -2,7 +2,7 @@ import View from "../../../../../view/View.js";
 import EmptyView from "../../../../../view/elements/EmptyView.js";
 import { LineView } from "../common/LineView.js";
 import ButtonView from "../../../../../view/elements/button/ButtonView.js";
-import Aura from "../../../../../../model/game/logic/combat/unit/aura/Aura.js";
+import Aura from "../../../../../../model/game/unit/aura/Aura.js";
 import ObservedValue from "../../../../../core/model/ObservedValue.js";
 import LabelView from "../../../../../view/common/LabelView.js";
 import ListView from "../../../../../view/common/ListView.js";
