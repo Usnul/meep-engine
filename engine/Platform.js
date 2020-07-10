@@ -1,8 +1,14 @@
+let cached = null;
+
 /**
  * https://stackoverflow.com/questions/5916900/how-can-you-detect-the-version-of-a-browser
  * @returns {{name:String, version:Number}}
  */
 function browserInfo() {
+    if (cached !== null) {
+        return cached;
+    }
+
     let ua = navigator.userAgent, tem,
         M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
 
@@ -24,10 +30,15 @@ function browserInfo() {
         M.splice(1, 1, tem[1]);
     }
 
-    return {
+    const result = {
         name: M[0],
         version: M[1]
     };
+
+    //cache the result
+    cached = result;
+
+    return result;
 }
 
 export {

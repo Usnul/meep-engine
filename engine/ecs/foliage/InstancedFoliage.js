@@ -69,6 +69,19 @@ function InstancedFoliage() {
 
     this.visibilitySetBuilder = new FoliageVisibilitySetBuilder();
     this.bvhVisibilityVisitor.collector = this.visibilitySetBuilder;
+
+    /**
+     *
+     * @type {*[]}
+     * @private
+     */
+    this.__garbage = [];
+    /**
+     *
+     * @type {number}
+     * @private
+     */
+    this.__garbagePointer = 0;
 }
 
 InstancedFoliage.prototype.initialize = function () {
@@ -226,7 +239,7 @@ function deserializeLeafValueUintVar(buffer) {
 InstancedFoliage.prototype.deserialize = function (buffer) {
     deserializeRowFirstTable(buffer, this.data);
 
-    deserializeBinaryNodeFromBinaryBuffer(this.bvh,buffer, deserializeLeafValueUintVar);
+    deserializeBinaryNodeFromBinaryBuffer(this.bvh, buffer, deserializeLeafValueUintVar);
 };
 
 /**
@@ -255,6 +268,49 @@ InstancedFoliage.prototype.serialize = function (buffer) {
 
 
 const tempQuaternion = new Quaternion();
+const rowData = [];
+
+/**
+ *
+ * @param index
+ * @param {int} ref
+ */
+InstancedFoliage.prototype.__updateVisibility = function (index, ref) {
+    /**
+     *
+     * @type {FoliageVisibilitySetBuilder}
+     */
+    const builder = this.visibilitySetBuilder;
+
+    /**
+     *
+     * @type {BitSet}
+     */
+    const visibleElementSet = builder.visibleSet;
+
+    if (!visibleElementSet.get(ref)) {
+        //no longer visible
+        this.__garbage[this.__garbagePointer++] = ref;
+    } else {
+        //visible, and is already in the group, update the set
+        visibleElementSet.set(ref, false);
+    }
+};
+
+InstancedFoliage.prototype.__removeGarbage = function () {
+
+    const garbagePointer = this.__garbagePointer;
+    const instances = this.instances;
+
+
+    const garbage = this.__garbage;
+
+    for (let i = 0; i < garbagePointer; i++) {
+        const ref = garbage[i];
+        instances.remove(ref);
+    }
+
+};
 
 /**
  *
@@ -272,8 +328,6 @@ InstancedFoliage.prototype.update = function (frustums, visibilityFilters = []) 
 
     const visibleElementSet = visibilitySetBuilder.visibleSet;
 
-    const elementsToRemove = [];
-
     //build visible set
     traverseBinaryNodeUsingVisitor(this.bvh, this.bvhVisibilityVisitor);
 
@@ -281,49 +335,33 @@ InstancedFoliage.prototype.update = function (frustums, visibilityFilters = []) 
 
     // console.log(`Visible: `, elementsToAdd.size);
 
-    /**
-     *
-     * @param index
-     * @param {int} ref
-     */
-    function visitInstancedReference(index, ref) {
-        if (!visibleElementSet.get(ref)) {
-            //no longer visible
-            elementsToRemove.push(ref);
-        } else {
-            //visible, and is already in the group, update the set
-            visibleElementSet.set(ref, false);
-        }
-    }
+    //reset garbage pointer
+    this.__garbagePointer = 0;
 
     //remove those that are no longer visible
-    instances.traverseReferences(visitInstancedReference);
+    instances.traverseReferences(this.__updateVisibility, this);
 
     //cull instances that are no longer visible
-    for (let i = 0, l = elementsToRemove.length; i < l; i++) {
-        const ref = elementsToRemove[i];
-        instances.remove(ref);
-    }
+    this.__removeGarbage();
 
-    const elementData = [];
 
     const data = this.data;
 
     //process entities that have become newly visible
     for (let index = visibleElementSet.nextSetBit(0); index !== -1; index = visibleElementSet.nextSetBit(index + 1)) {
         //read transform data for instance
-        data.getRow(index, elementData);
+        data.getRow(index, rowData);
 
-        const positionX = elementData[0];
-        const positionY = elementData[1];
-        const positionZ = elementData[2];
+        const positionX = rowData[0];
+        const positionY = rowData[1];
+        const positionZ = rowData[2];
 
-        const encodedRotation = elementData[3];
+        const encodedRotation = rowData[3];
 
 
-        const scaleX = elementData[4];
-        const scaleY = elementData[5];
-        const scaleZ = elementData[6];
+        const scaleX = rowData[4];
+        const scaleY = rowData[5];
+        const scaleZ = rowData[6];
 
         const i = instances.add(index);
 

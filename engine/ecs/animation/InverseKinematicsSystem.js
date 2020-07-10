@@ -47,7 +47,7 @@ export class InverseKinematicsSystem extends System {
 
         const skeleton = extractSkeletonFromMeshComponent(mesh);
 
-        if (skeleton === null) {
+        if (skeleton === undefined) {
             return;
         }
 

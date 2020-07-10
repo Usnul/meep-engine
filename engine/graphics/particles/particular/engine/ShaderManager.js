@@ -211,26 +211,6 @@ function MaterialRecord() {
     this.lastAccessTime = 0;
 }
 
-/**
- *
- * @param {ParameterSet} s
- * @returns {number}
- */
-function computeParameterSetHash(s) {
-    return s.hash();
-}
-
-
-/**
- *
- * @param {ParameterSet} a
- * @param {ParameterSet} b
- * @returns {boolean}
- */
-function computeParameterSetEquality(a, b) {
-    return a.equals(b);
-}
-
 const EMITTER_MATERIAL_FLAGS = ParticleEmitterFlag.DepthSoftDisabled | ParticleEmitterFlag.DepthReadDisabled | ParticleEmitterFlag.AlignOnVelocity;
 
 /**
@@ -264,19 +244,6 @@ function computeEmitterMaterialEquality(a, b) {
  * @type {Uint8Array}
  */
 const FOUR_BYTE_UINT8_ARRAY = new Uint8Array(4);
-
-
-/**
- *
- * @param {DataTexture} texture
- */
-function clearDataTexture(texture) {
-    texture.image.data = FOUR_BYTE_UINT8_ARRAY;
-    texture.image.width = 1;
-    texture.image.height = 1;
-
-    texture.needsUpdate = true;
-}
 
 /**
  * @returns {DataTexture}

@@ -58,6 +58,42 @@ export function getSkeletonBone(component, boneName) {
     throw  new Error("Bone '" + boneName + "' not found, did you mean '" + bestMatch.name + "'");
 }
 
+/**
+ *
+ * @param {Object3D} object
+ * @returns {Skeleton|undefined}
+ */
+function extractSkeletonFromObject3D(object) {
+
+    if (object.isSkinnedMesh === true) {
+        const skeleton = object.skeleton;
+
+        return skeleton;
+    }
+
+    const children = object.children;
+
+    const n = children.length;
+
+    for (let i = 0; i < n; i++) {
+
+        const child = children[i];
+
+        const sk = extractSkeletonFromObject3D(child);
+
+        if (sk !== undefined) {
+            return sk;
+        }
+
+    }
+
+}
+
+/**
+ *
+ * @param {Mesh} component
+ * @returns {Skeleton|undefined}
+ */
 export function extractSkeletonFromMeshComponent(component) {
     const mesh = component.mesh;
 
@@ -71,26 +107,7 @@ export function extractSkeletonFromMeshComponent(component) {
         return null;
     }
 
-    let r = null;
-
-    mesh.traverse(o => {
-
-        if (o.isSkinnedMesh !== true) {
-            // throw new Error("Not a skinned mesh, no bones");
-            return null;
-        }
-
-        const skeleton = o.skeleton;
-        if (skeleton === undefined) {
-            // No skeleton data
-            return null;
-        }
-
-        r = skeleton;
-    });
-
-    //bone not found
-    return r;
+    return extractSkeletonFromObject3D(mesh);
 }
 
 /**
@@ -141,7 +158,7 @@ export function findSkeletonBoneByType(skeleton, boneType) {
 export function getSkeletonBoneByType(component, boneType) {
     const skeleton = extractSkeletonFromMeshComponent(component);
 
-    if (skeleton === null) {
+    if (skeleton === undefined) {
         return null;
     }
 
@@ -158,7 +175,7 @@ export function getSkeletonBoneByType(component, boneType) {
 export function getSkeletonBoneByName(component, name) {
     const skeleton = extractSkeletonFromMeshComponent(component);
 
-    if (skeleton === null) {
+    if (skeleton === undefined) {
         return null;
     }
 

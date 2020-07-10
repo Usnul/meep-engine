@@ -8,6 +8,7 @@ import SoundListener from './SoundListener.js';
 import { Transform } from '../../ecs/transform/Transform.js';
 import { browserInfo } from "../../Platform.js";
 import Vector3 from "../../../core/geom/Vector3.js";
+import { noop } from "../../../core/function/Functions.js";
 
 const v3 = new Vector3();
 
@@ -56,9 +57,7 @@ class Context {
          */
         const listener = this.audioContext.listener;
 
-        listener.forwardX.value = v3.x;
-        listener.forwardY.value = v3.y;
-        listener.forwardZ.value = v3.z;
+        setListenerOrientation(listener, v3);
     }
 
     updatePosition() {
@@ -186,6 +185,7 @@ function setListenerPositionNOOP(listener, position) {
 }
 
 let setListenerPosition = setListenerPositionNOOP;
+
 if (navigator !== undefined) {
     const info = browserInfo();
     if (info.name === "Chrome") {
@@ -201,6 +201,25 @@ if (navigator !== undefined) {
 
 if (setListenerPosition === setListenerPositionNOOP) {
     console.warn("No support for AudioListener position detected");
+}
+
+
+let setListenerOrientation = noop;
+
+if (navigator !== undefined) {
+    const info = browserInfo();
+    if (info.name === "Chrome") {
+        setListenerOrientation = (listener, forward) => {
+            listener.forwardX.value = forward.x;
+            listener.forwardY.value = forward.y;
+            listener.forwardZ.value = forward.z;
+
+        };
+    } else if (info.name === "Firefox") {
+        setListenerOrientation = (listener, forward) => {
+            listener.setOrientation(forward.x, forward.y, forward.z, 0, 1, 0);
+        };
+    }
 }
 
 export default SoundListenerSystem;

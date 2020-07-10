@@ -298,9 +298,10 @@ InstancedMeshGroup.prototype.add = function (reference) {
 /**
  *
  * @param {function(index:int,reference:int)} visitor
+ * @param {*} [thisArg]
  */
-InstancedMeshGroup.prototype.traverseReferences = function (visitor) {
-    this.indices.forEach(visitor);
+InstancedMeshGroup.prototype.traverseReferences = function (visitor, thisArg) {
+    this.indices.forEach(visitor, thisArg);
 };
 
 /**
