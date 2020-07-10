@@ -4,7 +4,7 @@
 
 
 import Signal from "../events/signal/Signal.js";
-import { inverseLerp } from "../math/MathUtils.js";
+import { computeHashFloat, inverseLerp } from "../math/MathUtils.js";
 
 /**
  *
@@ -170,6 +170,20 @@ BoundedValue.prototype.copy = function (other) {
  */
 BoundedValue.prototype.equals = function (other) {
     return this.__value === other.__value && this.__limitLower === other.__limitLower && this.__limitUpper === other.__limitUpper;
+};
+
+/**
+ *
+ * @returns {number}
+ */
+BoundedValue.prototype.hash = function () {
+    const v0 = computeHashFloat(this.__value);
+    const v1 = computeHashFloat(this.__limitLower);
+    const v2 = computeHashFloat(this.__limitUpper);
+
+    const h0 = (v0 << 5) - v0 + v1;
+
+    return (h0 << 5) - h0 + v2;
 };
 
 BoundedValue.prototype.toJSON = function () {

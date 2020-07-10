@@ -54,6 +54,18 @@ class ObservedInteger extends Number {
     }
 
     /**
+     * Set value without dispatching change notification
+     * @param {number} value
+     */
+    setSilent(value) {
+
+        assert.equal(typeof value, "number", `Value must be of type "number", instead was "${typeof value}"`);
+        assert.ok(Number.isInteger(value) || !Number.isFinite(value), `Value must be an integer, instead was ${value}`);
+
+        this.__value = value;
+    }
+
+    /**
      *
      * @return {boolean}
      */
