@@ -50,7 +50,7 @@ import { StoryManager } from "../../model/game/story/dialogue/StoryManager.js";
 import { GameSaveStateManager } from "../../view/game/save/GameSaveStateManager.js";
 import { BinarySerializationRegistry } from "./ecs/storage/binary/BinarySerializationRegistry.js";
 import AfflictionDescriptionDatabase from "../../model/game/unit/afflictions/AfflictionDescriptionDatabase.js";
-import CombatUnitDescriptionDatabase from "../../model/game/unit/CombatUnitDescriptionDatabase.js";
+import CombatUnitDescriptionDatabase from "../../model/game/unit/description/CombatUnitDescriptionDatabase.js";
 import TalentDescriptionDatabase from "../../model/game/unit/talent/TalentDescriptionDatabase.js";
 import { TalentTreeDatabase } from "../../model/game/unit/talent/tree/TalentTreeDatabase.js";
 import { UnitActionDescriptionDatabase } from "../../model/game/unit/actions/UnitActionDescriptionDatabase.js";
