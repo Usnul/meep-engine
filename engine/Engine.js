@@ -61,8 +61,8 @@ import { WorldEventDescriptionDatabase } from "../../model/game/logic/strategy/e
 import { StoryPageDatabase } from "../../model/game/story/dialogue/StoryPageDatabase.js";
 import { CombatAbilityDescriptionDatabase } from "../../model/game/ability/description/CombatAbilityDescriptionDatabase.js";
 import { CombatAbilityAnimationSequenceDescriptionDatabase } from "../../model/game/scenes/combat/animation/system/CombatAbilityAnimationSequenceDescriptionDatabase.js";
-import { UnitTraitDescriptionDatabase } from "../../model/game/unit/trait/UnitTraitDescriptionDatabase.js";
-import { UnitTraitTreeDatabase } from "../../model/game/unit/trait/tree/UnitTraitTreeDatabase.js";
+import { UnitPerkDescriptionDatabase } from "../../model/game/unit/perk/UnitPerkDescriptionDatabase.js";
+import { UnitPerkTreeDatabase } from "../../model/game/unit/perk/tree/UnitPerkTreeDatabase.js";
 
 
 //gui
@@ -259,8 +259,8 @@ class Engine {
         this.staticKnowledge.add('storyPages', 'data/database/story/data.json', new StoryPageDatabase());
         this.staticKnowledge.add('abilities', 'data/database/abilities/data.json', new CombatAbilityDescriptionDatabase());
         this.staticKnowledge.add('ability-animations', 'data/database/ability-animations/data.json', new CombatAbilityAnimationSequenceDescriptionDatabase());
-        this.staticKnowledge.add('traits', 'data/database/traits/data.json', new UnitTraitDescriptionDatabase());
-        this.staticKnowledge.add('trait-trees', 'data/database/traits/trees/data.json', new UnitTraitTreeDatabase());
+        this.staticKnowledge.add('perks', 'data/database/perks/data.json', new UnitPerkDescriptionDatabase());
+        this.staticKnowledge.add('perk-trees', 'data/database/perks/trees/data.json', new UnitPerkTreeDatabase());
 
         this.story.initialize({
             engine: this
