@@ -266,6 +266,9 @@ function materializedEdgeTarget(state, source, edge, computeTerminalFlag, heuris
 
     child.heuristicValue = childHeuristicScore;
 
+    // bubble the heuristic score up the tree
+    child.bubbleUpHeuristicScore();
+
     if (terminalFlag === StateType.Undecided) {
         //do nothing
     } else {

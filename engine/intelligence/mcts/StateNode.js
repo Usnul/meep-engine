@@ -149,6 +149,61 @@ export class StateNode {
         this.type = StateType.Undecided;
     }
 
+    bubbleUpHeuristicScore() {
+        let r = this.parent;
+
+        while (r !== null) {
+            r.aggregateHeuristicScore();
+
+            r = r.parent;
+        }
+
+    }
+
+    /**
+     * Aggregate heuristic score from children
+     */
+    aggregateHeuristicScore() {
+        const moves = this.moves;
+
+        if (moves === null) {
+            //do nothing
+            return;
+        }
+
+        const n = moves.length;
+
+        let score = this.heuristicValue;
+
+        for (let i = 0; i < n; i++) {
+            /**
+             *
+             * @type {MoveEdge}
+             */
+            const move = moves[i];
+
+            if (!move.isTargetMaterialized()) {
+                continue;
+            }
+
+            /**
+             *
+             * @type {StateNode}
+             */
+            const target = move.target;
+
+            const childScore = target.heuristicValue;
+
+            if (childScore < score) {
+                // pick worst score to aggregate
+                score = childScore;
+            }
+
+        }
+
+        this.heuristicValue = score;
+    }
+
     /**
      * @param state
      * @param {function(State, source:StateNode):MoveEdge[]} computeValidMoves
