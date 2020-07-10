@@ -40,8 +40,8 @@ export class BaseProcess {
             this.shutdown();
         }
 
-        if (state.getValue() !== ProcessState.Stopped && state.getValue() !== ProcessState.New) {
-            throw new IllegalStateException(`Expected New or Stopped state, instead got ${objectKeyByValue(ProcessState, state.getValue())}`);
+        if (state.getValue() !== ProcessState.Stopped && state.getValue() !== ProcessState.Initialized) {
+            throw new IllegalStateException(`Expected Initialized or Stopped state, instead got ${objectKeyByValue(ProcessState, state.getValue())}`);
         }
 
         state.set(ProcessState.Finalized);
