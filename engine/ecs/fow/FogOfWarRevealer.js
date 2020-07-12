@@ -5,6 +5,24 @@ export class FogOfWarRevealer {
     constructor() {
         this.radius = new Vector1(1);
     }
+
+    toJSON() {
+        return {
+            radius: this.radius.toJSON()
+        };
+    }
+
+    fromJSON({ radius }) {
+        this.radius.fromJSON(radius);
+    }
+
+    static fromJSON(j) {
+        const r = new FogOfWarRevealer();
+
+        r.fromJSON(j);
+
+        return r;
+    }
 }
 
 FogOfWarRevealer.typeName = 'FogOfWarRevealer';

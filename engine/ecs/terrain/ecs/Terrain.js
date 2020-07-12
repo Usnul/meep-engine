@@ -820,6 +820,10 @@ class Terrain {
      */
     build(assetManager) {
 
+        assert.defined(assetManager, 'assetManager');
+        assert.notNull(assetManager, 'assetManager');
+        assert.equal(assetManager.isAssetManager, true,'.isAssetManager !== true');
+
         this.__assetManager = assetManager;
 
         this.buildGridTransform();

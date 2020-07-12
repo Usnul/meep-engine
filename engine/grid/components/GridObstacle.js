@@ -106,7 +106,20 @@ class GridObstacle {
         assert.ok(Number.isInteger(x), `expected x to be an integer, got ${x} instead`);
         assert.ok(Number.isInteger(y), `expected y to be an integer, got ${y} instead`);
 
-        return this.data[y * this.size.x + x];
+        const index = y * this.size.x + x;
+        return this.data[index];
+    }
+
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} value
+     */
+    writePoint(x, y, value) {
+        const index = y * this.size.x + x;
+
+        this.data[index] = value;
     }
 
     /**

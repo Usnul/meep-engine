@@ -247,6 +247,19 @@ Sampler2D.int8 = function (itemSize, width, height) {
  * @param {int} height
  * @return {Sampler2D}
  */
+Sampler2D.int16 = function (itemSize, width, height) {
+    const data = new Int16Array(width * height * itemSize);
+    const sampler = new Sampler2D(data, itemSize, width, height);
+    return sampler;
+};
+
+/**
+ *
+ * @param {int} itemSize
+ * @param {int} width
+ * @param {int} height
+ * @return {Sampler2D}
+ */
 Sampler2D.float32 = function (itemSize, width, height) {
     const data = new Float32Array(width * height * itemSize);
     const sampler = new Sampler2D(data, itemSize, width, height);

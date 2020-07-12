@@ -74,7 +74,7 @@ export class GridPosition2Transform {
     fromJSON(obj) {
 
         if (typeof obj.offset === "object") {
-            this.offset.fromJSON(obj.transformOffset);
+            this.offset.fromJSON(obj.offset);
         } else {
             this.offset.set(0, 0);
         }

@@ -6,6 +6,7 @@
 import Signal from '../events/signal/Signal.js';
 import { clamp, lerp, max2, min2 } from "../math/MathUtils.js";
 import { assert } from "../assert.js";
+import { v3_dot, v3Length_i } from "./Vector3.js";
 
 /**
  *
@@ -459,6 +460,23 @@ Vector2.prototype.lerpVectors = function (a, b, fraction) {
     v2Lerp(this, a, b, fraction);
 };
 
+
+/**
+ *
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @returns {number}
+ */
+export function v2_angleBetween(x0, y0, x1, y1) {
+    const d = v2_dot(x0, y0, x1, y1);
+    const l = v2_magnitude(x0, y0) * v2_magnitude(x1, y1);
+
+    const theta = clamp(d / l, -1, 1);
+
+    return Math.acos(theta);
+}
 
 /**
  *

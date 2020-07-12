@@ -54,6 +54,18 @@ export class Transform2GridPosition {
     getFlag(flag) {
         return (this.flags & flag) === flag;
     }
+
+    toJSON() {
+        return {
+            flags: this.flags,
+            mode: this.mode
+        };
+    }
+
+    fromJSON({ flags, mode }) {
+        this.flags = flags;
+        this.mode = mode;
+    }
 }
 
 Transform2GridPosition.typeName = 'Transform2GridPosition';

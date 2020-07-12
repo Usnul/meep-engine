@@ -1,5 +1,5 @@
 import { CellFilterOperationTertiary } from "../core/CellFilterOperationTertiary.js";
-import { clamp } from "../../../core/math/MathUtils.js";
+import { smoothStep } from "../../../core/math/MathUtils.js";
 import { assert } from "../../../core/assert.js";
 
 /**
@@ -8,11 +8,7 @@ import { assert } from "../../../core/assert.js";
  */
 export class CellFilterSmoothStep extends CellFilterOperationTertiary {
     operation(edge0, edge1, x) {
-        const span = edge1 - edge0;
-
-        const t = clamp((x - edge0) / span, 0, 1);
-
-        return t * t * (3 - 2 * t);
+        return smoothStep(edge0, edge1, x);
     }
 
     /**

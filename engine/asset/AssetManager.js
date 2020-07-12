@@ -298,6 +298,12 @@ AssetManager.prototype.tryGet = function (path, type) {
     }
 };
 
+/**
+ * @readonly
+ * @type {boolean}
+ */
+AssetManager.prototype.isAssetManager = true;
+
 export {
     AssetManager
 };

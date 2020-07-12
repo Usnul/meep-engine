@@ -54,6 +54,7 @@ import { CellFilterAdd } from "../filtering/math/algebra/CellFilterAdd.js";
 import { CellFilterDivide } from "../filtering/math/algebra/CellFilterDivide.js";
 import { CellFilterCubicFunction } from "../filtering/math/poly/CellFilterCubicFunction.js";
 import { CellFilterMax2 } from "../filtering/math/CellFilterMax2.js";
+import { matcher_not_play_area } from "./rules/matcher_not_play_area.js";
 
 export const SampleGenerator0 = new GridGenerator();
 
@@ -86,15 +87,15 @@ const aMakePlayArea = GridCellActionSequence.from([
     GridCellActionPlaceTags.from(GridTags.Traversable | GridTags.PlayArea, MirGridLayers.Tags)
 ]);
 
-const gMakeEmpty = GridTaskCellularAutomata.from(
-    aMakePlayArea,
-    3
-);
+const gMakeEmpty = GridTaskCellularAutomata.from({
+    action: aMakePlayArea,
+    margin: 3
+});
 
-const gConnectRooms = GridTaskConnectRooms.from(
-    matcher_tag_traversable,
-    aMakePlayArea
-);
+const gConnectRooms = GridTaskConnectRooms.from({
+    matcher: matcher_tag_traversable,
+    action: aMakePlayArea
+});
 
 gConnectRooms.addDependency(gMakeEmpty);
 
@@ -263,9 +264,6 @@ const gDrawLayerMoisture = GridTaskActionRuleSet.from(GridActionRuleSet.from([
 
 //trees
 const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
-
-const matcher_play_area = CellMatcherLayerBitMaskTest.from(GridTags.PlayArea, MirGridLayers.Tags);
-const matcher_not_play_area = CellMatcherNot.from(matcher_play_area);
 
 const fTreeArea = CellFilterCache.from(
     CellFilterMultiply.from(

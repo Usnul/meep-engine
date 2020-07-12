@@ -418,13 +418,15 @@ class Path {
     }
 
     toJSON() {
-        return this.points.map(function (p) {
-            return p.toJSON();
-        });
+        return {
+            points: this.points.map(function (p) {
+                return p.toJSON();
+            })
+        };
     }
 
-    fromJSON(json) {
-        this.points = json.map(function (p) {
+    fromJSON({ points }) {
+        this.points = points.map(function (p) {
             const vector3 = new Vector3();
             vector3.fromJSON(p);
             return vector3;

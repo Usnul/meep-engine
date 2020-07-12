@@ -22,6 +22,12 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
         this.steps = 50;
 
         /**
+         * Probability of cell being initialized at filled
+         * @type {number}
+         */
+        this.threshold = 0.57;
+
+        /**
          *
          * @type {GridCellAction}
          */
@@ -31,15 +37,19 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
     /**
      *
      * @param {GridCellAction} action
-     * @param {number} margin
+     * @param {number} [margin]
+     * @param {number} [threshold]
      */
-    static from(action, margin) {
+    static from({ action, margin = 0, threshold = 0.57 }) {
         assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
         assert.isNumber(margin);
+        assert.isNumber(threshold);
 
         const r = new GridTaskCellularAutomata();
 
         r.action = action;
+
+        r.threshold = threshold;
 
         r.marginTop = margin;
         r.marginLeft = margin;
@@ -69,13 +79,15 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
         const random = seededRandom(seed);
 
+        const threshold = this.threshold;
+
         const tSeed = countTask(0, mask_area, index => {
             const x = index % mask_width + mask_x0;
             const y = ((index / mask_width) | 0) + mask_y0;
 
             const field_index = y * width + x;
 
-            field.data[field_index] = (random() < 0.57) ? 1 : 0;
+            field.data[field_index] = (random() < threshold) ? 1 : 0;
         });
 
         const tAutomata = countTask(0, this.steps, index => {

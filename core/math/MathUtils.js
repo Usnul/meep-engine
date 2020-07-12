@@ -628,6 +628,22 @@ export function copysign(x, y) {
 }
 
 /**
+ * Adapted from OpenGL spec
+ * smoothstep performs smooth Hermite interpolation between 0 and 1 when edge0 < x < edge1. This is useful in cases where a threshold function with a smooth transition is desired.
+ * @param {number} edge0
+ * @param {number} edge1
+ * @param {number} x
+ */
+export function smoothStep(edge0, edge1, x) {
+
+    const span = edge1 - edge0;
+
+    const t = clamp((x - edge0) / span, 0, 1);
+
+    return t * t * (3 - 2 * t);
+}
+
+/**
  * Linear interpolation between two values controlled by a given fraction
  * @param {Number} a
  * @param {Number} b

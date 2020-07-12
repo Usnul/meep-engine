@@ -85,15 +85,21 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
      *
      * @param {CellMatcher} matcher
      * @param {GridCellAction} action
+     * @param {number} thickness
      * @returns {GridTaskConnectRooms}
      */
-    static from(matcher, action) {
+    static from({ matcher, action, thickness = 3 }) {
         assert.equal(matcher.isCellMatcher, true, 'matcher.isCellMatcher !== true');
         assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
+        assert.isNumber(thickness, 'thickness');
+        assert.greaterThanOrEqual(thickness, 1, 'thickness');
 
         const r = new GridTaskConnectRooms();
+
         r.matcher = matcher;
         r.action = action;
+        r.thickness = thickness;
+
         return r;
     }
 
@@ -453,6 +459,12 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
         const estimatedNumberOfRooms = gridSize / ESTIMATED_TILES_PER_ROOM;
 
+        //initialize matchers
+        const tInitializeMatchers = actionTask(() => {
+            this.matcher.initialize(grid, seed);
+            this.modifiable.initialize(grid, seed);
+        });
+
         const tInitializeActions = actionTask(() => {
             this.action.initialize(grid, seed);
         });
@@ -492,10 +504,14 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
             }
         });
 
+        tMain.addDependency(tInitializeMatchers);
         tMain.addDependency(tInitializeActions);
         tMain.addDependency(tFindStart);
 
-        return new TaskGroup([tInitializeActions, tFindStart, tMain]);
+
+        tFindStart.addDependency(tInitializeMatchers);
+
+        return new TaskGroup([tInitializeMatchers, tInitializeActions, tFindStart, tMain]);
         // return new TaskGroup([emptyTask()]);
     }
 }

@@ -58,8 +58,10 @@ export class SequenceBehavior extends CompositeBehavior {
 
             return BehaviorStatus.Running;
         } else {
+            this.__status = BehaviorStatus.Succeeded;
+
             //all behaviours completed
-            return BehaviorStatus.Succeeded;
+            return this.__status;
         }
     }
 
@@ -67,10 +69,11 @@ export class SequenceBehavior extends CompositeBehavior {
         if (this.__currentBehaviourIndex !== this.__children.length) {
             //sequence has not been finished
 
-            if (this.__currentBehaviour !== undefined) {
+            if (this.__currentBehaviour !== undefined && this.__currentBehaviour.getStatus() !== BehaviorStatus.Initial) {
                 this.__currentBehaviour.finalize();
             }
         }
+        this.__status = BehaviorStatus.Initial;
     }
 
     /**
