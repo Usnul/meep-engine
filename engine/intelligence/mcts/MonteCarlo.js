@@ -33,12 +33,19 @@ const C_ks = 1 / Math.sqrt(2);
  * @returns {number}
  */
 function computeNodeSelectionScore(parent, child) {
+    const playouts = child.playouts;
+
+    if (playouts === 0) {
+        // child has 0 playouts, this can only happen if it ended up with no moves, avoid division by 0
+        return 0;
+    }
+
     // Exploitation heuristic
-    const Q = mix((child.wins + 1) / child.playouts, child.heuristicValue, 0.65);
+    const Q = mix((child.wins + 1) / playouts, child.heuristicValue, 0.65);
 
     // Based on UCB1
     // exploration heuristic
-    const u = Math.sqrt((2 * Math.log(parent.playouts)) / (child.playouts + 1));
+    const u = Math.sqrt((2 * Math.log(parent.playouts)) / playouts);
 
     return Q + C_ks * u;
 }
@@ -158,11 +165,10 @@ export class MonteCarloTreeSearch {
 
                     const s = computeNodeSelectionScore(node, child);
 
-                    assert.notEqual(Number.isNaN(s), 'computed Node score is NaN');
-                    assert.ok(Number.isFinite(s), `computed Node score is not finite(=${s})`);
+                    assert.notNaN(s, 'computed Node score');
+                    assert.isFiniteNumber(s, `computed Node score`);
 
                     score = s + randomRoll;
-
                 } else {
 
                     //use a constant value for unexplored nodes
