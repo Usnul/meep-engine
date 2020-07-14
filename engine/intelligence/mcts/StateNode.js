@@ -41,6 +41,10 @@ function computeScore(move, totalPlayouts, totalUncertainPlayouts) {
     if (wins !== 0) {
 
         score += wins / playouts;
+    } else {
+        // TODO consider if the heuristic can bias the outcome in undesirable ways
+        // use heuristic instead of actual score
+        score = stateNode.heuristicValue;
     }
 
     return score;
