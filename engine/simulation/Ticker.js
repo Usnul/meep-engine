@@ -2,6 +2,7 @@
  * Created by Alex on 06/05/2015.
  */
 import Clock from '../Clock.js';
+import { SignalHandler } from "../../core/events/signal/SignalHandler.js";
 import { assert } from "../../core/assert.js";
 
 /**
@@ -25,20 +26,60 @@ function Ticker() {
      */
     this.isRunning = false;
 
+    /**
+     *
+     * @type {SignalHandler[]}
+     */
     this.callbacks = [];
 }
 
 /**
  *
  * @param {function} callback
+ * @param {*} [thisArg]
  */
-Ticker.prototype.subscribe = function (callback) {
-    assert.equal(typeof callback, 'function', `expected callback to be a function, instead was '${typeof callback}'`);
+Ticker.prototype.subscribe = function (callback, thisArg) {
+    const handler = new SignalHandler(callback, thisArg);
 
-    this.callbacks.push(callback);
+    this.callbacks.push(handler);
 };
 
+/**
+ *
+ * @param {function} callback
+ * @param {*} [thisArg]
+ */
+Ticker.prototype.unsubscribe = function (callback, thisArg) {
+    assert.typeOf(callback, 'function', 'callback');
+
+    const callbacks = this.callbacks;
+    const n = callbacks.length;
+    for (let i = 0; i < n; i++) {
+        const cb = callbacks[i];
+
+        if (cb.handle === callback) {
+            if (thisArg !== undefined) {
+                if (thisArg === cb.context) {
+                    callbacks.splice(i, 1);
+                    return;
+                }
+            } else {
+                callbacks.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+};
+
+/**
+ *
+ * @param {number} maxTimeout
+ */
 Ticker.prototype.start = function ({ maxTimeout = 100 } = {}) {
+    assert.typeOf(maxTimeout, 'number', 'maxTimeout');
+
+
     const self = this;
     let timeout = null;
     let animationFrame = null;
@@ -56,7 +97,7 @@ Ticker.prototype.start = function ({ maxTimeout = 100 } = {}) {
                 const callback = callbacks[i];
 
                 try {
-                    callback(delta);
+                    callback.handle.call(callback.context, delta);
                 } catch (e) {
                     console.error('Error in ticker subscription:', e);
                 }

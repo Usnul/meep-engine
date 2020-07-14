@@ -49,6 +49,7 @@ import { ClassRegistry } from "../core/model/ClassRegistry.js";
 import { StoryManager } from "../../model/game/story/dialogue/StoryManager.js";
 import { GameSaveStateManager } from "../../view/game/save/GameSaveStateManager.js";
 import { BinarySerializationRegistry } from "./ecs/storage/binary/BinarySerializationRegistry.js";
+import { EnginePluginManager } from "./plugin/EnginePluginManager.js";
 
 
 //gui
@@ -82,6 +83,12 @@ class Engine {
          * @type {StaticKnowledgeDatabase}
          */
         this.staticKnowledge = new StaticKnowledgeDatabase();
+
+        /**
+         *
+         * @type {EnginePluginManager}
+         */
+        this.plugins = new EnginePluginManager();
 
         this.initialize();
         this.__datGui = gui;
@@ -206,7 +213,6 @@ class Engine {
         this.ticker = new Ticker(em);
         this.ticker.subscribe(timeDelta => {
             this.entityManager.simulate(timeDelta);
-            this.story.update(timeDelta);
             this.effects.update(timeDelta);
         });
 
@@ -233,11 +239,6 @@ class Engine {
         };
         this.initializeViews();
 
-
-        this.story.initialize({
-            engine: this
-        });
-
         //Register game systems
         initializeSystems(this, em, ge, soundEngine, this.assetManager, this.grid, this.devices);
 
@@ -259,6 +260,9 @@ class Engine {
          * @type {boolean}
          */
         this.renderingEnabled = true;
+
+
+        this.plugins.initialize(this);
     }
 
     initializeViews() {
@@ -515,7 +519,7 @@ class Engine {
             this.gui.startup(this),
             this.achievements.startup(),
             this.effects.startup(),
-            this.story.startup()
+            this.plugins.startup()
         ]).then(function () {
             self.tutorial.link();
 

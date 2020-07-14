@@ -44,7 +44,13 @@ export class ButtonViewEntity extends ViewEntity {
     }
 
     initialize(parameters, entity, dataset, engine) {
-        this.actionExecutor = engine.story.executor;
+        /**
+         *
+         * @type {StoryManager}
+         */
+        const story = engine.plugins.getById("story-manager");
+
+        this.actionExecutor = story.executor;
         this.dataset = dataset;
         this.entity = entity;
 
