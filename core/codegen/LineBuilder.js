@@ -26,6 +26,27 @@ const LineBuilder = function () {
 
 /**
  *
+ * @return {boolean}
+ * @param {string} term
+ */
+LineBuilder.prototype.containsSubstring = function (term) {
+    const lines = this.lines;
+    const n = lines.length;
+    for (let i = 0; i < n; i++) {
+        const line = lines[i];
+
+        const termIndex = line.text.indexOf(term);
+
+        if (termIndex !== -1) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
+ *
  * @returns {LineBuilder}
  */
 LineBuilder.prototype.indent = function () {
@@ -65,7 +86,7 @@ LineBuilder.prototype.clear = function () {
  */
 LineBuilder.prototype.build = function () {
     const result = [];
-    let i,j, l;
+    let i, j, l;
 
 
     const lines = this.lines;
