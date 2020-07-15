@@ -8,19 +8,14 @@ class TerrainSystem extends System {
     /**
      *
      * @param {GraphicsEngine} graphics
-     * @param {Grid} grid
      * @param {AssetManager} assetManager
      * @constructor
      */
-    constructor(graphics, grid, assetManager) {
+    constructor(graphics, assetManager) {
         super();
 
         if (graphics === undefined) {
             throw new Error('No GraphicsEngine supplied');
-        }
-
-        if (grid === undefined) {
-            throw new Error('No Grid supplied');
         }
 
         if (assetManager === undefined) {
@@ -37,8 +32,6 @@ class TerrainSystem extends System {
 
         this.gridScaleX = 1;
         this.gridScaleY = 1;
-
-        this.grid = grid;
 
         /**
          *
@@ -102,9 +95,6 @@ class TerrainSystem extends System {
 
         this.gridScaleX = g_w * gridScale / (g_w - 1);
         this.gridScaleY = g_h * gridScale / (g_h - 1);
-
-        //resize pathing grid to terrain's size
-        this.grid.resize(g_w, g_h);
 
         component.startBuildService();
 

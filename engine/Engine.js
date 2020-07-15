@@ -8,7 +8,6 @@ import { AssetManager } from './asset/AssetManager.js';
 import InputEngine from './InputEngine.js';
 import { GraphicsEngine } from './graphics/GraphicsEngine.js';
 import SoundEngine from './sound/SoundEngine.js';
-import { initializeSystems } from '../../model/game/GameSystems.js';
 import { PerspectiveCamera as ThreePerspectiveCamera } from 'three';
 import { PointerDevice } from "./input/devices/PointerDevice.js";
 import KeyboardDevice from "./input/devices/KeyboardDevice.js";
@@ -238,9 +237,6 @@ class Engine {
             keyboard: new KeyboardDevice(window)
         };
         this.initializeViews();
-
-        //Register game systems
-        initializeSystems(this, em, ge, soundEngine, this.assetManager, this.grid, this.devices);
 
         //init level engine
         this.initDATGUI();
