@@ -1,7 +1,7 @@
-import ParserError from "../../../core/parser/simple/ParserError.js";
-import { readLiteral } from "../../../core/parser/simple/SimpleParser.js";
-import { KeyValuePair } from "../../../core/collection/KeyValuePair.js";
-import Token from "../../../core/parser/simple/Token.js";
+import ParserError from "../../../../core/parser/simple/ParserError.js";
+import { readLiteral } from "../../../../core/parser/simple/SimpleParser.js";
+import { KeyValuePair } from "../../../../core/collection/KeyValuePair.js";
+import Token from "../../../../core/parser/simple/Token.js";
 import { TooltipTokenType } from "./TooltipTokenType.js";
 
 /**

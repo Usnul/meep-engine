@@ -1,8 +1,8 @@
-import ParserError from "../../../core/parser/simple/ParserError.js";
-import { skipWhitespace } from "../../../core/parser/simple/SimpleParser.js";
+import ParserError from "../../../../core/parser/simple/ParserError.js";
+import { skipWhitespace } from "../../../../core/parser/simple/SimpleParser.js";
 import { readReferenceValueToken } from "./readReferenceValueToken.js";
 import { TooltipReferenceValue } from "./TooltipReferenceValue.js";
-import Token from "../../../core/parser/simple/Token.js";
+import Token from "../../../../core/parser/simple/Token.js";
 import { TooltipTokenType } from "./TooltipTokenType.js";
 
 /**

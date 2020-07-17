@@ -1,6 +1,6 @@
-import { Cache } from "../../core/Cache.js";
-import { computeStringHash, computeUTF8StringByteSize } from "../../core/primitives/strings/StringUtils.js";
-import { strictEquals } from "../../core/function/Functions.js";
+import { Cache } from "../../../core/Cache.js";
+import { computeStringHash, computeUTF8StringByteSize } from "../../../core/primitives/strings/StringUtils.js";
+import { strictEquals } from "../../../core/function/Functions.js";
 import { parseTooltipString } from "./parser/parseTooltipString.js";
 
 export class TooltipParser {

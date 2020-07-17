@@ -1,6 +1,6 @@
-import ParserError from "../../../core/parser/simple/ParserError.js";
+import ParserError from "../../../../core/parser/simple/ParserError.js";
 import { TooltipTokenType } from "./TooltipTokenType.js";
-import Token from "../../../core/parser/simple/Token.js";
+import Token from "../../../../core/parser/simple/Token.js";
 
 /**
  *

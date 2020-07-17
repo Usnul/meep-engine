@@ -1,8 +1,8 @@
-import Token from "../../../core/parser/simple/Token.js";
+import Token from "../../../../core/parser/simple/Token.js";
 import { TooltipTokenType } from "./TooltipTokenType.js";
 import { readStyleToken } from "./readStyleToken.js";
 import { readReferenceToken } from "./readReferenceToken.js";
-import { assert } from "../../../core/assert.js";
+import { assert } from "../../../../core/assert.js";
 
 /**
  *

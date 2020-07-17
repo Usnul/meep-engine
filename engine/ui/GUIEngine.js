@@ -26,7 +26,7 @@ import { OverlayPageGUI } from "../../../model/game/scenes/strategy/gui/OverlayP
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
 import EmptyView from "../../view/elements/EmptyView.js";
 import LinearModifier from "../../core/model/stat/LinearModifier.js";
-import { GMLEngine } from "../../view/tooltip/GMLEngine.js";
+import { GMLEngine } from "../../view/tooltip/gml/GMLEngine.js";
 import ObservedString from "../../core/model/ObservedString.js";
 import { CursorType } from "./cursor/CursorType.js";
 import { noop } from "../../core/function/Functions.js";

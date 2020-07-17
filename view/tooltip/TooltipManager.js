@@ -12,7 +12,7 @@ import TooltipView from "./TooltipView.js";
 import { PointerDevice } from "../../engine/input/devices/PointerDevice.js";
 import List from "../../core/collection/List.js";
 import { assert } from "../../core/assert.js";
-import { GMLEngine } from "./GMLEngine.js";
+import { GMLEngine } from "./gml/GMLEngine.js";
 
 /**
  *
