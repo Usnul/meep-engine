@@ -548,6 +548,24 @@ List.prototype.contains = function (v) {
 };
 
 /**
+ * Does the list contain at least one of the given options?
+ * @param {T[]} options
+ * @returns {boolean}
+ */
+List.prototype.containsAny = function (options) {
+    const n = options.length;
+
+    for (let i = 0; i < n; i++) {
+        const option = options[i];
+        if (this.contains(option)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+/**
  * List has no elements
  * @returns {boolean}
  */
