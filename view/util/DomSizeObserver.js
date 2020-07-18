@@ -56,6 +56,10 @@ export class DomSizeObserver {
     constructor({ depth = 0 } = {}) {
         const rectangle = new Rectangle();
 
+        /**
+         *
+         * @type {Rectangle}
+         */
         this.dimensions = rectangle;
 
         const aabb = new AABB2();

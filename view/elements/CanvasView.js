@@ -10,9 +10,21 @@ export class CanvasView extends View {
 
         this.context2d = canvas.getContext('2d');
 
-        this.size.onChanged.add(function (x, y) {
-            canvas.width = x;
-            canvas.height = y;
-        });
+        this.size.onChanged.add(this.__handleSizeChange, this);
+    }
+
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @private
+     */
+    __handleSizeChange(x, y) {
+        this.el.width = x;
+        this.el.height = y;
+    }
+
+    clear() {
+        this.context2d.clearRect(0, 0, this.size.x, this.size.y);
     }
 }

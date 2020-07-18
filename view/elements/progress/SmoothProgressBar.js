@@ -4,6 +4,7 @@ import dom from "../../DOM.js";
 import BoundedValue from "../../../core/model/BoundedValue.js";
 import { frameThrottle } from "../../../engine/graphics/FrameThrottle.js";
 import { passThrough } from "../../../core/function/Functions.js";
+import { clamp } from "../../../core/math/MathUtils.js";
 
 function makeTextPercentage(value, max, process) {
     const r = (value / max) * 100;
@@ -47,7 +48,9 @@ class ProgressBarView extends View {
         function render() {
             const style = fillElement.style;
             //sanitize input to be in range 0 to 1
-            const fill = Math.min(1, Math.max(0, value / max));
+
+            const fill = clamp(value / max, 0, 1);
+
             style.width = (fill * 100) + "%";
 
             if (dLabel !== null) {
