@@ -4,7 +4,7 @@
 import View from "../../../view/View.js";
 import dom from "../../../view/DOM.js";
 
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import ObservedValue from '../../../core/model/ObservedValue.js';
 import LabelView from '../../../view/common/LabelView.js';
 import ButtonView from '../../../view/elements/button/ButtonView.js';

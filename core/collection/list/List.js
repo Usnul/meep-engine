@@ -3,10 +3,10 @@
  * @copyright Alex Goldring 2016
  */
 
-import Signal from '../events/signal/Signal.js';
-import { assert } from "../assert.js";
-import { arrayIndexByEquality, arraySetDiff } from "./Set.js";
-import { invokeObjectEquals } from "../function/Functions.js";
+import Signal from '../../events/signal/Signal.js';
+import { assert } from "../../assert.js";
+import { arrayIndexByEquality, arraySetDiff } from "../Set.js";
+import { invokeObjectEquals } from "../../function/Functions.js";
 
 
 /**

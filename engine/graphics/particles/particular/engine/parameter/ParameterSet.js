@@ -1,4 +1,4 @@
-import List from "../../../../../../core/collection/List.js";
+import List from "../../../../../../core/collection/list/List.js";
 import { ParticleParameter } from "./ParticleParameter.js";
 
 function ParameterSet() {

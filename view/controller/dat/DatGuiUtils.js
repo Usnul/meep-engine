@@ -1,5 +1,5 @@
 import Vector3 from "../../../core/geom/Vector3.js";
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import ObservedValue from "../../../core/model/ObservedValue.js";
 import EmptyView from "../../elements/EmptyView.js";

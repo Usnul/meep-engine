@@ -3,7 +3,7 @@
  */
 
 
-import List from '../core/collection/List.js';
+import List from '../core/collection/list/List.js';
 import ToolEngine from './tools/engine/ToolEngine.js';
 import EditorView from './view/EditorView.js';
 import ActionProcessor from './actions/ActionProcessor.js';

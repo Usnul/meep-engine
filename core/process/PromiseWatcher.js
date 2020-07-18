@@ -1,4 +1,4 @@
-import List from "../collection/List.js";
+import List from "../collection/list/List.js";
 import Vector1 from "../geom/Vector1.js";
 
 export class PromiseWatcher {

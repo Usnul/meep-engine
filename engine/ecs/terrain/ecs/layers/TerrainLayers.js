@@ -17,7 +17,7 @@ import { TerrainLayer } from "./TerrainLayer.js";
 import { Sampler2D } from "../../../../graphics/texture/sampler/Sampler2D.js";
 import { scaleSampler2D } from "../../../../graphics/texture/sampler/scaleSampler2D.js";
 import { max2 } from "../../../../../core/math/MathUtils.js";
-import List from "../../../../../core/collection/List.js";
+import List from "../../../../../core/collection/list/List.js";
 
 /**
  *

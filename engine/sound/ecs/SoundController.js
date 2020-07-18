@@ -3,7 +3,7 @@
  */
 
 
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import { BinaryClassSerializationAdapter } from "../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
 
 function Rule() {

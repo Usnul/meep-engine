@@ -3,7 +3,7 @@
  */
 import View from '../View.js';
 import dom from '../DOM.js';
-import List from '../../core/collection/List.js';
+import List from '../../core/collection/list/List.js';
 import { frameThrottle } from '../../engine/graphics/FrameThrottle.js';
 
 class VirtualListView extends View {

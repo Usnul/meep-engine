@@ -3,7 +3,7 @@
  */
 
 
-import List from '../../../../core/collection/List.js';
+import List from '../../../../core/collection/list/List.js';
 import Vector1 from "../../../../core/geom/Vector1.js";
 import { SoundTrack } from "./SoundTrack.js";
 import { SoundEmitterFlags } from "./SoundEmitterFlags.js";

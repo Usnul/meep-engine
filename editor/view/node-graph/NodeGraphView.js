@@ -4,7 +4,7 @@ import Vector2 from "../../../core/geom/Vector2.js";
 import Vector1 from "../../../core/geom/Vector1.js";
 import ListView from "../../../view/common/ListView.js";
 import { NodeView } from "./NodeView.js";
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import { DraggableAspect } from "../../../engine/ui/DraggableAspect.js";
 import { ConnectionEndpoint } from "../../../core/model/node-graph/ConnectionEndpoint.js";
 import { PortDirection } from "../../../core/model/node-graph/node/PortDirection.js";

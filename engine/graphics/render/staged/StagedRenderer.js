@@ -1,4 +1,4 @@
-import List from "../../../../core/collection/List.js";
+import List from "../../../../core/collection/list/List.js";
 import { RenderGraph } from "../buffer/RenderGraph.js";
 import { RenderProgramDefinition } from "../buffer/node/RenderProgramDefinition.js";
 import { ProgramValueSlotConnection } from "../buffer/conection/ProgramValueSlotConnection.js";

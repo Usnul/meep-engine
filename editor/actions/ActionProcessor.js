@@ -4,7 +4,7 @@
  */
 
 
-import List from '../../core/collection/List.js';
+import List from '../../core/collection/list/List.js';
 import { assert } from "../../core/assert.js";
 import { min2 } from "../../core/math/MathUtils.js";
 

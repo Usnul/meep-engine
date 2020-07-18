@@ -6,7 +6,7 @@
 import { EntityComponentDataset } from "../ecs/EntityComponentDataset.js";
 import { promiseTask } from "../../core/process/task/TaskUtils.js";
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
-import List from "../../core/collection/List.js";
+import List from "../../core/collection/list/List.js";
 
 class Scene {
     /**

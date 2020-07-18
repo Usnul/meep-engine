@@ -3,7 +3,7 @@
  */
 
 
-import List from '../../core/collection/List.js';
+import List from '../../core/collection/list/List.js';
 
 import GUIElement from '../ecs/gui/GUIElement.js';
 import ViewportPosition from '../ecs/gui/ViewportPosition.js';

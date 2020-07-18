@@ -1,5 +1,5 @@
 import { MutableFilter } from "./MutableFilter.js";
-import List from "../../collection/List.js";
+import List from "../../collection/list/List.js";
 import { CollectionParticipationKind } from "./CollectionParticipationKind.js";
 
 /**

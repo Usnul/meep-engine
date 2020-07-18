@@ -3,7 +3,7 @@
  */
 
 
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import { Draggable } from "./Draggable.js";
 import { DropTarget } from "./DropTarget.js";
 

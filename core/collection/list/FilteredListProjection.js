@@ -1,9 +1,9 @@
 import List from "./List.js";
-import { arraySetDiff } from "./Set.js";
-import { invokeObjectEquals } from "../function/Functions.js";
-import { frameThrottle } from "../../engine/graphics/FrameThrottle.js";
+import { arraySetDiff } from "../Set.js";
+import { invokeObjectEquals } from "../../function/Functions.js";
+import { frameThrottle } from "../../../engine/graphics/FrameThrottle.js";
 
-export class DynamicallyFilteredList {
+export class FilteredListProjection {
     /**
      * @template T
      * @param {List<T>} input
@@ -38,10 +38,10 @@ export class DynamicallyFilteredList {
         this.deferredApply = frameThrottle(this.apply, this);
     }
 
-    update(){
-        if(this.deferred){
+    update() {
+        if (this.deferred) {
             this.deferredApply();
-        }else{
+        } else {
             this.apply();
         }
     }

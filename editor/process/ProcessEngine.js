@@ -1,5 +1,5 @@
 import { EditorProcess } from "./EditorProcess.js";
-import List from "../../core/collection/List.js";
+import List from "../../core/collection/list/List.js";
 import { ProcessState } from "../../core/process/ProcessState.js";
 
 /**

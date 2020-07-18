@@ -3,7 +3,7 @@
  */
 
 
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import ObservedValue from '../../../core/model/ObservedValue.js';
 import { decodeMouseEventButtons, PointerDevice } from '../../../engine/input/devices/PointerDevice.js';
 

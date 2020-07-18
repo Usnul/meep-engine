@@ -1,5 +1,5 @@
 import ObservedString from "../../../../core/model/ObservedString.js";
-import List from "../../../../core/collection/List.js";
+import List from "../../../../core/collection/list/List.js";
 import ObservedBoolean from "../../../../core/model/ObservedBoolean.js";
 import { InstancedFoliage } from "../InstancedFoliage.js";
 

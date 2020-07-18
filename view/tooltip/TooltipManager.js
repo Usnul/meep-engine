@@ -10,7 +10,7 @@ import ConcurrentExecutor from "../../core/process/executor/ConcurrentExecutor.j
 import TaskSignal from "../../core/process/task/TaskSignal.js";
 import TooltipView from "./TooltipView.js";
 import { PointerDevice } from "../../engine/input/devices/PointerDevice.js";
-import List from "../../core/collection/List.js";
+import List from "../../core/collection/list/List.js";
 import { assert } from "../../core/assert.js";
 import { GMLEngine } from "./gml/GMLEngine.js";
 

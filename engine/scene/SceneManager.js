@@ -3,7 +3,7 @@
  */
 import { EntityManager } from "../ecs/EntityManager.js";
 import Scene from "./Scene.js";
-import List from "../../core/collection/List.js";
+import List from "../../core/collection/list/List.js";
 
 
 /**

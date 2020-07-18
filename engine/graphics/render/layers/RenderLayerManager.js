@@ -1,4 +1,4 @@
-import List from "../../../../core/collection/List.js";
+import List from "../../../../core/collection/list/List.js";
 import RenderLayer from "./RenderLayer.js";
 import { Stack } from "../../../../core/collection/Stack.js";
 import { RenderLayerManagerState } from "./RenderLayerManagerState.js";

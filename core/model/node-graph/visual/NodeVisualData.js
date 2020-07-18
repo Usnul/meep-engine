@@ -1,4 +1,4 @@
-import List from "../../../collection/List.js";
+import List from "../../../collection/list/List.js";
 import { PortVisualData } from "./PortVisualData.js";
 import Rectangle from "../../../geom/Rectangle.js";
 

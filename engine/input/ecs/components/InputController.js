@@ -2,7 +2,7 @@
  * Created by Alex on 09/10/2015.
  */
 
-import List from '../../../../core/collection/List.js';
+import List from '../../../../core/collection/list/List.js';
 import { assert } from "../../../../core/assert.js";
 import Signal from "../../../../core/events/signal/Signal.js";
 import { InputBinding } from "../InputBinding.js";

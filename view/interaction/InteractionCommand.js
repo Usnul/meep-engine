@@ -1,5 +1,5 @@
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
-import List from "../../core/collection/List.js";
+import List from "../../core/collection/list/List.js";
 import { assert } from "../../core/assert.js";
 import DataType from "../../core/parser/simple/DataType.js";
 

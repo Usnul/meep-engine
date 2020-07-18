@@ -10,7 +10,7 @@ import VirtualListView from '../../../view/common/VirtualListView.js';
 import ButtonView from '../../../view/elements/button/ButtonView.js';
 import ObservedValue from '../../../core/model/ObservedValue.js';
 import Signal from '../../../core/events/signal/Signal.js';
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import Tag from '../../../engine/ecs/components/Tag.js';
 
 import SelectionAddAction from '../../actions/concrete/SelectionAddAction.js';

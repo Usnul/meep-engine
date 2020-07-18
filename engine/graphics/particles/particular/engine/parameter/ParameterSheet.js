@@ -3,7 +3,7 @@
  * @constructor
  */
 import { TextureAtlas } from "../../../../texture/atlas/TextureAtlas.js";
-import List from "../../../../../../core/collection/List.js";
+import List from "../../../../../../core/collection/list/List.js";
 import { Sampler2D } from "../../../../texture/sampler/Sampler2D.js";
 import { assert } from "../../../../../../core/assert.js";
 

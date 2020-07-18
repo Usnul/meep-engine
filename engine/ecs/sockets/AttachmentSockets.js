@@ -1,4 +1,4 @@
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import { AttachmentSocket } from "./AttachmentSocket.js";
 import { AttachmentSocketType } from "./AttachmentSocketType.js";
 import { BoneAttachmentSocket } from "./BoneAttachmentSocket.js";

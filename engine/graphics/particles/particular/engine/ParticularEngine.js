@@ -1,6 +1,6 @@
 import { ShaderManager } from "./ShaderManager.js";
 import { BinaryNode } from "../../../../../core/bvh2/BinaryNode.js";
-import List from "../../../../../core/collection/List.js";
+import List from "../../../../../core/collection/list/List.js";
 import { ParticleEmitterFlag } from "./emitter/ParticleEmitterFlag.js";
 
 

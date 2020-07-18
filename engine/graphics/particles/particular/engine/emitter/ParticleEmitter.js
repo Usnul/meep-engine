@@ -1,5 +1,5 @@
 import Vector3 from "../../../../../../core/geom/Vector3.js";
-import List from "../../../../../../core/collection/List.js";
+import List from "../../../../../../core/collection/list/List.js";
 import { ParticleAttributeType, ParticleDataType } from "../../group/ParticleGroup.js";
 import {
     randomPointInBox,

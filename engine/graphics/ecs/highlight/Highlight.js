@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 20/09/2015.
  */
-import List from "../../../../core/collection/List.js";
+import List from "../../../../core/collection/list/List.js";
 import { HighlightDefinition } from "./HighlightDefinition.js";
 
 class Highlight {

@@ -4,7 +4,7 @@
 
 
 import { Notification } from './Notification.js';
-import List from '../../core/collection/List.js';
+import List from '../../core/collection/list/List.js';
 import { assert } from "../../core/assert.js";
 
 function NotificationLog() {

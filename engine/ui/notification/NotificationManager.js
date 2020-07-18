@@ -1,7 +1,7 @@
 import NotificationLog from "../../notify/NotificationLog.js";
 import { assert } from "../../../core/assert.js";
 import { noop } from "../../../core/function/Functions.js";
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import EntityBuilder from "../../ecs/EntityBuilder.js";
 import GUIElement from "../../ecs/gui/GUIElement.js";
 import { SerializationMetadata } from "../../ecs/components/SerializationMetadata.js";

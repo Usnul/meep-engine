@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 15/03/2016.
  */
-import List from '../../../core/collection/List.js';
+import List from '../../../core/collection/list/List.js';
 import Vector2 from '../../../core/geom/Vector2.js';
 import Rectangle from '../../../core/geom/Rectangle.js';
 import Vector1 from "../../../core/geom/Vector1.js";

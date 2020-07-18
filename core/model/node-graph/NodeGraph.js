@@ -1,7 +1,7 @@
 import { NodeInstance } from "./node/NodeInstance.js";
 import IdPool from "../../IdPool.js";
 import { Connection } from "./Connection.js";
-import List from "../../collection/List.js";
+import List from "../../collection/list/List.js";
 
 export class NodeGraph {
     constructor() {

@@ -1,5 +1,5 @@
 import { ConnectionEndpoint } from "../ConnectionEndpoint.js";
-import List from "../../../collection/List.js";
+import List from "../../../collection/list/List.js";
 import { PortDirection } from "./PortDirection.js";
 
 export class NodeInstance {

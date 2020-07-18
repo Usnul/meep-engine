@@ -4,7 +4,7 @@ import Vector2 from "../../../core/geom/Vector2.js";
 import domify from "../../../view/DOM.js";
 import { computePathBase } from "../../../core/FilePath.js";
 import LabelView from "../../../view/common/LabelView.js";
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import AABB2 from "../../../core/geom/AABB2.js";
 import { DragEvents } from "../../../engine/input/devices/events/DragEvents.js";
 import { MouseEvents } from "../../../engine/input/devices/events/MouseEvents.js";

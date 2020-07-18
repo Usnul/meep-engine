@@ -2,7 +2,7 @@ import { computeHashIntegerArray } from "../../../../../../core/math/MathUtils.j
 import { computeStringHash } from "../../../../../../core/primitives/strings/StringUtils.js";
 import { assert } from "../../../../../../core/assert.js";
 import { ParameterLookupTable } from "./ParameterLookupTable.js";
-import List from "../../../../../../core/collection/List.js";
+import List from "../../../../../../core/collection/list/List.js";
 
 
 /**

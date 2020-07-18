@@ -9,7 +9,7 @@ import Vector2 from "../../../core/geom/Vector2.js";
 import EmptyView from '../EmptyView.js';
 
 import View from "../../View.js";
-import List from "../../../core/collection/List.js";
+import List from "../../../core/collection/list/List.js";
 import { arraySetDiff } from "../../../core/collection/Set.js";
 
 const PI2 = Math.PI * 2;
