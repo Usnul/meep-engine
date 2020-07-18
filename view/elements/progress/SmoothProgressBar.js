@@ -1,9 +1,9 @@
-import View from "../View.js";
-import dom from "../DOM.js";
+import View from "../../View.js";
+import dom from "../../DOM.js";
 
-import BoundedValue from "../../core/model/BoundedValue.js";
-import { frameThrottle } from "../../engine/graphics/FrameThrottle.js";
-import { passThrough } from "../../core/function/Functions.js";
+import BoundedValue from "../../../core/model/BoundedValue.js";
+import { frameThrottle } from "../../../engine/graphics/FrameThrottle.js";
+import { passThrough } from "../../../core/function/Functions.js";
 
 function makeTextPercentage(value, max, process) {
     const r = (value / max) * 100;

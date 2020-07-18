@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 15/06/2015.
  */
-import SmoothProgressBar from "../elements/SmoothProgressBar.js";
+import SmoothProgressBar from "../elements/progress/SmoothProgressBar.js";
 import View from "../View.js";
 
 class PreloaderView extends View {

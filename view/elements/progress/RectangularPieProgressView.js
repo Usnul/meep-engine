@@ -1,7 +1,7 @@
-import View from "../View.js";
-import SVG from "../SVG.js";
-import { line2_line2_intersection } from "../../core/geom/LineSegment2.js";
-import Vector1 from "../../core/geom/Vector1.js";
+import View from "../../View.js";
+import SVG from "../../SVG.js";
+import { line2_line2_intersection } from "../../../core/geom/LineSegment2.js";
+import Vector1 from "../../../core/geom/Vector1.js";
 
 export class RectangularPieProgressView extends View {
 

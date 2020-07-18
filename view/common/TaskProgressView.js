@@ -4,7 +4,7 @@
 
 
 import View from '../View.js';
-import SmoothProgressBar from '../elements/SmoothProgressBar.js';
+import SmoothProgressBar from '../elements/progress/SmoothProgressBar.js';
 import LabelView from './LabelView.js';
 
 import TaskState from '../../core/process/task/TaskState.js';
