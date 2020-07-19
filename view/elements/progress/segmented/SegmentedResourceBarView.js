@@ -5,6 +5,8 @@ import { CanvasView } from "../../CanvasView.js";
 import EmptyView from "../../EmptyView.js";
 import { DomSizeObserver } from "../../../util/DomSizeObserver.js";
 import { RESOURCE_BAR_SEGMENTS } from "./RESOURCE_BAR_SEGMENTS.js";
+import List from "../../../../core/collection/list/List.js";
+import ListView from "../../../common/ListView.js";
 
 export class SegmentedResourceBarView extends View {
     /**
@@ -34,6 +36,14 @@ export class SegmentedResourceBarView extends View {
          */
         this.__value_max = max;
 
+
+        /**
+         *
+         * @type {List<NumericInterval>}
+         */
+        this.highlights = new List();
+
+
         this.el = document.createElement('div');
 
         this.addClass('ui-segmented-resource-bar-view');
@@ -53,6 +63,42 @@ export class SegmentedResourceBarView extends View {
         this.__v_segments.addClass('notch-overlay');
 
         this.__v__fill.addChild(this.__v_segments);
+
+
+        /**
+         *
+         * @type {ListView}
+         */
+        this.highlightViews = new ListView(this.highlights, {
+            classList: ['highlights'],
+            elementFactory: (interval) => {
+                const v = new EmptyView({ classList: ['highlight'] });
+
+                const valueCurrent = this.__value_current;
+                const valueMax = this.__value_max;
+
+                const update = () => {
+                    const v0 = interval.min / valueMax;
+                    const span = (interval.max - interval.min) / valueMax;
+
+                    const style = v.el.style;
+
+                    style.left = `${v0 * 100}%`;
+                    style.width = `${span * 100}%`;
+
+                };
+
+                v.bindSignal(interval.onChanged, update);
+                v.bindSignal(valueCurrent.onChanged, update);
+                v.bindSignal(valueMax.onChanged, update);
+
+                v.on.linked.add(update);
+
+                return v;
+            }
+        });
+
+        this.addChild(this.highlightViews);
 
         // subscribe to changes
 
