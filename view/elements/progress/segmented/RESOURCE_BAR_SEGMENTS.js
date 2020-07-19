@@ -14,7 +14,7 @@ export const RESOURCE_BAR_SEGMENTS = [
          */
         (ctx, x, height) => {
 
-            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.strokeStyle = "rgba(0,0,0,0.2)";
             ctx.lineWidth = 1;
 
             ctx.beginPath();
@@ -105,8 +105,8 @@ export const RESOURCE_BAR_SEGMENTS = [
          */
         (ctx, x, height) => {
 
-            ctx.strokeStyle = "rgba(255,255,255,0.7)";
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0,0,0,0.7)";
+            ctx.lineWidth = 4;
 
             ctx.beginPath();
 
@@ -118,8 +118,8 @@ export const RESOURCE_BAR_SEGMENTS = [
 
             ctx.stroke();
 
-            ctx.strokeStyle = "rgba(255,255,255,0.3)";
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = "rgba(0,0,0,0.7)";
+            ctx.lineWidth = 2;
 
             ctx.beginPath();
 
@@ -128,7 +128,7 @@ export const RESOURCE_BAR_SEGMENTS = [
 
             ctx.stroke();
         }),
-    SegmentDefinition.from(100000,
+    SegmentDefinition.from(25000,
         /**
          *
          * @param {CanvasRenderingContext2D} ctx
@@ -137,8 +137,8 @@ export const RESOURCE_BAR_SEGMENTS = [
          */
         (ctx, x, height) => {
 
-            ctx.strokeStyle = "rgba(255,255,255,0.7)";
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0,0,0,0.7)";
+            ctx.lineWidth = 4;
 
             ctx.beginPath();
 
