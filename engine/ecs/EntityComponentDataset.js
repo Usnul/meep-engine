@@ -1305,6 +1305,12 @@ function dispatchEntityEventListeners(evl, entity, name, event) {
 const entityListenersProxy = [];
 
 /**
+ * Keep track of the stack pointer to allow recursive dispatching
+ * @type {number}
+ */
+let entityListenersProxyPointer = 0;
+
+/**
  *
  * @param {Object<SignalHandler[]>} hash
  * @param {number} entity
@@ -1325,22 +1331,30 @@ function dispatchEventListenersByHash(hash, entity, name, event) {
         return;
     }
 
+    const pointerOffset = entityListenersProxyPointer;
+
+    // reserve space on the stack
+    entityListenersProxyPointer += numListeners;
+
     let i;
 
     //copy listeners to prevent possible modification errors
     for (i = 0; i < numListeners; i++) {
-        entityListenersProxy[i] = listeners[i];
+        const signalHandler = listeners[i];
+
+        entityListenersProxy[i + pointerOffset] = signalHandler;
     }
+
 
     //invoke handlers
     for (let i = 0; i < numListeners; i++) {
-        const handler = entityListenersProxy[i];
+        const handler = entityListenersProxy[i + pointerOffset];
 
         handler.handle.call(handler.context, event, entity);
     }
 
     //reset proxy
-    entityListenersProxy.length = 0;
+    entityListenersProxyPointer = pointerOffset;
 }
 
 /**
