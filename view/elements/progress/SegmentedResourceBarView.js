@@ -2,14 +2,187 @@ import View from "../../View.js";
 import Vector1 from "../../../core/geom/Vector1.js";
 import { clamp } from "../../../core/math/MathUtils.js";
 import { CanvasView } from "../CanvasView.js";
-import { assert } from "../../../core/assert.js";
 import EmptyView from "../EmptyView.js";
 import { DomSizeObserver } from "../../util/DomSizeObserver.js";
 
-const DEFAULT_SPEC = {
-    minor: 200,
-    major: 1000
-};
+class SegmentDefinition {
+    constructor() {
+        this.value = 0;
+    }
+
+    /**
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {number} x
+     * @param {number} height
+     */
+    draw(ctx, x, height) {
+
+    }
+
+    /**
+     * @return {SegmentDefinition}
+     * @param {number} value
+     * @param {SegmentDefinition.draw} paint
+     */
+    static from(value, paint) {
+        const r = new SegmentDefinition();
+
+        r.value = value;
+        r.draw = paint;
+
+        return r;
+    }
+}
+
+/**
+ *
+ * @type {SegmentDefinition[]}
+ */
+const SEGMENTS = [
+    SegmentDefinition.from(10,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, Math.ceil(height * 0.5));
+
+            ctx.stroke();
+        }),
+    SegmentDefinition.from(40,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+
+            ctx.stroke();
+        }),
+    SegmentDefinition.from(200,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(0,0,0,0.7)";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 2);
+
+            ctx.moveTo(x, height);
+            ctx.lineTo(x, height - 2);
+
+            ctx.stroke();
+
+
+            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 2);
+            ctx.lineTo(x, height - 2);
+
+            ctx.stroke();
+        }),
+    SegmentDefinition.from(1000,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(0,0,0,0.7)";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+
+            ctx.stroke();
+
+        }),
+    SegmentDefinition.from(5000,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(255,255,255,0.7)";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 2);
+
+            ctx.moveTo(x, height);
+            ctx.lineTo(x, height - 2);
+
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(255,255,255,0.3)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 2);
+            ctx.lineTo(x, height - 2);
+
+            ctx.stroke();
+        }),
+    SegmentDefinition.from(100000,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(255,255,255,0.7)";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+
+            ctx.stroke();
+        })
+];
 
 export class SegmentedResourceBarView extends View {
     /**
@@ -17,24 +190,13 @@ export class SegmentedResourceBarView extends View {
      * @param {Vector1|ObservedInteger} value
      * @param {Vector1|ObservedInteger} [max=1]
      * @param {string[]} [classList]
-     * @param {{minor:number, major:number}} [spec]
      */
     constructor({
                     value,
                     max = Vector1.one,
-                    classList = [],
-                    spec = DEFAULT_SPEC
+                    classList = []
                 }) {
         super();
-
-        assert.lessThan(spec.minor, spec.major, 'spec.minor must be less than spec.major');
-        assert.equal(spec.major % spec.minor, 0, 'spec.major must be a multiple of spec.minor');
-
-        /**
-         *
-         * @type {{minor: number, major: number}}
-         */
-        this.spec = spec;
 
         /**
          *
@@ -114,6 +276,10 @@ export class SegmentedResourceBarView extends View {
     }
 
     updateSegments() {
+        /**
+         *
+         * @type {Vector2}
+         */
         const size = this.__sizeObserver.dimensions.size;
 
         this.__v_segments.size.copy(size);
@@ -130,53 +296,61 @@ export class SegmentedResourceBarView extends View {
 
         const maxValue = this.__value_max.getValue();
 
-        const majorSegmentValue = this.spec.major;
-        const minorSegmentValue = this.spec.minor;
+        // figure out what segments to use
+        let major_segment_index = 0;
 
-        const majorMultiplier = majorSegmentValue / minorSegmentValue;
+        const max_segment_index = SEGMENTS.length - 1;
+        for (let i = max_segment_index; i >= 0; i--) {
+            const segmentDefinition = SEGMENTS[i];
 
-        /**
-         *
-         * @type {number}
-         */
-        const minorSegmentCount = maxValue / minorSegmentValue;
-
-        const minorSegmentWidth = size.x / minorSegmentCount;
-
-        const displayMinor = minorSegmentWidth >= 2;
-
-        for (let i = 1; i < minorSegmentCount; i++) {
-
-            const x = i * minorSegmentWidth;
-
-            if (i % majorMultiplier === 0) {
-                // major notch
-
-                ctx.strokeStyle = "rgba(0,0,0,0.7)";
-                ctx.lineWidth = 2;
-
-                ctx.beginPath();
-
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, size.y);
-
-                ctx.stroke();
-
-            } else if (displayMinor) {
-                // minor notch
-
-                ctx.strokeStyle = "rgba(0,0,0,0.3)";
-                ctx.lineWidth = 1;
-
-                ctx.beginPath();
-
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, size.y);
-
-                ctx.stroke();
-
+            if (segmentDefinition.value <= maxValue && (i >= max_segment_index || SEGMENTS[i + 1].value > maxValue)) {
+                //we found major segment
+                major_segment_index = i;
             }
 
+        }
+
+        const major_spec = SEGMENTS[major_segment_index];
+        const minor_spec = SEGMENTS[major_segment_index - 1];
+
+
+        const majorSegmentValue = major_spec.value;
+
+        if (minor_spec === undefined) {
+            //no minor spec, only paint major
+        } else {
+
+            const minorSegmentValue = minor_spec.value;
+
+            const majorMultiplier = majorSegmentValue / minorSegmentValue;
+
+            /**
+             *
+             * @type {number}
+             */
+            const stepCount = maxValue / minorSegmentValue;
+
+            const minorSegmentWidth = size.x / stepCount;
+
+            const displayMinor = minorSegmentWidth >= 2;
+
+            for (let i = 1; i < stepCount; i++) {
+
+                const x = i * minorSegmentWidth;
+
+                if (i % majorMultiplier === 0) {
+                    // major notch
+
+                    major_spec.draw(ctx, x, size.y);
+
+                } else if (displayMinor) {
+                    // minor notch
+
+                    minor_spec.draw(ctx, x, size.y);
+
+                }
+
+            }
         }
     }
 
