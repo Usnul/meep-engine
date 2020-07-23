@@ -11,436 +11,456 @@ import { assert } from "../../../../../../core/assert.js";
 import { ParameterLookupTableFlags } from "./ParameterLookupTableFlags.js";
 
 
-/**
- *
- * @param {number} itemSize
- * @constructor
- */
-function ParameterLookupTable(itemSize) {
-    this.itemSize = itemSize;
-    this.data = [];
-    this.positions = [];
-
-
+export class ParameterLookupTable {
     /**
-     * Transient value
-     * @type {number}
+     *
+     * @param {number} itemSize
+     * @constructor
      */
-    this.valueMin = 0;
+    constructor(itemSize) {
+        this.itemSize = itemSize;
+        this.data = [];
+        this.positions = [];
 
-    /**
-     * Transient value
-     * @type {number}
-     */
-    this.valueMax = 0;
+
+        /**
+         * Transient value
+         * @type {number}
+         */
+        this.valueMin = 0;
+
+        /**
+         * Transient value
+         * @type {number}
+         */
+        this.valueMax = 0;
+
+        /**
+         *
+         * @type {number}
+         */
+        this.flags = 1;
+    }
 
     /**
      *
-     * @type {number}
+     * @param {ParameterLookupTableFlags} f
      */
-    this.flags = 1;
-}
-
-/**
- *
- * @param {ParameterLookupTableFlags} f
- */
-ParameterLookupTable.prototype.setFlag = function (f) {
-    this.flags |= f;
-};
-
-/**
- *
- * @param {ParameterLookupTableFlags|number} f
- */
-ParameterLookupTable.prototype.clearFlag = function (f) {
-    this.flags &= ~f;
-};
-
-/**
- *
- * @param {ParameterLookupTableFlags} f
- * @returns {boolean}
- */
-ParameterLookupTable.prototype.getFlag = function (f) {
-    return (this.flags & f) !== 0;
-};
-
-ParameterLookupTable.prototype.disableWriteMode = function () {
-    this.clearFlag(ParameterLookupTableFlags.WriteMode);
-};
-
-ParameterLookupTable.prototype.fromJSON = function (json) {
-    this.itemSize = json.itemSize;
-    this.write(json.data, json.positions);
-};
-
-ParameterLookupTable.prototype.toJSON = function () {
-    return {
-        itemSize: this.itemSize,
-        data: Array.from(this.data),
-        positions: Array.from(this.positions)
-    };
-};
-
-/**
- *
- * @param {BinaryBuffer} buffer
- */
-ParameterLookupTable.prototype.toBinaryBuffer = function (buffer) {
-    const itemCount = this.positions.length;
-
-    const itemCountBitSize = Math.log2(itemCount);
-
-    let itemCountByteSize;
-
-    if (itemCountBitSize <= 8) {
-        itemCountByteSize = 1;
-    } else if (itemCountBitSize <= 16) {
-        itemCountByteSize = 2;
-    } else if (itemCountBitSize <= 32) {
-        itemCountByteSize = 4;
-    } else {
-        throw new Error(`Item count is too high`);
+    setFlag(f) {
+        this.flags |= f;
     }
 
-    const itemSize = this.itemSize;
-    const header = itemSize | (itemCountByteSize << 4);
-
-    buffer.writeUint8(header);
-
-
-    //
-    if (itemCountByteSize === 1) {
-        buffer.writeUint8(itemCount);
-    } else if (itemCountByteSize === 2) {
-        buffer.writeUint16(itemCount);
-    } else if (itemCountByteSize === 4) {
-        buffer.writeUint32(itemCount);
+    /**
+     *
+     * @param {ParameterLookupTableFlags|number} f
+     */
+    clearFlag(f) {
+        this.flags &= ~f;
     }
 
-    const dataLength = itemCount * itemSize;
-
-    let i;
-
-    for (i = 0; i < dataLength; i++) {
-        buffer.writeFloat32(this.data[i]);
+    /**
+     *
+     * @param {ParameterLookupTableFlags} f
+     * @returns {boolean}
+     */
+    getFlag(f) {
+        return (this.flags & f) !== 0;
     }
 
-    for (i = 0; i < itemCount; i++) {
-        buffer.writeFloat32(this.positions[i]);
-    }
-};
-
-/**
- *
- * @param {BinaryBuffer} buffer
- */
-ParameterLookupTable.prototype.fromBinaryBuffer = function (buffer) {
-    const header = buffer.readUint8();
-
-    this.itemSize = header & 0xF;
-
-    const itemCountByteSize = (header >> 4) & 0xF;
-
-    let itemCount;
-
-    if (itemCountByteSize === 1) {
-        itemCount = buffer.readUint8();
-    } else if (itemCountByteSize === 2) {
-        itemCount = buffer.readUint16();
-    } else if (itemCountByteSize === 4) {
-        itemCount = buffer.readUint32();
-    } else {
-        throw new Error(`Unsupported itemCountByteSize '${itemCountByteSize}'`);
+    disableWriteMode() {
+        this.clearFlag(ParameterLookupTableFlags.WriteMode);
     }
 
-    const dataLength = itemCount * this.itemSize;
+    fromJSON(json) {
+        this.itemSize = json.itemSize;
+        this.write(json.data, json.positions);
+    }
 
-    const data = new Float32Array(dataLength);
-    buffer.readFloat32Array(data, 0, dataLength);
+    toJSON() {
+        return {
+            itemSize: this.itemSize,
+            data: Array.from(this.data),
+            positions: Array.from(this.positions)
+        };
+    }
 
-    const positions = new Float32Array(itemCount);
-    buffer.readFloat32Array(positions, 0, itemCount);
+    /**
+     *
+     * @param {BinaryBuffer} buffer
+     */
+    toBinaryBuffer(buffer) {
+        const itemCount = this.positions.length;
 
-    this.write(data, positions);
-};
+        const itemCountBitSize = Math.log2(itemCount);
 
-/**
- *
- * @param {number} position
- * @param {number[]} result
- */
-ParameterLookupTable.prototype.sample = function (position, result) {
-    assert.equal(typeof position, 'number', `position expected to be a number, instead was '${typeof position}'`);
-    assert.ok(position >= 0 && position <= 1, `position must be between 0 and 1, instead was ${position}`);
+        let itemCountByteSize;
 
-    const itemSize = this.itemSize;
-    const numValues = this.data.length / itemSize;
+        if (itemCountBitSize <= 8) {
+            itemCountByteSize = 1;
+        } else if (itemCountBitSize <= 16) {
+            itemCountByteSize = 2;
+        } else if (itemCountBitSize <= 32) {
+            itemCountByteSize = 4;
+        } else {
+            throw new Error(`Item count is too high`);
+        }
 
-    let i;
+        const itemSize = this.itemSize;
+        const header = itemSize | (itemCountByteSize << 4);
 
-    const positions = this.positions;
+        buffer.writeUint8(header);
 
-    let lowIndex = numValues - 1;
-    let highIndex = lowIndex;
-    let fraction = 0;
 
-    //find position index
-    for (i = 0; i < numValues; i++) {
-        //NOTE: no complex search is used, since for small data sizes linear scan is typically faster
-        const p = positions[i];
+        //
+        if (itemCountByteSize === 1) {
+            buffer.writeUint8(itemCount);
+        } else if (itemCountByteSize === 2) {
+            buffer.writeUint16(itemCount);
+        } else if (itemCountByteSize === 4) {
+            buffer.writeUint32(itemCount);
+        }
 
-        if (p === position) {
-            lowIndex = i;
-            highIndex = i;
-            fraction = 0;
-            break;
-        } else if (p > position) {
-            highIndex = i;
-            if (i === 0) {
-                lowIndex = i;
-                fraction = 0;
-            } else {
-                lowIndex = i - 1;
-                const prevPosition = positions[lowIndex];
-                fraction = inverseLerp(prevPosition, p, position);
-            }
-            break;
+        const dataLength = itemCount * itemSize;
+
+        let i;
+
+        for (i = 0; i < dataLength; i++) {
+            buffer.writeFloat32(this.data[i]);
+        }
+
+        for (i = 0; i < itemCount; i++) {
+            buffer.writeFloat32(this.positions[i]);
         }
     }
 
+    /**
+     *
+     * @param {BinaryBuffer} buffer
+     */
+    fromBinaryBuffer(buffer) {
+        const header = buffer.readUint8();
 
-    for (i = 0; i < itemSize; i++) {
-        const lowValue = this.data[lowIndex * itemSize + i];
-        const highValue = this.data[highIndex * itemSize + i];
+        this.itemSize = header & 0xF;
 
-        const value = mix(lowValue, highValue, fraction);
+        const itemCountByteSize = (header >> 4) & 0xF;
 
-        result[i] = value;
+        let itemCount;
+
+        if (itemCountByteSize === 1) {
+            itemCount = buffer.readUint8();
+        } else if (itemCountByteSize === 2) {
+            itemCount = buffer.readUint16();
+        } else if (itemCountByteSize === 4) {
+            itemCount = buffer.readUint32();
+        } else {
+            throw new Error(`Unsupported itemCountByteSize '${itemCountByteSize}'`);
+        }
+
+        const dataLength = itemCount * this.itemSize;
+
+        const data = new Float32Array(dataLength);
+        buffer.readFloat32Array(data, 0, dataLength);
+
+        const positions = new Float32Array(itemCount);
+        buffer.readFloat32Array(positions, 0, itemCount);
+
+        this.write(data, positions);
     }
-};
 
-ParameterLookupTable.prototype.computeUniformPositions = function () {
-    const numValues = this.data.length / this.itemSize;
+    /**
+     *
+     * @param {number} position
+     * @param {number[]} result
+     */
+    sample(position, result) {
+        assert.equal(typeof position, 'number', `position expected to be a number, instead was '${typeof position}'`);
+        assert.ok(position >= 0 && position <= 1, `position must be between 0 and 1, instead was ${position}`);
 
-    const positions = [];
+        const itemSize = this.itemSize;
+        const numValues = this.data.length / itemSize;
 
-    this.positions = positions;
+        let i;
 
-    for (let i = 0; i < numValues; i++) {
-        positions[i] = i / (numValues - 1);
+        const positions = this.positions;
+
+        let lowIndex = numValues - 1;
+        let highIndex = lowIndex;
+        let fraction = 0;
+
+        //find position index
+        for (i = 0; i < numValues; i++) {
+            //NOTE: no complex search is used, since for small data sizes linear scan is typically faster
+            const p = positions[i];
+
+            if (p === position) {
+                lowIndex = i;
+                highIndex = i;
+                fraction = 0;
+                break;
+            } else if (p > position) {
+                highIndex = i;
+                if (i === 0) {
+                    lowIndex = i;
+                    fraction = 0;
+                } else {
+                    lowIndex = i - 1;
+                    const prevPosition = positions[lowIndex];
+                    fraction = inverseLerp(prevPosition, p, position);
+                }
+                break;
+            }
+        }
+
+
+        for (i = 0; i < itemSize; i++) {
+            const lowValue = this.data[lowIndex * itemSize + i];
+            const highValue = this.data[highIndex * itemSize + i];
+
+            const value = mix(lowValue, highValue, fraction);
+
+            result[i] = value;
+        }
     }
-};
 
-/**
- *
- * @param {number[]|Float64Array|Float32Array} values
- * @param {number[]|Float64Array|Float32Array} [positions]
- */
-ParameterLookupTable.prototype.write = function (values, positions) {
-    if (!this.getFlag(ParameterLookupTableFlags.WriteMode)) {
-        throw new Error(`Cannot write, WriteMode disabled`);
-    }
+    computeUniformPositions() {
+        const numValues = this.data.length / this.itemSize;
 
-    assert.ok(Array.isArray(values) || isTypedArray(values), `values argument must be an array or a typed array, but was something else instead`);
-
-    const numValues = values.length;
-
-    assert.equal(numValues % this.itemSize, 0, `number of elements in the array(=${numValues}) is not multiple of itemSize(=${this.itemSize})`);
-
-    this.data = values;
-
-    if (positions === undefined) {
-
-        console.warn('positions are undefined, assuming uniform distribution');
-        this.computeUniformPositions();
-
-    } else {
-
-        assert.equal(numValues / this.itemSize, positions.length, `number of positions(=${positions.length}) is not equal to number of values(=${numValues / this.itemSize})`);
+        const positions = [];
 
         this.positions = positions;
-    }
 
-    this.computeStatistics();
-};
-
-/**
- *
- * @param {number} position
- * @param {number[]} value
- */
-ParameterLookupTable.prototype.addValue = function (position, value) {
-    if (!this.getFlag(ParameterLookupTableFlags.WriteMode)) {
-        throw new Error(`Cannot add value, WriteMode disabled`);
-    }
-
-    //insert operation cannot be done on a TypedArray, so we need to make sure we are working with dynamic array
-    if (!Array.isArray(this.positions)) {
-        this.positions = Array.from(this.positions);
-    }
-
-    if (!Array.isArray(this.data)) {
-        this.data = Array.from(this.data);
-    }
-
-    //find a place to insert the value at
-    const positions = this.positions;
-    const numValues = positions.length;
-
-    let i;
-
-    for (i = 0; i < numValues; i++) {
-        const p = positions[i];
-        if (p > position) {
-            break;
+        for (let i = 0; i < numValues; i++) {
+            positions[i] = i / (numValues - 1);
         }
     }
 
+    /**
+     *
+     * @param {number[]|Float64Array|Float32Array} values
+     * @param {number[]|Float64Array|Float32Array} [positions]
+     */
+    write(values, positions) {
+        if (!this.getFlag(ParameterLookupTableFlags.WriteMode)) {
+            throw new Error(`Cannot write, WriteMode disabled`);
+        }
 
-    //insert value
-    positions.splice(i, 0, position);
+        assert.ok(Array.isArray(values) || isTypedArray(values), `values argument must be an array or a typed array, but was something else instead`);
 
-    const spliceArgs = value.slice();
-    spliceArgs.unshift(i * this.itemSize, 0);
+        const numValues = values.length;
 
-    Array.prototype.splice.apply(this.data, spliceArgs);
-};
+        assert.equal(numValues % this.itemSize, 0, `number of elements in the array(=${numValues}) is not multiple of itemSize(=${this.itemSize})`);
 
-/**
- * Populates statistics values
- */
-ParameterLookupTable.prototype.computeStatistics = function () {
-    //first find min and max values
-    let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
+        this.data = values;
 
+        if (positions === undefined) {
 
-    const numElements = this.data.length;
+            console.warn('positions are undefined, assuming uniform distribution');
+            this.computeUniformPositions();
 
-    let i;
+        } else {
 
-    for (i = 0; i < numElements; i++) {
-        const inputElement = this.data[i];
+            assert.equal(numValues / this.itemSize, positions.length, `number of positions(=${positions.length}) is not equal to number of values(=${numValues / this.itemSize})`);
 
-        min = min2(min, inputElement);
-        max = max2(max, inputElement);
+            this.positions = positions;
+        }
+
+        this.computeStatistics();
     }
 
-    this.valueMin = min;
-    this.valueMax = max;
-};
+    /**
+     *
+     * @param {number} position
+     * @param {number[]} value
+     */
+    addValue(position, value) {
+        if (!this.getFlag(ParameterLookupTableFlags.WriteMode)) {
+            throw new Error(`Cannot add value, WriteMode disabled`);
+        }
 
-ParameterLookupTable.prototype.hash = function () {
-    const valueMax = this.valueMax;
-    const valueMin = this.valueMin;
-    if (valueMin === valueMax) {
-        //special case, all values are the same
-        return computeHashIntegerArray(valueMin);
-    } else {
-        const dataHash = computeHashFloatArray(this.data, valueMin, valueMax);
-        const positionHash = computeHashFloatArray(this.positions, 0, 1);
+        //insert operation cannot be done on a TypedArray, so we need to make sure we are working with dynamic array
+        if (!Array.isArray(this.positions)) {
+            this.positions = Array.from(this.positions);
+        }
 
-        return computeHashIntegerArray(dataHash, positionHash, this.itemSize);
-    }
-};
+        if (!Array.isArray(this.data)) {
+            this.data = Array.from(this.data);
+        }
 
-/**
- *
- * @param {ParameterLookupTable} other
- * @returns {boolean}
- */
-ParameterLookupTable.prototype.equals = function (other) {
-    if (this.itemSize !== other.itemSize) {
-        return false;
-    }
+        //find a place to insert the value at
+        const positions = this.positions;
+        const numValues = positions.length;
 
-    const thisData = this.data;
-    const otherData = other.data;
+        let i;
 
-    const thisDataLength = thisData.length;
-    const otherDataLength = otherData.length;
+        for (i = 0; i < numValues; i++) {
+            const p = positions[i];
+            if (p > position) {
+                break;
+            }
+        }
 
-    if (thisDataLength !== otherDataLength) {
-        return false;
-    }
 
-    const thisPositions = this.positions;
-    const otherPositions = other.positions;
+        //insert value
+        positions.splice(i, 0, position);
 
-    const thisPositionsLength = thisPositions.length;
-    const otherPositionsLength = otherPositions.length;
+        const spliceArgs = value.slice();
+        spliceArgs.unshift(i * this.itemSize, 0);
 
-    if (thisPositionsLength !== otherPositionsLength) {
-        return false;
+        Array.prototype.splice.apply(this.data, spliceArgs);
     }
 
-    let i;
+    /**
+     * Populates statistics values
+     */
+    computeStatistics() {
+        //first find min and max values
+        let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
 
-    for (i = 0; i < thisPositionsLength; i++) {
-        const pA = thisPositions[i];
-        const pB = otherPositions[i];
 
-        if (pA !== pB) {
-            return false;
+        const numElements = this.data.length;
+
+        let i;
+
+        for (i = 0; i < numElements; i++) {
+            const inputElement = this.data[i];
+
+            min = min2(min, inputElement);
+            max = max2(max, inputElement);
+        }
+
+        this.valueMin = min;
+        this.valueMax = max;
+    }
+
+    hash() {
+        const valueMax = this.valueMax;
+        const valueMin = this.valueMin;
+        if (valueMin === valueMax) {
+            //special case, all values are the same
+            return computeHashIntegerArray(valueMin);
+        } else {
+            const dataHash = computeHashFloatArray(this.data, valueMin, valueMax);
+            const positionHash = computeHashFloatArray(this.positions, 0, 1);
+
+            return computeHashIntegerArray(dataHash, positionHash, this.itemSize);
         }
     }
 
-    for (i = 0; i < thisDataLength; i++) {
-        const dA = thisData[i];
-        const dB = otherData[i];
-
-        if (dA !== dB) {
-            return false;
-        }
-    }
-
-    //equal
-    return true;
-};
-
-ParameterLookupTable.prototype.validate = function () {
-    //check data size
-    const data = this.data;
-    const dataLength = data.length;
-
-    const positions = this.positions;
-    const positionLength = positions.length;
-
-    if ((dataLength / this.itemSize) !== positionLength) {
-        //number of samples between position and data doesn't match
-        return false;
-    }
-
-
-    //check position values
-    let i, prevPosition;
-
-    for (i = 0; i < positionLength; i++) {
-        const position = positions[i];
-
-        if (position < 0) {
-            //position value must be greater or equal to 0
+    /**
+     *
+     * @param {ParameterLookupTable} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        if (this.itemSize !== other.itemSize) {
             return false;
         }
 
-        if (position > 1) {
-            //position must be less than or equal to 1
+        const thisData = this.data;
+        const otherData = other.data;
+
+        const thisDataLength = thisData.length;
+        const otherDataLength = otherData.length;
+
+        if (thisDataLength !== otherDataLength) {
             return false;
         }
 
-        if (prevPosition !== undefined) {
-            if (position <= prevPosition) {
-                //position values must always increase
+        const thisPositions = this.positions;
+        const otherPositions = other.positions;
+
+        const thisPositionsLength = thisPositions.length;
+        const otherPositionsLength = otherPositions.length;
+
+        if (thisPositionsLength !== otherPositionsLength) {
+            return false;
+        }
+
+        let i;
+
+        for (i = 0; i < thisPositionsLength; i++) {
+            const pA = thisPositions[i];
+            const pB = otherPositions[i];
+
+            if (pA !== pB) {
                 return false;
             }
         }
 
-        prevPosition = position;
+        for (i = 0; i < thisDataLength; i++) {
+            const dA = thisData[i];
+            const dB = otherData[i];
+
+            if (dA !== dB) {
+                return false;
+            }
+        }
+
+        //equal
+        return true;
     }
 
-    //all is good
-    return true;
-};
+    validate() {
+        //check data size
+        const data = this.data;
+        const dataLength = data.length;
 
-export { ParameterLookupTable };
+        const positions = this.positions;
+        const positionLength = positions.length;
+
+        if ((dataLength / this.itemSize) !== positionLength) {
+            //number of samples between position and data doesn't match
+            return false;
+        }
+
+
+        //check position values
+        let i, prevPosition;
+
+        for (i = 0; i < positionLength; i++) {
+            const position = positions[i];
+
+            if (position < 0) {
+                //position value must be greater or equal to 0
+                return false;
+            }
+
+            if (position > 1) {
+                //position must be less than or equal to 1
+                return false;
+            }
+
+            if (prevPosition !== undefined) {
+                if (position <= prevPosition) {
+                    //position values must always increase
+                    return false;
+                }
+            }
+
+            prevPosition = position;
+        }
+
+        //all is good
+        return true;
+    }
+
+    /**
+     *
+     * @param {number} itemSize
+     * @param {number[]} values
+     * @param {number[]} [positions]
+     */
+    static from(itemSize, values, positions) {
+        const r = new ParameterLookupTable(itemSize);
+
+        r.write(values, positions)
+
+        return r;
+    }
+}
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+ParameterLookupTable.prototype.isParameterLookupTable = true;
