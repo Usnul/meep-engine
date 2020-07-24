@@ -6,6 +6,10 @@ export const MirGridLayers = {
      */
     DistanceFromStart: "distance-from-start",
     /**
+     * How far is the nearest play-area tile
+     */
+    DistanceFromPlayArea: "distance-from-play-area",
+    /**
      *
      * Terrain height map
      */

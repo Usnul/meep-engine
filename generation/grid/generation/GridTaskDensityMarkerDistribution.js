@@ -230,6 +230,9 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
             const node = action.buildNode(grid, _x, _y, 0);
 
+            // remember the filter value for debug purposes
+            node.properties['@filter_density'] = densityValue;
+
             const markerScale = scale.sampleRandom(random);
 
             //modify size and scale

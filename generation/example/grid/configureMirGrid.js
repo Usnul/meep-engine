@@ -11,6 +11,7 @@ export function configureMirGrid(data) {
     data.addLayer(GridDataLayer.from(MirGridLayers.Tags, DataType.Uint32, 1));
 
     data.addLayer(GridDataLayer.from(MirGridLayers.DistanceFromStart, DataType.Uint16, 1));
+    data.addLayer(GridDataLayer.from(MirGridLayers.DistanceFromPlayArea, DataType.Uint16, 1));
 
     data.addLayer(GridDataLayer.from(MirGridLayers.Heights, DataType.Float32, 1));
 

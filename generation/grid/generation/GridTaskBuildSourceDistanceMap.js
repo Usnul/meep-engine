@@ -6,7 +6,6 @@ import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
 import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import { assert } from "../../../core/assert.js";
-import { MirGridLayers } from "../../example/grid/MirGridLayers.js";
 
 /**
  * Build a map of distances across the grid, using 2 concepts: source cells and passable cells. Source cells are where the distance is 0, and passable cells are those that can be travelled through
@@ -28,6 +27,12 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
         this.passMatcher = null;
 
         /**
+         * ID of the target layer
+         * @type {String}
+         */
+        this.layer = null;
+
+        /**
          *
          * @type {number}
          */
@@ -38,15 +43,19 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
      *
      * @param {CellMatcher} source
      * @param {CellMatcher} pass
+     * @param {string} layer
      */
-    static from(source, pass) {
+    static from(source, pass, layer) {
         assert.defined(source);
         assert.defined(pass);
+
+        assert.typeOf(layer, 'string', 'layer');
 
         const r = new GridTaskBuildSourceDistanceMap();
 
         r.sourceMatcher = source;
         r.passMatcher = pass;
+        r.layer = layer;
 
         return r;
     }
@@ -66,7 +75,17 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
 
         const initial = this.initial;
 
-        const target = grid.getLayerById(MirGridLayers.DistanceFromStart).sampler.data;
+        /**
+         *
+         * @type {GridDataLayer}
+         */
+        const layer = grid.getLayerById(this.layer);
+
+        if (layer === undefined) {
+            throw new Error(`Layer '${this.layer}' doesn't exist`);
+        }
+
+        const target = layer.sampler.data;
 
         const open = new BinaryHeap(function (i) {
             return target[i];
