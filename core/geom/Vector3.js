@@ -566,6 +566,57 @@ class Vector3 {
     }
 
     /**
+     * Project this vector onto another
+     * @param {Vector3} other
+     */
+    projectOntoVector3(other) {
+        const x0 = this.x;
+        const y0 = this.y;
+        const z0 = this.z;
+
+        const x1 = other.x;
+        const y1 = other.y;
+        const z1 = other.z;
+
+        const d = v3_dot(x0, y0, z0, x1, y1, z1);
+
+        const mag2 = (x1 * x1 + y1 * y1 + z1 * z1);
+
+        const m = d / mag2;
+
+        const x = x1 * m;
+        const y = y1 * m;
+        const z = z1 * m;
+
+        this.set(x, y, z);
+    }
+
+    /**
+     *
+     * @param {number} x0
+     * @param y0
+     * @param z0
+     * @param x1
+     * @param y1
+     * @param z1
+     * @private
+     */
+    _projectVectors(x0,y0,z0, x1,y1,z1){
+
+        const d = v3_dot(x0, y0, z0, x1, y1, z1);
+
+        const mag2 = (x1 * x1 + y1 * y1 + z1 * z1);
+
+        const m = d / mag2;
+
+        const x = x1 * m;
+        const y = y1 * m;
+        const z = z1 * m;
+
+        this.set(x, y, z);
+    }
+
+    /**
      *
      * @param {function} processor
      * @returns {Vector3}

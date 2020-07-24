@@ -12,6 +12,7 @@ import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
+import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
 
 const pMatcher = new CellMatcherGridPattern();
 
@@ -69,7 +70,7 @@ const rule = GridCellPlacementRule.from(pMatcher, [
     clearTags,
     placeMarker,
     placeRoadConnectors
-], 0.1);
+], CellFilterConstant.from(0.1));
 
 rule.allowRotation = false;
 

@@ -106,7 +106,7 @@ export class CellMatcherGridPattern extends CellMatcher {
 
             //rotate rule position
             const rotated_local_x = local_x * cos - local_y * sin
-            const rotated_local_y = local_x * sin - local_y * cos;
+            const rotated_local_y = local_x * sin + local_y * cos;
 
             const target_x = Math.round(x + rotated_local_x);
             const target_y = Math.round(y + rotated_local_y);

@@ -133,7 +133,9 @@ export class GridActionRuleSet {
 
                     const roll = random();
 
-                    if (roll <= element.probability) {
+                    const probabilityValue = element.probability.execute(grid, x, y, rotation);
+
+                    if (roll <= probabilityValue) {
 
                         element.execute(grid, x, y, rotation);
                         break;

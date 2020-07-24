@@ -1,4 +1,6 @@
 import { assert } from "../../core/assert.js";
+import Vector2 from "../../core/geom/Vector2.js";
+import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
 
 export class GridCellPlacementRule {
     constructor() {
@@ -10,9 +12,15 @@ export class GridCellPlacementRule {
 
         /**
          *
-         * @type {number}
+         * @type {CellFilter}
          */
-        this.probability = 1;
+        this.probability = CellFilterConstant.from(1);
+
+        /**
+         *
+         * @type {Vector2}
+         */
+        this.positionOffset = new Vector2();
 
 
         /**
@@ -32,19 +40,25 @@ export class GridCellPlacementRule {
      *
      * @param {CellMatcher} matcher
      * @param {GridCellAction[]} actions
-     * @param {number} [probability]
+     * @param {number|CellFilter} [probability]
+     * @param {Vector2} [offset]
      */
-    static from(matcher, actions, probability = 1) {
+    static from(matcher, actions, probability, offset = Vector2.zero) {
 
         assert.defined(matcher);
         assert.defined(actions);
-        assert.isNumber(probability);
 
         const r = new GridCellPlacementRule();
 
         r.pattern = matcher;
         r.actions = actions;
-        r.probability = probability;
+
+        if (probability !== undefined) {
+            assert.equal(probability.isCellFilter, true, 'probability.isCellFilter !== true');
+            r.probability = probability;
+        }
+
+        r.positionOffset.copy(offset);
 
         return r;
     }
@@ -65,6 +79,10 @@ export class GridCellPlacementRule {
         }
 
         this.pattern.initialize(grid, seed);
+
+        if (!this.probability.initialized) {
+            this.probability.initialize(grid, seed);
+        }
     }
 
     /**
@@ -78,10 +96,19 @@ export class GridCellPlacementRule {
         const actions = this.actions;
         const n = actions.length;
 
+        const sin = Math.sin(rotation);
+        const cos = Math.cos(rotation);
+
+        const local_x = this.positionOffset.x;
+        const local_y = this.positionOffset.y;
+
+        const rotated_local_x = local_x * cos - local_y * sin
+        const rotated_local_y = local_x * sin + local_y * cos;
+
         for (let i = 0; i < n; i++) {
             const action = actions[i];
 
-            action.execute(grid, x, y, rotation);
+            action.execute(grid, x + rotated_local_x, y + rotated_local_y, rotation);
         }
 
     }

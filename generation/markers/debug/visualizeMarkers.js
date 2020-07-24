@@ -16,6 +16,7 @@ import LabelView from "../../../view/common/LabelView.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
 import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
+import Vector3 from "../../../core/geom/Vector3.js";
 
 function formatValue(v) {
 
@@ -86,6 +87,8 @@ export function visualizeMarkers(grid, ecd) {
 
     const geometry_cylinder = CircleGeometry(1, 1);
 
+    const v3 = new Vector3();
+
     for (let i = 0; i < n; i++) {
         const markerNode = markers[i];
 
@@ -95,9 +98,10 @@ export function visualizeMarkers(grid, ecd) {
 
         const mark_1 = new ThreeMesh(geometry_0, m1);
 
-        terrain.mapPointGrid2World(markerNode.position.x, markerNode.position.y, mark_1.position);
+        terrain.mapPointGrid2World(markerNode.position.x, markerNode.position.y, v3);
 
-        mark_1.position.sub(markerNode.transform.position);
+        mark_1.position.copy(markerNode.transform.position);
+        mark_1.position.sub(v3);
 
         const line_geometry = new BufferGeometry();
         line_geometry.setFromPoints([
@@ -110,7 +114,6 @@ export function visualizeMarkers(grid, ecd) {
 
         const mark_size = new Line(geometry_cylinder, m3);
         mark_size.scale.set(markerNode.size, markerNode.size, markerNode.size);
-        mark_size.position.copy(mark_1.position);
 
 
         g.add(mark_0);
@@ -145,7 +148,7 @@ export function visualizeMarkers(grid, ecd) {
 
         const t = new Transform();
 
-        t.position.copy(markerNode.transform.position);
+        t.position.copy(v3);
 
         new EntityBuilder()
             .add(new HeadsUpDisplay())

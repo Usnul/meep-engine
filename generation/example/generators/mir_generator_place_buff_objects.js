@@ -18,6 +18,7 @@ import { CellMatcherOr } from "../../rules/logic/CellMatcherOr.js";
 import { RuleSelectionPolicyType } from "../../markers/RuleSelectionPolicyType.js";
 import { MarkerNodeMatcherAnd } from "../../markers/matcher/MarkerNodeMatcherAnd.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
+import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
 
 const TAG_BUFF_OBJECT = 'Buff Object';
 
@@ -105,7 +106,7 @@ const ruleAttackPower = GridCellPlacementRule.from(
         clearTags,
         placeMarker,
         placeRoadMarkers
-    ], 0.1);
+    ], CellFilterConstant.from(0.1));
 
 ruleAttackPower.allowRotation = true;
 
@@ -127,7 +128,7 @@ const ruleDefense = GridCellPlacementRule.from(
         clearTags,
         placeMarkerDefense,
         placeRoadMarkers
-    ], 0.1);
+    ], CellFilterConstant.from(0.1));
 
 const placeMarkerWell = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_WELL, size: 0.52 });
 placeMarkerWell.addTag(TAG_BUFF_OBJECT);
@@ -164,7 +165,7 @@ const ruleWell = GridCellPlacementRule.from(
         placeTags,
         clearTags,
         placeMarkerWell
-    ], 0.1)
+    ], CellFilterConstant.from(0.1))
 
 const placeMarkerCampfire = GridCellActionPlaceMarker.from({ type: BUFF_OBJECT_TYPE_CAMPFIRE, size: 0.52 });
 placeMarkerCampfire.addTag(TAG_BUFF_OBJECT);
@@ -188,7 +189,7 @@ const ruleCampfire = GridCellPlacementRule.from(
         placeTags,
         clearTags,
         placeMarkerCampfire
-    ], 0.1)
+    ], CellFilterConstant.from(0.1))
 
 /**
  *

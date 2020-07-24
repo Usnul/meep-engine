@@ -312,11 +312,37 @@ class Quaternion {
     /**
      *
      * @param {Vector3} axis
+     * @param {Quaternion} swing
+     * @param {Quaternion} twist
+     * @returns {number}
+     */
+    computeSwingAndTwist(axis, swing, twist) {
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        const w = this.w;
+
+        const p = new Vector3();
+
+        p._projectVectors(x, y, z, axis.x, axis.y, axis.z);
+
+        twist.set(p.x, p.y, p.z, w);
+        twist.normalize();
+
+        // rotation * twist.conjugated()
+        swing._multiplyQuaternions(x, y, z, w, -twist.x, -twist.y, -twist.z, twist.w);
+    }
+
+    /**
+     *
+     * @param {Vector3} axis
      * @returns {number} angle in radians
      */
     toAxisAngle(axis) {
         const rad = Math.acos(this.w) * 2.0;
+
         const s = Math.sin(rad / 2.0);
+
         if (s > EPSILON) {
             axis.set(
                 this.x / s,
@@ -528,10 +554,13 @@ class Quaternion {
         }
     }
 
+    /**
+     *
+     * @param {Vector3} result
+     */
     toEulerAnglesXYZ(result) {
 
         const x = this.x;
-
         const y = this.y;
         const z = this.z;
         const w = this.w;
@@ -541,12 +570,43 @@ class Quaternion {
         const y2 = y * y;
         const z2 = z * z;
 
-        const psi = Math.atan2(2 * (x * w - y * z), (w2 - x2 - y2 + z2));
+        const psi = Math.atan2(-2 * (x * w - y * z), (w2 - x2 - y2 + z2));
         const theta = Math.asin(2 * (x * z + y * w));
-        const phi = Math.atan2(2 * (z * w - x * y), (w2 + x2 - y2 - z2));
+        const phi = Math.atan2(-2 * (z * w - x * y), (w2 + x2 - y2 - z2));
 
         result.set(psi, theta, phi);
     }
+
+    /**
+     * Adapted from http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
+     * @param {Vector3} result
+     */
+    toEulerAnglesYXZ(result) {
+
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        const w = this.w;
+
+
+        const z2 = z * z;
+        const x2 = x * x;
+        const w2 = w * w;
+        const y2 = y * y;
+
+        const r11 = 2 * (x * z + w * y),
+            r12 = w2 - x2 - y2 + z2,
+            r21 = -2 * (y * z - w * x),
+            r31 = 2 * (x * y + w * z),
+            r32 = w2 - x2 + y2 - z2;
+
+        const psi = Math.atan2(r31, r32);
+        const theta = Math.asin(r21);
+        const phi = Math.atan2(r11, r12);
+
+        result.set(psi, theta, phi);
+    }
+
 
     /**
      *

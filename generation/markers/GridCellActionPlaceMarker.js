@@ -88,14 +88,16 @@ export class GridCellActionPlaceMarker extends GridCellAction {
      * @param {String} type
      * @param {number} [size=0]
      * @param {MarkerNodeTransformer[]} [transformers]
-     * @param {string[]} tags
+     * @param {string[]} [tags]
+     * @param {Transform} [transform]
      * @return {GridCellActionPlaceMarker}
      */
     static from({
                     type,
                     size = 0,
                     transformers = [],
-                    tags = []
+                    tags = [],
+                    transform
                 }) {
 
         assert.typeOf(type, 'string', 'type');
@@ -104,6 +106,10 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         r.type = type;
         r.size = size;
+
+        if (transform !== undefined) {
+            r.transform.copy(transform);
+        }
 
         for (let i = 0; i < transformers.length; i++) {
             r.addTransformer(transformers[i]);
@@ -140,7 +146,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         const offsetX = offset.x;
 
         const rotated_local_offset_x = offsetX * cos - offsetY * sin
-        const rotated_local_offset_y = offsetX * sin - offsetY * cos;
+        const rotated_local_offset_y = offsetX * sin + offsetY * cos;
 
         const target_x = rotated_local_offset_x + x;
         const target_y = rotated_local_offset_y + y;
@@ -156,7 +162,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
             target_y * data.transform.scale_y + data.transform.offset_y
         );
 
-        node.transform.rotation.__setFromEuler(0, rotation, 0);
+        node.transform.rotation.__setFromEuler(0, -rotation, 0);
 
         node.transform.multiplyTransforms(node.transform, this.transform);
 

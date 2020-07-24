@@ -106,7 +106,7 @@ export class GridCellActionPlaceTags extends GridCellAction {
 
                 //rotate rule position
                 const rotated_local_x = local_x * cos - local_y * sin
-                const rotated_local_y = local_x * sin - local_y * cos;
+                const rotated_local_y = local_x * sin + local_y * cos;
 
                 //
                 const target_x = Math.round(rotated_local_x + x);

@@ -80,7 +80,7 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
     GridCellActionPlaceMarker.from({ type: 'Treasure', size: 0.5 }),
     GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
-], 0.5);
+], CellFilterConstant.from(0.5));
 
 
 const aMakePlayArea = GridCellActionSequence.from([
