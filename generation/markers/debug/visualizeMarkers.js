@@ -1,5 +1,6 @@
 import {
     BufferGeometry,
+    Float32BufferAttribute,
     Group,
     Line,
     LineBasicMaterial,
@@ -26,6 +27,23 @@ function formatValue(v) {
 
 }
 
+function CircleGeometry(radius, arc) {
+
+    var geometry = new BufferGeometry();
+    var vertices = [];
+
+    for (var i = 0; i <= 64 * arc; ++i) {
+
+        vertices.push(Math.cos(i / 32 * Math.PI) * radius, 0, Math.sin(i / 32 * Math.PI) * radius);
+
+    }
+
+    geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+
+    return geometry;
+
+}
+
 /**
  *
  * @param {GridData} grid
@@ -46,11 +64,14 @@ export function visualizeMarkers(grid, ecd) {
     const m0 = new MeshLambertMaterial({ color: 0xFFFFFF });
     const m1 = new MeshLambertMaterial({ color: 0xFF0000, transparent: true, opacity: 0.5 });
 
-    const m3 = new MeshLambertMaterial({ color: 0xFF0000, transparent: true, opacity: 0.3 });
+    const m3 = new LineBasicMaterial({ color: 0xFF0000, transparent: true, opacity: 0.3, depthTest: false });
 
     const m_line = new LineBasicMaterial({
         color: 0xffffff,
         linewidth: 1,
+        transparent: true,
+        depthTest: false,
+        opacity: 0.5,
         linecap: 'round', //ignored by WebGLRenderer
         linejoin: 'round' //ignored by WebGLRenderer
     });
@@ -62,6 +83,8 @@ export function visualizeMarkers(grid, ecd) {
     const terrain = obtainTerrain(ecd);
 
     const geometry_0 = new TetrahedronBufferGeometry(0.05, 2);
+
+    const geometry_cylinder = CircleGeometry(1, 1);
 
     for (let i = 0; i < n; i++) {
         const markerNode = markers[i];
@@ -85,8 +108,9 @@ export function visualizeMarkers(grid, ecd) {
         const mark_line = new Line(line_geometry, m_line);
 
 
-        const mark_size = new ThreeMesh(geometry_0, m3);
+        const mark_size = new Line(geometry_cylinder, m3);
         mark_size.scale.set(markerNode.size, markerNode.size, markerNode.size);
+        mark_size.position.copy(mark_1.position);
 
 
         g.add(mark_0);
@@ -98,6 +122,9 @@ export function visualizeMarkers(grid, ecd) {
         renderable.computeBoundsFromObject();
 
         const props = [];
+
+        props.push(`TYPE: ${markerNode.type}`);
+
         for (const propertyKey in markerNode.properties) {
             let propValue = formatValue(markerNode.properties[propertyKey]);
 
