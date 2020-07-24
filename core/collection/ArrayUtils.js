@@ -42,26 +42,28 @@ export function randomizeArrayElementOrder(array, random) {
  */
 export function binarySearchLowIndex(array, el, compareFunction, minIndex = 0, maxIndex = array.length - 1) {
 
-    let currentIndex;
+    let result = 0;
 
     while (minIndex <= maxIndex) {
 
-        currentIndex = (minIndex + maxIndex) >> 1;
+        const pivotIndex = (minIndex + maxIndex) >> 1;
 
-        const cmp = compareFunction(el, array[currentIndex]);
+        const cmp = compareFunction(el, array[pivotIndex]);
 
         if (cmp > 0) {
-            minIndex = currentIndex + 1;
+            minIndex = pivotIndex + 1;
         } else if (cmp < 0) {
-            maxIndex = currentIndex - 1;
+            maxIndex = pivotIndex - 1;
+            result = pivotIndex;
         } else {
             //set low boundary for next step based on assumption that upper bound is higher than lower bound
+            result = pivotIndex;
             break;
         }
 
     }
 
-    return currentIndex;
+    return result;
 }
 
 /**
