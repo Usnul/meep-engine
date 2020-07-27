@@ -475,6 +475,16 @@ class Quaternion {
 
     /**
      *
+     * @param {function():number} random
+     */
+    setRandom(random) {
+        this.set(random(), random(), random(), random());
+
+        this.normalize();
+    }
+
+    /**
+     *
      * @param {number} x
      * @param {number} y
      * @param {number} z
