@@ -1,11 +1,14 @@
 import { GridTaskGenerator } from "../GridTaskGenerator.js";
 import Task from "../../../core/process/task/Task.js";
-import { clamp, seededRandom } from "../../../core/math/MathUtils.js";
+import { clamp, min2, seededRandom } from "../../../core/math/MathUtils.js";
 import TaskSignal from "../../../core/process/task/TaskSignal.js";
 import { NumericInterval } from "../../../core/math/interval/NumericInterval.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../../core/assert.js";
 import { computeStatisticalMean } from "../../../core/math/statistics/computeStatisticalMean.js";
+import TaskGroup from "../../../core/process/task/TaskGroup.js";
+import { actionTask } from "../../../core/process/task/TaskUtils.js";
+import { ArrayIteratorRandom } from "../../../core/collection/array/ArrayIteratorRandom.js";
 
 
 /**
@@ -76,8 +79,12 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
     /**
      *
      * @param {GridData} grid
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
      */
-    estimateTapCount(grid) {
+    estimateTapCount(grid, x0, y0, x1, y1) {
         const random = seededRandom(99);
 
         /*
@@ -87,8 +94,8 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
                 3) average size of the marker
          */
 
-        const width = grid.width;
-        const height = grid.height;
+        const width = x1 - x0;
+        const height = y1 - y0;
 
         const gridSize = width * height;
 
@@ -109,8 +116,8 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             const u = random();
             const v = random();
 
-            const x = u * x_max;
-            const y = v * y_max;
+            const x = x0 + u * x_max;
+            const y = y0 + v * y_max;
 
             const densityValue = this.density.execute(grid, x, y, 0);
 
@@ -161,8 +168,17 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
         return saturationTapCount * collisionCompensation;
     }
 
-
-    build(grid, ecd, seed) {
+    /**
+     *
+     * @param {number} seed
+     * @param {GridData} grid
+     * @param {number} x0
+     * @param {number} y0
+     * @param {number} x1
+     * @param {number} y1
+     * @returns {Task}
+     */
+    processArea(seed, grid, x0, y0, x1, y1) {
 
         //we want to estimate average size of a marker
 
@@ -170,8 +186,6 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
         let iterationLimit = 0;
         let iteration = 0;
-
-        const random = seededRandom(seed + this.__seed);
 
         /**
          *
@@ -193,6 +207,11 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
 
         const self = this;
 
+        const random = seededRandom(seed);
+
+        const width = x1 - x0;
+        const height = y1 - y0;
+
         /**
          * @returns {TaskSignal}
          */
@@ -209,8 +228,8 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             const u = random();
             const v = random();
 
-            const _x = u * grid.width;
-            const _y = v * grid.height;
+            const _x = x0 + u * width;
+            const _y = y0 + v * height;
 
             //sample density mask
             const densityValue = density.execute(grid, _x, _y, 0);
@@ -261,15 +280,10 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
         }
 
         function initializer() {
-            if (!density.initialized) {
-                density.initialize(grid, seed);
-            }
-
-            action.initialize(grid, seed);
 
             random.setCurrentSeed(seed);
 
-            iterationLimit = self.estimateTapCount(grid);
+            iterationLimit = self.estimateTapCount(grid, x0, y0, x1, y1);
             iteration = 0;
 
             assert.isNumber(iterationLimit, 'iterationLimit');
@@ -283,7 +297,7 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
             name: 'Density marker distribution',
             cycleFunction,
             initializer,
-            estimatedDuration: grid.height * grid.width / 6000,
+            estimatedDuration: height * width / 6000,
             computeProgress() {
                 if (iterationLimit === 0) {
                     return 0;
@@ -292,5 +306,67 @@ export class GridTaskDensityMarkerDistribution extends GridTaskGenerator {
                 return clamp(iteration / iterationLimit, 0, 1);
             }
         });
+    }
+
+
+    build(grid, ecd, seed) {
+
+        const random = seededRandom(seed);
+
+        const tile_size = 16;
+        //we want to estimate average size of a marker
+        const tasks = [];
+
+        const tInitialize = actionTask(() => {
+
+            if (!this.density.initialized) {
+                this.density.initialize(grid, seed);
+            }
+
+            this.action.initialize(grid, seed);
+        });
+
+
+        for (let j = 0; j < grid.height; j += tile_size) {
+            const y0 = j;
+            const y1 = min2(grid.height, j + tile_size);
+
+            for (let i = 0; i < grid.width; i += tile_size) {
+                const x0 = i;
+                const x1 = min2(grid.width, i + tile_size);
+
+                const seed = Math.floor(random() * Number.MAX_SAFE_INTEGER);
+
+                const task = this.processArea(seed, grid, x0, y0, x1, y1);
+
+                task.addDependency(tInitialize);
+
+                tasks.push(task);
+            }
+        }
+
+        //build a random dependency chain to ensure that tiles are not processed in parallel, thus crating race coditions and leading to non-deterministic result
+        const iteratorRandom = new ArrayIteratorRandom();
+        iteratorRandom.initialize(tasks);
+
+        let previous = iteratorRandom.next().value;
+
+        while (true) {
+            const it = iteratorRandom.next();
+
+            if (it.done) {
+                break;
+            }
+
+            const task = it.value;
+
+            task.addDependency(previous);
+
+            previous = task;
+        }
+
+        tasks.push(tInitialize);
+
+        return new TaskGroup(tasks, "Density marker distribution");
     }
 }
