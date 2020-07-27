@@ -137,6 +137,12 @@ export function visualizeMarkers(grid, ecd) {
         props.push(`# [x: ${formatValue(markerNode.position.x)}, y: ${formatValue(markerNode.position.y)}]`);
         props.push(`# [size: ${formatValue(markerNode.size)}]`);
 
+        for (let j = 0; j < markerNode.tags.length; j++) {
+            const tag = markerNode.tags[j];
+
+            props.push(`# T: ${tag}`);
+        }
+
 
         const v = new LabelView(props.join('\n'), { classList: ['__debug-plaque'] });
         v.css({
