@@ -54,4 +54,4 @@ const ruleBend90 = GridCellPlacementRule.from(matchBend90, [
  *
  * @returns {GridTaskActionRuleSet}
  */
-export const mir_generator_place_road_decorators = () => GridTaskActionRuleSet.from(GridActionRuleSet.from([ruleBend90]));
+export const mir_generator_place_road_decorators = () => GridTaskActionRuleSet.from(GridActionRuleSet.from({ rules: [ruleBend90] }));

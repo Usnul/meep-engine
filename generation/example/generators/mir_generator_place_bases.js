@@ -78,4 +78,4 @@ rule.allowRotation = false;
  *
  * @returns {GridTaskActionRuleSet}
  */
-export const mir_generator_place_bases = () => GridTaskActionRuleSet.from(GridActionRuleSet.from([rule]));
+export const mir_generator_place_bases = () => GridTaskActionRuleSet.from(GridActionRuleSet.from({ rules: [rule] }));

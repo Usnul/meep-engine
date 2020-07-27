@@ -29,6 +29,35 @@ export class GridCellActionPlaceMarkerGroup extends GridCellAction {
         return r;
     }
 
+    /**
+     *
+     * @param {GridData} data
+     * @param {number} x
+     * @param {number} y
+     * @param {number} rotation
+     * @param {MarkerNodeMatcher} matcher
+     * @returns {boolean} True if a collision exists
+     */
+    testNodeCollisions(data, x, y, rotation, matcher) {
+
+        const children = this.children;
+        const n = children.length;
+
+        for (let i = 0; i < n; i++) {
+            const child = children[i];
+
+            const node = child.buildNode(data, x, y, rotation);
+
+            const collision = data.containsMarkerInCircle(node.position.x, node.position.y, node.size, matcher);
+
+            if (collision) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     execute(data, x, y, rotation) {
         const id = idCounter++;
 

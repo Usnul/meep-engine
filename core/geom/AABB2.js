@@ -72,6 +72,40 @@ class AABB2 {
 
     /**
      *
+     * @param {number[]} m
+     */
+    applyMatrix3(m) {
+
+        const m0 = m[0];
+        const m1 = m[1];
+        const m3 = m[3];
+        const m4 = m[4];
+        const m6 = m[6];
+        const m7 = m[7];
+
+        const x0 = this.x0;
+        const y0 = this.y0;
+        const x1 = this.x1;
+        const y1 = this.y1;
+
+
+        const _xa = m0 * x0 + m3 * y0 + m6;
+        const _ya = m1 * x0 + m4 * y0 + m7;
+
+        const _xb = m0 * x1 + m3 * y1 + m6;
+        const _yb = m1 * x1 + m4 * y1 + m7;
+
+        let _x0 = min2(_xa, _xb);
+        let _x1 = max2(_xa, _xb);
+
+        let _y0 = min2(_ya, _yb);
+        let _y1 = max2(_ya, _yb);
+
+        this.set(_x0, _y0, _x1, _y1);
+    }
+
+    /**
+     *
      * @param {number} value
      */
     multiplyScalar(value) {
@@ -101,6 +135,25 @@ class AABB2 {
         const by1 = other.y1;
 
         return computeOverlap(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1, result);
+    }
+
+    /**
+     *
+     * @param {AABB2} other
+     * @returns {number}
+     */
+    overlapExists(other) {
+        const ax0 = this.x0;
+        const ay0 = this.y0;
+        const ax1 = this.x1;
+        const ay1 = this.y1;
+
+        const bx0 = other.x0;
+        const by0 = other.y0;
+        const bx1 = other.x1;
+        const by1 = other.y1;
+
+        return aabb2_overlapExists(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1);
     }
 
     /**

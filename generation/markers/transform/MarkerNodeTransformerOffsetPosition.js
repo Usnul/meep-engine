@@ -1,10 +1,7 @@
 import { MarkerNodeTransformer } from "./MarkerNodeTransformer.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import Vector3 from "../../../core/geom/Vector3.js";
-import Quaternion from "../../../core/geom/Quaternion.js";
 
-const swing = new Quaternion();
-const twist = new Quaternion();
 const v3 = new Vector3();
 
 export class MarkerNodeTransformerOffsetPosition extends MarkerNodeTransformer {

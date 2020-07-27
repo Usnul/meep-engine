@@ -64,14 +64,14 @@ function multiplyMatrices3(a, b, r) {
 
 /**
  *
+ * @param {number[]} result
  * @param {number} tX translation X offset
  * @param {number} tY translation Y offset
  * @param {number} sX scale in X axis
  * @param {number} sY scale in Y axis
  * @param {number} angle rotation angle
- * @returns {number[]}
  */
-function compose3x3transform(tX, tY, sX, sY, angle) {
+function compose3x3transform(result, tX, tY, sX, sY, angle) {
     //translation matrix
     const tM = [
         1, 0, tX,
@@ -96,13 +96,10 @@ function compose3x3transform(tX, tY, sX, sY, angle) {
         0, 0, 1
     ];
 
-    const result = [];
 
     multiplyMatrices3(tM, sM, result);
 
     multiplyMatrices3(result, rM, result);
-
-    return result;
 }
 
 /**
@@ -115,7 +112,9 @@ function compose3x3transform(tX, tY, sX, sY, angle) {
 function setElementTransform(domElement, position, scale, rotation) {
 
     //todo simplify this matrix composition to avoid complex maths
-    const m3 = compose3x3transform(position.x, position.y, scale.x, scale.y, rotation);
+    const m3 = [];
+
+    compose3x3transform(m3, position.x, position.y, scale.x, scale.y, rotation);
 
 
     /*

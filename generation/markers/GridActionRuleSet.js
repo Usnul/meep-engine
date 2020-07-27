@@ -29,21 +29,44 @@ export class GridActionRuleSet {
          * @type {RuleSelectionPolicyType|number}
          */
         this.policy = RuleSelectionPolicyType.Sequential;
+
+        /**
+         * Rules will be evaluated for each cell, this pattern will be applied within each cell
+         * @type {number[]}
+         */
+        this.pattern = [0, 0];
+
+        /**
+         *
+         * @type {boolean}
+         */
+        this.matchOrigin = true;
+
+        /**
+         *
+         * @type {boolean}
+         */
+        this.allowEveryRotation = false;
     }
 
     /**
      *
      * @param {GridCellPlacementRule[]} rules
-     * @param {RuleSelectionPolicyType} policy
+     * @param {RuleSelectionPolicyType} [policy]
+     * @param {number[]} [pattern]
+     * @param {boolean} [allowEveryRotation]
      * @returns {GridActionRuleSet}
      */
-    static from(rules, policy = RuleSelectionPolicyType.Sequential) {
+    static from({ rules, policy = RuleSelectionPolicyType.Sequential, pattern = [0, 0], allowEveryRotation = false }) {
         assert.enum(policy, RuleSelectionPolicyType, 'policy');
+assert.typeOf(allowEveryRotation,'boolean','allowEveryRotation');
 
         const r = new GridActionRuleSet();
 
         rules.forEach(r.add, r);
         r.policy = policy;
+        r.pattern = pattern;
+        r.allowEveryRotation = allowEveryRotation;
 
         return r;
     }
@@ -90,6 +113,16 @@ export class GridActionRuleSet {
         });
 
 
+        /**
+         *
+         * @type {number[]}
+         */
+        const pattern = this.pattern;
+        const patternSize = pattern.length;
+
+        const matchOrigin = this.matchOrigin;
+        const allowEveryRotation = this.allowEveryRotation;
+
         const sampleCountX = width * resolution;
         const sampleCountY = height * resolution;
 
@@ -117,31 +150,67 @@ export class GridActionRuleSet {
 
                 const matcher = element.pattern;
 
-                for (let j = 0; j < 4; j++) {
+                sampling_loop: for (let sampleIndex = 0; sampleIndex < patternSize;) {
+                    const sampleOffsetX = pattern[sampleIndex++];
+                    const sampleOffsetY = pattern[sampleIndex++];
 
-                    if (j > 0 && !element.allowRotation) {
-                        break;
+
+                    let final_sample_offset_x = sampleOffsetX;
+                    let final_sample_offset_y = sampleOffsetY;
+
+                    rotation_loop: for (let j = 0; j < 4; j++) {
+
+
+                        const rotation = j * PI_HALF;
+
+                        if (j > 0) {
+                            if (!element.allowRotation) {
+                                break rotation_loop;
+                            } else {
+
+
+                                const sin = Math.sin(rotation);
+                                const cos = Math.cos(rotation);
+
+                                final_sample_offset_x = sampleOffsetX * cos - sampleOffsetY * sin;
+                                final_sample_offset_y = sampleOffsetX * sin + sampleOffsetY * cos;
+
+                            }
+
+                        }
+
+                        const p_x = final_sample_offset_x + x;
+                        const p_y = final_sample_offset_y + y;
+
+
+                        let match;
+
+                        if (matchOrigin) {
+                            match = matcher.match(grid, x, y, rotation);
+                        } else {
+                            match = matcher.match(grid, p_x, p_y, rotation);
+                        }
+
+                        if (!match) {
+                            continue rotation_loop;
+                        }
+
+                        const roll = random();
+
+                        const probabilityValue = element.probability.execute(grid, p_x, p_y, rotation);
+
+                        if (roll < probabilityValue) {
+
+                            element.execute(grid, p_x, p_y, rotation);
+
+                            if (!allowEveryRotation) {
+                                break sampling_loop;
+                            }
+                        }
+
                     }
-
-                    const rotation = j * PI_HALF;
-
-                    const match = matcher.match(grid, x, y, rotation);
-
-                    if (!match) {
-                        continue;
-                    }
-
-                    const roll = random();
-
-                    const probabilityValue = element.probability.execute(grid, x, y, rotation);
-
-                    if (roll <= probabilityValue) {
-
-                        element.execute(grid, x, y, rotation);
-                        break;
-                    }
-
                 }
+
 
                 iteratorValue = ruleIterator.next();
             }

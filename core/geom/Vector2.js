@@ -6,7 +6,6 @@
 import Signal from '../events/signal/Signal.js';
 import { clamp, lerp, max2, min2 } from "../math/MathUtils.js";
 import { assert } from "../assert.js";
-import { v3_dot, v3Length_i } from "./Vector3.js";
 
 /**
  *
@@ -458,6 +457,20 @@ function v2Lerp(result, a, b, fraction) {
  */
 Vector2.prototype.lerpVectors = function (a, b, fraction) {
     v2Lerp(this, a, b, fraction);
+};
+
+/**
+ *
+ * @param {number[]} matrix3
+ */
+Vector2.prototype.applyMatrix3 = function (matrix3) {
+    const x = this.x;
+    const y = this.y;
+
+    const _x = matrix3[0] * x + matrix3[3] * y + matrix3[6];
+    const _y = matrix3[1] * x + matrix3[4] * y + matrix3[7];
+
+    this.set(_x, _y);
 };
 
 
