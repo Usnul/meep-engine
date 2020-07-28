@@ -37,6 +37,7 @@ ReactiveGreaterThanOrEqual.prototype.dataType = DataType.Boolean;
  */
 ReactiveGreaterThanOrEqual.prototype.isComparativeExpression = true;
 
+ReactiveGreaterThanOrEqual.prototype.isReactiveGreaterThanOrEqual = true;
 
 /**
  *

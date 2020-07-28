@@ -16,11 +16,13 @@ import { ReactiveNot } from "../../../model/reactive/model/logic/ReactiveNot.js"
 import { ReactiveNegate } from "../../../model/reactive/model/arithmetic/ReactiveNegate.js";
 import { ReactiveGreaterThanOrEqual } from "../../../model/reactive/model/comparative/ReactiveGreaterThanOrEqual.js";
 import { ReactiveParser } from "./ReactiveParser.js";
+import { ReactiveLiteralString } from "../../../model/reactive/model/terminal/ReactiveLiteralString.js";
 
 const compilers = {
     Reference: ({ value }) => new ReactiveReference(value.join('.')),
     LiteralNumber: ({ value }) => new ReactiveLiteralNumber(value),
     LiteralBoolean: ({ value }) => new ReactiveLiteralBoolean(value),
+    LiteralString: ({ value }) => new ReactiveLiteralString(value),
     BinaryAdd: ({ left, right }) => {
         const result = new ReactiveAdd();
 

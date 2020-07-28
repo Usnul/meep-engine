@@ -60,6 +60,8 @@ ReactiveLiteralBoolean.prototype.dataType = DataType.Boolean;
  */
 ReactiveLiteralBoolean.prototype.isTerminal = true;
 
+ReactiveLiteralBoolean.prototype.isReactiveLiteralBoolean = true;
+
 /**
  *
  * @param {boolean} v

@@ -37,6 +37,8 @@ ReactiveLessThan.prototype.dataType = DataType.Boolean;
  */
 ReactiveLessThan.prototype.isComparativeExpression = true;
 
+ReactiveLessThan.prototype.isReactiveLessThan = true;
+
 /**
  *
  * @param {ReactiveExpression} left
