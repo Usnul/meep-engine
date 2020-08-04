@@ -90,6 +90,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
      * @param {MarkerNodeTransformer[]} [transformers]
      * @param {string[]} [tags]
      * @param {Transform} [transform]
+     * @param {*} [properties]
      * @return {GridCellActionPlaceMarker}
      */
     static from({
@@ -97,7 +98,8 @@ export class GridCellActionPlaceMarker extends GridCellAction {
                     size = 0,
                     transformers = [],
                     tags = [],
-                    transform
+                    transform,
+                    properties
                 }) {
 
         assert.typeOf(type, 'string', 'type');
@@ -117,6 +119,10 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         for (let i = 0; i < tags.length; i++) {
             r.addTag(tags[i]);
+        }
+
+        if (properties !== undefined) {
+            r.properties = properties;
         }
 
         return r;

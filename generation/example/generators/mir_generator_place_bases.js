@@ -13,6 +13,16 @@ import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlac
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { MarkerNodeEmitterGridCellAction } from "../../markers/emitter/MarkerNodeEmitterGridCellAction.js";
+import { MarkerNodeEmitterPredicated } from "../../markers/emitter/MarkerNodeEmitterPredicated.js";
+import { GridDataNodePredicateNot } from "../../markers/predicate/GridDataNodePredicateNot.js";
+import { GridDataNodePredicateOverlaps } from "../../markers/predicate/GridDataNodePredicateOverlaps.js";
+import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
+import { MarkerNodeEmitterFromAction } from "../../markers/emitter/MarkerNodeEmitterFromAction.js";
+import { Transform } from "../../../engine/ecs/transform/Transform.js";
+import { MarkerNodeTransformerOffsetPosition } from "../../markers/transform/MarkerNodeTransformerOffsetPosition.js";
+import { MarkerNodeTransformerRecordPropertyClosure } from "../../markers/transform/MarkerNodeTransformerRecordPropertyClosure.js";
+import { randomIntegerBetween } from "../../../core/math/MathUtils.js";
 
 const pMatcher = new CellMatcherGridPattern();
 
@@ -41,11 +51,6 @@ clearTags.resize(2, 2);
 clearTags.fill(~GridTags.Traversable);
 clearTags.operation = bitwiseAnd;
 
-const placeMarker = GridCellActionPlaceMarker.from({ type: 'Base', size: 1 });
-placeMarker.addTag('Town');
-
-placeMarker.transform.position.set(0.5, 0.1, -0.5);
-
 const placeRoadConnector0 = GridCellActionPlaceMarker.from({ type: 'Road Connector' });
 placeRoadConnector0.offset.set(-1, 0);
 
@@ -68,7 +73,56 @@ const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
 const rule = GridCellPlacementRule.from(pMatcher, [
     placeTags,
     clearTags,
-    placeMarker,
+    MarkerNodeEmitterGridCellAction.from(
+        MarkerNodeEmitterPredicated.from({
+            predicate: GridDataNodePredicateNot.from(GridDataNodePredicateOverlaps.from(MarkerNodeMatcherAny.INSTANCE)),
+            source: MarkerNodeEmitterFromAction.from([
+                GridCellActionPlaceMarker.from({
+                    type: 'Base',
+                    size: 0.5,
+                    tags: ['Town'],
+                    transform: Transform.fromJSON({
+                        position: {
+                            x: 0.5,
+                            y: 0,
+                            z: 0.5
+                        }
+                    }),
+                    transformers: [
+
+                        MarkerNodeTransformerRecordPropertyClosure.from(
+                            'name',
+                            (node, random, grid) => {
+                                const i = randomIntegerBetween(random, 0, 10);
+                                return `name-${i}`;
+                            }
+                        )
+                    ]
+                }),
+                GridCellActionPlaceMarker.from({
+                    type: 'Virtual',
+                    size: 0.5,
+                    transformers: [
+                        MarkerNodeTransformerOffsetPosition.from(1, 0)
+                    ]
+                }),
+                GridCellActionPlaceMarker.from({
+                    type: 'Virtual',
+                    size: 0.5,
+                    transformers: [
+                        MarkerNodeTransformerOffsetPosition.from(0, 1)
+                    ]
+                }),
+                GridCellActionPlaceMarker.from({
+                    type: 'Virtual',
+                    size: 0.5,
+                    transformers: [
+                        MarkerNodeTransformerOffsetPosition.from(1, 1)
+                    ]
+                })
+            ])
+        })
+    ),
     placeRoadConnectors
 ], CellFilterConstant.from(0.1));
 
