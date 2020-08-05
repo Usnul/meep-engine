@@ -21,8 +21,7 @@ import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny
 import { MarkerNodeEmitterFromAction } from "../../markers/emitter/MarkerNodeEmitterFromAction.js";
 import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { MarkerNodeTransformerOffsetPosition } from "../../markers/transform/MarkerNodeTransformerOffsetPosition.js";
-import { MarkerNodeTransformerRecordPropertyClosure } from "../../markers/transform/MarkerNodeTransformerRecordPropertyClosure.js";
-import { randomIntegerBetween } from "../../../core/math/MathUtils.js";
+import { MarkerNodeTransformerRecordUniqueRandomEnum } from "../../markers/transform/MarkerNodeTransformerRecordUniqueRandomEnum.js";
 
 const pMatcher = new CellMatcherGridPattern();
 
@@ -70,6 +69,12 @@ const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
     placeRoadConnector3
 ]);
 
+const name_set = [];
+
+for (let i = 0; i < 20; i++) {
+    name_set.push(`name-${i}`);
+}
+
 const rule = GridCellPlacementRule.from(pMatcher, [
     placeTags,
     clearTags,
@@ -90,12 +95,9 @@ const rule = GridCellPlacementRule.from(pMatcher, [
                     }),
                     transformers: [
 
-                        MarkerNodeTransformerRecordPropertyClosure.from(
+                        MarkerNodeTransformerRecordUniqueRandomEnum.from(
                             'name',
-                            (node, random, grid) => {
-                                const i = randomIntegerBetween(random, 0, 10);
-                                return `name-${i}`;
-                            }
+                            name_set
                         )
                     ]
                 }),
