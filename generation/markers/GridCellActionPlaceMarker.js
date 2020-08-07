@@ -52,7 +52,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
         for (let i = 0; i < n; i++) {
             const nodeTransformer = transformers[i];
 
-            nodeTransformer.initialize(grid, seed);
+            nodeTransformer.initialize(data, seed);
         }
     }
 
@@ -189,7 +189,7 @@ export class GridCellActionPlaceMarker extends GridCellAction {
 
         for (let i = 0; i < transformerCount; i++) {
             const transformer = transformers[i];
-            node = transformer.transform(node, grid);
+            node = transformer.transform(node, data);
         }
 
         return node;

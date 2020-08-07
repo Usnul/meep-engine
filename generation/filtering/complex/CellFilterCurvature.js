@@ -25,12 +25,13 @@ const xpos = [];
 
 /**
  *
+ * @param {GridData} grid
  * @param {number[]} result
  * @param {CellFilter} surface
  * @param {number} x
  * @param {number} y
  */
-function computeNormal(result, surface, x, y) {
+function computeNormal(grid, result, surface, x, y) {
 
 
     //read surrounding points
@@ -105,10 +106,10 @@ export class CellFilterCurvature extends CellFilter {
         const surface = this.surface;
 
         //compute normals up, down, left, right
-        computeNormal(yneg, surface, x, y - 1);
-        computeNormal(xneg, surface, x - 1, y);
-        computeNormal(xpos, surface, x + 1, y);
-        computeNormal(ypos, surface, x, y + 1);
+        computeNormal(grid, yneg, surface, x, y - 1);
+        computeNormal(grid, xneg, surface, x - 1, y);
+        computeNormal(grid, xpos, surface, x + 1, y);
+        computeNormal(grid, ypos, surface, x, y + 1);
 
 
         // compute curvature value
