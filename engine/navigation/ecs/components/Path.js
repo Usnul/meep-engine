@@ -425,7 +425,7 @@ class Path {
         };
     }
 
-    fromJSON({ points }) {
+    fromJSON({ points = [] }) {
         this.points = points.map(function (p) {
             const vector3 = new Vector3();
             vector3.fromJSON(p);

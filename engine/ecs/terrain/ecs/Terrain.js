@@ -39,6 +39,7 @@ import { OffsetScaleTransform2D } from "./OffsetScaleTransform2D.js";
 import { GridTransformKind } from "./GridTransformKind.js";
 import { clamp } from "../../../../core/math/MathUtils.js";
 import { makeTerrainWorkerProxy } from "./makeTerrainWorkerProxy.js";
+import { MeepSettings } from "../../../MeepSettings.js";
 
 /**
  *
@@ -822,7 +823,7 @@ class Terrain {
 
         assert.defined(assetManager, 'assetManager');
         assert.notNull(assetManager, 'assetManager');
-        assert.equal(assetManager.isAssetManager, true,'.isAssetManager !== true');
+        assert.equal(assetManager.isAssetManager, true, '.isAssetManager !== true');
 
         this.__assetManager = assetManager;
 
@@ -832,7 +833,8 @@ class Terrain {
         this.bvh.setNegativelyInfiniteBounds();
         //
         this.overlay.size.copy(this.size);
-        this.overlay.tileImage.set('data/textures/decal/tile_square_styled_star6_128.png');
+
+        this.overlay.tileImage.set(MeepSettings.ecs.Terrain['tile-decal']);
 
         this.tiles.totalSize.copy(this.size);
         this.tiles.scale.set(this.gridScale, this.gridScale);
