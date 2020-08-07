@@ -124,6 +124,7 @@ class PathFollower {
             active: this.getFlag(PathFollowerFlags.Active),
             speed: this.speed.toJSON(),
             rotationAlignment: this.rotationAlignment.toJSON(),
+            positionWriting: this.positionWriting.toJSON()
         };
     }
 
@@ -143,6 +144,10 @@ class PathFollower {
 
         if (typeof json.rotationSpeed === "number") {
             this.rotationSpeed.fromJSON(json.rotationSpeed);
+        }
+
+        if (json.positionWriting !== undefined) {
+            this.positionWriting.fromJSON(json.positionWriting);
         }
     }
 
