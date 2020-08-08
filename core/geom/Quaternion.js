@@ -1009,13 +1009,9 @@ class Quaternion {
      * @param {number} t fractional value between 0 and 1
      */
     lerp(other, t) {
-        const x = lerp(this.x, other.x, t);
-        const y = lerp(this.y, other.y, t);
-        const z = lerp(this.z, other.z, t);
-        const w = lerp(this.w, other.w, t);
 
+        this.lerpQuaternions(this, other, t);
 
-        this.set(x, y, z, w);
     }
 
     /**
@@ -1025,6 +1021,11 @@ class Quaternion {
      * @param {number} t
      */
     lerpQuaternions(first, second, t) {
+
+        assert.isNumber(t, 't');
+
+        assert.greaterThanOrEqual(t, 0, 't >= 0');
+        assert.lessThanOrEqual(t, 1, 't <= 1');
 
         const x = lerp(first.x, second.x, t);
         const y = lerp(first.y, second.y, t);

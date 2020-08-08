@@ -13,6 +13,7 @@ import Quaternion from "../../../../core/geom/Quaternion.js";
 import { clamp, EPSILON, min2 } from "../../../../core/math/MathUtils.js";
 import { Matrix4 } from "three";
 import { noop } from "../../../../core/function/Functions.js";
+import { assert } from "../../../../core/assert.js";
 
 
 function deregister(datum) {
@@ -188,6 +189,9 @@ const q_temp = new Quaternion();
  * @param forward
  */
 export function alignToVector(rotation, direction, angularLimit, up = Vector3.up, forward = Vector3.forward) {
+    assert.isNumber(angularLimit, 'angularLimit');
+    assert.notNaN(angularLimit, 'angularLimit');
+
     //compute old facing direction vector
     v3_forward.copy(forward);
 
@@ -216,6 +220,8 @@ export function alignToVector(rotation, direction, angularLimit, up = Vector3.up
     v3_up.applyQuaternion(rotation);
 
     const angle = v3_up.angleTo(direction);
+
+    assert.notNaN(angle, 'angle');
 
     if (angle === 0) {
         //no change
@@ -252,7 +258,13 @@ function processRaycastHit(point, t, normal, cling, timeDelta) {
         position.setY(point.y);
     }
 
-    const angularLimit = cling.rotationSpeed * timeDelta;
+    let angularLimit;
+
+    if (Number.isFinite(cling.rotationSpeed)) {
+        angularLimit = cling.rotationSpeed * timeDelta;
+    } else {
+        angularLimit = Number.POSITIVE_INFINITY;
+    }
 
     if (cling.normalAlign) {
         alignToVector(rotation, normal, angularLimit);

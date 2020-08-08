@@ -601,7 +601,7 @@ class Vector3 {
      * @param z1
      * @private
      */
-    _projectVectors(x0,y0,z0, x1,y1,z1){
+    _projectVectors(x0, y0, z0, x1, y1, z1) {
 
         const d = v3_dot(x0, y0, z0, x1, y1, z1);
 
@@ -916,7 +916,16 @@ function v3LengthSqr_i(x, y, z) {
  */
 export function v3_angleBetween(x0, y0, z0, x1, y1, z1) {
     const d = v3_dot(x0, y0, z0, x1, y1, z1);
-    const l = v3Length_i(x0, y0, z0) * v3Length_i(x1, y1, z1);
+
+    const magnitude_0 = v3Length_i(x0, y0, z0);
+    const magnitude_1 = v3Length_i(x1, y1, z1);
+
+    const l = magnitude_0 * magnitude_1;
+
+    if (l === 0) {
+        // collective magnitude is 0, provide arbitrary angle
+        return 0;
+    }
 
     const theta = clamp(d / l, -1, 1);
 
