@@ -114,6 +114,7 @@ export class EngineHarness {
     /**
      *
      * @param {Engine} engine
+     * @param {EntityComponentDataset} ecd
      * @param {Vector3} [target]
      * @param {number} [distance]
      * @param {number} [pitch]
@@ -124,6 +125,7 @@ export class EngineHarness {
     static buildCamera(
         {
             engine,
+            ecd = engine.entityManager.dataset,
             target = new Vector3(),
             distance = 10,
             pitch = -1.4,
@@ -152,7 +154,7 @@ export class EngineHarness {
             .add(transform)
             .add(cameraController)
             .add(camera)
-            .build(engine.entityManager.dataset);
+            .build(ecd);
 
         console.log('build camera', entityBuilder);
 
@@ -182,7 +184,7 @@ export class EngineHarness {
                            terrainSize = new Vector2(10, 10),
                            terrainResolution = 10
                        }) {
-        EngineHarness.buildLights(engine);
+        EngineHarness.buildLights({ engine: engine });
 
         const camera = EngineHarness.buildCamera({
             engine,
@@ -209,8 +211,9 @@ export class EngineHarness {
     /**
      *
      * @param {Engine} engine
+     * @param {EntityComponentDataset} ecd
      */
-    static buildLights(engine) {
+    static buildLights({ engine, ecd = engine.entityManager.dataset }) {
         const key = new Light();
         key.type.set(Light.Type.DIRECTION);
         key.color.setRGB(1, 1, 1);
@@ -229,7 +232,7 @@ export class EngineHarness {
         new EntityBuilder()
             .add(key)
             .add(transform)
-            .build(engine.entityManager.dataset);
+            .build(ecd);
 
 
         const fill = new Light();
@@ -241,7 +244,7 @@ export class EngineHarness {
         new EntityBuilder()
             .add(fill)
             .add(new Transform())
-            .build(engine.entityManager.dataset);
+            .build(ecd);
     }
 
     /**
