@@ -207,6 +207,20 @@ assert.isNumber = function (value, name = 'value') {
 };
 
 /**
+ *
+ * @param {number|*} value
+ * @param {string} [name]
+ */
+assert.isNonNegativeInteger = function (value, name = 'value') {
+    assert.isNumber(value, name);
+    assert.greaterThanOrEqual(value, 0, `${name} must be >= 0, instead was ${value}`);
+
+    if (!Number.isInteger(value)) {
+        throw new Error(`${name} must be an integer, instead was ${value}`);
+    }
+}
+
+/**
  * @template T
  * @param {T[]} value
  * @param {string} name

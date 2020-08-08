@@ -1,14 +1,5 @@
 import { CellFilter } from "../CellFilter.js";
-
-/**
- *
- * @param {number} sigma
- * @param {number} v
- * @returns {number}
- */
-function gaussian(sigma, v) {
-    return Math.exp(-(v * v) / (2 * sigma * sigma));
-}
+import { gaussian } from "../../../core/math/MathUtils.js";
 
 export class CellFilterGaussianBlur extends CellFilter {
     constructor() {

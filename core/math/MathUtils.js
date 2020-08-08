@@ -422,7 +422,7 @@ export function cubicCurve(t, p0, p1, p2, p3) {
  * @param {number} p3 end point
  * @returns {number}
  */
- function bezierCurve(t, p0, p1, p2, p3) {
+function bezierCurve(t, p0, p1, p2, p3) {
     const nt = 1 - t;
 
     const nt_2 = nt * nt;
@@ -823,6 +823,32 @@ export function separation1D(a0, a1, b0, b1) {
 }
 
 /**
+ * Assuming the input is an N-dimension vector, normalizes the vector to magnitude of 1
+ * @param {number[]} data
+ */
+export function normalizeArrayVector(data) {
+    const n = data.length;
+
+    let magnitude2 = 0;
+
+    for (let i = 0; i < n; i++) {
+        const value = data[i];
+
+        const value2 = value * value;
+
+        magnitude2 += value2;
+    }
+
+
+    const magnitude = Math.sqrt(magnitude2);
+
+    for (let i = 0; i < n; i++) {
+        data[i] /= magnitude;
+    }
+
+}
+
+/**
  * Pi*2
  * @type {number}
  */
@@ -839,3 +865,13 @@ export const PI_HALF = Math.PI / 2;
  * @type {number}
  */
 export const EPSILON = 0.000001;
+
+/**
+ *
+ * @param {number} sigma
+ * @param {number} v
+ * @returns {number}
+ */
+export function gaussian(sigma, v) {
+    return Math.exp(-(v * v) / (2 * sigma * sigma));
+}

@@ -12,32 +12,6 @@ import { binarySearchLowIndex } from "../../core/collection/ArrayUtils.js";
 import { compareNumbers } from "../../core/primitives/numbers/compareNumbers.js";
 import TaskGroup from "../../core/process/task/TaskGroup.js";
 
-/**
- *
- * @param {number[]} data
- */
-function normalizeVectorArray(data) {
-    const n = data.length;
-
-    let magnitude2 = 0;
-
-    for (let i = 0; i < n; i++) {
-        const value = data[i];
-
-        const value2 = value * value;
-
-        magnitude2 += value2;
-    }
-
-
-    const magnitude = Math.sqrt(magnitude2);
-
-    for (let i = 0; i < n; i++) {
-        data[i] /= magnitude;
-    }
-
-}
-
 export class ThemeEngine {
     constructor() {
 
