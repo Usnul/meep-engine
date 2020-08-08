@@ -3,6 +3,11 @@ import { computeHashIntegerArray } from "../../../../../../../core/math/MathUtil
 
 export class AnimationStateDefinition {
     constructor() {
+        /**
+         * Arbitrary free-form text name. Used for identification purposes
+         * @type {string}
+         */
+        this.name = "";
 
         /**
          * Edges coming in

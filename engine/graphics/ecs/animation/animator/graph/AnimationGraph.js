@@ -226,6 +226,29 @@ export class AnimationGraph {
 
     /**
      *
+     * @param {string} name
+     * @return {AnimationState|undefined}
+     */
+    getStateByName(name) {
+
+        const animationStates = this.states;
+        const n = animationStates.length;
+        for (let i = 0; i < n; i++) {
+            const state = animationStates[i];
+
+            /**
+             * @type {AnimationStateDefinition}
+             */
+            const stateDefinition = state.def;
+
+            if (stateDefinition.name === name) {
+                return state;
+            }
+        }
+    }
+
+    /**
+     *
      * @param {AnimationTransitionDefinition} transitionDefinition
      * @returns {AnimationTransition}
      */

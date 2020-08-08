@@ -82,6 +82,7 @@ export function readAnimationGraphDefinitionFromJSON(
         animationClip.flags = motion.flags;
 
         state.type = jState.type;
+        state.name = jState.name;
         state.motion = animationClip;
 
         return state;

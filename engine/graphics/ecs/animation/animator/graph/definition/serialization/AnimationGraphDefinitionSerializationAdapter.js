@@ -238,6 +238,7 @@ export class AnimationGraphDefinitionSerializationAdapter extends BinaryClassSer
         const stateCount = buffer.readUintVar();
 
         for (let i = 0; i < stateCount; i++) {
+            const name = buffer.readUTF8String();
             const type = buffer.readUint8();
 
             const clipDefinitionIndex = buffer.readUintVar();
@@ -256,6 +257,7 @@ export class AnimationGraphDefinitionSerializationAdapter extends BinaryClassSer
 
             state.type = type;
             state.motion = clip;
+            state.name = name;
 
             states.push(state);
         }
