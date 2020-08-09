@@ -19,6 +19,16 @@ export function TerrainPreview() {
     this.scale = new Vector2(1, 1);
 }
 
+/**
+ *
+ * @param {TerrainPreview} other
+ */
+TerrainPreview.prototype.copy = function (other) {
+    this.url = other.url;
+    this.scale.copy(other.scale);
+    this.offset.copy(other.offset);
+};
+
 TerrainPreview.prototype.toJSON = function () {
     return {
         url: this.url,

@@ -112,9 +112,20 @@ function loadStandardImageTexture(path, success, failure, progress) {
  */
 function loadTexture(path, success, failure, progress) {
     //figure out what kind of a texture it is
-    const fileExtension = computeFileExtension(path);
+    let fileExtension = computeFileExtension(path);
     if (fileExtension === null) {
-        throw new Error(`no file extension on path '${path}'`);
+        //check if it's a data path
+
+        const match = path.match(/^data\:image\/([a-zA-Z0-9]+)\;/);
+
+        if (match === null) {
+            throw new Error(`no file extension on path '${path}'`);
+
+        } else {
+            //seems ok
+            fileExtension = match[1];
+        }
+
     }
 
     const lowerCaseExtension = fileExtension.toLowerCase();
