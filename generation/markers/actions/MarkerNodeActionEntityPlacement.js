@@ -49,7 +49,7 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
             r.transform.copy(transform);
         }
 
-        this.process = process;
+        r.process = process;
 
         return r;
     }
