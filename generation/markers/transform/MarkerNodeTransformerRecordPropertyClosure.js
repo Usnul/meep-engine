@@ -24,7 +24,7 @@ export class MarkerNodeTransformerRecordPropertyClosure extends MarkerNodeTransf
     /**
      *
      * @param {string} propertyName
-     * @param {function} value
+     * @param {function(node:MarkerNode, random:function, grid:GridData):*} value
      * @returns {MarkerNodeTransformerRecordPropertyClosure}
      */
     static from(propertyName, value) {
@@ -46,7 +46,7 @@ export class MarkerNodeTransformerRecordPropertyClosure extends MarkerNodeTransf
 
 
     transform(node, grid) {
-        const value = this.value(node,this.random, grid);
+        const value = this.value(node, this.random, grid);
 
         const result = node.clone();
 

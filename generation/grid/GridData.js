@@ -76,6 +76,34 @@ export class GridData {
 
     /**
      *
+     * @param {MarkerNode[]} result
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
+     * @param {MarkerNodeMatcher} matcher
+     * @returns {number} match count
+     */
+    queryMarkersInCircle(result, x, y, radius, matcher) {
+        let count = 0;
+        this.markers.traverseCircleIntersections(x, y, this.radius, leaf => {
+            /**
+             *
+             * @type {MarkerNode}
+             */
+            const marker = leaf.data;
+
+            if (matcher.match(marker)) {
+                result.push(marker);
+
+                count++;
+            }
+        });
+
+        return count;
+    }
+
+    /**
+     *
      * @param {number} x
      * @param {number} y
      * @param {number} radius

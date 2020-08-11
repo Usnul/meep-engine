@@ -4,6 +4,7 @@ import Vector3 from "../../../core/geom/Vector3.js";
 import { computePlaneRayIntersection } from "../../../core/geom/Plane.js";
 import ObservedValue from "../../../core/model/ObservedValue.js";
 import { SurfacePoint3 } from "../../../core/geom/3d/SurfacePoint3.js";
+import { max2, min2 } from "../../../core/math/MathUtils.js";
 
 
 const rayContact = new SurfacePoint3();
@@ -122,8 +123,13 @@ export class MinimapCameraView extends View {
             const v0 = getPoint(-1, 1);
             const v1 = getPoint(1, -1);
 
-            self.position.set(v0.x, v0.z);
-            self.size.set(v1.x - v0.x, v1.z - v0.z);
+            const x0 = min2(v0.x, v1.x);
+            const y0 = min2(v0.z, v1.z);
+            const x1 = max2(v0.x, v1.x);
+            const y1 = max2(v0.z, v1.z);
+
+            self.position.set(x0, y0);
+            self.size.set(x1 - x0, y1 - y0);
         };
 
         this

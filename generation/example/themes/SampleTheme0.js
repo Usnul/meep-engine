@@ -179,198 +179,199 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         )
     ],
     action: MarkerNodeActionEntityPlacement.from(
-        EntityBlueprint.from([
-            Mesh.fromJSON({
-                url: 'data/models/Fantasy Props/chest-wood.gltf',
-                castShadow: true,
-                receiveShadow: true
-            }),
-            Transform.fromJSON({}),
-            GridPosition.fromJSON({}),
-            ParticleEmitter.fromJSON({
-                "position": {
-                    "x": 106.73611111111111,
-                    "y": -6.605019546832523,
-                    "z": 161.11111111111111
-                },
-                "scale": {
-                    "x": 0.662797212600708,
-                    "y": 0.662797212600708,
-                    "z": 0.662797212600708
-                },
-                "rotation": {
-                    "x": 0.03830398104616067,
-                    "y": -0.6227358234290987,
-                    "z": 0.07906005037206675,
-                    "w": 0.7774846671730987
-                },
-                "parameters": [
-                    {
-                        "name": "scale",
-                        "itemSize": 1,
-                        "defaultTrackValue": {
+        {
+            blueprint: EntityBlueprint.from([
+                Mesh.fromJSON({
+                    url: 'data/models/Fantasy Props/chest-wood.gltf',
+                    castShadow: true,
+                    receiveShadow: true
+                }),
+                Transform.fromJSON({}),
+                GridPosition.fromJSON({}),
+                ParticleEmitter.fromJSON({
+                    "position": {
+                        "x": 106.73611111111111,
+                        "y": -6.605019546832523,
+                        "z": 161.11111111111111
+                    },
+                    "scale": {
+                        "x": 0.662797212600708,
+                        "y": 0.662797212600708,
+                        "z": 0.662797212600708
+                    },
+                    "rotation": {
+                        "x": 0.03830398104616067,
+                        "y": -0.6227358234290987,
+                        "z": 0.07906005037206675,
+                        "w": 0.7774846671730987
+                    },
+                    "parameters": [
+                        {
+                            "name": "scale",
                             "itemSize": 1,
-                            "data": [
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
-                    },
-                    {
-                        "name": "color",
-                        "itemSize": 4,
-                        "defaultTrackValue": {
-                            "itemSize": 4,
-                            "data": [
-                                1,
-                                1,
-                                1,
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
-                    }
-                ],
-                "preWarm": false,
-                "readDepth": true,
-                "softDepth": true,
-                "velocityAlign": true,
-                "blendingMode": 1,
-                "layers": [
-                    {
-                        "imageURL": "data/textures/particle/UETools/x64/Star_02.png",
-                        "particleLife": {
-                            "min": 2,
-                            "max": 3
-                        },
-                        "particleSize": {
-                            "min": 0.169,
-                            "max": 0.338
-                        },
-                        "particleRotation": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "particleRotationSpeed": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "emissionShape": 0,
-                        "emissionFrom": 1,
-                        "emissionRate": 4,
-                        "emissionImmediate": 0,
-                        "parameterTracks": [
-                            {
-                                "name": "color",
-                                "track": {
-                                    "itemSize": 4,
-                                    "data": [
-                                        0.9882352948188782,
-                                        0.9529411792755127,
-                                        0.0117647061124444,
-                                        0.01785714365541935,
-                                        0.9882352948188782,
-                                        0.9529411792755127,
-                                        0.0117647061124444,
-                                        0.6071428656578064,
-                                        0.9764705896377563,
-                                        0.9803921580314636,
-                                        0.8039215803146362,
-                                        0.648809552192688,
-                                        0.9764705896377563,
-                                        0.9803921580314636,
-                                        0.8039215803146362,
-                                        0
-                                    ],
-                                    "positions": [
-                                        0,
-                                        0.20652173459529877,
-                                        0.820652186870575,
-                                        1
-                                    ]
-                                }
+                            "defaultTrackValue": {
+                                "itemSize": 1,
+                                "data": [
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
                             }
-                        ],
-                        "position": {
-                            "x": 0,
-                            "y": 1,
-                            "z": 0
                         },
-                        "scale": {
-                            "x": 1.7000000476837158,
-                            "y": 1,
-                            "z": 1.7000000476837158
-                        },
-                        "particleVelocityDirection": {
-                            "direction": {
+                        {
+                            "name": "color",
+                            "itemSize": 4,
+                            "defaultTrackValue": {
+                                "itemSize": 4,
+                                "data": [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
+                            }
+                        }
+                    ],
+                    "preWarm": false,
+                    "readDepth": true,
+                    "softDepth": true,
+                    "velocityAlign": true,
+                    "blendingMode": 1,
+                    "layers": [
+                        {
+                            "imageURL": "data/textures/particle/UETools/x64/Star_02.png",
+                            "particleLife": {
+                                "min": 2,
+                                "max": 3
+                            },
+                            "particleSize": {
+                                "min": 0.169,
+                                "max": 0.338
+                            },
+                            "particleRotation": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "particleRotationSpeed": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "emissionShape": 0,
+                            "emissionFrom": 1,
+                            "emissionRate": 4,
+                            "emissionImmediate": 0,
+                            "parameterTracks": [
+                                {
+                                    "name": "color",
+                                    "track": {
+                                        "itemSize": 4,
+                                        "data": [
+                                            0.9882352948188782,
+                                            0.9529411792755127,
+                                            0.0117647061124444,
+                                            0.01785714365541935,
+                                            0.9882352948188782,
+                                            0.9529411792755127,
+                                            0.0117647061124444,
+                                            0.6071428656578064,
+                                            0.9764705896377563,
+                                            0.9803921580314636,
+                                            0.8039215803146362,
+                                            0.648809552192688,
+                                            0.9764705896377563,
+                                            0.9803921580314636,
+                                            0.8039215803146362,
+                                            0
+                                        ],
+                                        "positions": [
+                                            0,
+                                            0.20652173459529877,
+                                            0.820652186870575,
+                                            1
+                                        ]
+                                    }
+                                }
+                            ],
+                            "position": {
                                 "x": 0,
                                 "y": 1,
                                 "z": 0
                             },
-                            "angle": 0
-                        },
-                        "particleSpeed": {
-                            "min": 0.5,
-                            "max": 0.5
-                        }
-                    },
-                    {
-                        "imageURL": "data/textures/particle/UETools/x64/Circle_04.png",
-                        "particleLife": {
-                            "min": 100000000000,
-                            "max": 100000000000
-                        },
-                        "particleSize": {
-                            "min": 2.4,
-                            "max": 2.4
-                        },
-                        "particleRotation": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "particleRotationSpeed": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "emissionShape": 3,
-                        "emissionFrom": 1,
-                        "emissionRate": 0,
-                        "emissionImmediate": 1,
-                        "parameterTracks": [],
-                        "position": {
-                            "x": 0,
-                            "y": 0.699999988079071,
-                            "z": 0
-                        },
-                        "scale": {
-                            "x": 1,
-                            "y": 1,
-                            "z": 1
-                        },
-                        "particleVelocityDirection": {
-                            "direction": {
-                                "x": 0,
+                            "scale": {
+                                "x": 1.7000000476837158,
                                 "y": 1,
+                                "z": 1.7000000476837158
+                            },
+                            "particleVelocityDirection": {
+                                "direction": {
+                                    "x": 0,
+                                    "y": 1,
+                                    "z": 0
+                                },
+                                "angle": 0
+                            },
+                            "particleSpeed": {
+                                "min": 0.5,
+                                "max": 0.5
+                            }
+                        },
+                        {
+                            "imageURL": "data/textures/particle/UETools/x64/Circle_04.png",
+                            "particleLife": {
+                                "min": 100000000000,
+                                "max": 100000000000
+                            },
+                            "particleSize": {
+                                "min": 2.4,
+                                "max": 2.4
+                            },
+                            "particleRotation": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "particleRotationSpeed": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "emissionShape": 3,
+                            "emissionFrom": 1,
+                            "emissionRate": 0,
+                            "emissionImmediate": 1,
+                            "parameterTracks": [],
+                            "position": {
+                                "x": 0,
+                                "y": 0.699999988079071,
                                 "z": 0
                             },
-                            "angle": 0
-                        },
-                        "particleSpeed": {
-                            "min": 0,
-                            "max": 0
+                            "scale": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "particleVelocityDirection": {
+                                "direction": {
+                                    "x": 0,
+                                    "y": 1,
+                                    "z": 0
+                                },
+                                "angle": 0
+                            },
+                            "particleSpeed": {
+                                "min": 0,
+                                "max": 0
+                            }
                         }
-                    }
-                ]
+                    ]
+                })
+            ]), transform: Transform.fromJSON({
+                scale: { x: 0.5, y: 0.5, z: 0.5 },
+                position: { x: 0, y: 0, z: 0 }
             })
-        ]),
-        Transform.fromJSON({
-            scale: { x: 0.5, y: 0.5, z: 0.5 },
-            position: { x: 0, y: 0, z: 0 }
-        }))
+        })
 }));
 
 
@@ -385,10 +386,12 @@ ebpStartingPoint.add(GridPosition.fromJSON({}));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Starting Point'),
-    action: MarkerNodeActionEntityPlacement.from(ebpStartingPoint, Transform.fromJSON({
-        scale: { x: 0.5, y: 0.5, z: 0.5 },
-        position: { x: 0, y: 0.5, z: 0 }
-    }))
+    action: MarkerNodeActionEntityPlacement.from({
+        blueprint: ebpStartingPoint, transform: Transform.fromJSON({
+            scale: { x: 0.5, y: 0.5, z: 0.5 },
+            position: { x: 0, y: 0.5, z: 0 }
+        })
+    })
 }));
 
 const bpEnemy = EntityBlueprint.from([
@@ -541,41 +544,44 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         )
     ],
     action: MarkerNodeActionEntityPlacement.from(
-        bpEnemy,
-        Transform.fromJSON({
-            scale: { x: 0.3, y: 0.5, z: 0.3 },
-            position: { x: 0, y: 0.5, z: 0 }
-        })
+        {
+            blueprint: bpEnemy, transform: Transform.fromJSON({
+                scale: { x: 0.3, y: 0.5, z: 0.3 },
+                position: { x: 0, y: 0.5, z: 0 }
+            })
+        }
     )
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Base'),
     transformers: [MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1, 1))],
-    action: MarkerNodeActionEntityPlacement.from(EntityBlueprint.from([
-        Mesh.fromJSON({
-            url: 'data/models/LowPolyTownshipSet/Large_house/model.gltf',
-            dropShadow: true,
-            receiveShadow: true
-        }),
-        Transform.fromJSON({}),
-        GridPosition.fromJSON({}),
-        SoundEmitter.fromJSON({
-            isPositioned: true,
-            channel: 'ambient',
-            distanceMin: 6,
-            distanceMax: 35,
-            tracks: [
-                {
-                    url: "data/sounds/ambient/Universal Sound FX/AMBIENCES/Villages/AMBIENCES_Medieval_Village_loop_stereo.ogg",
-                    loop: true,
-                }
-            ]
+    action: MarkerNodeActionEntityPlacement.from({
+        blueprint: EntityBlueprint.from([
+            Mesh.fromJSON({
+                url: 'data/models/LowPolyTownshipSet/Large_house/model.gltf',
+                dropShadow: true,
+                receiveShadow: true
+            }),
+            Transform.fromJSON({}),
+            GridPosition.fromJSON({}),
+            SoundEmitter.fromJSON({
+                isPositioned: true,
+                channel: 'ambient',
+                distanceMin: 6,
+                distanceMax: 35,
+                tracks: [
+                    {
+                        url: "data/sounds/ambient/Universal Sound FX/AMBIENCES/Villages/AMBIENCES_Medieval_Village_loop_stereo.ogg",
+                        loop: true,
+                    }
+                ]
+            })
+        ]), transform: Transform.fromJSON({
+            scale: { x: 2.2, y: 2.2, z: 2.2 },
+            position: { x: 0, y: 0, z: 0 }
         })
-    ]), Transform.fromJSON({
-        scale: { x: 2.2, y: 2.2, z: 2.2 },
-        position: { x: 0, y: 0, z: 0 }
-    }))
+    })
 }));
 
 const ebpRoadJunction90 = new EntityBlueprint();
@@ -589,10 +595,12 @@ ebpRoadJunction90.add(GridPosition.fromJSON({}));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Road Junction Decorator 90'),
-    action: MarkerNodeActionEntityPlacement.from(ebpRoadJunction90, Transform.fromJSON({
-        scale: { x: 0.1, y: 1, z: 0.1 },
-        position: { x: 0, y: 1, z: 0 }
-    }))
+    action: MarkerNodeActionEntityPlacement.from({
+        blueprint: ebpRoadJunction90, transform: Transform.fromJSON({
+            scale: { x: 0.1, y: 1, z: 0.1 },
+            position: { x: 0, y: 1, z: 0 }
+        })
+    })
 }));
 
 const ebpBuffObject0 = new EntityBlueprint();
@@ -616,10 +624,12 @@ ebpBuffObject0.add(GridPosition.fromJSON({}));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Attack Power Increase'),
-    action: MarkerNodeActionEntityPlacement.from(ebpBuffObject0, Transform.fromJSON({
-        scale: { x: 0.4, y: 1, z: 0.4 },
-        position: { x: 0, y: 1, z: 0 }
-    }))
+    action: MarkerNodeActionEntityPlacement.from({
+        blueprint: ebpBuffObject0, transform: Transform.fromJSON({
+            scale: { x: 0.4, y: 1, z: 0.4 },
+            position: { x: 0, y: 1, z: 0 }
+        })
+    })
 }));
 
 const ebpBuffObjectDefense = new EntityBlueprint();
@@ -643,10 +653,12 @@ ebpBuffObjectDefense.add(GridPosition.fromJSON({}));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Defense Increase'),
-    action: MarkerNodeActionEntityPlacement.from(ebpBuffObjectDefense, Transform.fromJSON({
-        scale: { x: 0.4, y: 1, z: 0.4 },
-        position: { x: 0, y: 1, z: 0 }
-    }))
+    action: MarkerNodeActionEntityPlacement.from({
+        blueprint: ebpBuffObjectDefense, transform: Transform.fromJSON({
+            scale: { x: 0.4, y: 1, z: 0.4 },
+            position: { x: 0, y: 1, z: 0 }
+        })
+    })
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
@@ -655,355 +667,357 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         MarkerNodeTransformerYRotateByFilter.from(CellFilterSimplexNoise.from(1.1, 1.1))
     ],
     action: MarkerNodeActionEntityPlacement.from(
-        EntityBlueprint.from([
-            Mesh.fromJSON({
-                url: 'data/models/LowPolyTownshipSet/Well/model.gltf',
-                dropShadow: true,
-                receiveShadow: true
-            }),
-            Transform.fromJSON({}),
-            GridPosition.fromJSON({}),
-            new Tag(),
-            new HeadsUpDisplay(),
-            new ViewportPosition(),
-            GUIElement.fromJSON({
-                parameters: {
-                    id: 'Well',
-                    classList: "__debug-plaque"
-                },
-                klass: 'view.LocalizedLabel'
-            }),
-            ParticleEmitter.fromJSON({
-                "position": {
-                    "x": 92.47767720491711,
-                    "y": -6.869804537333128,
-                    "z": 237.8283880265284
-                },
-                "scale": {
-                    "x": 0.0037936652079224586,
-                    "y": 0.0037936652079224586,
-                    "z": 0.0037936652079224586
-                },
-                "rotation": {
-                    "x": -0.0006912089747605077,
-                    "y": 0.30620557581890523,
-                    "z": -0.0006912089747605077,
-                    "w": 0.9519649099613489
-                },
-                "parameters": [
-                    {
-                        "name": "scale",
-                        "itemSize": 1,
-                        "defaultTrackValue": {
-                            "itemSize": 1,
-                            "data": [
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
+        {
+            blueprint: EntityBlueprint.from([
+                Mesh.fromJSON({
+                    url: 'data/models/LowPolyTownshipSet/Well/model.gltf',
+                    dropShadow: true,
+                    receiveShadow: true
+                }),
+                Transform.fromJSON({}),
+                GridPosition.fromJSON({}),
+                new Tag(),
+                new HeadsUpDisplay(),
+                new ViewportPosition(),
+                GUIElement.fromJSON({
+                    parameters: {
+                        id: 'Well',
+                        classList: "__debug-plaque"
                     },
-                    {
-                        "name": "color",
-                        "itemSize": 4,
-                        "defaultTrackValue": {
-                            "itemSize": 4,
-                            "data": [
-                                1,
-                                1,
-                                1,
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
-                    }
-                ],
-                "preWarm": false,
-                "readDepth": true,
-                "softDepth": true,
-                "velocityAlign": false,
-                "blendingMode": 1,
-                "layers": [
-                    {
-                        "imageURL": "data/textures/particle/travnik/glowing_sphere2/glowing_sphere_64.png",
-                        "particleLife": {
-                            "min": 3,
-                            "max": 5
-                        },
-                        "particleSize": {
-                            "min": 0.1,
-                            "max": 0.2
-                        },
-                        "particleRotation": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "particleRotationSpeed": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "emissionShape": 0,
-                        "emissionFrom": 1,
-                        "emissionRate": 3,
-                        "emissionImmediate": 0,
-                        "parameterTracks": [
-                            {
-                                "name": "color",
-                                "track": {
-                                    "itemSize": 4,
-                                    "data": [
-                                        0.01568627543747425,
-                                        0.5215686559677124,
-                                        0.9882352948188782,
-                                        0,
-                                        0.01568627543747425,
-                                        0.5215686559677124,
-                                        0.9882352948188782,
-                                        0.9900000095367432,
-                                        0.01568627543747425,
-                                        0.5215686559677124,
-                                        0.9882352948188782,
-                                        0.5450000166893005,
-                                        0.01568627543747425,
-                                        0.5215686559677124,
-                                        0.9882352948188782,
-                                        0.004999999888241291
-                                    ],
-                                    "positions": [
-                                        0,
-                                        0.336448609828949,
-                                        0.8177570104598999,
-                                        1
-                                    ]
-                                }
-                            },
-                            {
-                                "name": "scale",
-                                "track": {
-                                    "itemSize": 1,
-                                    "data": [
-                                        0.9993333220481873
-                                    ],
-                                    "positions": [
-                                        0.5
-                                    ]
-                                }
+                    klass: 'view.LocalizedLabel'
+                }),
+                ParticleEmitter.fromJSON({
+                    "position": {
+                        "x": 92.47767720491711,
+                        "y": -6.869804537333128,
+                        "z": 237.8283880265284
+                    },
+                    "scale": {
+                        "x": 0.0037936652079224586,
+                        "y": 0.0037936652079224586,
+                        "z": 0.0037936652079224586
+                    },
+                    "rotation": {
+                        "x": -0.0006912089747605077,
+                        "y": 0.30620557581890523,
+                        "z": -0.0006912089747605077,
+                        "w": 0.9519649099613489
+                    },
+                    "parameters": [
+                        {
+                            "name": "scale",
+                            "itemSize": 1,
+                            "defaultTrackValue": {
+                                "itemSize": 1,
+                                "data": [
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
                             }
-                        ],
-                        "position": {
-                            "x": 0,
-                            "y": 300,
-                            "z": 0
                         },
-                        "scale": {
-                            "x": 300,
-                            "y": 300,
-                            "z": 300
-                        },
-                        "particleVelocityDirection": {
-                            "direction": {
+                        {
+                            "name": "color",
+                            "itemSize": 4,
+                            "defaultTrackValue": {
+                                "itemSize": 4,
+                                "data": [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
+                            }
+                        }
+                    ],
+                    "preWarm": false,
+                    "readDepth": true,
+                    "softDepth": true,
+                    "velocityAlign": false,
+                    "blendingMode": 1,
+                    "layers": [
+                        {
+                            "imageURL": "data/textures/particle/travnik/glowing_sphere2/glowing_sphere_64.png",
+                            "particleLife": {
+                                "min": 3,
+                                "max": 5
+                            },
+                            "particleSize": {
+                                "min": 0.1,
+                                "max": 0.2
+                            },
+                            "particleRotation": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "particleRotationSpeed": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "emissionShape": 0,
+                            "emissionFrom": 1,
+                            "emissionRate": 3,
+                            "emissionImmediate": 0,
+                            "parameterTracks": [
+                                {
+                                    "name": "color",
+                                    "track": {
+                                        "itemSize": 4,
+                                        "data": [
+                                            0.01568627543747425,
+                                            0.5215686559677124,
+                                            0.9882352948188782,
+                                            0,
+                                            0.01568627543747425,
+                                            0.5215686559677124,
+                                            0.9882352948188782,
+                                            0.9900000095367432,
+                                            0.01568627543747425,
+                                            0.5215686559677124,
+                                            0.9882352948188782,
+                                            0.5450000166893005,
+                                            0.01568627543747425,
+                                            0.5215686559677124,
+                                            0.9882352948188782,
+                                            0.004999999888241291
+                                        ],
+                                        "positions": [
+                                            0,
+                                            0.336448609828949,
+                                            0.8177570104598999,
+                                            1
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "scale",
+                                    "track": {
+                                        "itemSize": 1,
+                                        "data": [
+                                            0.9993333220481873
+                                        ],
+                                        "positions": [
+                                            0.5
+                                        ]
+                                    }
+                                }
+                            ],
+                            "position": {
                                 "x": 0,
-                                "y": 1,
+                                "y": 300,
                                 "z": 0
                             },
-                            "angle": 3
-                        },
-                        "particleSpeed": {
-                            "min": 0.03,
-                            "max": 0.1
+                            "scale": {
+                                "x": 300,
+                                "y": 300,
+                                "z": 300
+                            },
+                            "particleVelocityDirection": {
+                                "direction": {
+                                    "x": 0,
+                                    "y": 1,
+                                    "z": 0
+                                },
+                                "angle": 3
+                            },
+                            "particleSpeed": {
+                                "min": 0.03,
+                                "max": 0.1
+                            }
                         }
-                    }
-                ]
+                    ]
+                })
+            ]), transform: Transform.fromJSON({
+                scale: { x: 0.005, y: 0.005, z: 0.005 },
+                position: { x: 0, y: 0, z: 0 }
             })
-        ]),
-        Transform.fromJSON({
-            scale: { x: 0.005, y: 0.005, z: 0.005 },
-            position: { x: 0, y: 0, z: 0 }
-        }))
+        })
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Campfire'),
     action: MarkerNodeActionEntityPlacement.from(
-        EntityBlueprint.from([
-            Mesh.fromJSON({
-                url: 'data/models/MOBA and Tower Defense/Campfire.gltf',
-                dropShadow: true,
-                receiveShadow: true
-            }),
-            new HeadsUpDisplay(),
-            new ViewportPosition(),
-            GUIElement.fromJSON({
-                parameters: {
-                    id: 'Campfire',
-                    classList: "__debug-plaque"
-                },
-                klass: 'view.LocalizedLabel'
-            }),
-            Transform.fromJSON({}),
-            GridPosition.fromJSON({}),
-            ParticleEmitter.fromJSON({
-                "position": {
-                    "x": 62.6424314119665,
-                    "y": -6.534322529929943,
-                    "z": 245.9431982357952
-                },
-                "scale": {
-                    "x": 0.8654883503913879,
-                    "y": 0.8654883503913879,
-                    "z": 0.8654883503913879
-                },
-                "rotation": {
-                    "x": 0.03248682181374386,
-                    "y": -0.1403154218763832,
-                    "z": 0.07395936029937433,
-                    "w": 0.9868060608935284
-                },
-                "parameters": [
-                    {
-                        "name": "scale",
-                        "itemSize": 1,
-                        "defaultTrackValue": {
-                            "itemSize": 1,
-                            "data": [
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
+        {
+            blueprint: EntityBlueprint.from([
+                Mesh.fromJSON({
+                    url: 'data/models/MOBA and Tower Defense/Campfire.gltf',
+                    dropShadow: true,
+                    receiveShadow: true
+                }),
+                new HeadsUpDisplay(),
+                new ViewportPosition(),
+                GUIElement.fromJSON({
+                    parameters: {
+                        id: 'Campfire',
+                        classList: "__debug-plaque"
                     },
-                    {
-                        "name": "color",
-                        "itemSize": 4,
-                        "defaultTrackValue": {
-                            "itemSize": 4,
-                            "data": [
-                                1,
-                                1,
-                                1,
-                                1
-                            ],
-                            "positions": [
-                                0
-                            ]
-                        }
-                    }
-                ],
-                "preWarm": true,
-                "readDepth": true,
-                "softDepth": true,
-                "velocityAlign": false,
-                "blendingMode": 0,
-                "layers": [
-                    {
-                        "imageURL": "data/textures/particle/UETools/x64/Smoke_14.png",
-                        "particleLife": {
-                            "min": 6,
-                            "max": 7
-                        },
-                        "particleSize": {
-                            "min": 0.23,
-                            "max": 0.23
-                        },
-                        "particleRotation": {
-                            "min": 0,
-                            "max": 6.3
-                        },
-                        "particleRotationSpeed": {
-                            "min": 0,
-                            "max": 0
-                        },
-                        "emissionShape": 3,
-                        "emissionFrom": 1,
-                        "emissionRate": 2,
-                        "emissionImmediate": 0,
-                        "parameterTracks": [
-                            {
-                                "name": "scale",
-                                "track": {
-                                    "itemSize": 1,
-                                    "data": [
-                                        2,
-                                        2.5999999046325684,
-                                        2.9000000953674316
-                                    ],
-                                    "positions": [
-                                        0,
-                                        0.5,
-                                        1
-                                    ]
-                                }
-                            },
-                            {
-                                "name": "color",
-                                "track": {
-                                    "itemSize": 4,
-                                    "data": [
-                                        0.15294118225574493,
-                                        0.15294118225574493,
-                                        0.15294118225574493,
-                                        0,
-                                        0.364705890417099,
-                                        0.364705890417099,
-                                        0.364705890417099,
-                                        0.4821428656578064,
-                                        0.4117647111415863,
-                                        0.4117647111415863,
-                                        0.4117647111415863,
-                                        0.3392857015132904,
-                                        0.47058823704719543,
-                                        0.47058823704719543,
-                                        0.47058823704719543,
-                                        0.125,
-                                        0.6666666865348816,
-                                        0.6666666865348816,
-                                        0.6666666865348816,
-                                        0
-                                    ],
-                                    "positions": [
-                                        0,
-                                        0.15217390656471252,
-                                        0.5,
-                                        0.875,
-                                        1
-                                    ]
-                                }
+                    klass: 'view.LocalizedLabel'
+                }),
+                Transform.fromJSON({}),
+                GridPosition.fromJSON({}),
+                ParticleEmitter.fromJSON({
+                    "position": {
+                        "x": 62.6424314119665,
+                        "y": -6.534322529929943,
+                        "z": 245.9431982357952
+                    },
+                    "scale": {
+                        "x": 0.8654883503913879,
+                        "y": 0.8654883503913879,
+                        "z": 0.8654883503913879
+                    },
+                    "rotation": {
+                        "x": 0.03248682181374386,
+                        "y": -0.1403154218763832,
+                        "z": 0.07395936029937433,
+                        "w": 0.9868060608935284
+                    },
+                    "parameters": [
+                        {
+                            "name": "scale",
+                            "itemSize": 1,
+                            "defaultTrackValue": {
+                                "itemSize": 1,
+                                "data": [
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
                             }
-                        ],
-                        "position": {
-                            "x": 0,
-                            "y": 0,
-                            "z": 0
                         },
-                        "scale": {
-                            "x": 1,
-                            "y": 1,
-                            "z": 1
-                        },
-                        "particleVelocityDirection": {
-                            "direction": {
+                        {
+                            "name": "color",
+                            "itemSize": 4,
+                            "defaultTrackValue": {
+                                "itemSize": 4,
+                                "data": [
+                                    1,
+                                    1,
+                                    1,
+                                    1
+                                ],
+                                "positions": [
+                                    0
+                                ]
+                            }
+                        }
+                    ],
+                    "preWarm": true,
+                    "readDepth": true,
+                    "softDepth": true,
+                    "velocityAlign": false,
+                    "blendingMode": 0,
+                    "layers": [
+                        {
+                            "imageURL": "data/textures/particle/UETools/x64/Smoke_14.png",
+                            "particleLife": {
+                                "min": 6,
+                                "max": 7
+                            },
+                            "particleSize": {
+                                "min": 0.23,
+                                "max": 0.23
+                            },
+                            "particleRotation": {
+                                "min": 0,
+                                "max": 6.3
+                            },
+                            "particleRotationSpeed": {
+                                "min": 0,
+                                "max": 0
+                            },
+                            "emissionShape": 3,
+                            "emissionFrom": 1,
+                            "emissionRate": 2,
+                            "emissionImmediate": 0,
+                            "parameterTracks": [
+                                {
+                                    "name": "scale",
+                                    "track": {
+                                        "itemSize": 1,
+                                        "data": [
+                                            2,
+                                            2.5999999046325684,
+                                            2.9000000953674316
+                                        ],
+                                        "positions": [
+                                            0,
+                                            0.5,
+                                            1
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "color",
+                                    "track": {
+                                        "itemSize": 4,
+                                        "data": [
+                                            0.15294118225574493,
+                                            0.15294118225574493,
+                                            0.15294118225574493,
+                                            0,
+                                            0.364705890417099,
+                                            0.364705890417099,
+                                            0.364705890417099,
+                                            0.4821428656578064,
+                                            0.4117647111415863,
+                                            0.4117647111415863,
+                                            0.4117647111415863,
+                                            0.3392857015132904,
+                                            0.47058823704719543,
+                                            0.47058823704719543,
+                                            0.47058823704719543,
+                                            0.125,
+                                            0.6666666865348816,
+                                            0.6666666865348816,
+                                            0.6666666865348816,
+                                            0
+                                        ],
+                                        "positions": [
+                                            0,
+                                            0.15217390656471252,
+                                            0.5,
+                                            0.875,
+                                            1
+                                        ]
+                                    }
+                                }
+                            ],
+                            "position": {
                                 "x": 0,
-                                "y": 1,
+                                "y": 0,
                                 "z": 0
                             },
-                            "angle": 0.17481119672686515
-                        },
-                        "particleSpeed": {
-                            "min": 0.315,
-                            "max": 0.48500000000000004
+                            "scale": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "particleVelocityDirection": {
+                                "direction": {
+                                    "x": 0,
+                                    "y": 1,
+                                    "z": 0
+                                },
+                                "angle": 0.17481119672686515
+                            },
+                            "particleSpeed": {
+                                "min": 0.315,
+                                "max": 0.48500000000000004
+                            }
                         }
-                    }
-                ]
+                    ]
+                })
+            ]), transform: Transform.fromJSON({
+                scale: { x: 1, y: 1, z: 1 },
+                position: { x: 0, y: 0, z: 0 }
             })
-        ]),
-        Transform.fromJSON({
-            scale: { x: 1, y: 1, z: 1 },
-            position: { x: 0, y: 0, z: 0 }
-        }))
+        })
 }));
 
 const filterAridArea = CellFilterClamp.from(
@@ -1021,53 +1035,56 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     action: MarkerNodeActionSelectWeighted.from([
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_01.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 23, y: 23, z: 23 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_01.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 23, y: 23, z: 23 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 1000)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_02.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 21, y: 21, z: 21 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_02.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 21, y: 21, z: 21 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 8000512)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_03.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 20, y: 20, z: 20 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_03.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 20, y: 20, z: 20 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(37, 30, 5817512),
                 filterAridArea
@@ -1075,36 +1092,38 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_04.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 27, y: 27, z: 27 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_04.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 27, y: 27, z: 27 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 33, 23985417)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_05.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 24, y: 24, z: 24 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_05.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 24, y: 24, z: 24 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(27, 33, 7512839),
                 filterAridArea
@@ -1112,36 +1131,38 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_06.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 20, y: 20, z: 20 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_06.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 20, y: 20, z: 20 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(27, 33, 681230)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_07.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 22, y: 22, z: 22 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_07.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 22, y: 22, z: 22 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(27, 33, 9124715712),
                 filterAridArea
@@ -1149,36 +1170,38 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_08.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 23, y: 23, z: 23 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_08.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 23, y: 23, z: 23 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(27, 33, 1581273)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_09.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 26, y: 26, z: 26 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_09.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 26, y: 26, z: 26 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(27, 33, 1912851723)
         )
     ])
@@ -1189,53 +1212,56 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     action: MarkerNodeActionSelectWeighted.from([
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_Small_01.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 32, y: 32, z: 32 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_Small_01.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 32, y: 32, z: 32 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 1000)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_Small_02.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 31, y: 31, z: 31 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_Small_02.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 31, y: 31, z: 31 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 8000512)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_Small_03.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 31, y: 31, z: 31 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_Small_03.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 31, y: 31, z: 31 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(27, 33, 9124715712),
                 filterAridArea
@@ -1243,36 +1269,38 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_Small_04.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 27, y: 27, z: 27 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_Small_04.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 27, y: 27, z: 27 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 33, 23985417)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Tree_Small_05.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 24, y: 24, z: 24 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Tree_Small_05.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 24, y: 24, z: 24 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(27, 33, 7512839)
         )
     ])
@@ -1281,19 +1309,20 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Tree-1'),
     action: MarkerNodeActionEntityPlacement.from(
-        EntityBlueprint.from([
-            Mesh.fromJSON({
-                url: 'data/models/LowPolyTownshipSet/Tree_1/Tree_1.gltf',
-                dropShadow: true,
-                receiveShadow: true
-            }),
-            Transform.fromJSON({}),
-            new ClingToTerrain()
-        ]),
-        Transform.fromJSON({
-            scale: { x: 1, y: 1, z: 1 },
-            position: { x: 0, y: 0, z: 0 }
-        }))
+        {
+            blueprint: EntityBlueprint.from([
+                Mesh.fromJSON({
+                    url: 'data/models/LowPolyTownshipSet/Tree_1/Tree_1.gltf',
+                    dropShadow: true,
+                    receiveShadow: true
+                }),
+                Transform.fromJSON({}),
+                new ClingToTerrain()
+            ]), transform: Transform.fromJSON({
+                scale: { x: 1, y: 1, z: 1 },
+                position: { x: 0, y: 0, z: 0 }
+            })
+        })
 }));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
@@ -1301,19 +1330,20 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     action: MarkerNodeActionSelectWeighted.from([
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Mushroom3B.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 1.41, y: 1.41, z: 1.41 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Mushroom3B.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 1.41, y: 1.41, z: 1.41 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(20, 20, 507),
                 CellFilterSimplexNoise.from(30, 30, 1000)
@@ -1321,19 +1351,20 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Mushroom4B.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 2.2, y: 2.2, z: 2.2 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Mushroom4B.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 2.2, y: 2.2, z: 2.2 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 10050)
         )
     ]),
@@ -1347,19 +1378,20 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     action: MarkerNodeActionSelectWeighted.from([
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Mushroom3A.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 1, y: 1, z: 1 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Mushroom3A.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 1, y: 1, z: 1 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterMultiply.from(
                 CellFilterSimplexNoise.from(20, 20, 507),
                 CellFilterSimplexNoise.from(30, 30, 1000)
@@ -1367,19 +1399,20 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/MOBA and Tower Defense/Mushroom4A.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    new ClingToTerrain()
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 1.3, y: 1.3, z: 1.3 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/MOBA and Tower Defense/Mushroom4A.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        new ClingToTerrain()
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 1.3, y: 1.3, z: 1.3 },
+                        position: { x: 0, y: 0, z: 0 }
+                    })
+                }),
             CellFilterSimplexNoise.from(30, 30, 10050)
         )
     ]),
@@ -1393,78 +1426,82 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     action: MarkerNodeActionSelectWeighted.from([
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_1.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    ClingToTerrain.fromJSON({
-                        normalAlign: true
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/LowPolyTownshipSet/Rocks/Rock_1.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        ClingToTerrain.fromJSON({
+                            normalAlign: true
+                        })
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 10, y: 10, z: 10 },
+                        position: { x: 0, y: 0, z: 0 }
                     })
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 10, y: 10, z: 10 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                }),
             CellFilterConstant.from(1)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_2.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    ClingToTerrain.fromJSON({
-                        normalAlign: true
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/LowPolyTownshipSet/Rocks/Rock_2.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        ClingToTerrain.fromJSON({
+                            normalAlign: true
+                        })
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 12, y: 12, z: 12 },
+                        position: { x: 0, y: 0, z: 0 }
                     })
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 12, y: 12, z: 12 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                }),
             CellFilterConstant.from(2)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_3.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    ClingToTerrain.fromJSON({
-                        normalAlign: true
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/LowPolyTownshipSet/Rocks/Rock_3.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        ClingToTerrain.fromJSON({
+                            normalAlign: true
+                        })
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 12, y: 12, z: 12 },
+                        position: { x: 0, y: 0, z: 0 }
                     })
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 12, y: 12, z: 12 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                }),
             CellFilterConstant.from(0.7)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
-                EntityBlueprint.from([
-                    Mesh.fromJSON({
-                        url: 'data/models/LowPolyTownshipSet/Rocks/Rock_4.gltf',
-                        dropShadow: true,
-                        receiveShadow: true
-                    }),
-                    Transform.fromJSON({}),
-                    ClingToTerrain.fromJSON({
-                        normalAlign: true
+                {
+                    blueprint: EntityBlueprint.from([
+                        Mesh.fromJSON({
+                            url: 'data/models/LowPolyTownshipSet/Rocks/Rock_4.gltf',
+                            dropShadow: true,
+                            receiveShadow: true
+                        }),
+                        Transform.fromJSON({}),
+                        ClingToTerrain.fromJSON({
+                            normalAlign: true
+                        })
+                    ]), transform: Transform.fromJSON({
+                        scale: { x: 12, y: 12, z: 12 },
+                        position: { x: 0, y: 0, z: 0 }
                     })
-                ]),
-                Transform.fromJSON({
-                    scale: { x: 12, y: 12, z: 12 },
-                    position: { x: 0, y: 0, z: 0 }
-                })),
+                }),
             CellFilterConstant.from(1)
         )
     ]),

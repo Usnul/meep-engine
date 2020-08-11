@@ -8,6 +8,10 @@ import { GridTaskExecuteRuleTimes } from "../../grid/generation/GridTaskExecuteR
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
+import { TransfromNearbyMarkers } from "../../placement/TransfromNearbyMarkers.js";
+import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
+import { MarkerNodeTransformerRecordProperty } from "../../markers/transform/MarkerNodeTransformerRecordProperty.js";
+import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
 
 const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
 
@@ -22,7 +26,11 @@ const rule = GridCellPlacementRule.from(
     pattern,
     [
         GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
-        GridCellActionPlaceMarker.from({ type: 'Starting Point' })
+        GridCellActionPlaceMarker.from({ type: 'Starting Point' }),
+        // transfer ownership of any base within some distance to the player
+        TransfromNearbyMarkers.from(5, MarkerNodeMatcherByType.from('Base'), [
+            MarkerNodeTransformerRecordProperty.from('team', CellFilterConstant.from(0))
+        ])
     ]
 );
 

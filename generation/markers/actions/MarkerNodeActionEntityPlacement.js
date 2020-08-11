@@ -18,15 +18,29 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
          * @type {Transform}
          */
         this.transform = new Transform();
+
+        /**
+         *
+         * @type {Function}
+         */
+        this.process = null;
     }
 
     /**
      *
      * @param {EntityBlueprint} blueprint
      * @param {Transform} [transform]
+     * @param {function(EntityBuilder, MarkerNode, GridData, EntityComponentDataset)} [process] Opportunity to mutate entity before it is added to the dataset (ecd)
      * @returns {MarkerNodeActionEntityPlacement}
      */
-    static from(blueprint, transform = undefined) {
+    static from(
+        {
+            blueprint,
+            transform = undefined,
+            process = null
+        }
+    ) {
+
         const r = new MarkerNodeActionEntityPlacement();
 
         r.entity = blueprint;
@@ -34,6 +48,8 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         if (transform !== undefined) {
             r.transform.copy(transform);
         }
+
+        this.process = process;
 
         return r;
     }
@@ -61,6 +77,13 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
 
         if (t !== null) {
             t.multiplyTransforms(node.transform, this.transform);
+        }
+
+        // execute post-process step
+        const process = this.process;
+
+        if (process !== null) {
+            process(entityBuilder, node, grid, ecd);
         }
 
         entityBuilder.build(ecd);

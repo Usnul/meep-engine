@@ -86,6 +86,10 @@ const rule = GridCellPlacementRule.from(pMatcher, [
                     type: 'Base',
                     size: 0.5,
                     tags: ['Town'],
+                    properties: {
+                        // assign to enemy team
+                        team: 1
+                    },
                     transform: Transform.fromJSON({
                         position: {
                             x: 0.5,
