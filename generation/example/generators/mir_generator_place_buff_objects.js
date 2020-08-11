@@ -7,7 +7,7 @@ import { GridTags } from "../../GridTags.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
-import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/discrete/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversable.js";

@@ -5,10 +5,10 @@ import { CellMatcherLayerBitMaskTest } from "../rules/CellMatcherLayerBitMaskTes
 import { GridTags } from "../GridTags.js";
 import { CellMatcherNot } from "../rules/logic/CellMatcherNot.js";
 import { GridCellActionPlaceMarker } from "../markers/GridCellActionPlaceMarker.js";
-import { GridTaskCellularAutomata } from "../grid/generation/GridTaskCellularAutomata.js";
-import { GridTaskActionRuleSet } from "../grid/generation/GridTaskCellActionRuleSet.js";
+import { GridTaskCellularAutomata } from "../grid/generation/discrete/GridTaskCellularAutomata.js";
+import { GridTaskActionRuleSet } from "../grid/generation/discrete/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../markers/GridActionRuleSet.js";
-import { GridTaskBuildSourceDistanceMap } from "../grid/generation/GridTaskBuildSourceDistanceMap.js";
+import { GridTaskBuildSourceDistanceMap } from "../grid/generation/discrete/layer/GridTaskBuildSourceDistanceMap.js";
 import { CellMatcherAnd } from "../rules/logic/CellMatcherAnd.js";
 import { GridCellActionPlaceTags } from "../placement/GridCellActionPlaceTags.js";
 import { CellMatcherContainsMarkerWithinRadius } from "../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
@@ -16,7 +16,7 @@ import { mir_matcher_attack_corridor } from "./rules/mir_matcher_attack_corridor
 import { mir_generator_place_bases } from "./generators/mir_generator_place_bases.js";
 import { matcher_tag_traversable_unoccupied } from "./rules/matcher_tag_traversable_unoccupied.js";
 import { mir_generator_place_starting_point } from "./generators/mir_generator_place_starting_point.js";
-import { GridTaskConnectRooms } from "../grid/generation/GridTaskConnectRooms.js";
+import { GridTaskConnectRooms } from "../grid/generation/discrete/GridTaskConnectRooms.js";
 import { matcher_tag_traversable } from "./rules/matcher_tag_traversable.js";
 import { GridTaskGenerateRoads } from "../grid/generation/road/GridTaskGenerateRoads.js";
 import { mir_generator_place_road_decorators } from "./generators/mir_generator_place_road_decorators.js";

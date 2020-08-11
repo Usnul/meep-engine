@@ -1,20 +1,20 @@
-import { GridTaskGenerator } from "../GridTaskGenerator.js";
-import { BitSet } from "../../../core/binary/BitSet.js";
-import Task from "../../../core/process/task/Task.js";
-import TaskSignal from "../../../core/process/task/TaskSignal.js";
-import Vector2 from "../../../core/geom/Vector2.js";
-import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
-import { passThrough } from "../../../core/function/Functions.js";
-import TaskGroup from "../../../core/process/task/TaskGroup.js";
-import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
-import { bitSet2Sampler2D } from "../../../engine/graphics/texture/sampler/util/bitSet2Sampler2D.js";
-import { min2 } from "../../../core/math/MathUtils.js";
-import { drawSamplerHTML } from "../../../engine/graphics/texture/sampler/util/drawSamplerHTML.js";
-import { matcher_tag_unoccupied } from "../../example/rules/matcher_tag_unoccupied.js";
-import { buildDistanceMapToObjective } from "./util/buildDistanceMapToObjective.js";
-import { buildPathFromDistanceMap } from "./util/buildPathFromDistanceMap.js";
-import { actionTask } from "../../../core/process/task/TaskUtils.js";
-import { assert } from "../../../core/assert.js";
+import { GridTaskGenerator } from "../../GridTaskGenerator.js";
+import { BitSet } from "../../../../core/binary/BitSet.js";
+import Task from "../../../../core/process/task/Task.js";
+import TaskSignal from "../../../../core/process/task/TaskSignal.js";
+import Vector2 from "../../../../core/geom/Vector2.js";
+import BinaryHeap from "../../../../engine/navigation/grid/FastBinaryHeap.js";
+import { passThrough } from "../../../../core/function/Functions.js";
+import TaskGroup from "../../../../core/process/task/TaskGroup.js";
+import { Sampler2D } from "../../../../engine/graphics/texture/sampler/Sampler2D.js";
+import { bitSet2Sampler2D } from "../../../../engine/graphics/texture/sampler/util/bitSet2Sampler2D.js";
+import { min2 } from "../../../../core/math/MathUtils.js";
+import { drawSamplerHTML } from "../../../../engine/graphics/texture/sampler/util/drawSamplerHTML.js";
+import { matcher_tag_unoccupied } from "../../../example/rules/matcher_tag_unoccupied.js";
+import { buildDistanceMapToObjective } from "../util/buildDistanceMapToObjective.js";
+import { buildPathFromDistanceMap } from "../util/buildPathFromDistanceMap.js";
+import { actionTask } from "../../../../core/process/task/TaskUtils.js";
+import { assert } from "../../../../core/assert.js";
 
 const ESTIMATED_TILES_PER_ROOM = 900;
 

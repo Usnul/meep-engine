@@ -59,7 +59,7 @@ export class GridActionRuleSet {
      */
     static from({ rules, policy = RuleSelectionPolicyType.Sequential, pattern = [0, 0], allowEveryRotation = false }) {
         assert.enum(policy, RuleSelectionPolicyType, 'policy');
-assert.typeOf(allowEveryRotation,'boolean','allowEveryRotation');
+        assert.typeOf(allowEveryRotation, 'boolean', 'allowEveryRotation');
 
         const r = new GridActionRuleSet();
 

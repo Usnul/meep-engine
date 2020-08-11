@@ -1,4 +1,4 @@
-import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/discrete/GridTaskCellActionRuleSet.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";

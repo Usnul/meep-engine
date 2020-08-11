@@ -1,11 +1,11 @@
-import { actionTask, countTask } from "../../../core/process/task/TaskUtils.js";
-import Task from "../../../core/process/task/Task.js";
-import { BitSet } from "../../../core/binary/BitSet.js";
-import TaskGroup from "../../../core/process/task/TaskGroup.js";
-import TaskSignal from "../../../core/process/task/TaskSignal.js";
-import BinaryHeap from "../../../engine/navigation/grid/FastBinaryHeap.js";
-import { GridTaskGenerator } from "../GridTaskGenerator.js";
-import { assert } from "../../../core/assert.js";
+import { actionTask, countTask } from "../../../../../core/process/task/TaskUtils.js";
+import Task from "../../../../../core/process/task/Task.js";
+import { BitSet } from "../../../../../core/binary/BitSet.js";
+import TaskGroup from "../../../../../core/process/task/TaskGroup.js";
+import TaskSignal from "../../../../../core/process/task/TaskSignal.js";
+import BinaryHeap from "../../../../../engine/navigation/grid/FastBinaryHeap.js";
+import { GridTaskGenerator } from "../../../GridTaskGenerator.js";
+import { assert } from "../../../../../core/assert.js";
 
 /**
  * Build a map of distances across the grid, using 2 concepts: source cells and passable cells. Source cells are where the distance is 0, and passable cells are those that can be travelled through

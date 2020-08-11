@@ -1,4 +1,4 @@
-import { GridTaskActionRuleSet } from "../../grid/generation/GridTaskCellActionRuleSet.js";
+import { GridTaskActionRuleSet } from "../../grid/generation/discrete/GridTaskCellActionRuleSet.js";
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
@@ -72,7 +72,7 @@ const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
 const name_set = [];
 
 for (let i = 0; i < 20; i++) {
-    name_set.push(`name-${i}`);
+    name_set.push(`base-${i}`);
 }
 
 const rule = GridCellPlacementRule.from(pMatcher, [

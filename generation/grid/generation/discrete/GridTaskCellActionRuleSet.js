@@ -1,5 +1,5 @@
-import { GridTaskGenerator } from "../GridTaskGenerator.js";
-import { assert } from "../../../core/assert.js";
+import { GridTaskGenerator } from "../../GridTaskGenerator.js";
+import { assert } from "../../../../core/assert.js";
 
 export class GridTaskActionRuleSet extends GridTaskGenerator {
     constructor() {

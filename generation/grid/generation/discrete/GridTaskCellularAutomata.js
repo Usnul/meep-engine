@@ -1,10 +1,10 @@
-import { GridTaskGenerator } from "../GridTaskGenerator.js";
-import { CaveGeneratorCellularAutomata } from "../../automata/CaveGeneratorCellularAutomata.js";
-import { actionTask, countTask } from "../../../core/process/task/TaskUtils.js";
-import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
-import TaskGroup from "../../../core/process/task/TaskGroup.js";
-import { seededRandom } from "../../../core/math/MathUtils.js";
-import { assert } from "../../../core/assert.js";
+import { GridTaskGenerator } from "../../GridTaskGenerator.js";
+import { CaveGeneratorCellularAutomata } from "../../../automata/CaveGeneratorCellularAutomata.js";
+import { actionTask, countTask } from "../../../../core/process/task/TaskUtils.js";
+import { Sampler2D } from "../../../../engine/graphics/texture/sampler/Sampler2D.js";
+import TaskGroup from "../../../../core/process/task/TaskGroup.js";
+import { seededRandom } from "../../../../core/math/MathUtils.js";
+import { assert } from "../../../../core/assert.js";
 
 export class GridTaskCellularAutomata extends GridTaskGenerator {
     constructor() {
