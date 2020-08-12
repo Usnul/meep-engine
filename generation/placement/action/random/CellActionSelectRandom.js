@@ -1,6 +1,6 @@
-import { GridCellAction } from "./GridCellAction.js";
-import { randomFromArray, seededRandom } from "../../core/math/MathUtils.js";
-import { assert } from "../../core/assert.js";
+import { GridCellAction } from "../GridCellAction.js";
+import { randomFromArray, seededRandom } from "../../../../core/math/MathUtils.js";
+import { assert } from "../../../../core/assert.js";
 
 export class CellActionSelectRandom extends GridCellAction {
     constructor() {

@@ -1,8 +1,8 @@
-import { GridCellAction } from "./GridCellAction.js";
+import { GridCellAction } from "./action/GridCellAction.js";
 import { MarkerNodeMatcherAny } from "../markers/matcher/MarkerNodeMatcherAny.js";
 import { assert } from "../../core/assert.js";
 
-export class TransfromNearbyMarkers extends GridCellAction {
+export class GridCellActionTransformNearbyMarkers extends GridCellAction {
     constructor() {
         super();
 
@@ -42,14 +42,14 @@ export class TransfromNearbyMarkers extends GridCellAction {
      * @param {number} radius
      * @param {MarkerNodeMatcher} matcher
      * @param {MarkerNodeTransformer[]} transformers
-     * @returns {TransfromNearbyMarkers}
+     * @returns {GridCellActionTransformNearbyMarkers}
      */
     static from(radius, matcher, transformers) {
         assert.greaterThanOrEqual(radius, 0, 'radius');
         assert.equal(matcher.isMarkerNodeMatcher, true, 'matcher.isMarkerNodeMatcher');
         assert.isArray(transformers, 'transformers');
 
-        const r = new TransfromNearbyMarkers();
+        const r = new GridCellActionTransformNearbyMarkers();
 
         r.radius = radius;
         r.matcher = matcher;

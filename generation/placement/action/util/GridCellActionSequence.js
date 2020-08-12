@@ -1,5 +1,5 @@
-import { GridCellAction } from "./GridCellAction.js";
-import { assert } from "../../core/assert.js";
+import { GridCellAction } from "../GridCellAction.js";
+import { assert } from "../../../../core/assert.js";
 
 /**
  * Wrapper around multiple actions

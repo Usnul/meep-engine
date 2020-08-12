@@ -2,7 +2,7 @@ import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.
 import { matcher_tag_traversable_unoccupied } from "../rules/matcher_tag_traversable_unoccupied.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";
 import { CellMatcherContainsMarkerWithinRadius } from "../../rules/cell/CellMatcherContainsMarkerWithinRadius.js";
-import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
+import { GridCellActionPlaceTags } from "../../placement/action/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";

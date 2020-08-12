@@ -1,7 +1,7 @@
-import { GridData } from "../grid/GridData.js";
+import { GridData } from "../../grid/GridData.js";
 import { GridCellActionPlaceTags } from "./GridCellActionPlaceTags.js";
-import { GridDataLayer } from "../grid/layers/GridDataLayer.js";
-import { DataType } from "../../core/collection/table/DataType.js";
+import { GridDataLayer } from "../../grid/layers/GridDataLayer.js";
+import { DataType } from "../../../core/collection/table/DataType.js";
 
 test('write a single 1x1 set of tags', () => {
     const data = new GridData();

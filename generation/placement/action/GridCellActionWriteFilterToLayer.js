@@ -1,5 +1,5 @@
 import { GridCellAction } from "./GridCellAction.js";
-import { assert } from "../../core/assert.js";
+import { assert } from "../../../core/assert.js";
 
 export class GridCellActionWriteFilterToLayer extends GridCellAction {
     constructor() {

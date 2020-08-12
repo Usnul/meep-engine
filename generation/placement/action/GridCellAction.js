@@ -1,4 +1,4 @@
-import { assert } from "../../core/assert.js";
+import { assert } from "../../../core/assert.js";
 
 export class GridCellAction {
     /**

@@ -7,7 +7,7 @@ import { BitSet } from "../../../../core/binary/BitSet.js";
 import { matcher_tag_traversable } from "../../../example/rules/matcher_tag_traversable.js";
 import { buildPathFromDistanceMap } from "../util/buildPathFromDistanceMap.js";
 import { inverseLerp, lerp, seededRandom } from "../../../../core/math/MathUtils.js";
-import { GridCellActionPlaceTags } from "../../../placement/GridCellActionPlaceTags.js";
+import { GridCellActionPlaceTags } from "../../../placement/action/GridCellActionPlaceTags.js";
 import { GridTags } from "../../../GridTags.js";
 import { CellMatcher } from "../../../rules/CellMatcher.js";
 import { groupArrayBy } from "../../../../core/collection/ArrayUtils.js";

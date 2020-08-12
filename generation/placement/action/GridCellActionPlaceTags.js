@@ -1,7 +1,7 @@
 import { GridCellAction } from "./GridCellAction.js";
-import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
-import { assert } from "../../core/assert.js";
-import { bitwiseOr } from "../../core/binary/operations/bitwiseOr.js";
+import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js";
+import { assert } from "../../../core/assert.js";
+import { bitwiseOr } from "../../../core/binary/operations/bitwiseOr.js";
 
 export class GridCellActionPlaceTags extends GridCellAction {
     constructor() {

@@ -1,6 +1,6 @@
-import { GridCellAction } from "./GridCellAction.js";
-import Vector2 from "../../core/geom/Vector2.js";
-import { assert } from "../../core/assert.js";
+import { GridCellAction } from "../GridCellAction.js";
+import Vector2 from "../../../../core/geom/Vector2.js";
+import { assert } from "../../../../core/assert.js";
 
 export class GridCellDisplacedAction extends GridCellAction {
     constructor() {

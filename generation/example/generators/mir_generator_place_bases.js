@@ -2,7 +2,7 @@ import { GridTaskActionRuleSet } from "../../grid/generation/discrete/GridTaskCe
 import { GridCellPlacementRule } from "../../placement/GridCellPlacementRule.js";
 import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.js";
 import { GridActionRuleSet } from "../../markers/GridActionRuleSet.js";
-import { GridCellActionPlaceTags } from "../../placement/GridCellActionPlaceTags.js";
+import { GridCellActionPlaceTags } from "../../placement/action/GridCellActionPlaceTags.js";
 import { GridTags } from "../../GridTags.js";
 import { GridCellActionPlaceMarker } from "../../markers/GridCellActionPlaceMarker.js";
 import { CellMatcherNot } from "../../rules/logic/CellMatcherNot.js";

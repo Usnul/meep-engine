@@ -1,4 +1,4 @@
-import { GridCellAction } from "../../../placement/GridCellAction.js";
+import { GridCellAction } from "../../../placement/action/GridCellAction.js";
 
 export class GridCellActionLogToConsole extends GridCellAction {
     constructor() {

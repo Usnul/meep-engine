@@ -1,4 +1,4 @@
-import { GridCellAction } from "../placement/GridCellAction.js";
+import { GridCellAction } from "../placement/action/GridCellAction.js";
 import { assert } from "../../core/assert.js";
 
 let idCounter = 0;
