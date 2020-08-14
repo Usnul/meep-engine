@@ -12,36 +12,36 @@ import { matcher_tag_not_traversable } from "../rules/matcher_tag_not_traversabl
 import { CellMatcherLayerBitMaskTest } from "../../rules/CellMatcherLayerBitMaskTest.js";
 import { GridTags } from "../../GridTags.js";
 import { CellFilterCellMatcher } from "../../filtering/CellFilterCellMatcher.js";
-import { CellFilterSimplexNoise } from "../../filtering/complex/CellFilterSimplexNoise.js";
-import { CellFilterFXAA } from "../../filtering/complex/CellFilterFXAA.js";
-import { CellFilterMultiply } from "../../filtering/math/algebra/CellFilterMultiply.js";
-import { CellFilterLerp } from "../../filtering/math/CellFilterLerp.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterSimplexNoise } from "../../filtering/numeric/complex/CellFilterSimplexNoise.js";
+import { CellFilterFXAA } from "../../filtering/numeric/complex/CellFilterFXAA.js";
+import { CellFilterMultiply } from "../../filtering/numeric/math/algebra/CellFilterMultiply.js";
+import { CellFilterLerp } from "../../filtering/numeric/math/CellFilterLerp.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import Tag from "../../../engine/ecs/components/Tag.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
 import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
 import { MarkerNodeTransformerYRotateByFilterGradient } from "../../markers/transform/MarkerNodeTransformerYRotateByFilterGradient.js";
 import { PI_HALF } from "../../../core/math/MathUtils.js";
-import { CellFilterGaussianBlur } from "../../filtering/complex/CellFilterGaussianBlur.js";
+import { CellFilterGaussianBlur } from "../../filtering/numeric/complex/CellFilterGaussianBlur.js";
 import { CellProcessingRule } from "../../theme/cell/CellProcessingRule.js";
 import { ContinuousGridCellActionSetTerrainHeight } from "../../grid/actions/ContinuousGridCellActionSetTerrainHeight.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
-import { CellFilterReadGridLayer } from "../../filtering/CellFilterReadGridLayer.js";
+import { CellFilterReadGridLayer } from "../../filtering/numeric/CellFilterReadGridLayer.js";
 import ClingToTerrain from "../../../engine/ecs/terrain/ecs/ClingToTerrain.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
-import { CellFilterAngleToNormal } from "../../filtering/complex/CellFilterAngleToNormal.js";
+import { CellFilterAngleToNormal } from "../../filtering/numeric/complex/CellFilterAngleToNormal.js";
 import Vector3 from "../../../core/geom/Vector3.js";
-import { CellFilterClamp } from "../../filtering/math/CellFilterClamp.js";
-import { CellFilterOneMinus } from "../../filtering/math/CellFilterOneMinus.js";
-import { CellFilterSmoothStep } from "../../filtering/math/CellFilterSmoothStep.js";
-import { CellFilterInverseLerp } from "../../filtering/math/CellFilterInverseLerp.js";
-import { CellFilterAdd } from "../../filtering/math/algebra/CellFilterAdd.js";
-import { CellFilterNegate } from "../../filtering/math/algebra/CellFilterNegate.js";
+import { CellFilterClamp } from "../../filtering/numeric/math/CellFilterClamp.js";
+import { CellFilterOneMinus } from "../../filtering/numeric/math/CellFilterOneMinus.js";
+import { CellFilterSmoothStep } from "../../filtering/numeric/math/CellFilterSmoothStep.js";
+import { CellFilterInverseLerp } from "../../filtering/numeric/math/CellFilterInverseLerp.js";
+import { CellFilterAdd } from "../../filtering/numeric/math/algebra/CellFilterAdd.js";
+import { CellFilterNegate } from "../../filtering/numeric/math/algebra/CellFilterNegate.js";
 import { MarkerNodeActionWeightedElement } from "../../markers/actions/probability/MarkerNodeActionWeightedElement.js";
 import { MarkerNodeActionSelectWeighted } from "../../markers/actions/probability/MarkerNodeActionSelectWeighted.js";
 import { ParticleEmitter } from "../../../engine/graphics/particles/particular/engine/emitter/ParticleEmitter.js";
-import { CellFilterCache } from "../../filtering/CellFilterCache.js";
+import { CellFilterCache } from "../../filtering/numeric/CellFilterCache.js";
 import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { SampleGroundMoistureFilter } from "../filters/SampleGroundMoistureFilter.js";
 import GeneratedArmy from "../../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
@@ -56,15 +56,15 @@ const filterMoisture = CellFilterReadGridLayer.from(MirGridLayers.Moisture);
 
 const filterRock = CellFilterClamp.from(
     CellFilterSmoothStep.from(
-        CellFilterConstant.from(Math.PI / 5),
-        CellFilterConstant.from(Math.PI / 3.5),
+        CellFilterLiteralFloat.from(Math.PI / 5),
+        CellFilterLiteralFloat.from(Math.PI / 3.5),
         CellFilterAngleToNormal.from(
             CellFilterReadGridLayer.from(MirGridLayers.Heights),
             Vector3.forward
         )
     ),
-    CellFilterConstant.from(0),
-    CellFilterConstant.from(1),
+    CellFilterLiteralFloat.from(0),
+    CellFilterLiteralFloat.from(1),
 );
 
 const NOISE_10_a = CellFilterSimplexNoise.from(30, 30);
@@ -79,8 +79,8 @@ const filterRoad =
             6
         ),
         CellFilterLerp.from(
-            CellFilterConstant.from(0.4),
-            CellFilterConstant.from(1),
+            CellFilterLiteralFloat.from(0.4),
+            CellFilterLiteralFloat.from(1),
             NOISE_10_a
         )
     );
@@ -95,8 +95,8 @@ const filterSand = CellFilterMultiply.from(
         CellFilterAdd.from(
             CellFilterGaussianBlur.from(
                 CellFilterSmoothStep.from(
-                    CellFilterConstant.from(0),
-                    CellFilterConstant.from(0.2),
+                    CellFilterLiteralFloat.from(0),
+                    CellFilterLiteralFloat.from(0.2),
                     CellFilterNegate.from(
                         CellFilterReadGridLayer.from(MirGridLayers.Heights)
                     )
@@ -107,17 +107,17 @@ const filterSand = CellFilterMultiply.from(
             CellFilterOneMinus.from(
                 CellFilterClamp.from(
                     CellFilterInverseLerp.from(
-                        CellFilterConstant.from(0),
-                        CellFilterConstant.from(0.15),
+                        CellFilterLiteralFloat.from(0),
+                        CellFilterLiteralFloat.from(0.15),
                         filterMoisture
                     ),
-                    CellFilterConstant.from(0),
-                    CellFilterConstant.from(1)
+                    CellFilterLiteralFloat.from(0),
+                    CellFilterLiteralFloat.from(1)
                 )
             )
         ),
-        CellFilterConstant.from(0),
-        CellFilterConstant.from(1)
+        CellFilterLiteralFloat.from(0),
+        CellFilterLiteralFloat.from(1)
     ),
     filterNotRockAndNotRoad
 );
@@ -155,7 +155,7 @@ terrainTheme.rules.push(TerrainLayerRule.from(
 terrainTheme.rules.push(TerrainLayerRule.from(
     CellFilterMultiply.from(
         ROAD_FILTER,
-        CellFilterLerp.from(CellFilterConstant.from(1), CellFilterConstant.from(0.3), NOISE_10_a)
+        CellFilterLerp.from(CellFilterLiteralFloat.from(1), CellFilterLiteralFloat.from(0.3), NOISE_10_a)
     ),
     TERRAIN_LAYER_GRASS,
 ));
@@ -170,7 +170,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                 CellFilterLerp.from(
                     CellFilterCellMatcher.from(matcher_tag_not_traversable),
                     CellFilterSimplexNoise.from(2, 2),
-                    CellFilterConstant.from(0.15)
+                    CellFilterLiteralFloat.from(0.15)
                 ),
                 1.5,
                 1.5,
@@ -538,7 +538,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     2
                 ),
                 CellFilterSimplexNoise.from(50, 50),
-                CellFilterConstant.from(0.8)
+                CellFilterLiteralFloat.from(0.8)
             ),
             -PI_HALF
         )
@@ -1022,12 +1022,12 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
 
 const filterAridArea = CellFilterClamp.from(
     CellFilterInverseLerp.from(
-        CellFilterConstant.from(0.5),
-        CellFilterConstant.from(0.1),
+        CellFilterLiteralFloat.from(0.5),
+        CellFilterLiteralFloat.from(0.1),
         SampleGroundMoistureFilter
     ),
-    CellFilterConstant.from(0),
-    CellFilterConstant.from(1)
+    CellFilterLiteralFloat.from(0),
+    CellFilterLiteralFloat.from(1)
 );
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
@@ -1442,7 +1442,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         position: { x: 0, y: 0, z: 0 }
                     })
                 }),
-            CellFilterConstant.from(1)
+            CellFilterLiteralFloat.from(1)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
@@ -1462,7 +1462,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         position: { x: 0, y: 0, z: 0 }
                     })
                 }),
-            CellFilterConstant.from(2)
+            CellFilterLiteralFloat.from(2)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
@@ -1482,7 +1482,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         position: { x: 0, y: 0, z: 0 }
                     })
                 }),
-            CellFilterConstant.from(0.7)
+            CellFilterLiteralFloat.from(0.7)
         ),
         MarkerNodeActionWeightedElement.from(
             MarkerNodeActionEntityPlacement.from(
@@ -1502,7 +1502,7 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         position: { x: 0, y: 0, z: 0 }
                     })
                 }),
-            CellFilterConstant.from(1)
+            CellFilterLiteralFloat.from(1)
         )
     ]),
     transformers: [
@@ -1519,6 +1519,6 @@ const aHeight = new ContinuousGridCellActionSetTerrainHeight();
 aHeight.target = CellFilterReadGridLayer.from(MirGridLayers.Heights);
 
 SampleTheme0.cells.add(CellProcessingRule.from(
-    CellFilterConstant.from(1),
+    CellFilterLiteralFloat.from(1),
     aHeight
 ))

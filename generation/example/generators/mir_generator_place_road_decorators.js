@@ -13,7 +13,7 @@ import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcher
 import { MarkerNodeMatcherContainsTag } from "../../markers/matcher/MarkerNodeMatcherContainsTag.js";
 import { MarkerNodeMatcherAny } from "../../markers/matcher/MarkerNodeMatcherAny.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 
 
 const matcher_tag_road = CellMatcherLayerBitMaskTest.from(GridTags.Road, MirGridLayers.Tags);
@@ -47,7 +47,7 @@ placeMarker.addTag(TAG_ROAD_DECORATOR);
 
 const ruleBend90 = GridCellPlacementRule.from(matchBend90, [
     placeMarker
-], CellFilterConstant.from(0.1));
+], CellFilterLiteralFloat.from(0.1));
 
 
 /**

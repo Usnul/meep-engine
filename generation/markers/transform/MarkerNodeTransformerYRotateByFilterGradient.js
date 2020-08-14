@@ -1,7 +1,7 @@
 import { MarkerNodeTransformer } from "./MarkerNodeTransformer.js";
 import Vector3 from "../../../core/geom/Vector3.js";
 import { assert } from "../../../core/assert.js";
-import { computeCellFilterGradient } from "../../filtering/process/computeCellFilterGradient.js";
+import { computeCellFilterGradient } from "../../filtering/numeric/process/computeCellFilterGradient.js";
 import { EPSILON, epsilonEquals } from "../../../core/math/MathUtils.js";
 
 const v3_object = new Vector3();

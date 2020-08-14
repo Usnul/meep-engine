@@ -23,37 +23,37 @@ import { mir_generator_place_road_decorators } from "./generators/mir_generator_
 import { MarkerNodeMatcherByType } from "../markers/matcher/MarkerNodeMatcherByType.js";
 import { mir_generator_place_buff_objects } from "./generators/mir_generator_place_buff_objects.js";
 import { GridTaskDensityMarkerDistribution } from "../grid/generation/GridTaskDensityMarkerDistribution.js";
-import { CellFilterSimplexNoise } from "../filtering/complex/CellFilterSimplexNoise.js";
+import { CellFilterSimplexNoise } from "../filtering/numeric/complex/CellFilterSimplexNoise.js";
 import { NumericInterval } from "../../core/math/interval/NumericInterval.js";
-import { CellFilterMultiply } from "../filtering/math/algebra/CellFilterMultiply.js";
+import { CellFilterMultiply } from "../filtering/numeric/math/algebra/CellFilterMultiply.js";
 import { CellFilterCellMatcher } from "../filtering/CellFilterCellMatcher.js";
-import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../filtering/numeric/CellFilterLiteralFloat.js";
 import { MirGridLayers } from "./grid/MirGridLayers.js";
-import { CellFilterLerp } from "../filtering/math/CellFilterLerp.js";
+import { CellFilterLerp } from "../filtering/numeric/math/CellFilterLerp.js";
 import { GridCellActionWriteFilterToLayer } from "../placement/action/GridCellActionWriteFilterToLayer.js";
 import { CellMatcherAny } from "../rules/CellMatcherAny.js";
-import { CellFilterGaussianBlur } from "../filtering/complex/CellFilterGaussianBlur.js";
+import { CellFilterGaussianBlur } from "../filtering/numeric/complex/CellFilterGaussianBlur.js";
 import { GridCellActionSequence } from "../placement/action/util/GridCellActionSequence.js";
-import { CellFilterStep } from "../filtering/math/CellFilterStep.js";
-import { CellFilterReadGridLayer } from "../filtering/CellFilterReadGridLayer.js";
-import { CellFilterAngleToNormal } from "../filtering/complex/CellFilterAngleToNormal.js";
+import { CellFilterStep } from "../filtering/numeric/math/CellFilterStep.js";
+import { CellFilterReadGridLayer } from "../filtering/numeric/CellFilterReadGridLayer.js";
+import { CellFilterAngleToNormal } from "../filtering/numeric/complex/CellFilterAngleToNormal.js";
 import Vector3 from "../../core/geom/Vector3.js";
-import { CellFilterOneMinus } from "../filtering/math/CellFilterOneMinus.js";
-import { CellFilterSmoothStep } from "../filtering/math/CellFilterSmoothStep.js";
+import { CellFilterOneMinus } from "../filtering/numeric/math/CellFilterOneMinus.js";
+import { CellFilterSmoothStep } from "../filtering/numeric/math/CellFilterSmoothStep.js";
 import { SampleNoise20_0 } from "./filters/SampleNoise20_0.js";
 import { SampleGroundMoistureFilter } from "./filters/SampleGroundMoistureFilter.js";
 import { GridTaskSequence } from "../grid/generation/GridTaskSequence.js";
-import { CellFilterSubtract } from "../filtering/math/algebra/CellFilterSubtract.js";
-import { CellFilterCache } from "../filtering/CellFilterCache.js";
-import { CellFilterInverseLerp } from "../filtering/math/CellFilterInverseLerp.js";
-import { CellFilterClamp } from "../filtering/math/CellFilterClamp.js";
+import { CellFilterSubtract } from "../filtering/numeric/math/algebra/CellFilterSubtract.js";
+import { CellFilterCache } from "../filtering/numeric/CellFilterCache.js";
+import { CellFilterInverseLerp } from "../filtering/numeric/math/CellFilterInverseLerp.js";
+import { CellFilterClamp } from "../filtering/numeric/math/CellFilterClamp.js";
 import { MarkerNodeTransformerYRotateByFilter } from "../markers/transform/MarkerNodeTransformerYRotateByFilter.js";
 import { GridPatternMatcherCell } from "../rules/cell/GridPatternMatcherCell.js";
 import { MarkerNodeTransformerRecordProperty } from "../markers/transform/MarkerNodeTransformerRecordProperty.js";
-import { CellFilterAdd } from "../filtering/math/algebra/CellFilterAdd.js";
-import { CellFilterDivide } from "../filtering/math/algebra/CellFilterDivide.js";
-import { CellFilterCubicFunction } from "../filtering/math/poly/CellFilterCubicFunction.js";
-import { CellFilterMax2 } from "../filtering/math/CellFilterMax2.js";
+import { CellFilterAdd } from "../filtering/numeric/math/algebra/CellFilterAdd.js";
+import { CellFilterDivide } from "../filtering/numeric/math/algebra/CellFilterDivide.js";
+import { CellFilterCubicFunction } from "../filtering/numeric/math/poly/CellFilterCubicFunction.js";
+import { CellFilterMax2 } from "../filtering/numeric/math/CellFilterMax2.js";
 import { matcher_not_play_area } from "./rules/matcher_not_play_area.js";
 
 export const SampleGenerator0 = new GridGenerator();
@@ -80,7 +80,7 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
 const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
     GridCellActionPlaceMarker.from({ type: 'Treasure', size: 0.5 }),
     GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
-], CellFilterConstant.from(0.5));
+], CellFilterLiteralFloat.from(0.5));
 
 
 const aMakePlayArea = GridCellActionSequence.from([
@@ -137,18 +137,18 @@ const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({
                                     CellFilterDivide.from(
                                         CellFilterReadGridLayer.from(MirGridLayers.DistanceFromStart),
                                         //increase level by 1 for each X tiles distance
-                                        CellFilterConstant.from(20)
+                                        CellFilterLiteralFloat.from(20)
                                     ),
                                     //add a bit of noise to difficulty distribution
                                     CellFilterMultiply.from(
                                         CellFilterSmoothStep.from(
-                                            CellFilterConstant.from(20),
-                                            CellFilterConstant.from(50),
+                                            CellFilterLiteralFloat.from(20),
+                                            CellFilterLiteralFloat.from(50),
                                             CellFilterReadGridLayer.from(MirGridLayers.DistanceFromStart)
                                         ),
                                         CellFilterLerp.from(
-                                            CellFilterConstant.from(0.9),
-                                            CellFilterConstant.from(2),
+                                            CellFilterLiteralFloat.from(0.9),
+                                            CellFilterLiteralFloat.from(2),
                                             CellFilterMultiply.from(
                                                 CellFilterSimplexNoise.from(111.1134, 111.1134, 12319518),
                                                 CellFilterSimplexNoise.from(25.4827, 25.4827, 4512371)
@@ -156,18 +156,18 @@ const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({
                                         )
                                     )
                                 ),
-                                CellFilterConstant.from(1)
+                                CellFilterLiteralFloat.from(1)
                             ),
-                            CellFilterConstant.from(0)
+                            CellFilterLiteralFloat.from(0)
                         ),
                         0,
                         1, //linear factor
                         0.05, //quadratic factor (good for estimating branching)
                         0.01 //cubic factor
                     ),
-                    CellFilterConstant.from(100)
+                    CellFilterLiteralFloat.from(100)
                 ),
-                CellFilterConstant.from(50)
+                CellFilterLiteralFloat.from(50)
             )
         )
     ]
@@ -221,7 +221,7 @@ const gPlaceStartingPoint = mir_generator_place_starting_point();
 
 gPlaceStartingPoint.addDependency(gConnectRooms);
 
-const gBuildDistanceMap = GridTaskBuildSourceDistanceMap.from(MATCH_STARTING_POINT, MATCH_EMPTY);
+const gBuildDistanceMap = GridTaskBuildSourceDistanceMap.from({ source: MATCH_STARTING_POINT, pass: MATCH_EMPTY });
 
 gBuildDistanceMap.addDependency(gPlaceStartingPoint);
 
@@ -273,19 +273,19 @@ const fTreeArea = CellFilterCache.from(
             SampleNoise20_0,
             CellFilterClamp.from(
                 CellFilterInverseLerp.from(
-                    CellFilterConstant.from(0.1),
-                    CellFilterConstant.from(0.5),
+                    CellFilterLiteralFloat.from(0.1),
+                    CellFilterLiteralFloat.from(0.5),
                     CellFilterReadGridLayer.from(MirGridLayers.Moisture)
                 ),
-                CellFilterConstant.from(0),
-                CellFilterConstant.from(1)
+                CellFilterLiteralFloat.from(0),
+                CellFilterLiteralFloat.from(1)
             )
         ),
         CellFilterMultiply.from(
             CellFilterMultiply.from(
                 //filter out areas that are below height of 0
                 CellFilterStep.from(
-                    CellFilterConstant.from(0),
+                    CellFilterLiteralFloat.from(0),
                     fReadHeight
                 ),
                 //filter areas that are playable
@@ -296,8 +296,8 @@ const fTreeArea = CellFilterCache.from(
             // Filter areas with sharp slopes
             CellFilterOneMinus.from(
                 CellFilterSmoothStep.from(
-                    CellFilterConstant.from(Math.PI / 9),
-                    CellFilterConstant.from(Math.PI / 5),
+                    CellFilterLiteralFloat.from(Math.PI / 9),
+                    CellFilterLiteralFloat.from(Math.PI / 5),
                     CellFilterAngleToNormal.from(fReadHeight, Vector3.forward)
                 )
             )
@@ -310,8 +310,8 @@ const fFlatlandTrees = CellFilterCache.from(
         fTreeArea,
         CellFilterClamp.from(
             CellFilterInverseLerp.from(
-                CellFilterConstant.from(0.2),
-                CellFilterConstant.from(0),
+                CellFilterLiteralFloat.from(0.2),
+                CellFilterLiteralFloat.from(0),
                 CellFilterCache.from(
                     CellFilterGaussianBlur.from(
                         CellFilterAngleToNormal.from(fReadHeight),
@@ -320,8 +320,8 @@ const fFlatlandTrees = CellFilterCache.from(
                     )
                 )
             ),
-            CellFilterConstant.from(0),
-            CellFilterConstant.from(1)
+            CellFilterLiteralFloat.from(0),
+            CellFilterLiteralFloat.from(1)
         )
     )
 );
@@ -349,7 +349,7 @@ const gFoliageLarge = GridTaskSequence.from([
                     //trees take up quite a bit of space, make sure they are far enough from play area
                     filterNonPlayableArea_3x3
                 ),
-                CellFilterConstant.from(10)
+                CellFilterLiteralFloat.from(10)
             )
         ),
         GridCellActionPlaceMarker.from({
@@ -361,7 +361,7 @@ const gFoliageLarge = GridTaskSequence.from([
                         CellFilterSimplexNoise.from(
                             3.1234, 3.1234, 90127151
                         ),
-                        CellFilterConstant.from(123421)
+                        CellFilterLiteralFloat.from(123421)
                     )
                 )
             ]
@@ -371,7 +371,7 @@ const gFoliageLarge = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
             fFlatlandTrees,
-            CellFilterConstant.from(20)
+            CellFilterLiteralFloat.from(20)
         ),
         GridCellActionPlaceMarker.from({
             type: 'Tree-Flatland-Small',
@@ -382,7 +382,7 @@ const gFoliageLarge = GridTaskSequence.from([
                         CellFilterSimplexNoise.from(
                             3.1234, 3.1234, 90127151
                         ),
-                        CellFilterConstant.from(123421)
+                        CellFilterLiteralFloat.from(123421)
                     )
                 )
             ]
@@ -393,8 +393,8 @@ const gFoliageLarge = GridTaskSequence.from([
 
 const fSharpSlope = CellFilterCache.from(
     CellFilterSmoothStep.from(
-        CellFilterConstant.from(Math.PI / 5),
-        CellFilterConstant.from(Math.PI / 3.5),
+        CellFilterLiteralFloat.from(Math.PI / 5),
+        CellFilterLiteralFloat.from(Math.PI / 3.5),
         CellFilterAngleToNormal.from(
             CellFilterReadGridLayer.from(MirGridLayers.Heights),
             Vector3.forward
@@ -408,7 +408,7 @@ const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
             filterMushroom,
-            CellFilterConstant.from(0.02)
+            CellFilterLiteralFloat.from(0.02)
         ),
         GridCellActionPlaceMarker.from({
             type: 'Mushroom-1',
@@ -421,7 +421,7 @@ const gFoliageSmall = GridTaskSequence.from([
     GridTaskDensityMarkerDistribution.from(
         CellFilterMultiply.from(
             filterMushroom,
-            CellFilterConstant.from(0.05)
+            CellFilterLiteralFloat.from(0.05)
         ),
         GridCellActionPlaceMarker.from({
             type: 'Mushroom-0',
@@ -445,7 +445,7 @@ const gFoliageSmall = GridTaskSequence.from([
                     ),
                     CellFilterCellMatcher.from(matcher_not_play_area)
                 ),
-                CellFilterConstant.from(0.15)
+                CellFilterLiteralFloat.from(0.15)
             )
         ),
         GridCellActionPlaceMarker.from({
@@ -491,10 +491,10 @@ const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
                         MirGridLayers.Heights,
 
                         CellFilterLerp.from(
-                            CellFilterConstant.from(0),
+                            CellFilterLiteralFloat.from(0),
                             CellFilterLerp.from(
-                                CellFilterConstant.from(-2),
-                                CellFilterConstant.from(7),
+                                CellFilterLiteralFloat.from(-2),
+                                CellFilterLiteralFloat.from(7),
                                 CellFilterMultiply.from(
                                     CellFilterSimplexNoise.from(30, 30),
                                     CellFilterSimplexNoise.from(13, 13)

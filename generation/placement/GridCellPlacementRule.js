@@ -1,6 +1,6 @@
 import { assert } from "../../core/assert.js";
 import Vector2 from "../../core/geom/Vector2.js";
-import { CellFilterConstant } from "../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../filtering/numeric/CellFilterLiteralFloat.js";
 
 export class GridCellPlacementRule {
     constructor() {
@@ -14,7 +14,7 @@ export class GridCellPlacementRule {
          *
          * @type {CellFilter}
          */
-        this.probability = CellFilterConstant.from(1);
+        this.probability = CellFilterLiteralFloat.from(1);
 
         /**
          *

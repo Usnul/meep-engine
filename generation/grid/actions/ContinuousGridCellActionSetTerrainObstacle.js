@@ -2,7 +2,7 @@ import { ContinuousGridCellAction } from "./ContinuousGridCellAction.js";
 import Terrain from "../../../engine/ecs/terrain/ecs/Terrain.js";
 import { assert } from "../../../core/assert.js";
 import GridObstacle from "../../../engine/grid/components/GridObstacle.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 
 export class ContinuousGridCellActionSetTerrainObstacle extends ContinuousGridCellAction {
     constructor() {
@@ -18,7 +18,7 @@ export class ContinuousGridCellActionSetTerrainObstacle extends ContinuousGridCe
          *
          * @type {CellFilter}
          */
-        this.threshold = CellFilterConstant.from(0);
+        this.threshold = CellFilterLiteralFloat.from(0);
     }
 
     initialize(seed, ecd, grid) {

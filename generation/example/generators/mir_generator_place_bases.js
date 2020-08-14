@@ -12,7 +12,7 @@ import { bitwiseAnd } from "../../../core/binary/operations/bitwiseAnd.js";
 import { GridCellActionPlaceMarkerGroup } from "../../markers/GridCellActionPlaceMarkerGroup.js";
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MirGridLayers } from "../grid/MirGridLayers.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import { MarkerNodeEmitterGridCellAction } from "../../markers/emitter/MarkerNodeEmitterGridCellAction.js";
 import { MarkerNodeEmitterPredicated } from "../../markers/emitter/MarkerNodeEmitterPredicated.js";
 import { GridDataNodePredicateNot } from "../../markers/predicate/GridDataNodePredicateNot.js";
@@ -130,7 +130,7 @@ const rule = GridCellPlacementRule.from(pMatcher, [
         })
     ),
     placeRoadConnectors
-], CellFilterConstant.from(0.1));
+], CellFilterLiteralFloat.from(0.1));
 
 rule.allowRotation = false;
 

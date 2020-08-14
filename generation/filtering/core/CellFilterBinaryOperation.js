@@ -18,10 +18,10 @@ export class CellFilterBinaryOperation extends CellFilter {
     }
 
     /**
-     *
-     * @param {number} left
-     * @param {number} right
-     * @returns {number}
+     * @template T,R
+     * @param {T} left
+     * @param {T} right
+     * @returns {R}
      */
     operation(left, right) {
 
@@ -39,14 +39,14 @@ export class CellFilterBinaryOperation extends CellFilter {
             return;
         }
 
-        super.initialize(grid,seed);
+        super.initialize(grid, seed);
 
         if (!this.left.initialized) {
-            this.left.initialize(grid,seed);
+            this.left.initialize(grid, seed);
         }
 
         if (!this.right.initialized) {
-            this.right.initialize(grid,seed);
+            this.right.initialize(grid, seed);
         }
 
     }

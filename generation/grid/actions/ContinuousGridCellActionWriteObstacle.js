@@ -1,5 +1,5 @@
 import { ContinuousGridCellAction } from "./ContinuousGridCellAction.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import Terrain from "../../../engine/ecs/terrain/ecs/Terrain.js";
 import GridPosition from "../../../engine/grid/components/GridPosition.js";
 import GridObstacle from "../../../engine/grid/components/GridObstacle.js";
@@ -12,7 +12,7 @@ export class ContinuousGridCellActionWriteObstacle extends ContinuousGridCellAct
          *
          * @type {CellFilter}
          */
-        this.obstacle = CellFilterConstant.from(1);
+        this.obstacle = CellFilterLiteralFloat.from(1);
 
         this.threshold = 0;
 

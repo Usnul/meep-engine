@@ -1,4 +1,5 @@
 import { assert } from "../../core/assert.js";
+import DataType from "../../core/parser/simple/DataType.js";
 
 export class CellFilter {
 
@@ -9,6 +10,15 @@ export class CellFilter {
          * @protected
          */
         this.__initialized = false;
+
+    }
+
+    /**
+     *
+     * @returns {DataType}
+     */
+    get dataType() {
+        return DataType.Number;
     }
 
     /**

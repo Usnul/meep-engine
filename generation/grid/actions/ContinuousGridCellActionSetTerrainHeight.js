@@ -3,7 +3,7 @@ import { Sampler2D } from "../../../engine/graphics/texture/sampler/Sampler2D.js
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import { assert } from "../../../core/assert.js";
 import { lerp, min2 } from "../../../core/math/MathUtils.js";
-import { CellFilterConstant } from "../../filtering/core/CellFilterConstant.js";
+import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 
 export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCellAction {
     constructor() {
@@ -19,7 +19,7 @@ export class ContinuousGridCellActionSetTerrainHeight extends ContinuousGridCell
          * Target height
          * @type {CellFilter}
          */
-        this.target = CellFilterConstant.from(0);
+        this.target = CellFilterLiteralFloat.from(0);
     }
 
     initialize(seed, ecd, grid) {
