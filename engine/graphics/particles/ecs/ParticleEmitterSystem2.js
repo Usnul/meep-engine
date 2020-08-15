@@ -107,7 +107,7 @@ export class ParticleEmitterSystem2 extends System {
             // wake up
             emitter.clearFlag(ParticleEmitterFlag.Sleeping);
 
-            console.log('Added', emitter, renderLayer.visibleSet.version);
+            // console.log('Added', emitter, renderLayer.visibleSet.version);
         });
 
         renderLayer.visibleSet.onRemoved.add((points) => {
@@ -119,7 +119,7 @@ export class ParticleEmitterSystem2 extends System {
 
             emitter.setFlag(ParticleEmitterFlag.Sleeping);
 
-            console.log('Removed', emitter, renderLayer.visibleSet.version);
+            // console.log('Removed', emitter, renderLayer.visibleSet.version);
         });
 
         this.bvh = renderLayer.bvh;

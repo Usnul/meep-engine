@@ -54,8 +54,6 @@ function applyEmitterChanges(emitter, system, op, arg0) {
     particleEngine.add(emitter);
 
     emitter.writeFlag(ParticleEmitterFlag.Sleeping, isSleeping);
-
-    console.log(isSleeping, emitter.getFlag(ParticleEmitterFlag.Sleeping));
 }
 
 export class ParticleEmitterController extends EmptyView {
