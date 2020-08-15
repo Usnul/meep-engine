@@ -1,6 +1,7 @@
 import { BitSet } from "../../../../core/binary/BitSet.js";
 import Signal from "../../../../core/events/signal/Signal.js";
 import { assert } from "../../../../core/assert.js";
+import { IllegalStateException } from "../../../../core/fsm/exceptions/IllegalStateException.js";
 
 /**
  * @readonly
@@ -23,6 +24,12 @@ export class IncrementalDeltaSet {
          * @type {V[]}
          */
         this.elements = [];
+
+        /**
+         * Current version of the state, each time the set is updated - version changes
+         * @type {number}
+         */
+        this.version = 0;
 
         /**
          * Dirty flag set, used during the update to keep track of which elements are to be remove
@@ -61,12 +68,47 @@ export class IncrementalDeltaSet {
         this.state = IncrementalDeltaSetState.Clear;
     }
 
+    /**
+     *
+     * @param {V} element
+     * @returns {boolean}
+     */
+    contains(element) {
+        return this.elements.indexOf(element) !== -1;
+    }
+
+    /**
+     *
+     * @param {V} element
+     * @returns {boolean}
+     */
+    forceRemove(element) {
+        if (this.state === IncrementalDeltaSetState.Building) {
+            throw new IllegalStateException('Cannot remove during build');
+        }
+
+        const i = this.elements.indexOf(element, 0);
+
+        if (i !== -1) {
+            this.elements.splice(i, 1);
+            this.size--;
+
+            this.version++;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     clear() {
         this.elements.splice(0, this.size);
         this.size = 0;
         this.flags.reset();
 
         this.state = IncrementalDeltaSetState.Clear;
+
+        this.version++;
     }
 
     initializeUpdate() {
@@ -74,6 +116,8 @@ export class IncrementalDeltaSet {
         this.flags.setRange(0, this.size - 1);
 
         this.state = IncrementalDeltaSetState.Building;
+
+        this.version++;
     }
 
     finalizeUpdate() {

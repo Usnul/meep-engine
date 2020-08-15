@@ -14,7 +14,11 @@ import { ParticleParameters } from "../../../../../engine/graphics/particles/par
 import { ParameterLookupTable } from "../../../../../engine/graphics/particles/particular/engine/parameter/ParameterLookupTable.js";
 
 class ParticleLayerController extends GuiControl {
-    constructor() {
+    /**
+     *
+     * @param {function(function)} mutationHook
+     */
+    constructor(mutationHook) {
         super();
 
         const self = this;
@@ -28,30 +32,82 @@ class ParticleLayerController extends GuiControl {
             velocityAngle: 0
         };
 
+        /**
+         *
+         * @returns {ParticleLayer}
+         */
+        function getLayer() {
+            return self.model.getValue();
+        }
+
+        /**
+         * @template T
+         * @param {function(ParticleLayer,T?)} f
+         * @param {T} [arg0]
+         */
+        function mutate(f, arg0) {
+            mutationHook(() => {
+                f(getLayer(), arg0);
+            });
+        }
+
+        /**
+         *
+         * @param {function(ParticleLayer,*)} f
+         * @returns {function(...[*]=)}
+         */
+        function mutator(f) {
+            return function (arg0) {
+                mutate(f, arg0);
+            }
+        }
+
+        /**
+         *
+         * @param {string} property
+         * @param {function(layer:ParticleLayer, value:*)} mutationCallback
+         * @param {*} ops
+         */
+        function addControl(property, mutationCallback, ops) {
+            const controller = dat.addControl(surrogate, property, ops);
+
+            controller.onChange(mutator(mutationCallback));
+
+            return controller;
+        }
+
         const dat = new DatGuiController();
 
-        const cImageURL = dat.addControl(surrogate, 'imageURL').onChange(function (value) {
-            self.model.getValue().imageURL = value;
+        const cImageURL = addControl('imageURL', (layer, value) => {
+            layer.imageURL = value;
         });
 
-        const cEmissionShape = dat.addControl(surrogate, 'emissionShape', Object.keys(EmissionShapeType)).onChange(function (shapeTypeName) {
-            self.model.getValue().emissionShape = EmissionShapeType[shapeTypeName];
+        const cEmissionShape = addControl(
+            'emissionShape',
+            function (layer, shapeTypeName) {
+                layer.emissionShape = EmissionShapeType[shapeTypeName];
+            },
+            Object.keys(EmissionShapeType)
+        );
+
+        const cEmissionFrom = addControl(
+            'emissionFrom',
+            function (layer, fromTypeName) {
+                layer.emissionFrom = EmissionFromType[fromTypeName];
+            },
+            Object.keys(EmissionFromType)
+        );
+
+        const cEmissionRate = addControl('emissionRate', function (layer, rate) {
+            layer.emissionRate = rate;
         });
 
-        const cEmissionFrom = dat.addControl(surrogate, 'emissionFrom', Object.keys(EmissionFromType)).onChange(function (fromTypeName) {
-            self.model.getValue().emissionFrom = EmissionFromType[fromTypeName];
+        const cEmissionImmediate = addControl('emissionImmediate', function (layer, value) {
+            layer.emissionImmediate = value;
         });
 
-        const cEmissionRate = dat.addControl(surrogate, 'emissionRate').onChange(function (rate) {
-            self.model.getValue().emissionRate = rate;
-        });
-
-        const cEmissionImmediate = dat.addControl(surrogate, 'emissionImmediate').onChange(function (value) {
-            self.model.getValue().emissionImmediate = value;
-        });
-
-        const cVelocityAngle = dat.addControl(surrogate, 'velocityAngle').onChange(function (value) {
-            self.model.getValue().particleVelocityDirection.angle = value;
+        const cVelocityAngle = addControl('velocityAngle', function (layer, value) {
+            layer.particleVelocityDirection.angle = value;
         });
 
         this.addChild(dat);
@@ -144,8 +200,6 @@ class ParticleLayerController extends GuiControl {
         this.model.onChanged.add(handleModelSet);
     }
 }
-
-
 
 
 export default ParticleLayerController;

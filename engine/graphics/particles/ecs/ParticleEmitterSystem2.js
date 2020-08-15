@@ -14,6 +14,17 @@ const frustum = new Frustum();
 /**
  *
  * @param {ParticleEmitter} emitter
+ * @returns {Group|Object3D}
+ */
+function extractRenderable(emitter) {
+
+
+    return emitter.mesh;
+}
+
+/**
+ *
+ * @param {ParticleEmitter} emitter
  */
 function putEmitterToSleep(emitter) {
     emitter.setFlag(ParticleEmitterFlag.Sleeping);
@@ -85,17 +96,6 @@ export class ParticleEmitterSystem2 extends System {
 
         renderLayer.renderPass = RenderPassType.Transparent;
 
-        /**
-         *
-         * @param {ParticleEmitter} emitter
-         * @returns {Group|Object3D}
-         */
-        function extractRenderable(emitter) {
-
-
-            return emitter.mesh;
-        }
-
         renderLayer.extractRenderable = extractRenderable;
         renderLayer.visibleSet.onAdded.add((points) => {
             /**
@@ -104,8 +104,12 @@ export class ParticleEmitterSystem2 extends System {
              */
             const emitter = points.__meep_ecs_component;
 
+            // wake up
             emitter.clearFlag(ParticleEmitterFlag.Sleeping);
+
+            console.log('Added', emitter, renderLayer.visibleSet.version);
         });
+
         renderLayer.visibleSet.onRemoved.add((points) => {
             /**
              *
@@ -115,6 +119,7 @@ export class ParticleEmitterSystem2 extends System {
 
             emitter.setFlag(ParticleEmitterFlag.Sleeping);
 
+            console.log('Removed', emitter, renderLayer.visibleSet.version);
         });
 
         this.bvh = renderLayer.bvh;
@@ -154,7 +159,6 @@ export class ParticleEmitterSystem2 extends System {
                     depthBuffer.referenceCount--;
                 });
             }
-
 
 
             for (let i = 0; i < visibleEmitters; i++) {

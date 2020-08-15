@@ -59,6 +59,13 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
 
         const entityBuilder = blueprint.buildEntityBuilder(node.properties);
 
+        // execute post-process step
+        const process = this.process;
+
+        if (process !== null) {
+            process(entityBuilder, node, grid, ecd);
+        }
+
         /**
          *
          * @type {GridPosition}
@@ -76,14 +83,11 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         const t = entityBuilder.getComponent(Transform);
 
         if (t !== null) {
-            t.multiplyTransforms(node.transform, this.transform);
-        }
+            const temp = new Transform();
 
-        // execute post-process step
-        const process = this.process;
+            temp.multiplyTransforms(node.transform, this.transform);
 
-        if (process !== null) {
-            process(entityBuilder, node, grid, ecd);
+            t.multiplyTransforms(temp, t);
         }
 
         entityBuilder.build(ecd);

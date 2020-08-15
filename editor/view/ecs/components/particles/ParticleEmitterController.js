@@ -6,6 +6,7 @@ import { ParticleEmitterFlag } from "../../../../../engine/graphics/particles/pa
 import { NativeListController } from "../../../../../view/controller/controls/NativeListController.js";
 import EmptyView from "../../../../../view/elements/EmptyView.js";
 import ObservedValue from "../../../../../core/model/ObservedValue.js";
+import { noop } from "../../../../../core/function/Functions.js";
 
 
 /**
@@ -22,12 +23,27 @@ export function enumNameByValue(value, enumerable) {
  *
  * @param {ParticleEmitter} emitter
  * @param {ParticleEmitterSystem2} system
+ * @param {function} op
+ * @param {*} [arg0]
  */
-function applyEmitterChanges(emitter, system) {
+function applyEmitterChanges(emitter, system, op, arg0) {
     const particleEngine = system.particleEngine;
+
+    const isSleeping = emitter.getFlag(ParticleEmitterFlag.Sleeping);
 
     //re-add the emitter
     particleEngine.remove(emitter);
+
+    if (system.renderLayer.visibleSet.contains(emitter.mesh)) {
+        //remove from visible layer if present
+        system.renderLayer.visibleSet.forceRemove(emitter.mesh);
+    }
+
+    //execute operation
+    op(emitter, arg0);
+
+    //clear flags
+    emitter.clearFlag(ParticleEmitterFlag.Built | ParticleEmitterFlag.Initialized);
 
     //update internal state
     emitter.build();
@@ -36,6 +52,10 @@ function applyEmitterChanges(emitter, system) {
     emitter.computeBoundingBox();
 
     particleEngine.add(emitter);
+
+    emitter.writeFlag(ParticleEmitterFlag.Sleeping, isSleeping);
+
+    console.log(isSleeping, emitter.getFlag(ParticleEmitterFlag.Sleeping));
 }
 
 export class ParticleEmitterController extends EmptyView {
@@ -56,7 +76,31 @@ export class ParticleEmitterController extends EmptyView {
             const emitter = self.model.getValue();
 
             if (emitter !== null) {
-                applyEmitterChanges(emitter, particleEmitterSystem);
+                applyEmitterChanges(emitter, particleEmitterSystem, noop);
+            }
+        }
+
+        /**
+         *
+         * @param {function(ParticleEmitter)} op
+         * @param {v} [v]
+         */
+        function makeChange(op, v) {
+            const emitter = self.model.getValue();
+
+            if (emitter !== null) {
+                applyEmitterChanges(emitter, particleEmitterSystem, op, v);
+            }
+        }
+
+        /**
+         *
+         * @param {function(ParticleEmitter)} op
+         * @returns {function(...[*]=)}
+         */
+        function mutator(op) {
+            return function (arg0) {
+                makeChange(op, arg0);
             }
         }
 
@@ -89,61 +133,53 @@ export class ParticleEmitterController extends EmptyView {
                 self.addChild(dat);
 
 
-                dat.addControl(emitterSurrogate, 'preWarm').onChange(function (value) {
-                    const emitter = self.model.getValue();
+                dat.addControl(emitterSurrogate, 'preWarm').onChange(mutator((emitter, value) => {
 
                     /**
                      * @type {ParticleEmitter}
                      */
                     emitter.writeFlag(ParticleEmitterFlag.PreWarm, value);
 
-                    applyChanges();
-                });
+                }));
 
-                dat.addControl(emitterSurrogate, 'depthRead').onChange(function (value) {
-                    const emitter = self.model.getValue();
+                dat.addControl(emitterSurrogate, 'depthRead').onChange(mutator((emitter, value) => {
 
                     /**
                      * @type {ParticleEmitter}
                      */
                     emitter.writeFlag(ParticleEmitterFlag.DepthReadDisabled, !value);
 
-                    applyChanges();
-                });
+                }));
 
-                dat.addControl(emitterSurrogate, 'depthSoft').onChange(function (value) {
-                    const emitter = self.model.getValue();
-
+                dat.addControl(emitterSurrogate, 'depthSoft').onChange(mutator((emitter, value) => {
                     /**
                      * @type {ParticleEmitter}
                      */
                     emitter.writeFlag(ParticleEmitterFlag.DepthSoftDisabled, !value);
 
-                    applyChanges();
-                });
+                }));
 
-                dat.addControl(emitterSurrogate, 'velocityAlign').onChange(function (value) {
-                    const emitter = self.model.getValue();
+                dat.addControl(emitterSurrogate, 'velocityAlign').onChange(mutator((emitter, value) => {
 
                     /**
                      * @type {ParticleEmitter}
                      */
                     emitter.writeFlag(ParticleEmitterFlag.AlignOnVelocity, value);
 
-                    applyChanges();
-                });
+                }));
 
-                dat.addControl(emitterSurrogate, 'blendingMode', Object.keys(BlendingType)).onChange(function (blendModeName) {
-                    self.model.getValue().blendingMode = BlendingType[blendModeName];
-                    applyChanges();
-                });
+                dat.addControl(emitterSurrogate, 'blendingMode', Object.keys(BlendingType)).onChange(mutator((emitter, blendModeName) => {
+
+                    emitter.blendingMode = BlendingType[blendModeName];
+
+                }));
 
                 dat.addControl(emitterSurrogate, 'update').name('Apply Changes');
 
                 self.addChild(new NativeListController({
                     model: emitter.layers,
                     elementViewFactory(layer) {
-                        const c = new ParticleLayerController();
+                        const c = new ParticleLayerController(makeChange);
 
                         c.model.set(layer);
 
