@@ -780,7 +780,9 @@ function createShaderEntry(emitter, shaderManager) {
     }
 
     //add parameters to parameter sheet
-    for (let i = 0; i < parameters.length; i++) {
+    const parameterCount = parameters.length;
+
+    for (let i = 0; i < parameterCount; i++) {
         const particleParameter = parameters[i];
         shaderManager.parameterSheet.add(particleParameter);
 

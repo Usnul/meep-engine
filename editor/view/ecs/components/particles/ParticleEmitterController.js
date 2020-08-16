@@ -46,9 +46,9 @@ function applyEmitterChanges(emitter, system, op, arg0) {
     emitter.clearFlag(ParticleEmitterFlag.Built | ParticleEmitterFlag.Initialized);
 
     //update internal state
+    emitter.registerLayerParameters();
     emitter.build();
     emitter.initialize();
-    emitter.registerLayerParameters();
     emitter.computeBoundingBox();
 
     particleEngine.add(emitter);
@@ -185,6 +185,11 @@ export class ParticleEmitterController extends EmptyView {
                     },
                     elementFactory() {
                         return new ParticleLayer();
+                    },
+                    operationAdd(list, layer) {
+                        makeChange(emitter => {
+                            emitter.addLayer(layer);
+                        });
                     }
                 }))
 

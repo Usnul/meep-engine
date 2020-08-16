@@ -71,7 +71,17 @@ ParameterSet.prototype.equals = function (other) {
  * @param {number} count
  */
 ParameterSet.prototype.setTrackCount = function (count) {
-    this.parameters.forEach(p => p.setTrackCount(count));
+
+    const parameters = this.parameters;
+    const n = parameters.length;
+
+    for (let i = 0; i < n; i++) {
+
+        const p = parameters.get(i);
+        p.setTrackCount(count);
+
+    }
+
 };
 
 /**
