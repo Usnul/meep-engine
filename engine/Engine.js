@@ -515,7 +515,8 @@ class Engine {
             this.gui.startup(this),
             this.achievements.startup(),
             this.effects.startup(),
-            this.plugins.startup()
+            this.plugins.startup(),
+            this.gameSaves.load()
         ]).then(function () {
             self.tutorial.link();
 
