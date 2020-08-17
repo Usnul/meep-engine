@@ -914,5 +914,21 @@ BinaryBuffer.copyFloat64 = function (source, target) {
     return v;
 };
 
+/**
+ *
+ * @param {BinaryBuffer} source
+ * @param {BinaryBuffer} target
+ * @param {number} length
+ */
+BinaryBuffer.copyBytes = function (source, target, length) {
+    const temp = new Uint8Array(length);
+
+    source.readBytes(temp, 0, length);
+
+    target.writeBytes(target, 0, length);
+
+    return temp;
+};
+
 
 export { BinaryBuffer };

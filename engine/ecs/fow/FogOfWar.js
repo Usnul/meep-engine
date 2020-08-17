@@ -1,5 +1,5 @@
 import { Sampler2D } from "../../graphics/texture/sampler/Sampler2D.js";
-import { ClampToEdgeWrapping, DataTexture, LinearFilter, LuminanceFormat, RedFormat, UnsignedByteType } from "three";
+import { ClampToEdgeWrapping, DataTexture, LinearFilter, RedFormat, UnsignedByteType } from "three";
 import Vector1 from "../../../core/geom/Vector1.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import Vector3 from "../../../core/geom/Vector3.js";
@@ -8,15 +8,10 @@ import { clamp, max2, min2 } from "../../../core/math/MathUtils.js";
 import { computeUnsignedDistanceField } from "../../graphics/texture/sampler/distanceField.js";
 import Vector4 from "../../../core/geom/Vector4.js";
 import Signal from "../../../core/events/signal/Signal.js";
-import {
-    deserializeRowFirstTable,
-    RowFirstTable,
-    serializeRowFirstTable
-} from "../../../core/collection/table/RowFirstTable.js";
+import { RowFirstTable } from "../../../core/collection/table/RowFirstTable.js";
 import { RowFirstTableSpec } from "../../../core/collection/table/RowFirstTableSpec.js";
 import { DataType } from "../../../core/collection/table/DataType.js";
 import { writeSample2DDataToDataTexture } from "../../graphics/texture/sampler/writeSampler2DDataToDataTexture.js";
-import { BinaryClassSerializationAdapter } from "../storage/binary/BinaryClassSerializationAdapter.js";
 
 const samplePosition = [];
 
@@ -80,8 +75,6 @@ export class FogOfWar {
         this.texture = null;
 
         this.scale = new Vector1(1);
-
-        this.height = new Vector1(0);
 
         /**
          * Size of the fog area
@@ -607,51 +600,3 @@ export class FogOfWar {
 FogOfWar.typeName = 'FogOfWar';
 
 
-export class FogOfWarSerializationAdapter extends BinaryClassSerializationAdapter {
-    constructor() {
-        super();
-
-        this.klass = FogOfWar;
-        this.version = 0;
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {FogOfWar} value
-     */
-    serialize(buffer, value) {
-        value.scale.toBinaryBuffer(buffer);
-
-        value.height.toBinaryBuffer(buffer);
-
-        value.size.toBinaryBuffer(buffer);
-
-        value.sampler.toBinaryBuffer(buffer);
-
-        //serialize reveal state
-        serializeRowFirstTable(buffer, value.fadeMask);
-    }
-
-    /**
-     *
-     * @param {BinaryBuffer} buffer
-     * @param {FogOfWar} value
-     */
-    deserialize(buffer, value) {
-        value.scale.fromBinaryBuffer(buffer);
-
-        value.height.fromBinaryBuffer(buffer);
-
-        value.size.fromBinaryBuffer(buffer);
-
-        value.sampler.fromBinaryBuffer(buffer);
-
-        //deserialize reveal state
-        deserializeRowFirstTable(buffer, value.fadeMask);
-
-        //
-        value.textureNeedsUpdate = true;
-        value.rebuildDistanceSampler();
-    }
-}
