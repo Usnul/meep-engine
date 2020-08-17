@@ -120,6 +120,8 @@ export class EngineHarness {
      * @param {number} [pitch]
      * @param {number} [yaw]
      * @param {boolean} [autoClip]
+     * @param {number} [distanceMin]
+     * @param {number} [distanceMax]
      * @returns {EntityBuilder}
      */
     static buildCamera(
@@ -130,7 +132,9 @@ export class EngineHarness {
             distance = 10,
             pitch = -1.4,
             yaw = 0,
-            autoClip = true
+            autoClip = true,
+            distanceMin = 0,
+            distanceMax = 1000
         }
     ) {
         const transform = new Transform();
@@ -139,8 +143,8 @@ export class EngineHarness {
         cameraController.pitch = pitch;
         cameraController.yaw = yaw;
         cameraController.distance = distance;
-        cameraController.distanceMin = 0;
-        cameraController.distanceMax = 1000;
+        cameraController.distanceMin = distanceMin;
+        cameraController.distanceMax = distanceMax;
         cameraController.target.copy(target);
 
         const camera = new Camera();
