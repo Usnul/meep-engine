@@ -26,10 +26,10 @@ export class FogOfWarSerializationAdapter extends BinaryClassSerializationAdapte
         const color_b = (value.color.z * 255) | 0;
         const color_a = (value.color.w * 255) | 0;
 
-        const color = (color_r << 16)
-            | (color_g << 8)
-            | (color_b << 0)
-            | (color_a << 24)
+        const color = (color_r << 24)
+            | (color_g << 16)
+            | (color_b << 8)
+            | (color_a << 0)
         ;
 
         buffer.writeUint32(color);
@@ -55,10 +55,10 @@ export class FogOfWarSerializationAdapter extends BinaryClassSerializationAdapte
 
         const color = buffer.readUint32();
 
-        const color_r = (color >> 16) & 0xFF;
-        const color_g = (color >> 8) & 0xFF;
-        const color_b = (color >> 0) & 0xFF;
-        const color_a = (color >> 24) & 0xFF;
+        const color_r = (color >> 24) & 0xFF;
+        const color_g = (color >> 16) & 0xFF;
+        const color_b = (color >> 8) & 0xFF;
+        const color_a = (color >> 0) & 0xFF;
 
         value.color.set(
             color_r / 255,

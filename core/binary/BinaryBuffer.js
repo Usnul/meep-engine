@@ -925,7 +925,7 @@ BinaryBuffer.copyBytes = function (source, target, length) {
 
     source.readBytes(temp, 0, length);
 
-    target.writeBytes(target, 0, length);
+    target.writeBytes(temp, 0, length);
 
     return temp;
 };

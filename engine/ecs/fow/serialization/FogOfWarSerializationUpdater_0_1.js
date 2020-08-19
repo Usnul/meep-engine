@@ -31,7 +31,7 @@ export class FogOfWarSerializationUpdater_0_1 extends BinaryClassUpgrader {
 
         BinaryBuffer.copyUint8(source, target); // data type
 
-        BinaryBuffer.copyBytes(sampler_height * sampler_width * sampler_item_size); // sampler data
+        BinaryBuffer.copyBytes(source, target, sampler_height * sampler_width * sampler_item_size); // sampler data
 
         const table_type_count = BinaryBuffer.copyUint16(source, target);
 
