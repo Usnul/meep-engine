@@ -22,15 +22,15 @@ class AABB2 {
      * @constructor
      */
     constructor(x0 = 0, y0 = 0, x1 = 0, y1 = 0) {
-        assert.equal(typeof x0, "number", `x0 must be of type "number", instead was "${typeof x0}"`);
-        assert.equal(typeof y0, "number", `y0 must be of type "number", instead was "${typeof y0}"`);
-        assert.equal(typeof x1, "number", `x1 must be of type "number", instead was "${typeof x1}"`);
-        assert.equal(typeof y1, "number", `y1 must be of type "number", instead was "${typeof y1}"`);
+        assert.isNumber(x0, `x0`);
+        assert.isNumber(y0, `y0`);
+        assert.isNumber(x1, `x1`);
+        assert.isNumber(y1, `y1`);
 
-        assert.ok(!Number.isNaN(x0), `x0 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(y0), `y0 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(x1), `x1 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(y1), `y1 must be a valid number, instead was NaN`);
+        assert.notNaN(x0, `x0`);
+        assert.notNaN(y0, `y0`);
+        assert.notNaN(x1, `x1`);
+        assert.notNaN(y1, `y1`);
 
         /**
          *
@@ -165,10 +165,10 @@ class AABB2 {
      * @public
      */
     _expandToFit(x0, y0, x1, y1) {
-        this.x0 = Math.min(this.x0, x0);
-        this.y0 = Math.min(this.y0, y0);
-        this.x1 = Math.max(this.x1, x1);
-        this.y1 = Math.max(this.y1, y1);
+        this.x0 = min2(this.x0, x0);
+        this.y0 = min2(this.y0, y0);
+        this.x1 = max2(this.x1, x1);
+        this.y1 = max2(this.y1, y1);
     }
 
     /**
@@ -387,15 +387,15 @@ class AABB2 {
      * returns {AABB2} this
      */
     set(x0, y0, x1, y1) {
-        assert.equal(typeof x0, "number", `x0 must be of type "number", instead was "${typeof x0}"`);
-        assert.equal(typeof y0, "number", `y0 must be of type "number", instead was "${typeof y0}"`);
-        assert.equal(typeof x1, "number", `x1 must be of type "number", instead was "${typeof x1}"`);
-        assert.equal(typeof y1, "number", `y1 must be of type "number", instead was "${typeof y1}"`);
+        assert.isNumber(x0, `x0`);
+        assert.isNumber(y0, `y0`);
+        assert.isNumber(x1, `x1`);
+        assert.isNumber(y1, `y1`);
 
-        assert.ok(!Number.isNaN(x0), `x0 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(y0), `y0 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(x1), `x1 must be a valid number, instead was NaN`);
-        assert.ok(!Number.isNaN(y1), `y1 must be a valid number, instead was NaN`);
+        assert.notNaN(x0, `x0`);
+        assert.notNaN(y0, `y0`);
+        assert.notNaN(x1, `x1`);
+        assert.notNaN(y1, `y1`);
 
         this.x0 = x0;
         this.y0 = y0;
@@ -513,6 +513,12 @@ function computeLineBetweenTwoBoxes(b0, b1, p0, p1) {
 }
 
 AABB2.computeLineBetweenTwoBoxes = computeLineBetweenTwoBoxes;
+
+/**
+ * @readonly
+ * @type {AABB2}
+ */
+AABB2.zero = Object.freeze(new AABB2(0, 0, 0, 0));
 
 /**
  *
