@@ -2,6 +2,8 @@ import { assert } from "../../core/assert.js";
 
 export class GridTaskGenerator {
     constructor() {
+        this.name = "Unnamed";
+
         /**
          *
          * @type {GridTaskGenerator[]}

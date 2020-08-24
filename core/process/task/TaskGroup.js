@@ -6,6 +6,8 @@ import TaskState from './TaskState.js';
 import Task from './Task.js';
 import { assert } from "../../assert.js";
 import ObservedInteger from "../../model/ObservedInteger.js";
+import LineBuilder from "../../codegen/LineBuilder.js";
+import { objectKeyByValue } from "../../model/ObjectUtils.js";
 
 /**
  *
@@ -146,6 +148,35 @@ TaskGroup.prototype.getEstimatedDuration = function () {
     }
 
     return result;
+};
+
+/**
+ * Dumps task group tree along with state of each task
+ * @returns {string}
+ */
+TaskGroup.prototype.getVerboseStatusMessage = function () {
+    const b = new LineBuilder();
+
+    /**
+     *
+     * @param {Task|TaskGroup} t
+     */
+    function addTask(t) {
+        if (t.isTaskGroup) {
+            b.add(`group ['${t.name}']`)
+            b.indent();
+            for (let i = 0; i < t.children.length; i++) {
+                addTask(t.children[i]);
+            }
+            b.dedent();
+        } else {
+            b.add(`task ['${t.name}'] ${objectKeyByValue(TaskState, t.state.getValue())}`)
+        }
+    }
+
+    addTask(this);
+
+    return b.build();
 };
 
 

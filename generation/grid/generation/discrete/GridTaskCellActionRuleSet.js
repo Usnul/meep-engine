@@ -20,17 +20,22 @@ export class GridTaskActionRuleSet extends GridTaskGenerator {
 
     /**
      *
+     * @param name
      * @param {GridActionRuleSet} rules
      * @param {number} [resolution=1]
      * @returns {GridTaskActionRuleSet}
      */
-    static from(rules, resolution = 1) {
+    static from({ name, rules, resolution = 1 }) {
         assert.isNumber(resolution, 'resolution');
 
         const r = new GridTaskActionRuleSet();
 
         r.rules = rules;
         r.resolution = resolution;
+
+        if (name !== undefined) {
+            r.name = name;
+        }
 
         return r;
     }

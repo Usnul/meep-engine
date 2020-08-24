@@ -28,6 +28,10 @@ export class GridGenerator {
      */
     generate(ecd, grid, seed) {
 
+        /**
+         *
+         * @type {TaskGroup[]}
+         */
         const tasks = [];
 
         const n = this.generators.length;
@@ -58,15 +62,33 @@ export class GridGenerator {
                 const dependencyIndex = this.generators.indexOf(dependency);
 
                 if (dependencyIndex === -1) {
-                    throw new Error(`Dependency ${j} of task generator [${i}] is not found`);
+                    throw new Error(`Dependency ${j}(name='${dependency.name}') of task generator [${i}] (name='${generator.name}') is not found`);
                 }
 
                 const dependencyTask = tasks[dependencyIndex];
 
                 task.addDependency(dependencyTask);
             }
+
+            if (!ENV_PRODUCTION) {
+                catchGeneratorErrors(generator, task);
+            }
         }
 
         return new TaskGroup(tasks, 'Grid Generator');
     }
+}
+
+
+/**
+ *
+ * @param {GridTaskGenerator} generator
+ * @param {TaskGroup} task
+ */
+function catchGeneratorErrors(generator, task) {
+
+    task.promise().catch(reason => {
+        console.error(`Generator '${generator.name}' failed. Task status: ${task.getVerboseStatusMessage()}`);
+    });
+
 }

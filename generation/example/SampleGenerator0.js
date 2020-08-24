@@ -99,7 +99,7 @@ const gConnectRooms = GridTaskConnectRooms.from({
 
 gConnectRooms.addDependency(gMakeEmpty);
 
-const gRuleSet1 = GridTaskActionRuleSet.from(GridActionRuleSet.from({ rules: [chestPlacementRule] }));
+const gRuleSet1 = GridTaskActionRuleSet.from({ rules: GridActionRuleSet.from({ rules: [chestPlacementRule] }) });
 
 
 const pNearTreasure = new CellMatcherGridPattern();
@@ -183,7 +183,7 @@ const prTreasureGuards = GridCellPlacementRule.from(
 );
 
 
-const gRuleSetTreasureGuards = GridTaskActionRuleSet.from(GridActionRuleSet.from({ rules: [prTreasureGuards] }));
+const gRuleSetTreasureGuards = GridTaskActionRuleSet.from({ rules: GridActionRuleSet.from({ rules: [prTreasureGuards] }) });
 gRuleSetTreasureGuards.addDependency(gRuleSet1);
 
 
@@ -212,7 +212,7 @@ const prEnemyCorridorGuard = GridCellPlacementRule.from(
 
 prEnemyCorridorGuard.probability = 0.5;
 
-const gRuleSet2 = GridTaskActionRuleSet.from(GridActionRuleSet.from({ rules: [prEnemyTreasureGuard, prEnemyCorridorGuard] }));
+const gRuleSet2 = GridTaskActionRuleSet.from({ rules: GridActionRuleSet.from({ rules: [prEnemyTreasureGuard, prEnemyCorridorGuard] }) });
 
 gRuleSet2.addDependency(gRuleSetTreasureGuards);
 
@@ -255,14 +255,16 @@ gRoadDecorators.addDependency(gRoads);
  *
  * @type {GridTaskActionRuleSet}
  */
-const gDrawLayerMoisture = GridTaskActionRuleSet.from(GridActionRuleSet.from({
-    rules: [
-        GridCellPlacementRule.from(
-            CellMatcherAny.INSTANCE,
-            [GridCellActionWriteFilterToLayer.from(MirGridLayers.Moisture, SampleGroundMoistureFilter)]
-        )
-    ]
-}));
+const gDrawLayerMoisture = GridTaskActionRuleSet.from({
+    rules: GridActionRuleSet.from({
+        rules: [
+            GridCellPlacementRule.from(
+                CellMatcherAny.INSTANCE,
+                [GridCellActionWriteFilterToLayer.from(MirGridLayers.Moisture, SampleGroundMoistureFilter)]
+            )
+        ]
+    })
+});
 
 //trees
 const fReadHeight = CellFilterReadGridLayer.from(MirGridLayers.Heights);
@@ -481,41 +483,43 @@ mHeightArea.addRule(1, 1, matcher_not_play_area);
 
 mHeightArea.addRule(0, 2, matcher_not_play_area);
 
-const gHeights = GridTaskActionRuleSet.from(GridActionRuleSet.from(
-    {
-        rules: [
-            GridCellPlacementRule.from(
-                CellMatcherAny.INSTANCE,
-                [
-                    GridCellActionWriteFilterToLayer.from(
-                        MirGridLayers.Heights,
+const gHeights = GridTaskActionRuleSet.from({
+    rules: GridActionRuleSet.from(
+        {
+            rules: [
+                GridCellPlacementRule.from(
+                    CellMatcherAny.INSTANCE,
+                    [
+                        GridCellActionWriteFilterToLayer.from(
+                            MirGridLayers.Heights,
 
-                        CellFilterLerp.from(
-                            CellFilterLiteralFloat.from(0),
                             CellFilterLerp.from(
-                                CellFilterLiteralFloat.from(-2),
-                                CellFilterLiteralFloat.from(7),
-                                CellFilterMultiply.from(
-                                    CellFilterSimplexNoise.from(30, 30),
-                                    CellFilterSimplexNoise.from(13, 13)
-                                )
-                            ),
-                            CellFilterGaussianBlur.from(
-                                CellFilterCache.from(
-                                    CellFilterCellMatcher.from(
-                                        mHeightArea
+                                CellFilterLiteralFloat.from(0),
+                                CellFilterLerp.from(
+                                    CellFilterLiteralFloat.from(-2),
+                                    CellFilterLiteralFloat.from(7),
+                                    CellFilterMultiply.from(
+                                        CellFilterSimplexNoise.from(30, 30),
+                                        CellFilterSimplexNoise.from(13, 13)
                                     )
                                 ),
-                                1.5,
-                                1.5
+                                CellFilterGaussianBlur.from(
+                                    CellFilterCache.from(
+                                        CellFilterCellMatcher.from(
+                                            mHeightArea
+                                        )
+                                    ),
+                                    1.5,
+                                    1.5
+                                )
                             )
                         )
-                    )
-                ]
-            )
-        ]
-    }
-), 1);
+                    ]
+                )
+            ]
+        }
+    ), resolution: 1
+});
 
 
 gHeights.addDependency(gConnectRooms);

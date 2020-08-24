@@ -41,12 +41,13 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
 
     /**
      *
+     * @param name
      * @param {CellMatcher} source
      * @param {CellMatcher} pass
      * @param {string} layer
      * @param {number} initial
      */
-    static from({ source, pass, layer, initial = 65535 }) {
+    static from({ name = 'Build source distance map', source, pass, layer, initial = 65535 }) {
         assert.defined(source);
         assert.defined(pass);
 
@@ -58,6 +59,8 @@ export class GridTaskBuildSourceDistanceMap extends GridTaskGenerator {
         r.passMatcher = pass;
         r.layer = layer;
         r.initial = initial;
+
+        r.name = name;
 
         return r;
     }

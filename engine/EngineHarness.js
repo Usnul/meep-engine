@@ -13,6 +13,8 @@ import InputController from "./input/ecs/components/InputController.js";
 import { decodeMouseEventButtons } from "./input/devices/PointerDevice.js";
 import { loadGameClassRegistry } from "../../model/game/GameClassRegistry.js";
 import { WebEnginePlatform } from "./platform/WebEnginePlatform.js";
+import Tag from "./ecs/components/Tag.js";
+import { SerializationMetadata } from "./ecs/components/SerializationMetadata.js";
 
 /**
  *
@@ -158,6 +160,7 @@ export class EngineHarness {
             .add(transform)
             .add(cameraController)
             .add(camera)
+            .add(Tag.fromJSON(['Camera']))
             .build(ecd);
 
         console.log('build camera', entityBuilder);
@@ -236,6 +239,7 @@ export class EngineHarness {
         new EntityBuilder()
             .add(key)
             .add(transform)
+            .add(Tag.fromJSON(['Light', 'Key']))
             .build(ecd);
 
 
@@ -248,6 +252,7 @@ export class EngineHarness {
         new EntityBuilder()
             .add(fill)
             .add(new Transform())
+            .add(Tag.fromJSON(['Light', 'Ambient']))
             .build(ecd);
     }
 
@@ -332,6 +337,7 @@ export class EngineHarness {
 
         const eb = new EntityBuilder();
         eb.add(inputController);
+        eb.add(SerializationMetadata.Transient)
 
         eb.build(ecd);
 

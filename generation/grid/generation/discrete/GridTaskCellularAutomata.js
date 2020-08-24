@@ -36,11 +36,12 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
     /**
      *
+     * @param name
      * @param {GridCellAction} action
      * @param {number} [margin]
      * @param {number} [threshold]
      */
-    static from({ action, margin = 0, threshold = 0.57 }) {
+    static from({ name = 'cellular automata', action, margin = 0, threshold = 0.57 }) {
         assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
         assert.isNumber(margin);
         assert.isNumber(threshold);
@@ -55,6 +56,8 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
         r.marginLeft = margin;
         r.marginRight = margin;
         r.marginBottom = margin;
+
+        r.name = name;
 
         return r;
     }
@@ -81,6 +84,7 @@ export class GridTaskCellularAutomata extends GridTaskGenerator {
 
         const threshold = this.threshold;
 
+        // initial seeding
         const tSeed = countTask(0, mask_area, index => {
             const x = index % mask_width + mask_x0;
             const y = ((index / mask_width) | 0) + mask_y0;

@@ -195,11 +195,13 @@ const ruleCampfire = GridCellPlacementRule.from(
  *
  * @returns {GridTaskActionRuleSet}
  */
-export const mir_generator_place_buff_objects = () => GridTaskActionRuleSet.from(GridActionRuleSet.from({
-    rules: [
-        ruleAttackPower,
-        ruleDefense,
-        ruleWell,
-        ruleCampfire
-    ], policy: RuleSelectionPolicyType.Random
-}));
+export const mir_generator_place_buff_objects = () => GridTaskActionRuleSet.from({
+    rules: GridActionRuleSet.from({
+        rules: [
+            ruleAttackPower,
+            ruleDefense,
+            ruleWell,
+            ruleCampfire
+        ], policy: RuleSelectionPolicyType.Random
+    })
+});

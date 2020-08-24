@@ -83,12 +83,13 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
 
     /**
      *
+     * @param name
      * @param {CellMatcher} matcher
      * @param {GridCellAction} action
      * @param {number} thickness
      * @returns {GridTaskConnectRooms}
      */
-    static from({ matcher, action, thickness = 3 }) {
+    static from({ name = 'connect rooms', matcher, action, thickness = 3 }) {
         assert.equal(matcher.isCellMatcher, true, 'matcher.isCellMatcher !== true');
         assert.equal(action.isGridCellAction, true, 'action.isGridCellAction !== true');
         assert.isNumber(thickness, 'thickness');
@@ -99,6 +100,8 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         r.matcher = matcher;
         r.action = action;
         r.thickness = thickness;
+
+        r.name = name;
 
         return r;
     }
@@ -119,6 +122,7 @@ export class GridTaskConnectRooms extends GridTaskGenerator {
         const gridSize = grid.width * grid.height;
 
         return new Task({
+            name: 'find empty tile',
             cycleFunction() {
                 if (i >= gridSize) {
                     //not found

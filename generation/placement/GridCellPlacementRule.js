@@ -48,6 +48,8 @@ export class GridCellPlacementRule {
         assert.defined(matcher);
         assert.defined(actions);
 
+        assert.isArray(actions);
+
         const r = new GridCellPlacementRule();
 
         r.pattern = matcher;
