@@ -9,7 +9,8 @@ const TransitionFunctions = {
     Sine: sine,
     EaseIn: easeInQuad,
     EaseOut: easeOutQuad,
-    CubicEaseIn: makeCubicCurve(0, 1, 0.98, 1)
+    EaseInOut: easeInOutQuad,
+    CubicEaseIn: makeCubicCurve(0, 1, 0.98, 1),
 };
 
 
@@ -46,6 +47,15 @@ function easeInQuad(x) {
  */
 function easeOutQuad(x) {
     return -x * (x - 2);
+}
+
+/**
+ *
+ * @param {number} t
+ * @returns {number}
+ */
+function easeInOutQuad(t) {
+    return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
 export default TransitionFunctions;
