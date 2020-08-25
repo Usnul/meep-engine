@@ -3,6 +3,7 @@ import Vector1 from "../../../core/geom/Vector1.js";
 import ObservedBoolean from "../../../core/model/ObservedBoolean.js";
 import { assert } from "../../../core/assert.js";
 import { BinaryClassSerializationAdapter } from "../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
+import ObservedString from "../../../core/model/ObservedString.js";
 
 /**
  *
@@ -19,6 +20,9 @@ function createValueByType(type) {
             break;
         case DataType.Boolean:
             value = new ObservedBoolean(false);
+            break;
+        case DataType.String:
+            value = new ObservedString("");
             break;
         default:
             throw new TypeError(`Unsupported data type '${type}'`);
@@ -109,6 +113,18 @@ export class Blackboard {
      */
     acquireNumber(name, initialValue = 0) {
         return this.acquire(name, DataType.Number, initialValue);
+    }
+
+    /**
+     *
+     * @param {string} name
+     * @param {string} [initialValue]
+     * @returns {ObservedString}
+     */
+    acquireString(name, initialValue = '') {
+        assert.typeOf(initialValue, 'string', 'initialValue');
+
+        return this.acquire(name, DataType.String, initialValue);
     }
 
     /**
@@ -231,6 +247,9 @@ export class BlackboardSerializationAdapter extends BinaryClassSerializationAdap
                 case DataType.Boolean:
                     buffer.writeUint8(2);
                     break;
+                case DataType.String:
+                    buffer.writeUint8(3);
+                    break;
                 default:
                     throw new TypeError(`Unexpected data type '${datum.type}'`);
             }
@@ -263,7 +282,9 @@ export class BlackboardSerializationAdapter extends BinaryClassSerializationAdap
                 case 2:
                     type = DataType.Boolean;
                     break;
-
+                case 3:
+                    type = DataType.String;
+                    break;
                 default:
                     throw new TypeError(`Unexpected data type flag '${typeFlag}'`);
             }
