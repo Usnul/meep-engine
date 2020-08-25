@@ -164,7 +164,7 @@ export function arrayPickBestElement(array, scoreFunction) {
 
     bestScore = scoreFunction(bestElement);
 
-    assert.typeOf(bestScore, 'number', 'bestScore');
+    assert.isNumber(bestScore, 'bestScore');
 
     for (let i = 1; i < size; i++) {
         const el = array[i];
@@ -172,7 +172,7 @@ export function arrayPickBestElement(array, scoreFunction) {
         // compute score
         const score = scoreFunction(el);
 
-        assert.typeOf(score, 'number', 'score');
+        assert.isNumber(score, 'score');
 
         if (score > bestScore) {
             bestScore = score;
@@ -181,6 +181,56 @@ export function arrayPickBestElement(array, scoreFunction) {
     }
 
     return bestElement;
+}
+
+/**
+ * @template T
+ * @param {T[]} array
+ * @param {function(T):number} scoreFunction
+ * @returns {T[]}
+ */
+export function arrayPickBestElements(array, scoreFunction) {
+    assert.notEqual(array, undefined, 'array is undefined');
+    assert.isArray(array, 'array');
+
+    assert.typeOf(scoreFunction, 'function', 'scoreFunction');
+
+    let bestScore;
+
+    const size = array.length;
+
+    if (size === 0) {
+        return [];
+    }
+
+    const first = array[0];
+
+    bestScore = scoreFunction(first);
+
+    assert.isNumber(bestScore, 'bestScore');
+
+    const result = [first];
+
+    for (let i = 1; i < size; i++) {
+        const el = array[i];
+
+        // compute score
+        const score = scoreFunction(el);
+
+        assert.isNumber(score, 'score');
+
+        if (score > bestScore) {
+            bestScore = score;
+
+            result.splice(0, result.length);
+
+            result.push(el);
+        } else if (score === bestScore) {
+            result.push(el);
+        }
+    }
+
+    return result;
 }
 
 /**

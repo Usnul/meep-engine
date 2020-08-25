@@ -66,6 +66,9 @@ export function randomGaussian(random, quality = 6) {
  * @returns {T}
  */
 export function randomFromArray(array, random) {
+    assert.isArray(array, 'array');
+    assert.typeOf(random, 'function', 'random');
+
     const i = Math.min(array.length - 1, Math.floor(random() * array.length));
 
     return array[i];

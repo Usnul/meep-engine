@@ -176,6 +176,14 @@ class Task {
 
     /**
      *
+     * @returns {Promise}
+     */
+    promise() {
+        return Task.promise(this);
+    }
+
+    /**
+     *
      * @param {(Task|TaskGroup)[]} tasks
      * @return {Promise}
      */
