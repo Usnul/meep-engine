@@ -2,6 +2,7 @@ import { OrthographicCamera, Scene } from "three";
 import { WebGLRendererPool } from "../../../engine/graphics/render/RendererPool.js";
 import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
 import Vector2 from "../../../core/geom/Vector2.js";
+import { assert } from "../../../core/assert.js";
 
 export class MinimapWorldGL {
     /**
@@ -77,8 +78,8 @@ export class MinimapWorldGL {
                     this.layers.forEach(l => l.setViewportSize(x, y));
                 }
             }),
-            new SignalBinding(worldBounds.size.onChanged, this.updateCameraFocus.bind(this)),
-            new SignalBinding(worldBounds.position.onChanged, this.updateCameraFocus.bind(this))
+            new SignalBinding(worldBounds.size.onChanged, this.updateCameraFocus, this),
+            new SignalBinding(worldBounds.position.onChanged, this.updateCameraFocus, this)
         ];
     }
 
@@ -94,6 +95,8 @@ export class MinimapWorldGL {
 
     updateCameraFocus() {
         const camera = this.camera;
+
+        assert.defined(camera, 'this.camera');
 
         const worldBounds = this.worldBounds;
 
