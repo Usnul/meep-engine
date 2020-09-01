@@ -38,6 +38,7 @@ export function buildDistanceMapToObjective(
 
 
     const width = grid.width;
+    const height = grid.height;
 
     const neighbourhoodMaskSize = neighbourhoodMask.length;
 
@@ -63,7 +64,7 @@ export function buildDistanceMapToObjective(
 
             const n_y = local_ny + c_y;
 
-            if (n_y < 0 || n_y >= grid.height) {
+            if (n_y < 0 || n_y >= height) {
                 continue;
             }
 

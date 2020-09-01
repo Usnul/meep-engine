@@ -45,6 +45,7 @@ import { CellFilterCache } from "../../filtering/numeric/CellFilterCache.js";
 import { SoundEmitter } from "../../../engine/sound/ecs/emitter/SoundEmitter.js";
 import { SampleGroundMoistureFilter } from "../filters/SampleGroundMoistureFilter.js";
 import GeneratedArmy from "../../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
+import { MirMarkerTypes } from "../../../../generator/MirMarkerTypes.js";
 
 export const SampleTheme0 = new Theme();
 
@@ -385,7 +386,7 @@ ebpStartingPoint.add(Transform.fromJSON({}));
 ebpStartingPoint.add(GridPosition.fromJSON({}));
 
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
-    matcher: MarkerNodeMatcherByType.from('Starting Point'),
+    matcher: MarkerNodeMatcherByType.from(MirMarkerTypes.StartingPoint),
     action: MarkerNodeActionEntityPlacement.from({
         blueprint: ebpStartingPoint, transform: Transform.fromJSON({
             scale: { x: 0.5, y: 0.5, z: 0.5 },

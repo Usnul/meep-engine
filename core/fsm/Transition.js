@@ -34,32 +34,32 @@ function fTrue(source, target) {
     return true;
 }
 
-/**
- *
- * @param {*} source
- * @param {*} target
- * @param {Transition~action} action
- * @param {Transition~condition} condition
- * @constructor
- * @extends Edge
- */
-function Transition(source, target, action, condition) {
-    Edge.call(this, source, target);
-    //make it a directed edge
-    this.direction = EdgeDirectionType.Forward;
+class Transition extends Edge {
+    /**
+     *
+     * @param {*} source
+     * @param {*} target
+     * @param {Transition~action} action
+     * @param {Transition~condition} condition
+     * @constructor
+     * @extends Edge
+     */
+    constructor(source, target, action, condition) {
+        super(source, target);
+        //make it a directed edge
+        this.direction = EdgeDirectionType.Forward;
 
-    this.action = action;
-    this.condition = (typeof condition === "function") ? condition : fTrue;
+        this.action = action;
+        this.condition = (typeof condition === "function") ? condition : fTrue;
+    }
+
+    /**
+     * @inheritDoc Transition~action
+     */
+    static EmptyAction(source, target) {
+        return Promise.resolve();
+    }
 }
 
-/**
- * @inheritDoc Transition~action
- */
-Transition.EmptyAction = function (source, target) {
-    return Promise.resolve();
-};
-
-
-Transition.prototype = Object.create(Edge.prototype);
 
 export default Transition;

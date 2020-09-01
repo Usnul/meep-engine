@@ -12,6 +12,7 @@ import { GridCellActionTransformNearbyMarkers } from "../../placement/GridCellAc
 import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcherByType.js";
 import { MarkerNodeTransformerRecordProperty } from "../../markers/transform/MarkerNodeTransformerRecordProperty.js";
 import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
+import { MirMarkerTypes } from "../../../../generator/MirMarkerTypes.js";
 
 const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
 
@@ -26,7 +27,7 @@ const rule = GridCellPlacementRule.from(
     pattern,
     [
         GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
-        GridCellActionPlaceMarker.from({ type: 'Starting Point' }),
+        GridCellActionPlaceMarker.from({ type: MirMarkerTypes.StartingPoint }),
         // transfer ownership of any base within some distance to the player
         GridCellActionTransformNearbyMarkers.from(5, MarkerNodeMatcherByType.from('Base'), [
             MarkerNodeTransformerRecordProperty.from('team', CellFilterLiteralFloat.from(0))
