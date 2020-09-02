@@ -378,6 +378,8 @@ function makeGridPositionSymbolDisplay(engine) {
     function makeHelper(gridPosition, transform) {
         const builder = new EntityBuilder();
 
+        // TODO replace with {@link VisualSymbolLine}
+
         const lineMaterial = new LineBasicMaterial({ color: 0xFFFFFF });
         lineMaterial.depthTest = false;
 

@@ -22,6 +22,24 @@ export class SymbolicDisplayInternalAPI {
         this.random = seededRandom(42);
     }
 
+    /**
+     *
+     * @param {Transform} source
+     * @param {Transform} target
+     */
+    bindTransform(source, target) {
+
+        // watch source transform
+        this.bind(source.position.onChanged, target.position.set, target.position);
+        this.bind(source.rotation.onChanged, target.rotation.set, target.rotation);
+        this.bind(source.scale.onChanged, target.scale.set, target.scale);
+
+        // copy source transform
+        target.position.copy(source.position);
+        target.rotation.copy(source.rotation);
+        target.scale.copy(source.scale);
+    }
+
     bind(signal, action, context) {
         const binding = new SignalBinding(signal, action, context);
         this.bindings.push(binding);

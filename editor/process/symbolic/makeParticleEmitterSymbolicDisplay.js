@@ -110,25 +110,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
          */
         const t = builder.getComponent(Transform);
 
-        function updatePosition() {
-            t.position.copy(transform.position);
-        }
-
-        function updateRotation() {
-            t.rotation.copy(transform.rotation);
-        }
-
-        function updateScale() {
-            t.scale.copy(transform.scale);
-        }
-
-        api.bind(transform.position.onChanged, updatePosition);
-        api.bind(transform.rotation.onChanged, updateRotation);
-        api.bind(transform.scale.onChanged, updateScale);
-
-        updatePosition();
-        updateRotation();
-        updateScale();
+        api.bindTransform(transform, t);
 
         return builder;
     }
