@@ -45,6 +45,15 @@ export class MarkerNode {
 
     /**
      *
+     * @param {string} tag
+     * @returns {boolean}
+     */
+    hasTag(tag) {
+        return this.tags.includes(tag);
+    }
+
+    /**
+     *
      * @returns {MarkerNode}
      */
     clone() {

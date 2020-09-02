@@ -22,6 +22,8 @@ import { MarkerNodeEmitterFromAction } from "../../markers/emitter/MarkerNodeEmi
 import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { MarkerNodeTransformerOffsetPosition } from "../../markers/transform/MarkerNodeTransformerOffsetPosition.js";
 import { MarkerNodeTransformerRecordUniqueRandomEnum } from "../../markers/transform/MarkerNodeTransformerRecordUniqueRandomEnum.js";
+import { MirMarkerTypes } from "../../../../generator/MirMarkerTypes.js";
+import { MirMarkerTags } from "../../../../generator/MirMarkerTags.js";
 
 const pMatcher = new CellMatcherGridPattern();
 
@@ -33,7 +35,7 @@ pMatcher.addRule(1, 1, matcher_tag_traversable_unoccupied);
 
 //no other bases nearby
 pMatcher.addRule(0, 0, CellMatcherNot.from(
-    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from('Base'), 25)
+    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(MirMarkerTypes.Base), 25)
 ));
 
 const placeTags = new GridCellActionPlaceTags();
@@ -83,9 +85,9 @@ const rule = GridCellPlacementRule.from(pMatcher, [
             predicate: GridDataNodePredicateNot.from(GridDataNodePredicateOverlaps.from(MarkerNodeMatcherAny.INSTANCE)),
             source: MarkerNodeEmitterFromAction.from([
                 GridCellActionPlaceMarker.from({
-                    type: 'Base',
+                    type: MirMarkerTypes.Base,
                     size: 0.5,
-                    tags: ['Town'],
+                    tags: ['Town', MirMarkerTags.Encounter],
                     properties: {
                         // assign to enemy team
                         team: 1

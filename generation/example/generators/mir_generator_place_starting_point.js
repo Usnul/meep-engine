@@ -13,6 +13,8 @@ import { MarkerNodeMatcherByType } from "../../markers/matcher/MarkerNodeMatcher
 import { MarkerNodeTransformerRecordProperty } from "../../markers/transform/MarkerNodeTransformerRecordProperty.js";
 import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import { MirMarkerTypes } from "../../../../generator/MirMarkerTypes.js";
+import { MarkerNodeTransformerRemoveTag } from "../../markers/transform/MarkerNodeTransformerRemoveTag.js";
+import { MirMarkerTags } from "../../../../generator/MirMarkerTags.js";
 
 const MATCH_STARTING_POINT = CellMatcherLayerBitMaskTest.from(GridTags.StartingPoint, MirGridLayers.Tags);
 
@@ -29,8 +31,9 @@ const rule = GridCellPlacementRule.from(
         GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
         GridCellActionPlaceMarker.from({ type: MirMarkerTypes.StartingPoint }),
         // transfer ownership of any base within some distance to the player
-        GridCellActionTransformNearbyMarkers.from(5, MarkerNodeMatcherByType.from('Base'), [
-            MarkerNodeTransformerRecordProperty.from('team', CellFilterLiteralFloat.from(0))
+        GridCellActionTransformNearbyMarkers.from(5, MarkerNodeMatcherByType.from(MirMarkerTypes.Base), [
+            MarkerNodeTransformerRecordProperty.from('team', CellFilterLiteralFloat.from(0)),
+            MarkerNodeTransformerRemoveTag.from(MirMarkerTags.Encounter)
         ])
     ]
 );

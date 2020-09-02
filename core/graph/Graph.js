@@ -4,7 +4,6 @@
 
 
 import Signal from '../events/signal/Signal.js';
-import { assert } from "../assert.js";
 import { Edge, EdgeDirectionType } from "./Edge.js";
 
 /**
@@ -25,7 +24,7 @@ export class Graph {
     constructor() {
         /**
          *
-         * @type {Array<N>}
+         * @type {N[]}
          */
         this.nodes = [];
         /**
@@ -34,6 +33,17 @@ export class Graph {
          */
         this.edges = [];
         this.onChange = new Signal();
+    }
+
+    /**
+     * Converts this graph into a shallow copy of supplied graph
+     * @param {Graph<N>} other
+     */
+    copy(other) {
+        this.clear();
+
+        this.nodes = other.nodes.slice();
+        this.edges = other.edges.slice();
     }
 
     /**
@@ -437,8 +447,8 @@ export class Graph {
      * @param {Edge<N>} edge
      */
     addEdge(edge) {
-        assert.ok(this.containsNode(edge.first), `Node Edge.first(=${edge.first}) is not present in the graph`);
-        assert.ok(this.containsNode(edge.second), `Node Edge.second(=${edge.second}) is not present in the graph`);
+        //assert.ok(this.containsNode(edge.first), `Node Edge.first(=${edge.first}) is not present in the graph`);
+        //assert.ok(this.containsNode(edge.second), `Node Edge.second(=${edge.second}) is not present in the graph`);
 
         this.edges.push(edge);
         this.onChange.dispatch(edge);
