@@ -6,7 +6,6 @@ import ShaderChunks from './lib/ShaderChunks.js';
 
 function vertex() {
     return `
-    #version 300 es
     
     #define PHYSICAL
     #define STANDARD
@@ -85,7 +84,6 @@ function vertex() {
 
 function fragment() {
     return `
-    #version 300 es
     
     #define PHYSICAL
     #define STANDARD
@@ -96,8 +94,6 @@ function fragment() {
     uniform float splatLayerCount;
     
     uniform vec2 splatResolution;
-    
-    out vec4 out_FragColor;
    
     uniform sampler2D materialScalesMap;
     
@@ -342,30 +338,30 @@ function fragment() {
         
         vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
                         
-        out_FragColor  = vec4( outgoingLight, diffuseColor.a );
+        pc_fragColor  = vec4( outgoingLight, diffuseColor.a );
       
         #if defined( TONE_MAPPING )
-            out_FragColor.rgb = toneMapping( out_FragColor.rgb );
+            pc_fragColor.rgb = toneMapping( pc_fragColor.rgb );
         #endif
         
         //encode fragment
-        out_FragColor = linearToOutputTexel( out_FragColor );
+        pc_fragColor = linearToOutputTexel( pc_fragColor );
         #ifdef USE_FOG
             #ifdef FOG_EXP2
                 float fogFactor = 1.0 - exp( - fogDensity * fogDensity * fogDepth * fogDepth );
             #else
                 float fogFactor = smoothstep( fogNear, fogFar, fogDepth );
             #endif
-            out_FragColor.rgb = mix( out_FragColor.rgb, fogColor, fogFactor );
+            pc_fragColor.rgb = mix( pc_fragColor.rgb, fogColor, fogFactor );
         #endif
         
         #ifdef PREMULTIPLIED_ALPHA
             // Get get normal blending with premultipled, use with CustomBlending, OneFactor, OneMinusSrcAlphaFactor, AddEquation.
-            out_FragColor.rgb *= out_FragColor.a;
+            pc_fragColor.rgb *= pc_fragColor.a;
         #endif
         
         #ifdef DITHERING
-            out_FragColor.rgb = dithering( out_FragColor.rgb );
+            pc_fragColor.rgb = dithering( pc_fragColor.rgb );
         #endif
     }
     `;
