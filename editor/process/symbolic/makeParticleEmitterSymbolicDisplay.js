@@ -43,12 +43,13 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
     function factory([emitter, transform, entity], api) {
 
         const group = new Group();
-        group.frustumCulled = false;
+        group.name = 'Particle Emitter Gizmo';
 
         emitter.traverseLayers(layer => {
             const emissionShape = layer.emissionShape;
 
             const center = new Mesh(centerGeometry, centerMaterial);
+            center.name = "Center Marker";
             center.frustumCulled = false;
 
             center.position.copy(layer.position);
@@ -85,7 +86,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             }
 
             function updatePosition() {
-                mesh.position.copy(layer.position.x);
+                mesh.position.copy(layer.position);
             }
 
             if (mesh !== undefined) {
@@ -105,7 +106,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
 
         });
 
-        const builder = buildThreeJSHelperEntity(group);
+        const builder = buildThreeJSHelperEntity(group, entity);
 
         /**
          *
