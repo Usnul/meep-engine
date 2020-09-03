@@ -45,9 +45,11 @@ matchBend90.addRule(-1, -1, matcher_tag_road);
 const placeMarker = GridCellActionPlaceMarker.from({ type: 'Road Junction Decorator 90' });
 placeMarker.addTag(TAG_ROAD_DECORATOR);
 
-const ruleBend90 = GridCellPlacementRule.from(matchBend90, [
-    placeMarker
-], CellFilterLiteralFloat.from(0.1));
+const ruleBend90 = GridCellPlacementRule.from({
+    matcher: matchBend90, actions: [
+        placeMarker
+    ], probability: CellFilterLiteralFloat.from(0.1)
+});
 
 
 /**

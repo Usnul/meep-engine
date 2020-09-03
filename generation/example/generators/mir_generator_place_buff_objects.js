@@ -20,6 +20,7 @@ import { MarkerNodeMatcherAnd } from "../../markers/matcher/MarkerNodeMatcherAnd
 import { MirGridLayers } from "../grid/MirGridLayers.js";
 import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import { MirMarkerTypes } from "../../../../generator/MirMarkerTypes.js";
+import { GridPatternMatcherCell } from "../../rules/cell/GridPatternMatcherCell.js";
 
 const TAG_MAJOR = 'Major Buff';
 const TAG_MINOR = 'Minor Buff';
@@ -88,64 +89,61 @@ const placeRoadMarkers = GridCellActionPlaceMarkerGroup.from([placeRoadConnector
 
 
 const ruleAttackPower = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        mNoMajorBuffObjectNearby,
-        CellMatcherAnd.from(
-            pMatcherNextToWall,
-            CellMatcherNot.from(
-                CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_ATTACK_POWER), 42)
+    {
+        matcher: CellMatcherAnd.from(
+            mNoMajorBuffObjectNearby,
+            CellMatcherAnd.from(
+                pMatcherNextToWall,
+                CellMatcherNot.from(
+                    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_ATTACK_POWER), 42)
+                )
             )
-        )
-    ), [
-        placeTags,
-        clearTags,
-        GridCellActionPlaceMarker.from({
-            type: BUFF_OBJECT_TYPE_ATTACK_POWER,
-            size: 0.52,
-            tags: [MirMarkerTypes.BuffObject, TAG_MAJOR]
-        }),
-        placeRoadMarkers
-    ], CellFilterLiteralFloat.from(0.1));
+        ), actions: [
+            placeTags,
+            clearTags,
+            GridCellActionPlaceMarker.from({
+                type: BUFF_OBJECT_TYPE_ATTACK_POWER,
+                size: 0.52,
+                tags: [MirMarkerTypes.BuffObject, TAG_MAJOR]
+            }),
+            placeRoadMarkers
+        ], probability: CellFilterLiteralFloat.from(0.1)
+    });
 
 ruleAttackPower.allowRotation = true;
 
 const ruleDefense = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        mNoMajorBuffObjectNearby,
-        CellMatcherAnd.from(
-            pMatcherNextToWall,
-            CellMatcherNot.from(
-                CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_DEFENSE), 42)
+    {
+        matcher: CellMatcherAnd.from(
+            mNoMajorBuffObjectNearby,
+            CellMatcherAnd.from(
+                pMatcherNextToWall,
+                CellMatcherNot.from(
+                    CellMatcherContainsMarkerWithinRadius.from(MarkerNodeMatcherByType.from(BUFF_OBJECT_TYPE_DEFENSE), 42)
+                )
             )
-        )
-    ), [
-        placeTags,
-        clearTags,
-        GridCellActionPlaceMarker.from({
-            type: BUFF_OBJECT_TYPE_DEFENSE,
-            size: 0.52,
-            tags: [MirMarkerTypes.BuffObject, TAG_MAJOR]
-        }),
-        placeRoadMarkers
-    ], CellFilterLiteralFloat.from(0.1));
+        ), actions: [
+            placeTags,
+            clearTags,
+            GridCellActionPlaceMarker.from({
+                type: BUFF_OBJECT_TYPE_DEFENSE,
+                size: 0.52,
+                tags: [MirMarkerTypes.BuffObject, TAG_MAJOR]
+            }),
+            placeRoadMarkers
+        ], probability: CellFilterLiteralFloat.from(0.1)
+    });
 
-const matchEmpty3x3 = new CellMatcherGridPattern();
+const matchCorner = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, -1),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 1, -1),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 0),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 1, 0),
+]);
 
-matchEmpty3x3.addRule(-1, -1, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(0, -1, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(1, -1, matcher_tag_traversable_unoccupied);
-
-matchEmpty3x3.addRule(-1, 0, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(0, 0, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(1, 0, matcher_tag_traversable_unoccupied);
-
-matchEmpty3x3.addRule(-1, 1, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(0, 1, matcher_tag_traversable_unoccupied);
-matchEmpty3x3.addRule(1, 1, matcher_tag_traversable_unoccupied);
-
-const ruleWell = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        matchEmpty3x3,
+const ruleWell = GridCellPlacementRule.from({
+    matcher: CellMatcherAnd.from(
+        matchCorner,
         CellMatcherAnd.from(
             mNoMinorBuffObjectNearby,
             CellMatcherNot.from(
@@ -155,7 +153,7 @@ const ruleWell = GridCellPlacementRule.from(
                 )
             )
         )
-    ), [
+    ), actions: [
 
         placeTags,
         clearTags,
@@ -164,11 +162,12 @@ const ruleWell = GridCellPlacementRule.from(
             size: 0.52,
             tags: [MirMarkerTypes.BuffObject, TAG_MINOR]
         })
-    ], CellFilterLiteralFloat.from(0.1))
+    ], probability: CellFilterLiteralFloat.from(0.1)
+});
 
-const ruleCampfire = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        matchEmpty3x3,
+const ruleCampfire = GridCellPlacementRule.from({
+    matcher: CellMatcherAnd.from(
+        matchCorner,
 
         CellMatcherAnd.from(
             mNoMinorBuffObjectNearby,
@@ -179,7 +178,7 @@ const ruleCampfire = GridCellPlacementRule.from(
                 )
             )
         )
-    ), [
+    ), actions: [
 
         placeTags,
         clearTags,
@@ -190,7 +189,8 @@ const ruleCampfire = GridCellPlacementRule.from(
             tags: [MirMarkerTypes.BuffObject, TAG_MINOR]
         })
 
-    ], CellFilterLiteralFloat.from(0.1))
+    ], probability: CellFilterLiteralFloat.from(0.1)
+});
 
 /**
  *

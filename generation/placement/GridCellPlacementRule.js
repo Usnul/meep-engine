@@ -43,7 +43,7 @@ export class GridCellPlacementRule {
      * @param {number|CellFilter} [probability]
      * @param {Vector2} [offset]
      */
-    static from(matcher, actions, probability, offset = Vector2.zero) {
+    static from({ matcher, actions, probability, offset = Vector2.zero }) {
 
         assert.defined(matcher);
         assert.defined(actions);

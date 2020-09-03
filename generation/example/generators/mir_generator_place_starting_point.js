@@ -26,16 +26,17 @@ pattern.addRule(0, 0, CellMatcherNot.from(MATCH_STARTING_POINT));
 pattern.addRule(0, -1, CellMatcherLayerBitMaskTest.from(GridTags.Base, MirGridLayers.Tags));
 
 const rule = GridCellPlacementRule.from(
-    pattern,
-    [
-        GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
-        GridCellActionPlaceMarker.from({ type: MirMarkerTypes.StartingPoint }),
-        // transfer ownership of any base within some distance to the player
-        GridCellActionTransformNearbyMarkers.from(5, MarkerNodeMatcherByType.from(MirMarkerTypes.Base), [
-            MarkerNodeTransformerRecordProperty.from('team', CellFilterLiteralFloat.from(0)),
-            MarkerNodeTransformerRemoveTag.from(MirMarkerTags.Encounter)
-        ])
-    ]
+    {
+        matcher: pattern, actions: [
+            GridCellActionPlaceTags.from(GridTags.StartingPoint | GridTags.Occupied, MirGridLayers.Tags),
+            GridCellActionPlaceMarker.from({ type: MirMarkerTypes.StartingPoint }),
+            // transfer ownership of any base within some distance to the player
+            GridCellActionTransformNearbyMarkers.from(5, MarkerNodeMatcherByType.from(MirMarkerTypes.Base), [
+                MarkerNodeTransformerRecordProperty.from('team', CellFilterLiteralFloat.from(0)),
+                MarkerNodeTransformerRemoveTag.from(MirMarkerTags.Encounter)
+            ])
+        ]
+    }
 );
 
 rule.allowRotation = true;

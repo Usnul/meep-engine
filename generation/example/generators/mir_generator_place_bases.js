@@ -77,62 +77,64 @@ for (let i = 0; i < 20; i++) {
     name_set.push(`base-${i}`);
 }
 
-const rule = GridCellPlacementRule.from(pMatcher, [
-    placeTags,
-    clearTags,
-    MarkerNodeEmitterGridCellAction.from(
-        MarkerNodeEmitterPredicated.from({
-            predicate: GridDataNodePredicateNot.from(GridDataNodePredicateOverlaps.from(MarkerNodeMatcherAny.INSTANCE)),
-            source: MarkerNodeEmitterFromAction.from([
-                GridCellActionPlaceMarker.from({
-                    type: MirMarkerTypes.Base,
-                    size: 0.5,
-                    tags: ['Town', MirMarkerTags.Encounter],
-                    properties: {
-                        // assign to enemy team
-                        team: 1
-                    },
-                    transform: Transform.fromJSON({
-                        position: {
-                            x: 0.5,
-                            y: 0,
-                            z: 0.5
-                        }
-                    }),
-                    transformers: [
+const rule = GridCellPlacementRule.from({
+    matcher: pMatcher, actions: [
+        placeTags,
+        clearTags,
+        MarkerNodeEmitterGridCellAction.from(
+            MarkerNodeEmitterPredicated.from({
+                predicate: GridDataNodePredicateNot.from(GridDataNodePredicateOverlaps.from(MarkerNodeMatcherAny.INSTANCE)),
+                source: MarkerNodeEmitterFromAction.from([
+                    GridCellActionPlaceMarker.from({
+                        type: MirMarkerTypes.Base,
+                        size: 0.5,
+                        tags: ['Town', MirMarkerTags.Encounter],
+                        properties: {
+                            // assign to enemy team
+                            team: 1
+                        },
+                        transform: Transform.fromJSON({
+                            position: {
+                                x: 0.5,
+                                y: 0,
+                                z: 0.5
+                            }
+                        }),
+                        transformers: [
 
-                        MarkerNodeTransformerRecordUniqueRandomEnum.from(
-                            'name',
-                            name_set
-                        )
-                    ]
-                }),
-                GridCellActionPlaceMarker.from({
-                    type: 'Virtual',
-                    size: 0.5,
-                    transformers: [
-                        MarkerNodeTransformerOffsetPosition.from(1, 0)
-                    ]
-                }),
-                GridCellActionPlaceMarker.from({
-                    type: 'Virtual',
-                    size: 0.5,
-                    transformers: [
-                        MarkerNodeTransformerOffsetPosition.from(0, 1)
-                    ]
-                }),
-                GridCellActionPlaceMarker.from({
-                    type: 'Virtual',
-                    size: 0.5,
-                    transformers: [
-                        MarkerNodeTransformerOffsetPosition.from(1, 1)
-                    ]
-                })
-            ])
-        })
-    ),
-    placeRoadConnectors
-], CellFilterLiteralFloat.from(0.1));
+                            MarkerNodeTransformerRecordUniqueRandomEnum.from(
+                                'name',
+                                name_set
+                            )
+                        ]
+                    }),
+                    GridCellActionPlaceMarker.from({
+                        type: 'Virtual',
+                        size: 0.5,
+                        transformers: [
+                            MarkerNodeTransformerOffsetPosition.from(1, 0)
+                        ]
+                    }),
+                    GridCellActionPlaceMarker.from({
+                        type: 'Virtual',
+                        size: 0.5,
+                        transformers: [
+                            MarkerNodeTransformerOffsetPosition.from(0, 1)
+                        ]
+                    }),
+                    GridCellActionPlaceMarker.from({
+                        type: 'Virtual',
+                        size: 0.5,
+                        transformers: [
+                            MarkerNodeTransformerOffsetPosition.from(1, 1)
+                        ]
+                    })
+                ])
+            })
+        ),
+        placeRoadConnectors
+    ], probability: CellFilterLiteralFloat.from(0.1)
+});
 
 rule.allowRotation = false;
 

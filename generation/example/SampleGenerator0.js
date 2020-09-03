@@ -77,10 +77,12 @@ pNoTreasureIn3.addRule(0, 0, CellMatcherNot.from(CellMatcherContainsMarkerWithin
     MarkerNodeMatcherByType.from('Treasure'), 3
 )));
 
-const chestPlacementRule = GridCellPlacementRule.from(CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), [
-    GridCellActionPlaceMarker.from({ type: 'Treasure', size: 0.5 }),
-    GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
-], CellFilterLiteralFloat.from(0.5));
+const chestPlacementRule = GridCellPlacementRule.from({
+    matcher: CellMatcherAnd.from(pTreasureCorner, pNoTreasureIn3), actions: [
+        GridCellActionPlaceMarker.from({ type: 'Treasure', size: 0.5 }),
+        GridCellActionPlaceTags.from(GridTags.Treasure, MirGridLayers.Tags)
+    ], probability: CellFilterLiteralFloat.from(0.5)
+});
 
 
 const aMakePlayArea = GridCellActionSequence.from([
@@ -175,11 +177,12 @@ const ACTION_PLACE_ENEMY_MARKER = GridCellActionPlaceMarker.from({
 const ACTION_PLACE_ENEMY_TAG = GridCellActionPlaceTags.from(GridTags.Enemy | GridTags.Occupied, MirGridLayers.Tags);
 
 const prTreasureGuards = GridCellPlacementRule.from(
-    pNearTreasure,
-    [
-        ACTION_PLACE_ENEMY_MARKER,
-        ACTION_PLACE_ENEMY_TAG
-    ]
+    {
+        matcher: pNearTreasure, actions: [
+            ACTION_PLACE_ENEMY_MARKER,
+            ACTION_PLACE_ENEMY_TAG
+        ]
+    }
 );
 
 
@@ -188,26 +191,28 @@ gRuleSetTreasureGuards.addDependency(gRuleSet1);
 
 
 const prEnemyTreasureGuard = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        pNearTreasure,
-        pNoEnemyIn3
-    ),
-    [
-        ACTION_PLACE_ENEMY_MARKER,
-        ACTION_PLACE_ENEMY_TAG
-    ]
+    {
+        matcher: CellMatcherAnd.from(
+            pNearTreasure,
+            pNoEnemyIn3
+        ), actions: [
+            ACTION_PLACE_ENEMY_MARKER,
+            ACTION_PLACE_ENEMY_TAG
+        ]
+    }
 );
 
 
 const prEnemyCorridorGuard = GridCellPlacementRule.from(
-    CellMatcherAnd.from(
-        mir_matcher_attack_corridor,
-        pNoEnemyIn3
-    ),
-    [
-        ACTION_PLACE_ENEMY_MARKER,
-        ACTION_PLACE_ENEMY_TAG
-    ]
+    {
+        matcher: CellMatcherAnd.from(
+            mir_matcher_attack_corridor,
+            pNoEnemyIn3
+        ), actions: [
+            ACTION_PLACE_ENEMY_MARKER,
+            ACTION_PLACE_ENEMY_TAG
+        ]
+    }
 );
 
 prEnemyCorridorGuard.probability = 0.5;
@@ -259,8 +264,10 @@ const gDrawLayerMoisture = GridTaskActionRuleSet.from({
     rules: GridActionRuleSet.from({
         rules: [
             GridCellPlacementRule.from(
-                CellMatcherAny.INSTANCE,
-                [GridCellActionWriteFilterToLayer.from(MirGridLayers.Moisture, SampleGroundMoistureFilter)]
+                {
+                    matcher: CellMatcherAny.INSTANCE,
+                    actions: [GridCellActionWriteFilterToLayer.from(MirGridLayers.Moisture, SampleGroundMoistureFilter)]
+                }
             )
         ]
     })
@@ -488,33 +495,34 @@ const gHeights = GridTaskActionRuleSet.from({
         {
             rules: [
                 GridCellPlacementRule.from(
-                    CellMatcherAny.INSTANCE,
-                    [
-                        GridCellActionWriteFilterToLayer.from(
-                            MirGridLayers.Heights,
+                    {
+                        matcher: CellMatcherAny.INSTANCE, actions: [
+                            GridCellActionWriteFilterToLayer.from(
+                                MirGridLayers.Heights,
 
-                            CellFilterLerp.from(
-                                CellFilterLiteralFloat.from(0),
                                 CellFilterLerp.from(
-                                    CellFilterLiteralFloat.from(-2),
-                                    CellFilterLiteralFloat.from(7),
-                                    CellFilterMultiply.from(
-                                        CellFilterSimplexNoise.from(30, 30),
-                                        CellFilterSimplexNoise.from(13, 13)
-                                    )
-                                ),
-                                CellFilterGaussianBlur.from(
-                                    CellFilterCache.from(
-                                        CellFilterCellMatcher.from(
-                                            mHeightArea
+                                    CellFilterLiteralFloat.from(0),
+                                    CellFilterLerp.from(
+                                        CellFilterLiteralFloat.from(-2),
+                                        CellFilterLiteralFloat.from(7),
+                                        CellFilterMultiply.from(
+                                            CellFilterSimplexNoise.from(30, 30),
+                                            CellFilterSimplexNoise.from(13, 13)
                                         )
                                     ),
-                                    1.5,
-                                    1.5
+                                    CellFilterGaussianBlur.from(
+                                        CellFilterCache.from(
+                                            CellFilterCellMatcher.from(
+                                                mHeightArea
+                                            )
+                                        ),
+                                        1.5,
+                                        1.5
+                                    )
                                 )
                             )
-                        )
-                    ]
+                        ]
+                    }
                 )
             ]
         }
