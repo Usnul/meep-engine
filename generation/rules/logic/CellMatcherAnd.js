@@ -4,6 +4,8 @@ import { assert } from "../../../core/assert.js";
 export class CellMatcherAnd extends CellMatcherBinary {
 
     match(grid, x, y, rotation) {
+        assert.isNumber(rotation, 'rotation');
+
         return this.left.match(grid, x, y, rotation)
             && this.right.match(grid, x, y, rotation);
     }

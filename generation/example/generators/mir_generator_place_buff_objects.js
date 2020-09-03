@@ -153,8 +153,8 @@ const ruleWell = GridCellPlacementRule.from({
                 )
             )
         )
-    ), actions: [
-
+    ),
+    actions: [
         placeTags,
         clearTags,
         GridCellActionPlaceMarker.from({
@@ -162,7 +162,8 @@ const ruleWell = GridCellPlacementRule.from({
             size: 0.52,
             tags: [MirMarkerTypes.BuffObject, TAG_MINOR]
         })
-    ], probability: CellFilterLiteralFloat.from(0.1)
+    ],
+    probability: CellFilterLiteralFloat.from(0.1)
 });
 
 const ruleCampfire = GridCellPlacementRule.from({
@@ -178,7 +179,8 @@ const ruleCampfire = GridCellPlacementRule.from({
                 )
             )
         )
-    ), actions: [
+    ),
+    actions: [
 
         placeTags,
         clearTags,
@@ -189,7 +191,8 @@ const ruleCampfire = GridCellPlacementRule.from({
             tags: [MirMarkerTypes.BuffObject, TAG_MINOR]
         })
 
-    ], probability: CellFilterLiteralFloat.from(0.1)
+    ],
+    probability: CellFilterLiteralFloat.from(0.1)
 });
 
 /**
