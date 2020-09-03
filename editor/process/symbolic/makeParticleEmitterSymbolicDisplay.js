@@ -49,6 +49,7 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             const emissionShape = layer.emissionShape;
 
             const center = new Mesh(centerGeometry, centerMaterial);
+            center.frustumCulled = false;
 
             center.position.copy(layer.position);
 
@@ -88,6 +89,8 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
             }
 
             if (mesh !== undefined) {
+
+                mesh.frustumCulled = false;
 
                 updateScale();
                 updatePosition();

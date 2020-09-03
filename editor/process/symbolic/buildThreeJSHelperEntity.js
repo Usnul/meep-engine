@@ -16,6 +16,7 @@ export function buildThreeJSHelperEntity(helper) {
     const entityBuilder = new EntityBuilder();
 
     const renderable = new Renderable(helper);
+    renderable.matrixAutoUpdate = false;
 
     entityBuilder.add(new Transform());
     entityBuilder.add(new EditorEntity());
