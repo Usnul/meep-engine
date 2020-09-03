@@ -2,84 +2,66 @@ import { CellMatcherGridPattern } from "../../rules/cell/CellMatcherGridPattern.
 import { matcher_tag_not_traversable } from "./matcher_tag_not_traversable.js";
 import { matcher_tag_traversable_unoccupied } from "./matcher_tag_traversable_unoccupied.js";
 import { CellMatcherOr } from "../../rules/logic/CellMatcherOr.js";
+import { GridPatternMatcherCell } from "../../rules/cell/GridPatternMatcherCell.js";
 
-//
-const pCorridor0 = new CellMatcherGridPattern();
+const pCorridor_1 = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 0),
 
-pCorridor0.addRule(0, 0, matcher_tag_traversable_unoccupied);
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, 0),
 
-pCorridor0.addRule(0, -1, matcher_tag_traversable_unoccupied);
-pCorridor0.addRule(0, 1, matcher_tag_traversable_unoccupied);
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, -1),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, 1),
+]);
 
-pCorridor0.addRule(-1, 0, matcher_tag_not_traversable);
-pCorridor0.addRule(1, 0, matcher_tag_not_traversable);
+const pCorridor_2 = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 1),
 
-//
-const pCorridor1 = new CellMatcherGridPattern();
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, 0),
 
-pCorridor1.addRule(0, 0, matcher_tag_traversable_unoccupied);
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, -1),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, 2),
+]);
 
-pCorridor1.addRule(0, -1, matcher_tag_traversable_unoccupied);
-pCorridor1.addRule(0, 1, matcher_tag_traversable_unoccupied);
+const pCorridor_3 = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, -1),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 1),
 
-pCorridor1.addRule(-2, 0, matcher_tag_not_traversable);
-pCorridor1.addRule(2, 0, matcher_tag_not_traversable);
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, 0),
 
-//
-const pCorridorDiagonal1 = new CellMatcherGridPattern();
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, -2),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 0, 2),
+]);
 
-pCorridorDiagonal1.addRule(0, 0, matcher_tag_traversable_unoccupied);
+const pCorridor_diagonal_3 = CellMatcherGridPattern.from([
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, -1),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, -1, 1),
 
-pCorridorDiagonal1.addRule(0, -1, matcher_tag_traversable_unoccupied);
-pCorridorDiagonal1.addRule(0, 1, matcher_tag_traversable_unoccupied);
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, -1),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 0, 1),
 
-pCorridorDiagonal1.addRule(-1, -1, matcher_tag_not_traversable);
-pCorridorDiagonal1.addRule(1, 1, matcher_tag_not_traversable);
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, -1),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, 0),
+    GridPatternMatcherCell.from(matcher_tag_traversable_unoccupied, 1, 1),
 
-
-//
-const pCorridorDiagonal2 = new CellMatcherGridPattern();
-
-pCorridorDiagonal2.addRule(0, 0, matcher_tag_traversable_unoccupied);
-
-pCorridorDiagonal2.addRule(0, -1, matcher_tag_traversable_unoccupied);
-pCorridorDiagonal2.addRule(0, 1, matcher_tag_traversable_unoccupied);
-
-pCorridorDiagonal2.addRule(1, -1, matcher_tag_not_traversable);
-pCorridorDiagonal2.addRule(-1, 1, matcher_tag_not_traversable);
-
-//
-const pCorridorLargeDiagonal1 = new CellMatcherGridPattern();
-
-pCorridorLargeDiagonal1.addRule(0, 0, matcher_tag_traversable_unoccupied);
-
-pCorridorLargeDiagonal1.addRule(1, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal1.addRule(2, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal1.addRule(-1, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal1.addRule(-2, 0, matcher_tag_traversable_unoccupied);
-
-pCorridorLargeDiagonal1.addRule(2, -2, matcher_tag_not_traversable);
-pCorridorLargeDiagonal1.addRule(-2, 2, matcher_tag_not_traversable);
-
-//
-const pCorridorLargeDiagonal2 = new CellMatcherGridPattern();
-
-pCorridorLargeDiagonal2.addRule(0, 0, matcher_tag_traversable_unoccupied);
-
-pCorridorLargeDiagonal2.addRule(2, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal2.addRule(1, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal2.addRule(-1, 0, matcher_tag_traversable_unoccupied);
-pCorridorLargeDiagonal2.addRule(-2, 0, matcher_tag_traversable_unoccupied);
-
-pCorridorLargeDiagonal2.addRule(-2, -2, matcher_tag_not_traversable);
-pCorridorLargeDiagonal2.addRule(2, 2, matcher_tag_not_traversable);
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, -2, -2),
+    GridPatternMatcherCell.from(matcher_tag_not_traversable, 2, 2),
+]);
 
 
-export const mir_matcher_attack_corridor = CellMatcherOr.from(pCorridor0,
-    CellMatcherOr.from(pCorridor1,
-        CellMatcherOr.from(
-            CellMatcherOr.from(pCorridorDiagonal1, pCorridorDiagonal2),
-            CellMatcherOr.from(pCorridorLargeDiagonal1, pCorridorLargeDiagonal2)
-        )
+export const mir_matcher_attack_corridor = CellMatcherOr.from(
+    CellMatcherOr.from(
+        pCorridor_1,
+        pCorridor_2,
+    ),
+    CellMatcherOr.from(
+        pCorridor_3,
+        pCorridor_diagonal_3
     )
 );

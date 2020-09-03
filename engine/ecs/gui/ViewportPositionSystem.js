@@ -75,15 +75,23 @@ class ViewportPositionSystem extends System {
 
         const view = el.view;
 
-        //convert size of the hud view into normalized (0-1) form
-        const extentX = view.size.x / viewportSize.x;
-        const extentY = view.size.y / viewportSize.y;
+        const viewport_width = viewportSize.x;
+        const viewport_height = viewportSize.y;
 
-        //convert screen-space offset from pixels to normalized (0-1) form
-        const nOffsetX = vp.offset.x / viewportSize.x;
-        const nOffsetY = vp.offset.y / viewportSize.y;
+        if (viewport_width === 0 || viewport_height === 0) {
+            // viewport size is 0
+            return;
+        }
 
-        //determine visibility in clip space
+        // convert size of the hud view into normalized (0-1) form
+        const extentX = view.size.x / viewport_width;
+        const extentY = view.size.y / viewport_height;
+
+        // convert screen-space offset from pixels to normalized (0-1) form
+        const nOffsetX = vp.offset.x / viewport_width;
+        const nOffsetY = vp.offset.y / viewport_height;
+
+        // determine visibility in clip space
         const nPositionX = vp.position.x + nOffsetX;
         const nPositionY = vp.position.y + nOffsetY;
 
@@ -91,16 +99,20 @@ class ViewportPositionSystem extends System {
         const anchorX = vp.anchor.x;
         const anchorY = vp.anchor.y;
 
+        const x0 = nPositionX - extentX * anchorX;
+        const y0 = nPositionY - extentY * anchorY;
+        const x1 = nPositionX + extentX * (1 - anchorX);
+        const y1 = nPositionY + extentY * (1 - anchorY);
+
         aabb2.set(
-            nPositionX - extentX * anchorX,
-            nPositionY - extentY * anchorY,
-            nPositionX + extentX * (1 - anchorX),
-            nPositionY + extentY * (1 - anchorY)
+            x0,
+            y0,
+            x1,
+            y1
         );
 
-
-        const trackedPositionOutOfBounds = aabb2.x0 > 1 || aabb2.x1 < 0
-            || aabb2.y0 > 1 || aabb2.y1 < 0;
+        const trackedPositionOutOfBounds = x0 > 1 || x1 < 0
+            || y0 > 1 || y1 < 0;
 
         const visible = (vp.stickToScreenEdge || !trackedPositionOutOfBounds);
 
