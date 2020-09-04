@@ -73,7 +73,7 @@ const placeRoadConnectors = GridCellActionPlaceMarkerGroup.from([
 
 const name_set = [];
 
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i < 100; i++) {
     name_set.push(`base-${i}`);
 }
 
