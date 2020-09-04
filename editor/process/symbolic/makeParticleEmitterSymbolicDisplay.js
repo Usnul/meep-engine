@@ -45,7 +45,11 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
         const group = new Group();
         group.name = 'Particle Emitter Gizmo';
 
-        emitter.traverseLayers(layer => {
+        /**
+         *
+         * @param {ParticleLayer} layer
+         */
+        function addLayer(layer) {
             const emissionShape = layer.emissionShape;
 
             const center = new Mesh(centerGeometry, centerMaterial);
@@ -103,8 +107,17 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
                 api.bind(layer.scale.onChanged, updateScale);
                 api.bind(transform.scale.onChanged, updateScale);
             }
+        }
 
-        });
+        /**
+         *
+         * @param {ParticleLayer} layer
+         */
+        function removeLayer(layer) {
+            // TODO implement
+        }
+
+        emitter.traverseLayers(addLayer);
 
         const builder = buildThreeJSHelperEntity(group, entity);
 
@@ -115,6 +128,9 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
         const t = builder.getComponent(Transform);
 
         api.bindTransform(transform, t);
+
+        api.bind(emitter.layers.on.added, addLayer, {});
+        api.bind(emitter.layers.on.removed, removeLayer, {});
 
         return builder;
     }
