@@ -9,9 +9,8 @@ import Vector3 from '../../../../core/geom/Vector3.js';
 import { clamp, computeHashFloat, computeHashIntegerArray, max2 } from '../../../../core/math/MathUtils.js';
 
 import Trail2D, { Trail2DFlags } from './Trail2D.js';
-import TrailMaterial from './CodeflowTrailMaterial.js';
-import { BufferAttribute, ClampToEdgeWrapping, DynamicDrawUsage, LinearFilter, StaticDrawUsage } from 'three';
-import Ribbon from '../../geometry/Ribbon.js';
+import TrailMaterial from '../../trail/CodeflowTrailMaterial.js';
+import { BufferAttribute, ClampToEdgeWrapping, LinearFilter } from 'three';
 
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import ThreeFactory from '../../three/ThreeFactory.js';
@@ -20,6 +19,9 @@ import { ReferenceManager } from "../../../ReferenceManager.js";
 import { AssetManager } from "../../../asset/AssetManager.js";
 import { Cache } from "../../../../core/Cache.js";
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
+import { createRibbon } from "../../geometry/ribbon/createRibbon.js";
+import { rotateRibbon } from "../../geometry/ribbon/rotateRibbon.js";
+import { updateTipPosition } from "../../geometry/ribbon/updateTipPosition.js";
 
 /**
  *
@@ -29,74 +31,6 @@ import { computeStringHash } from "../../../../core/primitives/strings/StringUti
 function setViewportSize(component, size) {
     const material = component.mesh.material;
     material.uniforms.viewport.value.set(size.x, size.y);
-}
-
-/**
- *
- * @param {number} numSegments
- * @returns {Ribbon}
- */
-function createRibbon(numSegments) {
-
-    const ribbon = new Ribbon(numSegments, 1);
-
-    /**
-     *
-     * @type {BufferGeometry}
-     */
-    const geometry = ribbon.geometry;
-
-    /*
-     attribute vec3 last, current, next;
-     attribute vec3 barycentric;
-     attribute float off;
-     attribute float uvOffset;
-     */
-
-    const position = geometry.attributes.position;
-    const vertexCount = position.count;
-
-
-    const last = new Float32Array(vertexCount * 3);
-    const next = new Float32Array(vertexCount * 3);
-    const off = new Int8Array(vertexCount);
-    const uvOffset = new Float32Array(vertexCount);
-    const age = new Float32Array(vertexCount);
-
-    const aLast = new BufferAttribute(last, 3);
-    const aNext = new BufferAttribute(next, 3);
-    const aOff = new BufferAttribute(off, 1);
-    const aUvOffset = new BufferAttribute(uvOffset, 1);
-    const aAge = new BufferAttribute(age, 1);
-
-
-    geometry.setAttribute("last", aLast);
-    geometry.setAttribute("next", aNext);
-    geometry.setAttribute("off", aOff);
-    geometry.setAttribute("uvOffset", aUvOffset);
-    geometry.setAttribute("age", aAge);
-
-
-    aLast.needsUpdate = true;
-    aNext.needsUpdate = true;
-    aOff.needsUpdate = true;
-    aUvOffset.needsUpdate = true;
-    aAge.needsUpdate = true;
-    aAge.usage = DynamicDrawUsage;
-
-
-    //set offsets
-    aOff.usage = StaticDrawUsage;
-
-    //offset attribute
-    geometry.setAttribute("off", aOff);
-
-    ribbon.traverseEdges(function (a, b, index, maxIndex) {
-        off[a] = 1;
-        off[b] = -1;
-    });
-
-    return ribbon;
 }
 
 /**
@@ -119,157 +53,6 @@ function initializeTexture(url, material, textures) {
     }
 
     material.needsUpdate = true;
-}
-
-/**
- *
- * @param {BufferAttribute} source
- * @param {int} sourceIndex
- * @param {BufferAttribute} target
- * @param {int} targetIndex
- * @param {int} count
- */
-function copyAttributeValue(source, sourceIndex, target, targetIndex, count) {
-    const targetArray = target.array;
-
-    const sourceArray = source.array;
-
-    for (let i = 0; i < count; i++) {
-        targetArray[targetIndex + i] = sourceArray[sourceIndex + i];
-    }
-}
-
-/**
- *
- * @param {BufferAttribute} source
- * @param {int} sourceIndex
- * @param {BufferAttribute} target
- * @param {int} targetIndex
- */
-function copyAttributeV3(source, sourceIndex, target, targetIndex) {
-    copyAttributeValue(source, sourceIndex * 3, target, targetIndex * 3, 3);
-}
-
-/**
- *
- * @param {BufferAttribute} first
- * @param {int} firstIndex
- * @param {BufferAttribute} second
- * @param {int} secondIndex
- * @param {int} count
- * @returns {boolean}
- */
-function equalAttributeValue(first, firstIndex, second, secondIndex, count) {
-    const firstArray = first.array;
-
-    const secondArray = second.array;
-
-    for (let i = 0; i < count; i++) {
-        const vFirst = firstArray[firstIndex + i];
-        const vSecond = secondArray[secondIndex + i];
-        if (vFirst !== vSecond) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- *
- * @param {BufferAttribute} first
- * @param {int} firstIndex
- * @param {BufferAttribute} second
- * @param {int} secondIndex
- * @returns {boolean}
- */
-function equalAttributeV3(first, firstIndex, second, secondIndex) {
-    return equalAttributeValue(first, firstIndex * 3, second, secondIndex * 3, 3);
-}
-
-/**
- *
- * @param {Ribbon} ribbon
- */
-function rotateRibbon(ribbon) {
-    ribbon.rotate();
-
-    const newHead = ribbon.head();
-    const neck = newHead.previous;
-
-    const geometry = ribbon.geometry;
-
-    const attributes = geometry.attributes;
-
-    const next = attributes.next;
-    const prev = attributes.last;
-    const position = attributes.position;
-
-
-    //set head segment
-    if (equalAttributeV3(position, neck.getA(), position, neck.getC())) {
-        //neck had 0 length, clone "prev" from it
-        copyAttributeV3(prev, newHead.getA(), prev, newHead.getC());
-        copyAttributeV3(prev, newHead.getB(), prev, newHead.getD());
-    } else {
-        copyAttributeV3(position, newHead.getA(), prev, newHead.getC());
-        copyAttributeV3(position, newHead.getB(), prev, newHead.getD());
-
-    }
-
-
-    next.needsUpdate = true;
-    prev.needsUpdate = true;
-}
-
-const vPreviousPosition = new Vector3();
-
-/**
- *
- * @param {Ribbon} ribbon
- * @param {number} x
- * @param {number} y
- * @param {number} z
- */
-function updateTipPosition(ribbon, x, y, z) {
-    const geometry = ribbon.geometry;
-
-    const attributes = geometry.attributes;
-    const next = attributes.next;
-    const prev = attributes.last;
-
-
-    const head = ribbon.head();
-
-    head.setVertexC(x, y, z);
-    head.setVertexD(x, y, z);
-
-    head.getVertexA(vPreviousPosition);
-
-    //special case when new head is at the same place as the old one
-    if (vPreviousPosition.x === x && vPreviousPosition.y === y && vPreviousPosition.z === z) {
-        copyAttributeV3(prev, head.getA(), prev, head.getC());
-        copyAttributeV3(prev, head.getB(), prev, head.getD());
-
-        copyAttributeV3(next, head.getA(), next, head.getC());
-        copyAttributeV3(next, head.getB(), next, head.getD());
-    } else {
-        //compute next offset from position
-        let tX = x - vPreviousPosition.x + x;
-        let tY = y - vPreviousPosition.y + y;
-        let tZ = z - vPreviousPosition.z + z;
-
-        //update head tip
-        next.setXYZ(head.getC(), tX, tY, tZ);
-        next.setXYZ(head.getD(), tX, tY, tZ);
-
-        //update neck
-        next.setXYZ(head.getA(), x, y, z);
-        next.setXYZ(head.getB(), x, y, z);
-    }
-
-    next.needsUpdate = true;
-    prev.needsUpdate = true;
 }
 
 const v3Temp0 = new Vector3();

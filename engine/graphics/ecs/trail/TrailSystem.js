@@ -10,7 +10,7 @@ import Vector3 from '../../../../core/geom/Vector3.js';
 import Trail from './Trail.js';
 import TrailMaterial from './TrailMaterial.js';
 import { ClampToEdgeWrapping, NearestFilter, TextureLoader } from 'three';
-import Ribbon from '../../geometry/Ribbon.js';
+import { Ribbon } from '../../geometry/ribbon/Ribbon.js';
 
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import ThreeFactory from '../../three/ThreeFactory.js';

@@ -1,5 +1,5 @@
-import { RowFirstTable } from "../../../../core/collection/table/RowFirstTable.js";
-import { DataType } from "../../../../core/collection/table/DataType.js";
+import { RowFirstTable } from "../../../core/collection/table/RowFirstTable.js";
+import { DataType } from "../../../core/collection/table/DataType.js";
 
 
 function TemporalPath() {
