@@ -5,6 +5,7 @@
 import { Cache } from "../../Cache.js";
 import { FunctionCompiler } from "../../function/FunctionCompiler.js";
 import { DataType } from "./DataType.js";
+import { EndianType } from "../../binary/BinaryBuffer.js";
 
 /**
  * @readonly
@@ -66,9 +67,10 @@ export const DataTypeByteSizes = {
 /**
  *
  * @param {DataType[]} types
+ * @param {EndianType} [endianType]
  * @returns {Function}
  */
-function genRowReader(types) {
+function genRowReader(types, endianType = EndianType.BigEndian) {
     let offset = 0;
 
     const lines = [];
@@ -78,7 +80,12 @@ function genRowReader(types) {
     for (let i = 0; i < numTypes; i++) {
 
         const type = types[i];
-        lines.push("result[" + i + "] = dataView." + DataType2DataViewReaders[type] + "(" + offset + " + byteOffset);");
+
+        const littleEndianFlag = endianType === EndianType.BigEndian ? 'false' : 'true';
+
+        // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView
+        lines.push(`result[${i}] = dataView.${DataType2DataViewReaders[type]}(${offset} + byteOffset, ${littleEndianFlag});`);
+
         offset += DataTypeByteSizes[type];
 
     }
@@ -94,9 +101,10 @@ function genRowReader(types) {
 /**
  *
  * @param {DataType[]} types
+ * @param {EndianType} [endianType]
  * @returns {Function}
  */
-function genRowWriter(types) {
+function genRowWriter(types, endianType = EndianType.BigEndian) {
     let offset = 0;
 
     const lines = [];
@@ -105,7 +113,12 @@ function genRowWriter(types) {
 
     for (let i = 0; i < numTypes; i++) {
         const type = types[i];
-        lines.push("dataView." + DataType2DataViewWriters[type] + "(" + offset + " + byteOffset, record[" + i + "]);");
+
+        const littleEndianFlag = endianType === EndianType.BigEndian ? 'false' : 'true';
+
+        // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView
+        lines.push(`dataView.${DataType2DataViewWriters[type]}(${offset} + byteOffset, record[${i}], ${littleEndianFlag});`);
+
         offset += DataTypeByteSizes[type];
     }
 
@@ -114,6 +127,7 @@ function genRowWriter(types) {
             code: lines.join("\n")
         }
     );
+
     return result;
 }
 
@@ -121,14 +135,17 @@ function genRowWriter(types) {
  *
  * @param {DataType} type
  * @param {number} offset
+ * @param {EndianType} [endianType]
  * @returns {Function}
  */
-function genCellWriter(type, offset) {
+function genCellWriter(type, offset, endianType = EndianType.BigEndian) {
     const writeMethod = DataType2DataViewWriters[type];
+
+    const littleEndianFlag = endianType === EndianType.BigEndian ? 'false' : 'true';
 
     return FunctionCompiler.INSTANCE.compile({
         args: ['dataView, byteOffset, value'],
-        code: `dataView.${writeMethod}(byteOffset+${offset}, value);`
+        code: `dataView.${writeMethod}(byteOffset+${offset}, value, ${littleEndianFlag});`
     });
 }
 
@@ -136,23 +153,27 @@ function genCellWriter(type, offset) {
  *
  * @param {DataType} type
  * @param {number} offset
+ * @param {EndianType} [endianType]
  * @returns {Function}
  */
-function genCellReader(type, offset) {
+function genCellReader(type, offset, endianType = EndianType.BigEndian) {
     const readMethod = DataType2DataViewReaders[type];
+
+    const littleEndianFlag = endianType === EndianType.BigEndian ? 'false' : 'true';
 
     return FunctionCompiler.INSTANCE.compile({
         args: ['dataView, byteOffset'],
-        code: `return dataView.${readMethod}(byteOffset+${offset});`
+        code: `return dataView.${readMethod}(byteOffset+${offset}, ${littleEndianFlag});`
     });
 }
 
 /**
  *
  * @param {DataType[]} types
+ * @param {EndianType} [endianType]
  * @constructor
  */
-export function RowFirstTableSpec(types) {
+export function RowFirstTableSpec(types, endianType = EndianType.BigEndian) {
     const numTypes = types.length;
 
     /**
@@ -186,13 +207,13 @@ export function RowFirstTableSpec(types) {
      * @readonly
      * @type {Function}
      */
-    this.readRowMethod = genRowReader(types);
+    this.readRowMethod = genRowReader(types, endianType);
 
     /**
      * @readonly
      * @type {Function}
      */
-    this.writeRowMethod = genRowWriter(types);
+    this.writeRowMethod = genRowWriter(types, endianType);
 
 
     //generate cell readers/writers
@@ -200,8 +221,8 @@ export function RowFirstTableSpec(types) {
     this.cellReaders = new Array(numTypes);
 
     for (let i = 0; i < numTypes; i++) {
-        this.cellReaders[i] = genCellReader(types[i], this.columnOffsets[i]);
-        this.cellWriters[i] = genCellWriter(types[i], this.columnOffsets[i]);
+        this.cellReaders[i] = genCellReader(types[i], this.columnOffsets[i], endianType);
+        this.cellWriters[i] = genCellWriter(types[i], this.columnOffsets[i], endianType);
     }
 }
 
@@ -211,11 +232,12 @@ const cache = new Cache();
 /**
  *
  * @param {DataType[]} types
+ * @param {EndianType} [endianType]
  * @returns {RowFirstTableSpec}
  */
-RowFirstTableSpec.get = function (types) {
+RowFirstTableSpec.get = function (types, endianType = EndianType.BigEndian) {
     //compute hash
-    const hash = types.join('.');
+    const hash = types.join('.') + ':' + endianType;
 
     const cachedValue = cache.get(hash);
 
