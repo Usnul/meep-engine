@@ -146,9 +146,15 @@ RowFirstTable.prototype.resize = function (rowCount) {
 RowFirstTable.prototype.writeCellValue = function (rowIndex, columnIndex, value) {
     const spec = this.spec;
 
-    const rowAddress = rowIndex * this.bytesPerRecord;
+    const bytesPerRecord = this.bytesPerRecord;
 
-    spec.cellWriters[columnIndex](this.dataView, rowAddress, value);
+    const rowAddress = rowIndex * bytesPerRecord;
+
+    const cellWriters = spec.cellWriters;
+
+    const cellWriter = cellWriters[columnIndex];
+
+    cellWriter(this.dataView, rowAddress, value);
 };
 
 /**
@@ -160,9 +166,15 @@ RowFirstTable.prototype.writeCellValue = function (rowIndex, columnIndex, value)
 RowFirstTable.prototype.readCellValue = function (rowIndex, columnIndex) {
     const spec = this.spec;
 
-    const rowAddress = rowIndex * this.bytesPerRecord;
+    const bytesPerRecord = this.bytesPerRecord;
 
-    return spec.cellReaders[columnIndex](this.dataView, rowAddress);
+    const rowAddress = rowIndex * bytesPerRecord;
+
+    const cellReaders = spec.cellReaders;
+
+    const cellReader = cellReaders[columnIndex];
+
+    return cellReader(this.dataView, rowAddress);
 };
 
 /**
@@ -279,6 +291,32 @@ RowFirstTable.prototype.clear = function () {
  */
 RowFirstTable.prototype.getNumColumns = function () {
     return this.types.length;
+};
+
+/**
+ *
+ * @returns {number[][]}
+ */
+RowFirstTable.prototype.toRowArray = function () {
+
+    const result = [];
+
+    for (let i = 0; i < this.length; i++) {
+        const row = [];
+
+        this.getRow(i, row);
+
+        result.push(row);
+    }
+
+    return result;
+
+};
+
+RowFirstTable.prototype.printToConsole = function () {
+    const rows = this.toRowArray();
+
+    console.table(rows);
 };
 
 /**

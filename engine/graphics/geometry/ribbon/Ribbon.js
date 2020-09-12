@@ -41,8 +41,8 @@ export class Ribbon {
      * @constructor
      */
     constructor(length, width) {
-        assert.equal(typeof length, "number");
-        assert.equal(typeof width, "number");
+        assert.isNonNegativeInteger(length, "length");
+        assert.isNumber(width, "width");
 
         const geometry = this.geometry = new PlaneBufferGeometry(length, width, length, 1);
 

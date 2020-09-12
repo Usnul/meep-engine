@@ -42,7 +42,7 @@ export function createRibbon(numSegments) {
 
     geometry.setAttribute("last", aLast);
     geometry.setAttribute("next", aNext);
-    geometry.setAttribute("off", aOff);
+    geometry.setAttribute("off", aOff); // offset attribute
     geometry.setAttribute("uvOffset", aUvOffset);
     geometry.setAttribute("age", aAge);
 
@@ -54,12 +54,8 @@ export function createRibbon(numSegments) {
     aAge.needsUpdate = true;
     aAge.usage = DynamicDrawUsage;
 
-
     //set offsets
     aOff.usage = StaticDrawUsage;
-
-    //offset attribute
-    geometry.setAttribute("off", aOff);
 
     ribbon.traverseEdges(function (a, b, index, maxIndex) {
         off[a] = 1;

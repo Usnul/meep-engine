@@ -16,11 +16,22 @@ export class Quad {
     constructor(bufferGeometry, index) {
         this.geometry = bufferGeometry;
         this.index = index;
+
+
         this.direction = new Vector3(0, 1, 0);
+
         //defines a point from which D and C are offset on the same line
         this.position = new Vector3();
 
+        /**
+         *
+         * @type {Quad|null}
+         */
         this.next = null;
+        /**
+         *
+         * @type {Quad|null}
+         */
         this.previous = null;
 
         this.computePosition();
