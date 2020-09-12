@@ -68,7 +68,11 @@ const vertexShader = `
         
         vColor = vec4(color/ 255.0, alpha);       
         
-        vec2 dir =  normalize(vec2(normal.y, -normal.x) * offset_signed );
+        vec2 dir =  vec2(normal.y, -normal.x) * offset_signed;
+        
+        float comp = length(normal);
+        
+        dir*= 1.0/ (comp*comp);
         
         float scale = estimateScale(position.xyz, sCurrent);
         
