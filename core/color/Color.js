@@ -57,14 +57,14 @@ class Color {
 
     /**
      *
-     * @param {number} h
-     * @param {number} s
-     * @param {number} v
+     * @param {number} h 0..1
+     * @param {number} s 0..1
+     * @param {number} v 0..1
      */
     setHSV(h, s, v) {
         const rgb = hsv2rgb(h, s, v);
 
-        this.setRGB(rgb.r / 255, rgb.b / 255, rgb.b / 255);
+        this.setRGB(rgb.r / 255, rgb.g / 255, rgb.b / 255);
     }
 
     /**
