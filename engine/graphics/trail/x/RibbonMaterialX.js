@@ -36,9 +36,13 @@ const vertexShader = `
 
     float estimateScale(vec3 position, vec2 sPosition){
         vec4 view_pos = modelViewMatrix * vec4(position, 1.0);
+        
         float halfWidth = thickness*0.5;
+        
         vec4 scale_pos = view_pos - vec4(normalize(view_pos.xy)*halfWidth, 0.0, 0.0);
+        
         vec2 screen_scale_pos = project(projectionMatrix * scale_pos);
+        
         return distance(sPosition, screen_scale_pos);
     }
 
@@ -70,11 +74,11 @@ const vertexShader = `
         
         vec2 dir =  vec2(normal.y, -normal.x) * offset_signed;
         
-        float comp = length(normal);
+        float angular_compensation = ( normal.x*normal.x + normal.y*normal.y );
         
-        dir*= 1.0/ (comp*comp);
+        float visual_size = resolution.y * projectionMatrix[1][1] * thickness*0.5 / dCurrent.w;
         
-        float scale = estimateScale(position.xyz, sCurrent);
+        float scale = visual_size / angular_compensation;
         
         vec2 pos = sCurrent + dir*scale;
 

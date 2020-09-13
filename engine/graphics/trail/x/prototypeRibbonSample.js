@@ -13,7 +13,7 @@ import { RibbonX } from "./RibbonX.js";
 import { randomFloatBetween, randomIntegerBetween, seededRandom } from "../../../../core/math/MathUtils.js";
 import { RibbonMaterialX } from "./RibbonMaterialX.js";
 
-const renderer = new WebGLRenderer();
+const renderer = new WebGLRenderer({ antialias: true });
 
 renderer.setSize(800, 600);
 
