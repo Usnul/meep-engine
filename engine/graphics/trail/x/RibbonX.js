@@ -144,12 +144,14 @@ export class RibbonX {
     initializeAttribute_Index() {
         const data = this.__ba_index.array;
 
-        const n = this.__count-1;
+        const n = this.__count - 1;
 
         for (let i = 0; i < n; i++) {
             const i6 = i * 6;
 
             const i2 = i * 2;
+
+            // build up a quad
 
             data[i6] = i2;
             data[i6 + 1] = i2 + 1;
@@ -190,13 +192,72 @@ export class RibbonX {
     setPointAttribute_Vector3(point_index, attribute_index, x, y, z) {
         const row_index = point_index * 2;
 
-        this.__data.writeCellValue(row_index, attribute_index, x);
-        this.__data.writeCellValue(row_index, attribute_index + 1, y);
-        this.__data.writeCellValue(row_index, attribute_index + 2, z);
+        const data = this.__data;
 
-        this.__data.writeCellValue(row_index + 1, attribute_index, x);
-        this.__data.writeCellValue(row_index + 1, attribute_index + 1, y);
-        this.__data.writeCellValue(row_index + 1, attribute_index + 2, z);
+        data.writeCellValue(row_index, attribute_index, x);
+        data.writeCellValue(row_index, attribute_index + 1, y);
+        data.writeCellValue(row_index, attribute_index + 2, z);
+
+        data.writeCellValue(row_index + 1, attribute_index, x);
+        data.writeCellValue(row_index + 1, attribute_index + 1, y);
+        data.writeCellValue(row_index + 1, attribute_index + 2, z);
+    }
+
+    /**
+     *
+     * @param {number} point_index
+     * @param {number} attribute_index
+     * @param {number} value
+     */
+    setPointAttribute_Scalar(point_index, attribute_index, value) {
+        const row_index = point_index * 2;
+
+        const data = this.__data;
+
+        data.writeCellValue(row_index, attribute_index, value);
+        data.writeCellValue(row_index + 1, attribute_index, value);
+    }
+
+    /**
+     *
+     * @param {number} point_index
+     * @param {number} attribute_index
+     * @param {number} delta
+     * @returns {number} incremented value
+     */
+    incrementPointAttribute_Scalar(point_index, attribute_index, delta) {
+
+        const row_index = point_index * 2;
+
+        const data = this.__data;
+
+        const original_value = data.readCellValue(row_index, attribute_index);
+
+        const value = original_value + delta;
+
+        data.writeCellValue(row_index, attribute_index, value);
+        data.writeCellValue(row_index + 1, attribute_index, value);
+
+        return value;
+    }
+
+    /**
+     *
+     * @param {number} point_index_source
+     * @param {number} attribute_index_source
+     * @param {number} point_index_destination
+     * @param {number} attribute_destination
+     */
+    copyPointAttribute_Vector3(point_index_source, attribute_index_source, point_index_destination, attribute_destination) {
+        const source_2 = point_index_source * 2;
+
+        const data = this.__data;
+
+        const x = data.readCellValue(source_2, attribute_index_source);
+        const y = data.readCellValue(source_2, attribute_index_source + 1);
+        const z = data.readCellValue(source_2, attribute_index_source + 2);
+
+        this.setPointAttribute_Vector3(point_index_destination, attribute_destination, x, y, z);
     }
 
     setPointPosition(index, x, y, z) {
@@ -206,36 +267,32 @@ export class RibbonX {
         this.setPointAttribute_Vector3(index, RIBBON_ATTRIBUTE_ADDRESS_POSITION, x, y, z);
 
 
-        // update "next position" for the previous point
-        if (index === this.__tail_index) {
-            // do nothing
-        } else {
+        if (index !== this.__tail_index) {
+            // update "next position" for the previous point
 
-            if (index >= this.__head_index) {
+            const previous_index = (index + 1) % this.__count;
 
-                const previous_index = (index + 1) % this.__count;
+            this.setPointAttribute_Vector3(previous_index, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, x, y, z);
 
-                this.setPointAttribute_Vector3(previous_index, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, x, y, z);
+            if (index === this.__head_index) {
+                // special case, head
 
-                if (index === this.__head_index) {
-                    // set next point to the same position as the current
+                // set next point to the same position as the current
 
-                    // compute direction
-                    const index_2 = previous_index * 2;
+                // compute direction
+                const index_2 = previous_index * 2;
 
-                    const prev_x = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION);
-                    const prev_y = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 1);
-                    const prev_z = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 2);
+                const prev_x = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION);
+                const prev_y = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 1);
+                const prev_z = this.__data.readCellValue(index_2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 2);
 
-                    this.setPointAttribute_Vector3(index, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, x * 2 - prev_x, y * 2 - prev_y, z * 2 - prev_z);
-                }
-
+                this.setPointAttribute_Vector3(index, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, x * 2 - prev_x, y * 2 - prev_y, z * 2 - prev_z);
             }
-
         }
 
+
         // update "previous position" for the next point
-        if (index <= this.__tail_index) {
+        if (index !== this.__head_index) {
             let next_index;
 
             if (index > 0) {
@@ -247,6 +304,8 @@ export class RibbonX {
             this.setPointAttribute_Vector3(next_index, RIBBON_ATTRIBUTE_ADDRESS_POSITION_PREVIOUS, x, y, z);
 
             if (index === this.__tail_index) {
+                // special case, tail
+
                 // set previous point to the same position as the current
 
                 const index_2 = next_index * 2;
@@ -296,6 +355,9 @@ export class RibbonX {
      * @param {number} count Number of points in the ribbon
      */
     setCount(count) {
+        assert.greaterThanOrEqual(count, 2, 'number of points in the ribbon must be at least 2 (to produce at least a single quad)');
+        assert.isNonNegativeInteger(count, 'count');
+
         const point_count = count * 2;
 
         this.__data.setCapacity(point_count);
@@ -334,6 +396,29 @@ export class RibbonX {
         this.initializeAttribute_Index();
     }
 
+    /**
+     * NOTE: takes trail thickness into account
+     * @param {AABB3} result
+     */
+    computeBoundingBox(result) {
+
+        const n = this.getCount() * 2;
+
+        result.setNegativelyInfiniteBounds();
+
+        for (let i = 0; i < n; i += 2) {
+            const thickness = this.__data.readCellValue(i, RIBBON_ATTRIBUTE_ADDRESS_THICKNESS);
+            const half_thickness = thickness / 2;
+
+            const x = this.__data.readCellValue(i, RIBBON_ATTRIBUTE_ADDRESS_POSITION);
+            const y = this.__data.readCellValue(i, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 1);
+            const z = this.__data.readCellValue(i, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 2);
+
+            result._expandToFit(x - half_thickness, y - half_thickness, z - half_thickness, x + half_thickness, y + half_thickness, z + half_thickness);
+        }
+
+    }
+
 
     /**
      * Move tail of the ribbon to it's head
@@ -357,6 +442,8 @@ export class RibbonX {
             this.__head_index = old_head - 1;
         }
 
+        const head = this.__head_index;
+
         // move triangles
 
         /**
@@ -377,22 +464,44 @@ export class RibbonX {
         const old_tail_index2 = old_tail * 2;
         const old_head_index2 = old_head * 2;
 
-        index_array[old_tail_quad_address] =        old_head_index2;
-        index_array[old_tail_quad_address + 1] =    old_head_index2 + 1;
-        index_array[old_tail_quad_address + 2] =    old_tail_index2;
+        index_array[old_tail_quad_address] = old_head_index2;
+        index_array[old_tail_quad_address + 1] = old_head_index2 + 1;
+        index_array[old_tail_quad_address + 2] = old_tail_index2;
 
-        index_array[old_tail_quad_address + 3] =    old_head_index2 + 1;
-        index_array[old_tail_quad_address + 4] =     old_tail_index2 + 1;
-        index_array[old_tail_quad_address + 5] =    old_tail_index2;
+        index_array[old_tail_quad_address + 3] = old_head_index2 + 1;
+        index_array[old_tail_quad_address + 4] = old_tail_index2 + 1;
+        index_array[old_tail_quad_address + 5] = old_tail_index2;
 
         this.__ba_index.needsUpdate = true;
-    }
 
-    /**
-     * Update simulation
-     * @param {number} timeDelta in seconds
-     */
-    tick(timeDelta) {
 
+        const data = this.__data;
+
+        const prev_x = data.readCellValue(old_head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION);
+        const prev_y = data.readCellValue(old_head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 1);
+        const prev_z = data.readCellValue(old_head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 2);
+
+        const head_index2 = head * 2;
+
+        const head_x = data.readCellValue(head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION);
+        const head_y = data.readCellValue(head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 1);
+        const head_z = data.readCellValue(head_index2, RIBBON_ATTRIBUTE_ADDRESS_POSITION + 2);
+
+        //patch old head to point to new head
+        this.setPointAttribute_Vector3(head, RIBBON_ATTRIBUTE_ADDRESS_POSITION_PREVIOUS, prev_x, prev_y, prev_z);
+        this.setPointAttribute_Vector3(head, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, head_x * 2 - prev_x, head_y * 2 - prev_y, head_z * 2 - prev_z);
+
+
+        // patch old head to point towards new head
+        this.setPointAttribute_Vector3(old_head, RIBBON_ATTRIBUTE_ADDRESS_POSITION_NEXT, head_x, head_y, head_z);
+
+        /*
+        NOTE:
+            tail is not updated, even though the new tail technically should point straight back instead of pointing to
+            the old tail's location, but for visual consistency we don't do this. Otherwise new tail segment would visually "snap" to the new orientation.
+         */
+
+
+        this.__ib_float32.needsUpdate = true;
     }
 }

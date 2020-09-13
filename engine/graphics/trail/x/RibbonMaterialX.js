@@ -11,7 +11,7 @@ const vertexShader = `
     attribute float uv_offset;
     attribute float age;
     attribute float alpha;
-
+    
     uniform vec2 resolution;
     uniform float maxAge;
     uniform float time;
@@ -33,23 +33,13 @@ const vertexShader = `
         vec2 device_normal = clip_pos*2.0-1.0;
         return vec4(device_normal*w, z, w);
     }
-
+    
     float estimateScale(vec3 position, vec2 sPosition){
         vec4 view_pos = modelViewMatrix * vec4(position, 1.0);
-        
         float halfWidth = thickness*0.5;
-        
         vec4 scale_pos = view_pos - vec4(normalize(view_pos.xy)*halfWidth, 0.0, 0.0);
-        
         vec2 screen_scale_pos = project(projectionMatrix * scale_pos);
-        
         return distance(sPosition, screen_scale_pos);
-    }
-
-    float curvatureCorrection(vec2 a, vec2 b){
-        float p = a.x*b.y - a.y*b.x;
-        float c = atan(p, dot(a,b))/pi;
-        return clamp(c, -1.0, 1.0);
     }
 
     void main(){
@@ -66,7 +56,7 @@ const vertexShader = `
         
         float offset_signed = off*2.0 - 1.0;
         
-        vUv = vec2(uv_offset*0.7, offset_signed*0.5+0.5);
+        vUv = vec2(uv_offset, offset_signed*0.5+0.5);
         
         float relativeAge = clamp(age/maxAge, 0.0, 1.0);
         
@@ -74,7 +64,7 @@ const vertexShader = `
         
         vec2 dir =  vec2(normal.y, -normal.x) * offset_signed;
         
-        float angular_compensation = ( normal.x*normal.x + normal.y*normal.y );
+        float angular_compensation = max( normal.x*normal.x + normal.y*normal.y, 0.25 );
         
         float visual_size = resolution.y * projectionMatrix[1][1] * thickness*0.5 / dCurrent.w;
         
@@ -90,18 +80,17 @@ const fragmentShader = `
     varying vec2 vUv;
     varying vec4 vColor;
 
-    uniform sampler2D uTexture;
+    uniform sampler2D uDiffuse;
     
     void main(){
         vec4 diffuseColor = vColor;
         
         #ifdef USE_TEXTURE
-            vec4 texel = texture2D(uTexture, vUv);
+            vec4 texel = texture2D(uDiffuse, vUv);
             diffuseColor *= texel;
         #endif
         
         gl_FragColor = diffuseColor;
-        // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
 `;
 
@@ -113,6 +102,13 @@ export class RibbonMaterialX extends ShaderMaterial {
             uniforms: {
                 resolution: {
                     value: new Vector2(120, 600)
+                },
+                uDiffuse: {
+                    type: 't',
+                    value: null
+                },
+                defines: {
+                    USE_TEXTURE: false
                 }
             }
         });

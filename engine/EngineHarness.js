@@ -15,6 +15,7 @@ import { loadGameClassRegistry } from "../../model/game/GameClassRegistry.js";
 import { WebEnginePlatform } from "./platform/WebEnginePlatform.js";
 import Tag from "./ecs/components/Tag.js";
 import { SerializationMetadata } from "./ecs/components/SerializationMetadata.js";
+import { TerrainLayer } from "./ecs/terrain/ecs/layers/TerrainLayer.js";
 
 /**
  *
@@ -373,27 +374,21 @@ export class EngineHarness {
         const terrainSystem = engine.entityManager.getOwnerSystemByComponentClass(Terrain);
 
         const terrain = new Terrain();
-        terrain.fromJSON({
-            heightMapRange: heightRange,
-            resolution: resolution,
-            size: {
-                x: size.x,
-                y: size.y
-            },
-            scale: 2,
-            material: {
-                "type": "splat",
-                "repeat": {
-                    "x": 1,
-                    "y": 1
-                },
-                "textures": {
-                    "splat": ["data/textures/utility/white_pixel.png"],
-                    "diffuse": [diffuse0]
-                }
-            },
-            "heightMap": heightMap,
-        }, terrainSystem);
+
+        terrain.size.copy(size);
+        terrain.resolution = resolution;
+        terrain.gridScale = 2;
+        terrain.layers.addLayer(TerrainLayer.from(
+            diffuse0,
+            512,
+            512
+        ));
+        terrain.splat.resize(1, 1, 1);
+        terrain.splat.fillLayerWeights(0, 255);
+        terrain.heightMapURL = heightMap;
+
+        terrain.build(engine.assetManager);
+
 
         const eb = new EntityBuilder();
 
