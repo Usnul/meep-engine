@@ -9,8 +9,7 @@ import Vector3 from '../../../../core/geom/Vector3.js';
 import { clamp, computeHashFloat, computeHashIntegerArray, max2 } from '../../../../core/math/MathUtils.js';
 
 import Trail2D, { Trail2DFlags } from './Trail2D.js';
-import TrailMaterial from '../../trail/CodeflowTrailMaterial.js';
-import { BufferAttribute, ClampToEdgeWrapping, LinearFilter } from 'three';
+import { ClampToEdgeWrapping, DoubleSide, LinearFilter, TextureLoader } from 'three';
 
 import { LeafNode } from '../../../../core/bvh2/LeafNode.js';
 import ThreeFactory from '../../three/ThreeFactory.js';
@@ -19,44 +18,17 @@ import { ReferenceManager } from "../../../ReferenceManager.js";
 import { AssetManager } from "../../../asset/AssetManager.js";
 import { Cache } from "../../../../core/Cache.js";
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
-import { createRibbon } from "../../geometry/ribbon/createRibbon.js";
-import { rotateRibbon } from "../../geometry/ribbon/rotateRibbon.js";
-import { updateTipPosition } from "../../geometry/ribbon/updateTipPosition.js";
+import { RibbonXFixedPhysicsSimulator } from "../../trail/x/simulator/RibbonXFixedPhysicsSimulator.js";
+import { RibbonX } from "../../trail/x/RibbonX.js";
+import {
+    RIBBON_ATTRIBUTE_ADDRESS_AGE,
+    RIBBON_ATTRIBUTE_ADDRESS_UV_OFFSET
+} from "../../trail/x/ribbon_attributes_spec.js";
+import { RibbonMaterialX } from "../../trail/x/RibbonMaterialX.js";
 
-/**
- *
- * @param {Trail2D} component
- * @param {Vector2} size
- */
-function setViewportSize(component, size) {
-    const material = component.mesh.material;
-    material.uniforms.viewport.value.set(size.x, size.y);
-}
-
-/**
- *
- * @param {string} url
- * @param {Material} material
- * @param {ReferenceManager<string,Promise.<THREE.Texture>>} textures
- */
-function initializeTexture(url, material, textures) {
-    if (url === null) {
-        material.defines.USE_TEXTURE = false;
-    } else {
-        material.defines.USE_TEXTURE = true;
-
-        textures.acquire(url).then(function (texture) {
-
-            material.uniforms.uTexture.value = texture;
-
-        });
-    }
-
-    material.needsUpdate = true;
-}
-
-const v3Temp0 = new Vector3();
 const v3Temp1 = new Vector3();
+
+const v3_array = [];
 
 class Trail2DSystem extends System {
     /**
@@ -137,20 +109,11 @@ class Trail2DSystem extends System {
          */
         this.bvh = null;
 
-        //
-        this.dying = [];
-
-        const self = this;
-        //watch viewport size changes
-        const viewportSize = this.graphics.viewport.size;
-        viewportSize.onChanged.add(function () {
-            const em = self.entityManager;
-            if (em !== null && em !== undefined) {
-                em.traverseComponents(Trail2D, function (component) {
-                    setViewportSize(component, viewportSize);
-                });
-            }
-        });
+        /**
+         *
+         * @type {RibbonXFixedPhysicsSimulator}
+         */
+        this.simulator = new RibbonXFixedPhysicsSimulator();
 
         /**
          * @private
@@ -196,6 +159,13 @@ class Trail2DSystem extends System {
 
         this.bvh = this.renderLayer.bvh;
 
+
+        this.graphics.viewport.size.onChanged.add((x, y) => {
+            this.entityManager.dataset.traverseComponents(Trail2D, trail => {
+                trail.material.uniforms.resolution.value.set(x, y);
+            });
+        });
+
         readyCallback();
     }
 
@@ -211,21 +181,20 @@ class Trail2DSystem extends System {
      * @returns {Material}
      */
     obtainMaterial(trail) {
-        let material = this.materialCache.get(trail);
 
-        if (material === null) {
+        const material = new RibbonMaterialX({
+            transparent: true,
+            depthWrite: false,
+            wireframe: false,
+            side: DoubleSide,
+            defines: {
+                USE_TEXTURE: false
+            }
+        });
 
-            material = new TrailMaterial();
-
-            initializeTexture(trail.textureURL, material, this.textures);
-
-            material.uniforms.color.value.copy(trail.color);
-            material.uniforms.width.value = trail.width;
-            material.uniforms.maxAge.value = trail.maxAge;
-
-            material.needsUpdate = true;
-
-            this.materialCache.put(trail, material);
+        if (trail.textureURL !== null) {
+            material.uniforms.uDiffuse.value = new TextureLoader().load(trail.textureURL);
+            material.defines.USE_TEXTURE = true;
         }
 
         return material;
@@ -241,12 +210,21 @@ class Trail2DSystem extends System {
         const segmentsPerSecond = 60;
         const maxSegments = 1000;
         //instantiation
+
         //make a mesh
-        const numSegments = Math.ceil(clamp(trail.maxAge * segmentsPerSecond, 1, maxSegments));
-        const ribbon = createRibbon(numSegments);
-        const geometry = ribbon.geometry;
+        const numSegments = Math.ceil(clamp(trail.maxAge * segmentsPerSecond, 2, maxSegments));
+
+        const ribbon = new RibbonX();
+
+        ribbon.buildGeometry();
+        ribbon.setCount(numSegments);
+
+
+        const geometry = ribbon.getGeometry();
 
         const material = this.obtainMaterial(trail);
+
+        material.uniforms.resolution.value.copy(this.graphics.viewport.size);
 
         const mesh = ThreeFactory.createMesh(geometry, material);
 
@@ -259,33 +237,29 @@ class Trail2DSystem extends System {
         const leafNode = new LeafNode();
 
         trail.bvhLeaf = leafNode;
+        trail.material = material;
 
         leafNode.object = trail;
         leafNode.setInfiniteBounds();
 
-        setViewportSize(trail, this.graphics.viewport.size);
-
-        //set BVH bounds to a single point at transform's position to ensure better BVH placement
-        // trail.bvhLeaf.setBounds(transform.position.x, transform.position.y, transform.position.z, transform.position.x, transform.position.y, transform.position.z);
-        trail.bvhLeaf.setInfiniteBounds();
-
         const position = trail.offset.clone().add(transform.position);
 
-        trail.ribbon.moveToPoint(position);
-        const attributes = trail.ribbon.geometry.attributes;
-        const last = attributes.last;
-        const next = attributes.next;
-        const age = attributes.age;
-        trail.ribbon.traverseEdges(function (a, b) {
-            next.setXYZ(a, position.x, position.y, position.z);
-            next.setXYZ(b, position.x, position.y, position.z);
+        const color = trail.color;
 
-            last.setXYZ(a, position.x, position.y, position.z);
-            last.setXYZ(b, position.x, position.y, position.z);
+        //initialize segments
+        for (let i = 0; i < numSegments; i++) {
+            const f = i / (numSegments - 1);
 
-            age.array[a] = trail.maxAge;
-            age.array[b] = trail.maxAge;
-        });
+            ribbon.setPointColor(i, color.x * 255, color.y * 255, color.z * 255);
+            ribbon.setPointPosition(i, position.x, position.y, position.z);
+            ribbon.setPointThickness(i, trail.width);
+            ribbon.setPointAttribute_Scalar(i, RIBBON_ATTRIBUTE_ADDRESS_UV_OFFSET, f);
+            ribbon.setPointAlpha(i, color.w);
+            ribbon.setPointAttribute_Scalar(i, RIBBON_ATTRIBUTE_ADDRESS_AGE, trail.maxAge);
+
+        }
+
+        leafNode.setBounds(position.x, position.y, position.z);
 
         this.bvh.insertNode(trail.bvhLeaf);
     }
@@ -302,6 +276,10 @@ class Trail2DSystem extends System {
     updateTrailEntity(trail, transform) {
         const timeDelta = this.__timeDelta;
 
+        /**
+         *
+         * @type {RibbonX|null}
+         */
         const ribbon = trail.ribbon;
 
         const newPosition = v3Temp1;
@@ -311,55 +289,37 @@ class Trail2DSystem extends System {
         trail.timeSinceLastUpdate += timeDelta;
         trail.time += timeDelta;
 
-        const attributes = ribbon.geometry.attributes;
-
-        /**
-         *
-         * @type {BufferAttribute}
-         */
-        const age = attributes.age;
-        const ageArray = age.array;
-
         const ageOffset = max2(0, trail.maxAge - trail.time);
 
         if (trail.getFlag(Trail2DFlags.Spawning)) {
-            const refitTimeDelta = trail.maxAge / trail.ribbon.length;
+            const refitTimeDelta = trail.maxAge / trail.ribbon.getCount();
 
 
-            if (trail.timeSinceLastUpdate < refitTimeDelta) {
-                //refitting
-            } else {
+            if (trail.timeSinceLastUpdate >= refitTimeDelta) {
 
-                const head = ribbon.head();
+                ribbon.getPointPosition(v3_array, ribbon.getHeadIndex());
 
-                head.getVertexA(v3Temp0);
-
-                if (!v3Temp0.equals(newPosition)) {
+                if (newPosition.x !== v3_array[0] || newPosition.y !== v3_array[1] || newPosition.z !== v3_array[2]) {
                     //make sure that this is a new position before rotating new segment
-                    trail.timeSinceLastUpdate -= refitTimeDelta;
+                    trail.timeSinceLastUpdate = 0;
                     //rotating segment
-                    rotateRibbon(ribbon);
+
+                    ribbon.rotate();
                 }
             }
 
-            const head = ribbon.head();
+            const head_index = ribbon.getHeadIndex();
 
-            updateTipPosition(ribbon, newPosition.x, newPosition.y, newPosition.z);
+            ribbon.setPointPosition(head_index, newPosition.x, newPosition.y, newPosition.z);
 
             //set head to fresh value
-            ageArray[head.getC()] = ageOffset;
-            ageArray[head.getD()] = ageOffset;
+            ribbon.setPointAttribute_Scalar(head_index, RIBBON_ATTRIBUTE_ADDRESS_AGE, ageOffset);
 
         }
 
-        const ageArrayLength = ageArray.length;
+        ribbon.computeBoundingBox(trail.bvhLeaf);
 
-        for (let i = 0; i < ageArrayLength; i++) {
-            //make older
-            ageArray[i] += timeDelta;
-        }
-
-        age.needsUpdate = true;
+        this.simulator.update(ribbon, trail.maxAge, timeDelta);
     }
 
     update(timeDelta) {

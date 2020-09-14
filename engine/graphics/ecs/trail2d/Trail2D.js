@@ -15,7 +15,7 @@ export const Trail2DFlags = {
 };
 
 class Trail2D {
-    constructor(options) {
+    constructor() {
 
         /**
          * Age at which trail segment disappears, in seconds
@@ -57,16 +57,28 @@ class Trail2D {
         this.offset = new Vector3();
 
         /**
+         * transient
+         * @type {RibbonX|null}
+         */
+        this.ribbon = null;
+
+        /**
+         * transient
+         * @type {Material|null}
+         */
+        this.material = null;
+
+        /**
+         * transient
+         * @type {LeafNode|null}
+         */
+        this.bvhLeaf = null;
+
+        /**
          * @private
          * @type {Trail2DFlags|number}
          */
         this.flags = Trail2DFlags.Spawning;
-
-        if (options !== undefined) {
-
-            console.warn('Trail2D constructor arguments are deprecated, use fromJSON instead');
-            this.fromJSON(options);
-        }
     }
 
     /**
@@ -158,6 +170,7 @@ class Trail2D {
             && this.width === other.width
             && this.maxAge === other.maxAge
             && this.color.equals(other.color)
+            && this.offset.equals(other.offset)
             ;
     }
 }

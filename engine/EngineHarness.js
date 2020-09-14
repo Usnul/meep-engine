@@ -371,8 +371,6 @@ export class EngineHarness {
         }
     ) {
 
-        const terrainSystem = engine.entityManager.getOwnerSystemByComponentClass(Terrain);
-
         const terrain = new Terrain();
 
         terrain.size.copy(size);
@@ -380,8 +378,8 @@ export class EngineHarness {
         terrain.gridScale = 2;
         terrain.layers.addLayer(TerrainLayer.from(
             diffuse0,
-            512,
-            512
+            5,
+            5
         ));
         terrain.splat.resize(1, 1, 1);
         terrain.splat.fillLayerWeights(0, 255);

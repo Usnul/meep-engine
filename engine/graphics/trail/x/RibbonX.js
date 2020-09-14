@@ -66,6 +66,18 @@ export class RibbonX {
         this.__count = 0;
     }
 
+    /**
+     *
+     * @returns {BufferGeometry}
+     */
+    getGeometry() {
+        return this.__geometry;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
     getCount() {
         return this.__count;
     }
