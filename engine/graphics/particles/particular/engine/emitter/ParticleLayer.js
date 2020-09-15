@@ -7,6 +7,8 @@ import { computeHashFloat, computeHashIntegerArray } from "../../../../../../cor
 import { computeStringHash } from "../../../../../../core/primitives/strings/StringUtils.js";
 import { ConicRay } from "../../../../../../core/geom/ConicRay.js";
 import { computeConeBoundingBox } from "../../../../../../core/geom/3d/ConeMath.js";
+import { SimulationStepType } from "../simulator/SimulationStepType.js";
+import { SimulationStepDefinition } from "../simulator/SimulationStepDefinition.js";
 
 /**
  * @readonly
@@ -27,6 +29,7 @@ const EmissionFromType = {
     Volume: 1
 };
 
+const DEFAULT_SIMULATION_STEPS = 1 << SimulationStepType.FixedPhysics;
 
 function ParticleLayer() {
     /**
@@ -116,6 +119,15 @@ function ParticleLayer() {
      * @type {boolean}
      */
     this.isEmitting = true;
+
+
+    /**
+     * Simulation steps that are to be applied
+     * @type {SimulationStepDefinition[]}
+     */
+    this.steps = [
+        SimulationStepDefinition.from(SimulationStepType.FixedPhysics, {})
+    ];
 
     this.scaledSpriteHalfSize = -1;
     this.baseBoundingBox = new AABB3(0, 0, 0, 0, 0, 0);

@@ -25,18 +25,20 @@ import { ParticleAttribute } from "../../group/ParticleAttribute.js";
 import { composeMatrix4 } from "../../../../Utils.js";
 import { ParticleEmitterFlag } from "./ParticleEmitterFlag.js";
 import { AABB3 } from "../../../../../../core/bvh2/AABB3.js";
+import {
+    PARTICLE_ATTRIBUTE_AGE,
+    PARTICLE_ATTRIBUTE_DEATH_AGE,
+    PARTICLE_ATTRIBUTE_LAYER_POSITION,
+    PARTICLE_ATTRIBUTE_POSITION,
+    PARTICLE_ATTRIBUTE_ROTATION,
+    PARTICLE_ATTRIBUTE_ROTATION_SPEED,
+    PARTICLE_ATTRIBUTE_SIZE,
+    PARTICLE_ATTRIBUTE_UV,
+    PARTICLE_ATTRIBUTE_VELOCITY
+} from "./PARTICLE_ATTRIBUTES.js";
+
 
 const EMPTY_GEOMETRY = new BufferGeometry();
-
-const PARTICLE_ATTRIBUTE_POSITION = 0;
-const PARTICLE_ATTRIBUTE_AGE = 1;
-const PARTICLE_ATTRIBUTE_DEATH_AGE = 2;
-const PARTICLE_ATTRIBUTE_UV = 3;
-const PARTICLE_ATTRIBUTE_SIZE = 4;
-const PARTICLE_ATTRIBUTE_LAYER_POSITION = 5;
-const PARTICLE_ATTRIBUTE_VELOCITY = 6;
-const PARTICLE_ATTRIBUTE_ROTATION = 7;
-const PARTICLE_ATTRIBUTE_ROTATION_SPEED = 8;
 
 
 const SERIALIZABLE_FLAGS = ParticleEmitterFlag.PreWarm
@@ -841,49 +843,6 @@ export class ParticleEmitter {
      * @param {number} timeDelta
      */
     advance(timeDelta) {
-        let i;
-
-        //retire dead particles
-        const particles = this.particles;
-
-        const liveParticleCount = particles.size();
-
-        for (i = 0; i < liveParticleCount; i++) {
-
-            const age = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_AGE);
-
-            const deathAge = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_DEATH_AGE);
-
-            const newAge = age + timeDelta;
-
-            if (newAge >= deathAge) {
-                //add to trash
-                particles.remove(i);
-                //we're done with this particle
-                continue;
-            }
-
-            //make older
-            particles.writeAttributeScalar(i, PARTICLE_ATTRIBUTE_AGE, newAge);
-
-            //update rotation
-            const rotationSpeed = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_ROTATION_SPEED);
-            const oldRotation = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_ROTATION);
-
-            particles.writeAttributeScalar(i, PARTICLE_ATTRIBUTE_ROTATION, oldRotation + rotationSpeed * timeDelta);
-
-            //advance position based on velocity
-            particles.readAttributeVector3(i, PARTICLE_ATTRIBUTE_VELOCITY, velocity);
-
-            particles.readAttributeVector3(i, PARTICLE_ATTRIBUTE_POSITION, position);
-
-            const p_x = position[0] + velocity[0] * timeDelta;
-            const p_y = position[1] + velocity[1] * timeDelta;
-            const p_z = position[2] + velocity[2] * timeDelta;
-
-            particles.writeAttributeVector3(i, PARTICLE_ATTRIBUTE_POSITION, p_x, p_y, p_z);
-        }
-
         this.emit(timeDelta);
 
         this.setFlag(ParticleEmitterFlag.ParticleBoundsNeedUpdate);
@@ -1269,8 +1228,6 @@ const frustum = new Frustum();
 
 const velocity = [];
 const position = [];
-
-const v3 = new Vector3();
 
 const v3position = new Vector3();
 const v3velocity = new Vector3();

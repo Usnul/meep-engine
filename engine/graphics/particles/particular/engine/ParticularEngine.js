@@ -2,6 +2,9 @@ import { ShaderManager } from "./ShaderManager.js";
 import { BinaryNode } from "../../../../../core/bvh2/BinaryNode.js";
 import List from "../../../../../core/collection/list/List.js";
 import { ParticleEmitterFlag } from "./emitter/ParticleEmitterFlag.js";
+import { SimulationStepFixedPhysics } from "./simulator/SimulationStepFixedPhysics.js";
+import { SimulationStepCurlNoise } from "./simulator/SimulationStepCurlNoise.js";
+import { SimulationStepApplyForce } from "./simulator/SimulationStepApplyForce.js";
 
 
 function ParticularEngine(assetManager) {
@@ -27,6 +30,17 @@ function ParticularEngine(assetManager) {
 
     this.bvh = new BinaryNode();
     this.bvh.setNegativelyInfiniteBounds();
+
+
+    /**
+     *
+     * @type {AbstractSimulationStep[]}
+     */
+    this.steps = [
+        new SimulationStepFixedPhysics(),
+        new SimulationStepCurlNoise(),
+        new SimulationStepApplyForce()
+    ];
 }
 
 /**
@@ -86,6 +100,72 @@ ParticularEngine.prototype.setViewportSize = function (x, y) {
  * @param {ParticleEmitter} emitter
  * @param {number} timeDelta
  */
+ParticularEngine.prototype.advanceEmitter = function (emitter, timeDelta) {
+    let i, j;
+
+
+    /**
+     *
+     * @type {List<ParticleLayer>}
+     */
+    const layers = emitter.layers;
+
+    const layer_count = layers.length;
+
+    let step_mask = 0;
+
+    const steps = this.steps;
+
+    for (j = 0; j < layer_count; j++) {
+        const particleLayer = layers.get(j);
+
+        const simulationStepDefinitions = particleLayer.steps;
+
+        const n = simulationStepDefinitions.length;
+
+        for (i = 0; i < n; i++) {
+            /**
+             *
+             * @type {SimulationStepDefinition}
+             */
+            const stepDefinition = simulationStepDefinitions[i];
+
+            const type = stepDefinition.type;
+
+            step_mask |= 1 << type;
+
+            const step = steps[type];
+
+            step.timeDelta = timeDelta;
+            step.particles = emitter.particles;
+            step.layer_parameters[j] = stepDefinition.parameters;
+
+        }
+    }
+
+    // apply simulation steps
+    const step_index_limit = steps.length;
+
+    for (i = 0; i < step_index_limit; i++) {
+        const m = 1 << i;
+        const is_used = (step_mask & m) !== 0;
+
+        if (is_used) {
+            const step = steps[i];
+
+            step.execute();
+        }
+    }
+
+    emitter.advance(timeDelta);
+
+};
+
+/**
+ * @private
+ * @param {ParticleEmitter} emitter
+ * @param {number} timeDelta
+ */
 ParticularEngine.prototype.updateEmitter = function (emitter, timeDelta) {
     if (emitter.getFlag(ParticleEmitterFlag.Sleeping)) {
         emitter.sleepTime += timeDelta;
@@ -110,7 +190,7 @@ ParticularEngine.prototype.updateEmitter = function (emitter, timeDelta) {
             while (wakingTime > 0) {
                 const wakingStep = Math.min(wakingIncrement, wakingTime);
 
-                emitter.advance(wakingStep);
+                this.advanceEmitter(emitter, wakingStep);
 
                 wakingTime -= wakingStep;
             }
@@ -119,7 +199,7 @@ ParticularEngine.prototype.updateEmitter = function (emitter, timeDelta) {
             emitter.sleepTime = 0;
         }
         //advance simulation
-        emitter.advance(timeDelta);
+        this.advanceEmitter(emitter, timeDelta);
 
         //update bounding box
         emitter.computeBoundingBox();
