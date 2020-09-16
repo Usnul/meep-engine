@@ -29,8 +29,6 @@ const EmissionFromType = {
     Volume: 1
 };
 
-const DEFAULT_SIMULATION_STEPS = 1 << SimulationStepType.FixedPhysics;
-
 function ParticleLayer() {
     /**
      *
