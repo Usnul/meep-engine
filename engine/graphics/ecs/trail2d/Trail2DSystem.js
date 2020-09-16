@@ -161,7 +161,14 @@ class Trail2DSystem extends System {
 
 
         this.graphics.viewport.size.onChanged.add((x, y) => {
-            this.entityManager.dataset.traverseComponents(Trail2D, trail => {
+            const ecd = this.entityManager.dataset;
+
+            if (ecd === null) {
+                // no dataset attached
+                return;
+            }
+
+            ecd.traverseComponents(Trail2D, trail => {
                 trail.material.uniforms.resolution.value.set(x, y);
             });
         });
