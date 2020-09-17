@@ -6,6 +6,7 @@ import {
 } from "../emitter/PARTICLE_ATTRIBUTES.js";
 import { v3Length_i } from "../../../../../../core/geom/Vector3.js";
 import SimplexNoise from 'simplex-noise';
+import { seededRandom } from "../../../../../../core/math/MathUtils.js";
 
 const velocity = [];
 const position = [];
@@ -16,7 +17,9 @@ export class SimulationStepCurlNoise extends AbstractSimulationStep {
     constructor() {
         super();
 
-        this.noise = new SimplexNoise();
+        this.random = seededRandom(1337);
+
+        this.noise = new SimplexNoise(this.random);
     }
 
     curlNoise(result, x, y, z) {
