@@ -5,6 +5,7 @@
 export const SimulationStepType = {
     Unknown: -1,
     FixedPhysics: 0,
-    CurlNoise: 1,
-    ApplyForce: 2
+    CurlNoiseAcceleration: 1,
+    CurlNoiseVelocity: 2,
+    ApplyForce: 3
 };

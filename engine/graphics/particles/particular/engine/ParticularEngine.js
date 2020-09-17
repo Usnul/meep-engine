@@ -3,18 +3,13 @@ import { BinaryNode } from "../../../../../core/bvh2/BinaryNode.js";
 import List from "../../../../../core/collection/list/List.js";
 import { ParticleEmitterFlag } from "./emitter/ParticleEmitterFlag.js";
 import { SimulationStepFixedPhysics } from "./simulator/SimulationStepFixedPhysics.js";
-import { SimulationStepCurlNoise } from "./simulator/SimulationStepCurlNoise.js";
+import { SimulationStepCurlNoiseAcceleration } from "./simulator/SimulationStepCurlNoiseAcceleration.js";
 import { SimulationStepApplyForce } from "./simulator/SimulationStepApplyForce.js";
+import { SimulationStepCurlNoiseVelocity } from "./simulator/SimulationStepCurlNoiseVelocity.js";
 
 
 function ParticularEngine(assetManager) {
     this.shaderManager = new ShaderManager(assetManager);
-
-    /**
-     *
-     * @type {THREE.Texture|null}
-     */
-    this.depthTexture = null;
 
     /**
      *
@@ -38,7 +33,8 @@ function ParticularEngine(assetManager) {
      */
     this.steps = [
         new SimulationStepFixedPhysics(),
-        new SimulationStepCurlNoise(),
+        new SimulationStepCurlNoiseAcceleration(),
+        new SimulationStepCurlNoiseVelocity(),
         new SimulationStepApplyForce()
     ];
 }
