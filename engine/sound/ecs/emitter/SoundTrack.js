@@ -94,6 +94,30 @@ export class SoundTrack {
     }
 
     /**
+     * Linearly transition volume to a target value over a certain duration.
+     * Useful for fading sounds in and out of the mix.
+     *
+     * NOTE: volume property of the object is updated instantly, transition happens at the AudioNode level only
+     *
+     * @param {number} target target volume value
+     * @param {number} duration How long the transition should take, in seconds
+     */
+    setVolumeOverTime(target, duration) {
+        // instantly update volume for consistency purposes wrt serialization
+        this.__volume = target;
+
+        const nodes = this.nodes;
+        if (nodes !== null) {
+
+            const gain = nodes.volume.gain;
+
+            const current_value = gain.value;
+
+            gain.setValueCurveAtTime([current_value, target], 0, duration);
+        }
+    }
+
+    /**
      *
      * @param {number} v
      */
