@@ -11,13 +11,6 @@ const velocity = [];
 const position = [];
 const noise = [];
 
-const p_x0 = [];
-const p_x1 = [];
-const p_y0 = [];
-const p_y1 = [];
-const p_z0 = [];
-const p_z1 = [];
-
 export class SimulationStepCurlNoise extends AbstractSimulationStep {
 
     constructor() {
@@ -26,40 +19,23 @@ export class SimulationStepCurlNoise extends AbstractSimulationStep {
         this.noise = new SimplexNoise();
     }
 
-    /**
-     *
-     * @param {number[]} result
-     * @param {number} x
-     * @param {number} y
-     * @param {number} z
-     */
-    snoiseVec3(result, x, y, z) {
+    curlNoise(result, x, y, z) {
         const n = this.noise;
 
-        const s0 = n.noise3D(x, y, z);
-        const s1 = n.noise3D(y + 19.1, z + 33.4, x + 47.2);
-        const s2 = n.noise3D(z + 74.2, x + 124.5, y + 99.4);
+        const e = 0.001;
 
-        result[0] = s0;
-        result[1] = s1;
-        result[2] = s2;
-    }
+        const n_x0 = n.noise3D(x - e, y, z);
+        const n_x1 = n.noise3D(x + e, y, z);
 
-    curlNoise(result, x, y, z) {
-        const e = .1;
+        const n_y0 = n.noise3D(x, y - e, z);
+        const n_y1 = n.noise3D(x, y + e, z);
 
-        this.snoiseVec3(p_x0, x - e, y, z);
-        this.snoiseVec3(p_x1, x + e, y, z);
+        const n_z0 = n.noise3D(x, y, z - e);
+        const n_z1 = n.noise3D(x, y, z + e);
 
-        this.snoiseVec3(p_y0, x, y - e, z);
-        this.snoiseVec3(p_y1, x, y + e, z);
-
-        this.snoiseVec3(p_z0, x, y, z - e);
-        this.snoiseVec3(p_z1, x, y, z + e);
-
-        const _x = p_y1[2] - p_y0[2] - p_z1[1] + p_z0[1];
-        const _y = p_z1[0] - p_z0[0] - p_x1[2] + p_x0[2];
-        const _z = p_x1[1] - p_x0[1] - p_y1[0] + p_y0[0];
+        const _x = n_x0 - n_x1;
+        const _y = n_y0 - n_y1;
+        const _z = n_z0 - n_z1;
 
         // normalize output
         const length = v3Length_i(_x, _y, _z);
