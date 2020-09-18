@@ -8,6 +8,7 @@ import { computeStringHash } from "../../../../../../core/primitives/strings/Str
 import { ConicRay } from "../../../../../../core/geom/ConicRay.js";
 import { computeConeBoundingBox } from "../../../../../../core/geom/3d/ConeMath.js";
 import { SimulationStepDefinition } from "../simulator/SimulationStepDefinition.js";
+import List from "../../../../../../core/collection/list/List.js";
 
 /**
  * @readonly
@@ -120,9 +121,9 @@ function ParticleLayer() {
 
     /**
      * Simulation steps that are to be applied
-     * @type {SimulationStepDefinition[]}
+     * @type {List<SimulationStepDefinition>}
      */
-    this.steps = [];
+    this.steps = new List();
 
     this.scaledSpriteHalfSize = -1;
     this.baseBoundingBox = new AABB3(0, 0, 0, 0, 0, 0);
@@ -264,7 +265,8 @@ ParticleLayer.prototype.toJSON = function () {
         position: this.position.toJSON(),
         scale: this.scale.toJSON(),
         particleVelocityDirection: this.particleVelocityDirection.toJSON(),
-        particleSpeed: this.particleSpeed.toJSON()
+        particleSpeed: this.particleSpeed.toJSON(),
+        steps: this.steps.toJSON()
     };
 };
 
@@ -320,12 +322,18 @@ ParticleLayer.prototype.fromJSON = function (json) {
         this.particleSpeed.set(0, 0);
     }
 
+    if (json.steps !== undefined) {
+        this.steps.fromJSON(json.steps, SimulationStepDefinition);
+    } else {
+        this.steps.reset();
+    }
+
     //reset bounds attributes
     this.scaledSpriteHalfSize = -1;
 };
 
 /**
- *
+ * @deprecated
  * @param {BinaryBuffer} buffer
  */
 ParticleLayer.prototype.toBinaryBuffer = function (buffer) {
@@ -346,7 +354,7 @@ ParticleLayer.prototype.toBinaryBuffer = function (buffer) {
 };
 
 /**
- *
+ * @deprecated
  * @param {BinaryBuffer} buffer
  */
 ParticleLayer.prototype.fromBinaryBuffer = function (buffer) {

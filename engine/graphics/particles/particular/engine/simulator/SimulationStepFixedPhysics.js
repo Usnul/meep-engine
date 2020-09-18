@@ -2,6 +2,7 @@ import { AbstractSimulationStep } from "./AbstractSimulationStep.js";
 import {
     PARTICLE_ATTRIBUTE_AGE,
     PARTICLE_ATTRIBUTE_DEATH_AGE,
+    PARTICLE_ATTRIBUTE_LAYER_POSITION,
     PARTICLE_ATTRIBUTE_POSITION,
     PARTICLE_ATTRIBUTE_ROTATION,
     PARTICLE_ATTRIBUTE_ROTATION_SPEED,
@@ -18,7 +19,20 @@ export class SimulationStepFixedPhysics extends AbstractSimulationStep {
 
         const liveParticleCount = particles.size();
 
+        const layerCount = this.layer_count;
+
+        const layerMask = this.layer_mask;
+
         for (let i = 0; i < liveParticleCount; i++) {
+
+            const layer_position = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_LAYER_POSITION);
+
+            const layer_index = layer_position * layerCount;
+
+            if ((layerMask & (1 << layer_index)) === 0) {
+                //skip
+                continue;
+            }
 
             const age = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_AGE);
 

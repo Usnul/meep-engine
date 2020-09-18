@@ -29,14 +29,26 @@ export class SimulationStepCurlNoiseAcceleration extends AbstractSimulationStep 
 
         const liveParticleCount = particles.size();
 
+        const layerCount = this.layer_count;
+
+        const layerMask = this.layer_mask;
+
         for (let i = 0; i < liveParticleCount; i++) {
+
+            const layer_position = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_LAYER_POSITION);
+
+            const layer_index = layer_position * layerCount;
+
+            if ((layerMask & (1 << layer_index)) === 0) {
+                //skip
+                continue;
+            }
 
             //advance position based on velocity
             particles.readAttributeVector3(i, PARTICLE_ATTRIBUTE_VELOCITY, velocity);
 
             particles.readAttributeVector3(i, PARTICLE_ATTRIBUTE_POSITION, position);
 
-            const layer_index = particles.readAttributeScalar(i, PARTICLE_ATTRIBUTE_LAYER_POSITION);
 
             const params = layer_parameters[layer_index];
 

@@ -19,6 +19,25 @@ export class AbstractSimulationStep {
          */
         this.layer_parameters = [];
 
+        /**
+         *
+         * @type {number}
+         */
+        this.layer_count = 0;
+
+        /**
+         *
+         * @type {number}
+         */
+        this.layer_mask = 0;
+    }
+
+    includeLayer(index) {
+        this.layer_mask |= 1 << index;
+    }
+
+    clear() {
+        this.layer_mask = 0;
     }
 
     /**

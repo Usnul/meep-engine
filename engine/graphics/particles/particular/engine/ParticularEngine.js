@@ -124,7 +124,7 @@ ParticularEngine.prototype.advanceEmitter = function (emitter, timeDelta) {
              *
              * @type {SimulationStepDefinition}
              */
-            const stepDefinition = simulationStepDefinitions[i];
+            const stepDefinition = simulationStepDefinitions.get(i);
 
             const type = stepDefinition.type;
 
@@ -135,6 +135,7 @@ ParticularEngine.prototype.advanceEmitter = function (emitter, timeDelta) {
             step.timeDelta = timeDelta;
             step.particles = emitter.particles;
             step.layer_parameters[j] = stepDefinition.parameters;
+            step.includeLayer(j);
 
         }
     }
@@ -149,7 +150,11 @@ ParticularEngine.prototype.advanceEmitter = function (emitter, timeDelta) {
         if (is_used) {
             const step = steps[i];
 
+            step.layer_count = layer_count;
+
             step.execute();
+
+            step.clear();
         }
     }
 

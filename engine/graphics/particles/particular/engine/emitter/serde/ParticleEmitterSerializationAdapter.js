@@ -62,7 +62,7 @@ export class ParticleEmitterSerializationAdapter extends BinaryClassSerializatio
             buffer.writeUintVar(num_steps);
 
             for (let j = 0; j < num_steps; j++) {
-                const simulationStepDefinition = steps[j];
+                const simulationStepDefinition = steps.get(j);
 
                 buffer.writeUintVar(simulationStepDefinition.type);
 
@@ -129,7 +129,7 @@ export class ParticleEmitterSerializationAdapter extends BinaryClassSerializatio
             const simulation_step_count = buffer.readUintVar();
 
 
-            layer.steps.splice(0, layer.steps.length);
+            layer.steps.reset();
 
             for (let j = 0; j < simulation_step_count; j++) {
                 const simulation_step_id = buffer.readUintVar();
@@ -143,7 +143,7 @@ export class ParticleEmitterSerializationAdapter extends BinaryClassSerializatio
                     definition.parameters[k] = buffer.readFloat64();
                 }
 
-                layer.steps.push(definition);
+                layer.steps.add(definition);
 
             }
 

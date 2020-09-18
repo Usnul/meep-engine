@@ -1,4 +1,5 @@
 import { SimulationStepType } from "./SimulationStepType.js";
+import { objectKeyByValue } from "../../../../../../core/model/ObjectUtils.js";
 
 export class SimulationStepDefinition {
     constructor() {
@@ -27,5 +28,17 @@ export class SimulationStepDefinition {
         r.parameters = parameters;
 
         return r;
+    }
+
+    toJSON() {
+        return {
+            type: objectKeyByValue(SimulationStepType, this.type),
+            parameters: this.parameters
+        }
+    }
+
+    fromJSON({ type, parameters = [] }) {
+        this.type = SimulationStepType[type];
+        this.parameters = parameters;
     }
 }
