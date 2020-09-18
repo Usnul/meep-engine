@@ -49,10 +49,6 @@ class TimerSystem extends System {
 
                 }
 
-                functions.forEach(function (action) {
-                    action();
-                });
-
                 entityManager.sendEvent(entity, "timer-timeout", timer);
                 if (++timer.ticks > timer.repeat) {
                     //already performed too many cycles
