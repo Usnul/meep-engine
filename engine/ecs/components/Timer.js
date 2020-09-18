@@ -18,8 +18,23 @@ class Timer {
     constructor(options = {}) {
         this.repeat = options.repeat !== void 0 ? options.repeat : 0;
         this.timeout = options.timeout;
+
+        /**
+         *
+         * @type {function[]}
+         */
         this.actions = options.actions || [];
+
+        /**
+         *
+         * @type {boolean}
+         */
         this.active = true;
+
+        /**
+         *
+         * @type {number}
+         */
         this.ticks = 0;
 
         /**

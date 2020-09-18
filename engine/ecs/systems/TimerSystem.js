@@ -30,17 +30,39 @@ class TimerSystem extends System {
 
             let budget = timer.counter + timeDelta;
             const timeout = timer.timeout;
+
             while (budget > timeout) {
                 budget -= timeout;
 
-                timer.actions.forEach(function (action) {
+                const functions = timer.actions;
+
+                const n = functions.length;
+
+                for (let i = 0; i < n; i++) {
+                    const action = functions[i];
+
+                    try {
+                        action();
+                    } catch (e) {
+                        console.error(`entity '${entity}' Timer action[${i}] exception:`, e);
+                    }
+
+                }
+
+                functions.forEach(function (action) {
                     action();
                 });
+
                 entityManager.sendEvent(entity, "timer-timeout", timer);
                 if (++timer.ticks > timer.repeat) {
                     //already performed too many cycles
                     timer.active = false;
                     return; //bail out
+                }
+
+                if (timeout === 0) {
+                    // prevent infinite loop
+                    break;
                 }
             }
             timer.counter = budget;
