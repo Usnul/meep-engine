@@ -21,7 +21,16 @@ export class AbstractSimulationStep {
 
     }
 
+    /**
+     *
+     * @return {string[]}
+     */
+    get parameter_schema() {
+        return [];
+    }
+
     execute() {
         throw new Error('Not implemented, needs to be overridden in the implementing subclass');
     }
+
 }

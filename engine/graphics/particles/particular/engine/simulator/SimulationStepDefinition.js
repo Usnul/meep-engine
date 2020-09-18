@@ -9,11 +9,17 @@ export class SimulationStepDefinition {
         this.type = SimulationStepType.Unknown;
         /**
          *
-         * @type {Object}
+         * @type {number[]}
          */
-        this.parameters = {};
+        this.parameters = [];
     }
 
+    /**
+     *
+     * @param {SimulationStepType} type
+     * @param {number[]} parameters
+     * @return {SimulationStepDefinition}
+     */
     static from(type, parameters) {
         const r = new SimulationStepDefinition();
 

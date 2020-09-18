@@ -26,9 +26,9 @@ export class SimulationStepApplyForce extends AbstractSimulationStep {
 
             const params = layer_parameters[layer_index];
 
-            const force_x = params.x;
-            const force_y = params.y;
-            const force_z = params.z;
+            const force_x = params[0];
+            const force_y = params[1];
+            const force_z = params[2];
 
             const v_x = velocity[0] + force_x * timeDelta;
             const v_y = velocity[1] + force_y * timeDelta;
@@ -36,5 +36,13 @@ export class SimulationStepApplyForce extends AbstractSimulationStep {
 
             particles.writeAttributeVector3(i, PARTICLE_ATTRIBUTE_VELOCITY, v_x, v_y, v_z);
         }
+    }
+
+    get parameter_schema() {
+        return [
+            'force_x',
+            'force_y',
+            'force_z'
+        ];
     }
 }

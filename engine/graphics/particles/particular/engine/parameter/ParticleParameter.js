@@ -1,218 +1,225 @@
-import { computeHashIntegerArray } from "../../../../../../core/math/MathUtils.js";
+import { computeHashIntegerArray, max2, min2 } from "../../../../../../core/math/MathUtils.js";
 import { computeStringHash } from "../../../../../../core/primitives/strings/StringUtils.js";
 import { assert } from "../../../../../../core/assert.js";
 import { ParameterLookupTable } from "./ParameterLookupTable.js";
 import List from "../../../../../../core/collection/list/List.js";
 
 
-/**
- *
- * @param {string} name
- * @param {number} itemSize
- * @constructor
- */
-function ParticleParameter(name, itemSize) {
-    this.name = name;
-    this.itemSize = itemSize;
-
+export class ParticleParameter {
     /**
      *
-     * @type {List.<ParameterLookupTable>}
+     * @param {string} name
+     * @param {number} itemSize
+     * @constructor
      */
-    this.tracks = new List();
+    constructor(name, itemSize) {
+        this.name = name;
+        this.itemSize = itemSize;
 
-    /**
-     * Default lookup table value for a track
-     * @type {ParameterLookupTable}
-     */
-    this.defaultTrackValue = new ParameterLookupTable(itemSize);
+        /**
+         *
+         * @type {List.<ParameterLookupTable>}
+         */
+        this.tracks = new List();
 
-    /**
-     *
-     * @type {number}
-     */
-    this.trackCount = 0;
+        /**
+         * Default lookup table value for a track
+         * @type {ParameterLookupTable}
+         */
+        this.defaultTrackValue = new ParameterLookupTable(itemSize);
 
-    this.valueMin = 0;
-    this.valueMax = 0;
+        /**
+         *
+         * @type {number}
+         */
+        this.trackCount = 0;
 
-    /**
-     *
-     * @type {AtlasPatch|null}
-     */
-    this.patch = null;
-}
+        /**
+         * Statistics of the parameter value data
+         * @type {number}
+         */
+        this.valueMin = 0;
+        /**
+         * Statistics of the parameter value data
+         * @type {number}
+         */
+        this.valueMax = 0;
 
-
-ParticleParameter.prototype.toJSON = function () {
-    return {
-        name: this.name,
-        itemSize: this.itemSize,
-        defaultTrackValue: this.defaultTrackValue.toJSON()
-    };
-};
-
-ParticleParameter.prototype.fromJSON = function (json) {
-    this.name = json.name;
-    this.itemSize = json.itemSize;
-
-    const defaultTrackValue = json.defaultTrackValue;
-
-    if (Array.isArray(defaultTrackValue)) {
-        //legacy format
-        this.defaultTrackValue.itemSize = this.itemSize;
-        this.defaultTrackValue.write(defaultTrackValue);
-    } else {
-        this.defaultTrackValue.fromJSON(defaultTrackValue);
-    }
-};
-
-
-/**
- *
- * @param {BinaryBuffer} buffer
- */
-ParticleParameter.prototype.toBinaryBuffer = function (buffer) {
-    buffer.writeUTF8String(this.name);
-    buffer.writeUint8(this.itemSize);
-    this.defaultTrackValue.toBinaryBuffer(buffer);
-};
-
-/**
- *
- * @param {BinaryBuffer} buffer
- */
-ParticleParameter.prototype.fromBinaryBuffer = function (buffer) {
-    this.name = buffer.readUTF8String();
-    this.itemSize = buffer.readUint8();
-    this.defaultTrackValue.fromBinaryBuffer(buffer);
-};
-
-/**
- *
- * @param {number} value
- */
-ParticleParameter.prototype.setTrackCount = function (value) {
-    assert.equal(typeof value, 'number', `value expected to be to a number, but instead was '${typeof value}'`);
-    assert.ok(Number.isInteger(value), `value expected to be an integer, instead was ${value}`);
-    assert.ok(value >= 0, `value expected to be non-negative, instead was ${value}`);
-
-    this.trackCount = value;
-};
-
-/**
- *
- * @returns {number}
- */
-ParticleParameter.prototype.getTrackCount = function () {
-    return this.trackCount;
-};
-
-/**
- *
- * @param {number[]} value
- * @param {number[]} positions
- */
-ParticleParameter.prototype.setDefault = function (value, positions) {
-    assert.equal(value.length % this.itemSize, 0, `number(=${value.length}) of elements in the default value set was not multiple of itemSize(=${this.itemSize})`)
-
-    this.defaultTrackValue.itemSize = this.itemSize;
-    this.defaultTrackValue.write(value, positions);
-};
-
-/**
- *
- * @param {number} index
- * @param {ParameterLookupTable} lut
- */
-ParticleParameter.prototype.setTrack = function (index, lut) {
-    if (lut.itemSize !== this.itemSize) {
-        throw new Error(`Failed to add parameter track, lut.itemSize(=${lut.itemSize}) does not match patamter.itemSize(=${this.itemSize})`);
+        /**
+         * Set by the engine, points to texture piece that stores this parameter data
+         * @type {AtlasPatch|null}
+         */
+        this.patch = null;
     }
 
-    this.tracks.set(index, lut);
-};
-
-ParticleParameter.prototype.computeStatistics = function () {
-    const trackCount = this.trackCount;
-
-
-    let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
-    let i, track;
-
-    //account defaults
-    min = Math.min(min, this.defaultTrackValue.valueMin);
-    max = Math.max(max, this.defaultTrackValue.valueMax);
-
-    //account tracks
-    for (i = 0; i < trackCount; i++) {
-        track = this.tracks.get(i);
-
-        min = Math.min(min, track.valueMin);
-        max = Math.max(max, track.valueMax);
+    toJSON() {
+        return {
+            name: this.name,
+            itemSize: this.itemSize,
+            defaultTrackValue: this.defaultTrackValue.toJSON()
+        };
     }
 
-    //determine common offset and value range
-    this.valueMin = min;
-    this.valueMax = max;
-};
+    fromJSON(json) {
+        this.name = json.name;
+        this.itemSize = json.itemSize;
 
-ParticleParameter.prototype.build = function () {
-    let i, track;
+        const defaultTrackValue = json.defaultTrackValue;
 
-    //lock default track
-    this.defaultTrackValue.disableWriteMode();
-
-    for (i = 0; i < this.trackCount; i++) {
-        track = this.tracks.get(i);
-
-        if (track === undefined) {
-            //write the default track into the parameter
-            this.setTrack(i, this.defaultTrackValue);
+        if (Array.isArray(defaultTrackValue)) {
+            //legacy format
+            this.defaultTrackValue.itemSize = this.itemSize;
+            this.defaultTrackValue.write(defaultTrackValue);
         } else {
-            //lock track
-            track.disableWriteMode();
+            this.defaultTrackValue.fromJSON(defaultTrackValue);
         }
     }
 
-    this.computeStatistics();
-};
-
-ParticleParameter.prototype.hash = function () {
-    const tracksHash = this.tracks.hash();
-
-    return computeHashIntegerArray(
-        tracksHash,
-        computeStringHash(this.name),
-        this.itemSize,
-        this.trackCount,
-        this.defaultTrackValue.hash()
-    );
-};
-
-/**
- *
- * @param {ParticleParameter} other
- * @returns {boolean}
- */
-ParticleParameter.prototype.equals = function (other) {
-    if (this.itemSize !== other.itemSize) {
-        return false;
+    /**
+     *
+     * @param {BinaryBuffer} buffer
+     */
+    toBinaryBuffer(buffer) {
+        buffer.writeUTF8String(this.name);
+        buffer.writeUint8(this.itemSize);
+        this.defaultTrackValue.toBinaryBuffer(buffer);
     }
 
-    if (this.name !== other.name) {
-        return false;
+    /**
+     *
+     * @param {BinaryBuffer} buffer
+     */
+    fromBinaryBuffer(buffer) {
+        this.name = buffer.readUTF8String();
+        this.itemSize = buffer.readUint8();
+        this.defaultTrackValue.fromBinaryBuffer(buffer);
     }
 
-    if (this.trackCount !== other.trackCount) {
-        return false;
+    /**
+     *
+     * @param {number} value
+     */
+    setTrackCount(value) {
+        assert.equal(typeof value, 'number', `value expected to be to a number, but instead was '${typeof value}'`);
+        assert.ok(Number.isInteger(value), `value expected to be an integer, instead was ${value}`);
+        assert.ok(value >= 0, `value expected to be non-negative, instead was ${value}`);
+
+        this.trackCount = value;
     }
 
-    if (!this.defaultTrackValue.equals(other.defaultTrackValue)) {
-        return false;
+    /**
+     *
+     * @returns {number}
+     */
+    getTrackCount() {
+        return this.trackCount;
     }
 
-    return this.tracks.equals(other.tracks);
-};
+    /**
+     *
+     * @param {number[]} value
+     * @param {number[]} positions
+     */
+    setDefault(value, positions) {
+        assert.equal(value.length % this.itemSize, 0, `number(=${value.length}) of elements in the default value set was not multiple of itemSize(=${this.itemSize})`)
 
-export { ParticleParameter };
+        this.defaultTrackValue.itemSize = this.itemSize;
+        this.defaultTrackValue.write(value, positions);
+    }
+
+    /**
+     *
+     * @param {number} index
+     * @param {ParameterLookupTable} lut
+     */
+    setTrack(index, lut) {
+        if (lut.itemSize !== this.itemSize) {
+            throw new Error(`Failed to add parameter track, lut.itemSize(=${lut.itemSize}) does not match patamter.itemSize(=${this.itemSize})`);
+        }
+
+        this.tracks.set(index, lut);
+    }
+
+    computeStatistics() {
+        let i, track;
+        let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
+
+        const trackCount = this.trackCount;
+
+        //account defaults
+        const defaultTrackValue = this.defaultTrackValue;
+
+        min = min2(min, defaultTrackValue.valueMin);
+        max = max2(max, defaultTrackValue.valueMax);
+
+        //account tracks
+        for (i = 0; i < trackCount; i++) {
+            track = this.tracks.get(i);
+
+            min = min2(min, track.valueMin);
+            max = max2(max, track.valueMax);
+        }
+
+        //determine common offset and value range
+        this.valueMin = min;
+        this.valueMax = max;
+    }
+
+    build() {
+        let i, track;
+
+        //lock default track
+        this.defaultTrackValue.disableWriteMode();
+
+        for (i = 0; i < this.trackCount; i++) {
+            track = this.tracks.get(i);
+
+            if (track === undefined) {
+                //write the default track into the parameter
+                this.setTrack(i, this.defaultTrackValue);
+            } else {
+                //lock track
+                track.disableWriteMode();
+            }
+        }
+
+        this.computeStatistics();
+    }
+
+    hash() {
+        const tracksHash = this.tracks.hash();
+
+        return computeHashIntegerArray(
+            tracksHash,
+            computeStringHash(this.name),
+            this.itemSize,
+            this.trackCount,
+            this.defaultTrackValue.hash()
+        );
+    }
+
+    /**
+     *
+     * @param {ParticleParameter} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        if (this.itemSize !== other.itemSize) {
+            return false;
+        }
+
+        if (this.name !== other.name) {
+            return false;
+        }
+
+        if (this.trackCount !== other.trackCount) {
+            return false;
+        }
+
+        if (!this.defaultTrackValue.equals(other.defaultTrackValue)) {
+            return false;
+        }
+
+        return this.tracks.equals(other.tracks);
+    }
+}

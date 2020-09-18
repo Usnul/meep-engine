@@ -36,13 +36,13 @@ export class SimulationStepCurlNoiseVelocity extends AbstractSimulationStep {
 
             const params = layer_parameters[layer_index];
 
-            const power_x = params.power_x;
-            const power_y = params.power_y;
-            const power_z = params.power_z;
+            const power_x = params[0];
+            const power_y = params[1];
+            const power_z = params[2];
 
-            const scale_x = params.scale_x;
-            const scale_y = params.scale_y;
-            const scale_z = params.scale_z;
+            const scale_x = params[3];
+            const scale_y = params[4];
+            const scale_z = params[5];
 
             curl_noise_3d(noise, position[0] * scale_x, position[1] * scale_y, position[2] * scale_z);
 
@@ -52,5 +52,16 @@ export class SimulationStepCurlNoiseVelocity extends AbstractSimulationStep {
 
             particles.writeAttributeVector3(i, PARTICLE_ATTRIBUTE_VELOCITY, delta_x, delta_y, delta_z);
         }
+    }
+
+    get parameter_schema() {
+        return [
+            'power_x',
+            'power_y',
+            'power_z',
+            'scale_x',
+            'scale_y',
+            'scale_z'
+        ];
     }
 }

@@ -9,6 +9,7 @@ import {
 } from "../../../../../../core/math/MathUtils.js";
 import { assert } from "../../../../../../core/assert.js";
 import { ParameterLookupTableFlags } from "./ParameterLookupTableFlags.js";
+import { ParameterLookupTableSerializationAdapter } from "../emitter/serde/ParameterLookupTableSerializationAdapter.js";
 
 
 export class ParameterLookupTable {
@@ -86,85 +87,23 @@ export class ParameterLookupTable {
 
     /**
      *
+     * @deprecated Use serialization adapter instead
      * @param {BinaryBuffer} buffer
      */
     toBinaryBuffer(buffer) {
-        const itemCount = this.positions.length;
+        const adapter = new ParameterLookupTableSerializationAdapter();
 
-        const itemCountBitSize = Math.log2(itemCount);
-
-        let itemCountByteSize;
-
-        if (itemCountBitSize <= 8) {
-            itemCountByteSize = 1;
-        } else if (itemCountBitSize <= 16) {
-            itemCountByteSize = 2;
-        } else if (itemCountBitSize <= 32) {
-            itemCountByteSize = 4;
-        } else {
-            throw new Error(`Item count is too high`);
-        }
-
-        const itemSize = this.itemSize;
-        const header = itemSize | (itemCountByteSize << 4);
-
-        buffer.writeUint8(header);
-
-
-        //
-        if (itemCountByteSize === 1) {
-            buffer.writeUint8(itemCount);
-        } else if (itemCountByteSize === 2) {
-            buffer.writeUint16(itemCount);
-        } else if (itemCountByteSize === 4) {
-            buffer.writeUint32(itemCount);
-        }
-
-        const dataLength = itemCount * itemSize;
-
-        let i;
-
-        for (i = 0; i < dataLength; i++) {
-            buffer.writeFloat32(this.data[i]);
-        }
-
-        for (i = 0; i < itemCount; i++) {
-            buffer.writeFloat32(this.positions[i]);
-        }
+        adapter.serialize(buffer, this);
     }
 
     /**
-     *
+     * @deprecated Use serialization adapter instead
      * @param {BinaryBuffer} buffer
      */
     fromBinaryBuffer(buffer) {
-        const header = buffer.readUint8();
+        const adapter = new ParameterLookupTableSerializationAdapter();
 
-        this.itemSize = header & 0xF;
-
-        const itemCountByteSize = (header >> 4) & 0xF;
-
-        let itemCount;
-
-        if (itemCountByteSize === 1) {
-            itemCount = buffer.readUint8();
-        } else if (itemCountByteSize === 2) {
-            itemCount = buffer.readUint16();
-        } else if (itemCountByteSize === 4) {
-            itemCount = buffer.readUint32();
-        } else {
-            throw new Error(`Unsupported itemCountByteSize '${itemCountByteSize}'`);
-        }
-
-        const dataLength = itemCount * this.itemSize;
-
-        const data = new Float32Array(dataLength);
-        buffer.readFloat32Array(data, 0, dataLength);
-
-        const positions = new Float32Array(itemCount);
-        buffer.readFloat32Array(positions, 0, itemCount);
-
-        this.write(data, positions);
+        adapter.deserialize(buffer, this);
     }
 
     /**

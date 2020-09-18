@@ -55,4 +55,8 @@ export class SimulationStepFixedPhysics extends AbstractSimulationStep {
             particles.writeAttributeVector3(i, PARTICLE_ATTRIBUTE_POSITION, p_x, p_y, p_z);
         }
     }
+
+    get parameter_schema() {
+        return [];
+    }
 }
