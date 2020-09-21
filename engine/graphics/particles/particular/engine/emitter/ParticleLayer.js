@@ -9,6 +9,7 @@ import { ConicRay } from "../../../../../../core/geom/ConicRay.js";
 import { computeConeBoundingBox } from "../../../../../../core/geom/3d/ConeMath.js";
 import { SimulationStepDefinition } from "../simulator/SimulationStepDefinition.js";
 import List from "../../../../../../core/collection/list/List.js";
+import { SimulationStepType } from "../simulator/SimulationStepType.js";
 
 /**
  * @readonly
@@ -325,7 +326,10 @@ ParticleLayer.prototype.fromJSON = function (json) {
     if (json.steps !== undefined) {
         this.steps.fromJSON(json.steps, SimulationStepDefinition);
     } else {
+        // steps are not defined, use "fixed physics" for backwards compatibility
+
         this.steps.reset();
+        this.steps.add(SimulationStepDefinition.from(SimulationStepType.FixedPhysics, []));
     }
 
     //reset bounds attributes
