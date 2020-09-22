@@ -1,9 +1,10 @@
 import { AssetLoader } from "./AssetLoader.js";
 import { Asset } from "../Asset.js";
-import { ImageLoader as ThreeImageLoader } from "three/src/loaders/ImageLoader.js";
 import { computeFileExtension } from "../../../core/FilePath.js";
 import { GameAssetType } from "../GameAssetType.js";
 import { convertTexture2Sampler2D } from "../../graphics/texture/sampler/convertTexture2Sampler2D.js";
+import WorkerBuilder from "../../../core/process/worker/WorkerBuilder.js";
+import { OnDemandWorkerManager } from "../../../core/process/worker/OnDemandWorkerManager.js";
 
 class ImageRGBADataAsset extends Asset {
     constructor(data, width, height) {
@@ -25,87 +26,84 @@ class ImageRGBADataAsset extends Asset {
     }
 }
 
-function loadStandard(path, success, failure, progress) {
-    const imageLoader = new ThreeImageLoader();
+/**
+ *
+ * @param {string} path
+ * @param {function} success
+ * @param {function} failure
+ * @param {function} progress
+ * @param {OnDemandWorkerManager} worker
+ */
+function loadStandard(path, success, failure, progress, worker) {
+
+    return fetch(path)
+        .then(response => response.blob())
+        .then(blob => worker.request("decode", [blob]))
+        .then(
+            handleImageBitmap,
+            failure
+        );
 
     /**
      *
-     * @param {Image} img
+     * @param {ImageBitmap} data
      */
-    function handleImageLoad(img) {
+    function handleImageBitmap(data) {
 
+        const decodedData = decode(data);
 
-        /**
-         *
-         * @param {ImageBitmap} data
-         */
-        function handleImageBitmap(data) {
+        const width = data.width;
+        const height = data.height;
 
-            decode(data);
+        data.close();
 
-            const width = data.width;
-            const height = data.height;
-
-            data.close();
-
-            success(new ImageRGBADataAsset(decodedData, width, height));
-
-        }
-
-        function buildAssetFromImage(img) {
-
-
-            const imgWidth = img.width;
-            const imgHeight = img.height;
-
-            decode(img);
-
-
-            success(new ImageRGBADataAsset(decodedData, imgWidth, imgHeight));
-
-        }
-
-        let decodedData = null;
-
-        if (typeof window.createImageBitmap === "function") {
-            createImageBitmap(img)
-                .then(handleImageBitmap, failure);
-        } else {
-            buildAssetFromImage(img);
-        }
-
-
-        /**
-         *
-         * @param {Image|ImageBitmap} img
-         */
-        function decode(img) {
-            const imgWidth = img.width;
-            const imgHeight = img.height;
-
-            //
-            const canvas = document.createElement('canvas');
-            canvas.width = imgWidth;
-            canvas.height = imgHeight;
-            const context = canvas.getContext('2d');
-
-            context.drawImage(img, 0, 0, imgWidth, imgHeight);
-
-            const imgd = context.getImageData(0, 0, imgWidth, imgHeight);
-            decodedData = imgd.data;
-        }
-
+        success(new ImageRGBADataAsset(decodedData, width, height));
 
     }
 
-    function handleProgress() {
 
-    }
+}
 
-    imageLoader.load(path, handleImageLoad, handleProgress, failure);
+/**
+ *
+ * @param {Image|ImageBitmap} img
+ */
+function decode(img) {
+    const imgWidth = img.width;
+    const imgHeight = img.height;
+
+    //
+    const canvas = document.createElement('canvas');
+
+    canvas.width = imgWidth;
+    canvas.height = imgHeight;
+
+    const context = canvas.getContext('2d');
+
+    context.drawImage(img, 0, 0, imgWidth, imgHeight);
+
+    const imgd = context.getImageData(0, 0, imgWidth, imgHeight);
+
+    return imgd.data;
 }
 
 export class ImageRGBADataLoader extends AssetLoader {
+    constructor() {
+        super();
+
+        const workerBuilder = new WorkerBuilder();
+
+        workerBuilder.addMethod('decode', function (blob) {
+            return createImageBitmap(blob);
+        });
+
+        /**
+         *
+         * @type {OnDemandWorkerManager}
+         */
+        this.worker = new OnDemandWorkerManager(workerBuilder.build());
+    }
+
     load(path, success, failure, progress) {
         const extension = computeFileExtension(path);
 
@@ -130,7 +128,8 @@ export class ImageRGBADataLoader extends AssetLoader {
             }, failure, progress);
 
         } else {
-            loadStandard(path, success, failure, progress);
+
+            loadStandard(path, success, failure, progress, this.worker);
         }
     }
 }
