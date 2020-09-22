@@ -32,74 +32,111 @@ function needsSerialization(value) {
     return false;
 }
 
-function generateAPI(target, methods) {
-    function makeMethod(name) {
-        const pending = target.__pending[name] = [];
-        target[name] = function () {
-            let idCounter = 0;
 
-            const argumentCount = arguments.length;
+class WorkerProxy {
+    constructor(url, methods) {
+        this.url = url;
+        this.methods = methods;
 
-            const parameters = new Array(argumentCount);
+        this.__pending = {};
+        this.__isRunning = false;
+        this.__worker = null;
 
-            for (let i = 0; i < argumentCount; i++) {
-                const argument = arguments[i];
-                if (needsSerialization(argument)) {
-                    //use toJSON method on an argument if possible
-                    parameters[i] = argument.toJSON();
-                } else {
-                    parameters[i] = argument;
-                }
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__id_counter = 0;
+        //
+
+        this.__handleMessageBound = this.__handleMessage.bind(this);
+
+        this.__generateAPI(this, methods);
+    }
+
+    /**
+     * @template T
+     * @param {number} name
+     * @param {[]} args
+     * @return {Promise<T>}
+     */
+    $submitRequest(name, args) {
+        const pending = this.__pending[name];
+
+        const argumentCount = args.length;
+
+        const parameters = new Array(argumentCount);
+
+        for (let i = 0; i < argumentCount; i++) {
+            const argument = args[i];
+            if (needsSerialization(argument)) {
+                //use toJSON method on an argument if possible
+                parameters[i] = argument.toJSON();
+            } else {
+                parameters[i] = argument;
             }
+        }
 
-            return new Promise(function (resolve, reject) {
-                const request = {
-                    parameters: parameters,
-                    id: idCounter,
-                    resolve: resolve,
-                    reject: reject
+        const request_id = this.__id_counter++;
+
+        return new Promise((resolve, reject) => {
+
+            const request = {
+                parameters: parameters,
+                id: request_id,
+                resolve: resolve,
+                reject: reject
+            };
+
+            pending.push(request);
+
+            if (this.isRunning()) {
+                const message = {
+                    methodName: name,
+                    id: request.id,
+                    parameters: parameters
                 };
 
-                pending.push(request);
-
-                if (target.isRunning()) {
-                    const message = {
-                        methodName: name,
-                        id: request.id,
-                        parameters: parameters
-                    };
-
-                    if (!trySendMessage(target.__worker, message)) {
-                        //failed to send message
-                        //drop pending request
-                        const i = pending.indexOf(request);
-                        pending.splice(i, 1);
-                    }
+                if (!trySendMessage(this.__worker, message)) {
+                    //failed to send message
+                    //drop pending request
+                    const i = pending.indexOf(request);
+                    pending.splice(i, 1);
                 }
-            });
-        };
+            }
+        });
     }
 
-    for (let methodName in methods) {
-        if (methods.hasOwnProperty(methodName)) {
-            makeMethod(methodName);
+    __makeMethod(name) {
+        const pending = this.__pending[name] = [];
+
+        const proxy = this;
+
+        this[name] = function () {
+            return proxy.$submitRequest(name, arguments);
+        };
+
+    }
+
+    __generateAPI() {
+
+
+        for (let methodName in this.methods) {
+            if (this.methods.hasOwnProperty(methodName)) {
+                this.__makeMethod(methodName);
+            }
         }
     }
-}
 
-const WorkerProxy = function (url, methods) {
-    this.url = url;
-    this.methods = methods;
+    /**
+     *
+     * @param {Event} event
+     * @private
+     */
+    __handleMessage(event) {
+        const pending = this.__pending;
 
-    this.__pending = {};
-    this.__isRunning = false;
-    this.__worker = null;
-    //
-    const pending = this.__pending;
-
-    generateAPI(this, methods);
-
-    this.__handleMessage = function (event) {
         const data = event.data;
 
         const requestId = data.id;
@@ -134,92 +171,92 @@ const WorkerProxy = function (url, methods) {
 
             throw new Error(`Request ${requestId} not found in the request queue`);
         }
-    };
-};
-
-WorkerProxy.prototype.isRunning = function () {
-    return this.__isRunning;
-};
-
-WorkerProxy.prototype.stop = function () {
-    if (!this.__isRunning) {
-        //not running
-        return;
-    }
-    this.__worker.terminate();
-    this.__isRunning = false;
-};
-
-/**
- *
- * @param {number} id
- * @param {string} methodName
- * @returns {boolean}
- */
-WorkerProxy.prototype.cancelRequest = function (id, methodName) {
-    //find request
-    const requestQueue = this.__pending[methodName];
-
-    if (requestQueue === undefined) {
-        throw new Error(`No request queue for method name '${methodName}'`);
     }
 
-    const n = requestQueue.length;
+    isRunning() {
+        return this.__isRunning;
+    }
 
-    for (let i = 0; i < n; i++) {
-        const request = requestQueue[i];
+    stop() {
+        if (!this.__isRunning) {
+            //not running
+            return;
+        }
+        this.__worker.terminate();
+        this.__isRunning = false;
+    }
 
-        if (request.id === id) {
+    /**
+     *
+     * @param {number} id
+     * @param {string} methodName
+     * @returns {boolean}
+     */
+    cancelRequest(id, methodName) {
+        //find request
+        const requestQueue = this.__pending[methodName];
+
+        if (requestQueue === undefined) {
+            throw new Error(`No request queue for method name '${methodName}'`);
+        }
+
+        const n = requestQueue.length;
+
+        for (let i = 0; i < n; i++) {
+            const request = requestQueue[i];
+
+            if (request.id === id) {
 
 
-            if (!this.__isRunning) {
-                //not running, simply cut from the queue
+                if (!this.__isRunning) {
+                    //not running, simply cut from the queue
 
-                requestQueue.splice(i, 1);
+                    requestQueue.splice(i, 1);
 
-                return true;
-            } else {
-                //worker is running, send termination request for this ID
-                throw new Error('Ability to cancel pending requests while worker is running is not implemented yet');
+                    return true;
+                } else {
+                    //worker is running, send termination request for this ID
+                    throw new Error('Ability to cancel pending requests while worker is running is not implemented yet');
+                }
+
             }
+        }
 
+    }
+
+    sendPendingRequests() {
+        for (let methodName in this.__pending) {
+            if (this.__pending.hasOwnProperty(methodName)) {
+
+                const pending = this.__pending[methodName];
+                const n = pending.length;
+
+                for (let i = 0; i < n; i++) {
+                    const request = pending[i];
+                    const message = {
+                        methodName: methodName,
+                        id: request.id,
+                        parameters: request.parameters
+                    };
+
+                    trySendMessage(this.__worker, message);
+                }
+            }
         }
     }
 
-};
-
-WorkerProxy.prototype.sendPendingRequests = function () {
-    for (let methodName in this.__pending) {
-        if (this.__pending.hasOwnProperty(methodName)) {
-
-            const pending = this.__pending[methodName];
-            const n = pending.length;
-
-            for (let i = 0; i < n; i++) {
-                const request = pending[i];
-                const message = {
-                    methodName: methodName,
-                    id: request.id,
-                    parameters: request.parameters
-                };
-
-                trySendMessage(this.__worker, message);
-            }
+    start() {
+        if (this.__isRunning) {
+            //already running
+            return;
         }
+
+        this.__worker = new Worker(this.url);
+        this.__worker.onmessage = this.__handleMessageBound;
+        this.__isRunning = true;
+
+        this.sendPendingRequests();
     }
-};
-
-WorkerProxy.prototype.start = function () {
-    if (this.__isRunning) {
-        //already running
-        return;
-    }
-
-    this.__worker = new Worker(this.url);
-    this.__worker.onmessage = this.__handleMessage;
-    this.__isRunning = true;
-
-    this.sendPendingRequests();
-};
+}
 
 export default WorkerProxy;

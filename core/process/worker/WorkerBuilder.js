@@ -87,6 +87,8 @@ WorkerBuilder.prototype.build = function () {
         '       return;', //not an object, skip
         '   }else if(obj.buffer instanceof ArrayBuffer){',
         '       result.push(obj.buffer);',
+        '   }else if(obj instanceof ImageBitmap){',
+        '       result.push(obj);',
         '   }else{',
         '       for(var i in obj){',
         '           if(obj.hasOwnProperty(i)){ extractTransferables(obj[i], result); }',
