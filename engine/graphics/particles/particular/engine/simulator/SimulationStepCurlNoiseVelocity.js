@@ -4,7 +4,7 @@ import {
     PARTICLE_ATTRIBUTE_POSITION,
     PARTICLE_ATTRIBUTE_VELOCITY
 } from "../emitter/PARTICLE_ATTRIBUTES.js";
-import { curl_noise_3d } from "../../../../../../core/math/noise/curl_noise_3d.js";
+import { curl_noise_3dt } from "../../../../../../core/math/noise/curl_noise_3dt.js";
 
 const position = [];
 const noise = [];
@@ -14,9 +14,15 @@ export class SimulationStepCurlNoiseVelocity extends AbstractSimulationStep {
 
     constructor() {
         super();
+
+        this.time = 0;
     }
 
     execute() {
+        this.time += this.timeDelta;
+
+        const time = this.time;
+
         const particles = this.particles;
 
         /**
@@ -55,7 +61,7 @@ export class SimulationStepCurlNoiseVelocity extends AbstractSimulationStep {
             const scale_y = params[4];
             const scale_z = params[5];
 
-            curl_noise_3d(noise, position[0] * scale_x, position[1] * scale_y, position[2] * scale_z);
+            curl_noise_3dt(noise, position[0] * scale_x, position[1] * scale_y, position[2] * scale_z, time * 0.01);
 
             const delta_x = noise[0] * power_x;
             const delta_y = noise[1] * power_y;
