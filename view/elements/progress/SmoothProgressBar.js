@@ -21,6 +21,7 @@ class ProgressBarView extends View {
         classList = [],
         displayLabel = false,
         displayLabelType = 'percent',
+        displayTipMarker = true,
         process = passThrough
     } = {}) {
 
@@ -30,12 +31,21 @@ class ProgressBarView extends View {
 
         const dRoot = dom().addClass('progress-bar');
 
-        classList.forEach((className) => dRoot.addClass(className));
-
         this.el = dRoot.el;
 
-        const fillElement = dRoot.createChild().addClass('fill').el;
-        this.el.appendChild(fillElement);
+        this.addClasses(classList);
+
+        /**
+         * @type {HTMLElement}
+         */
+        this.__el_fill = dRoot.createChild().addClass('fill').el;
+
+        this.__el_fill_container = document.createElement('div');
+        this.__el_fill_container.classList.add('fill-container');
+
+        this.__el_fill_container.appendChild(this.__el_fill);
+
+        this.el.appendChild(this.__el_fill_container);
 
         let dLabel = null;
 
@@ -43,52 +53,48 @@ class ProgressBarView extends View {
             dLabel = dom(this.el).createChild('div').addClass('label').css({ height: "inherit" });
         }
 
-        let value = 0, max = 0;
+        this.__display_tip_marker = displayTipMarker;
 
-        function render() {
-            const style = fillElement.style;
-            //sanitize input to be in range 0 to 1
+        if (displayTipMarker) {
+            this.__el_tip_marker = document.createElement('div');
+            this.__el_tip_marker.classList.add('tip-marker');
 
-            const fill = clamp(value / max, 0, 1);
-
-            style.width = (fill * 100) + "%";
-
-            if (dLabel !== null) {
-                //update label text
-                if (displayLabelType === "absolute") {
-                    dLabel.text(makeTextAbsolute(value, max, process));
-                } else {
-                    dLabel.text(makeTextPercentage(value, max, process));
-                }
-            }
+            this.el.appendChild(this.__el_tip_marker);
         }
 
-        const throttledRender = frameThrottle(render);
 
-        Object.defineProperties(this, {
-            value: {
-                get: function () {
-                    return value;
-                },
-                set: function (val) {
-                    if (value !== val) {
-                        value = val;
-                        throttledRender();
-                    }
-                }
-            },
-            max: {
-                get: function () {
-                    return max;
-                },
-                set: function (val) {
-                    if (max !== val) {
-                        max = val;
-                        throttledRender();
-                    }
-                }
-            }
-        });
+        /**
+         *
+         * @type {function}
+         * @private
+         */
+        this.__process = process;
+
+        /**
+         *
+         * @type {boolean}
+         * @private
+         */
+        this.__display_label_enabled = displayLabel;
+        /**
+         *
+         * @type {string}
+         * @private
+         */
+        this.__display_label_type = displayLabelType;
+
+        /**
+         *
+         * @type {null|DOM}
+         * @private
+         */
+        this.__dom_label = dLabel;
+
+        this.__value_current = 0;
+        this.__value_max = 0;
+
+
+        this.__throttled_render = frameThrottle(this.render, this);
 
         if (model instanceof BoundedValue) {
 
@@ -103,6 +109,63 @@ class ProgressBarView extends View {
             this.bindSignal(model[0].onChanged, this.__updateFromArray, this);
             this.bindSignal(model[1].onChanged, this.__updateFromArray, this);
 
+        }
+    }
+
+    get value() {
+        return this.__value_current;
+    }
+
+    set value(v) {
+        if (v === this.__value_current) {
+            return;
+        }
+
+        this.__value_current = v;
+
+        this.__throttled_render();
+    }
+
+    get max() {
+        return this.__value_max;
+    }
+
+    set max(v) {
+        if (v === this.__value_max) {
+            return;
+        }
+
+        this.__value_max = v;
+
+        this.__throttled_render();
+    }
+
+    render() {
+        const value = this.__value_current;
+        const max = this.__value_max;
+
+        const style = this.__el_fill.style;
+        //sanitize input to be in range 0 to 1
+
+        const fill = clamp(value / max, 0, 1);
+
+        const fill_percent_string = (fill * 100) + "%";
+
+        style.width = fill_percent_string;
+
+        const dLabel = this.__dom_label;
+
+        if (dLabel !== null) {
+            //update label text
+            if (this.__display_label_type === "absolute") {
+                dLabel.text(makeTextAbsolute(value, max, this.__process));
+            } else {
+                dLabel.text(makeTextPercentage(value, max, this.__process));
+            }
+        }
+
+        if (this.__display_tip_marker) {
+            this.__el_tip_marker.style.left = fill_percent_string;
         }
     }
 
