@@ -78,6 +78,10 @@ class RadialMenuElement extends View {
 
         this.el = dRoot.el;
 
+        if (description.cssClass !== null) {
+            this.addClass(description.cssClass);
+        }
+
         /**
          * @deprecated use description directly
          * @type {View}

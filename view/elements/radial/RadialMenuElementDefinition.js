@@ -41,6 +41,12 @@ export class RadialMenuElementDefinition {
 
         /**
          *
+         * @type {String}
+         */
+        this.cssClass = null;
+
+        /**
+         *
          * @type {View|null}
          */
         this.iconView = null;
@@ -107,6 +113,7 @@ export class RadialMenuElementDefinition {
      * @param {String} [name]
      * @param {number} [nameRadiusOffset]
      * @param {String|number} [nameFill] CSS color for name label
+     * @param {string} [cssClass]
      */
     from({
              share = 1,
@@ -121,7 +128,8 @@ export class RadialMenuElementDefinition {
              autoSizeIcon = true,
              name = "",
              nameRadiusOffset = 10,
-             nameFill = "white"
+             nameFill = "white",
+             cssClass = null
          }) {
 
         assert.notEqual(iconView, undefined, "Icon View must be defined");
@@ -148,6 +156,7 @@ export class RadialMenuElementDefinition {
         this.name = name;
         this.nameRadiusOffset = nameRadiusOffset;
         this.nameFill = nameFill;
+        this.cssClass = cssClass;
     }
 
 
@@ -166,6 +175,7 @@ export class RadialMenuElementDefinition {
      * @param {String} [name]
      * @param {number} [nameRadiusOffset]
      * @param {String|number} [nameFill] CSS color for name label
+     * @param {string} [cssClass]
      * @returns {RadialMenuElementDefinition}
      */
     static from({
@@ -181,7 +191,8 @@ export class RadialMenuElementDefinition {
                     autoSizeIcon,
                     name,
                     nameRadiusOffset,
-                    nameFill
+                    nameFill,
+                    cssClass
                 }) {
         const r = new RadialMenuElementDefinition();
 
