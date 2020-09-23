@@ -15,7 +15,7 @@ const p_z0 = [];
 export function curl_noise_3d(result, x,y,z) {
     sdnoise3(p_x0, x, y, z);
     sdnoise3(p_y0, x + 31.341, y - 43.23, z + 12.34);
-    sdnoise3(p_z0, x - 231.141, y + 124.123, z + -54.4341);
+    sdnoise3(p_z0, x - 231.141, y + 124.123, z -54.4341);
 
     const _x = p_z0[1] - p_y0[2];
     const _y = p_x0[2] - p_z0[0];
