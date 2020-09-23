@@ -6,7 +6,7 @@
 import List from '../../core/collection/list/List.js';
 
 import GUIElement from '../ecs/gui/GUIElement.js';
-import ViewportPosition from '../ecs/gui/ViewportPosition.js';
+import ViewportPosition from '../ecs/gui/position/ViewportPosition.js';
 
 import EntityBuilder from '../ecs/EntityBuilder.js';
 

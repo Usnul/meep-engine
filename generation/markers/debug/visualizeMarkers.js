@@ -14,7 +14,7 @@ import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { obtainTerrain } from "../../../../model/game/scenes/SceneUtils.js";
 import LabelView from "../../../view/common/LabelView.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
-import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
+import ViewportPosition from "../../../engine/ecs/gui/position/ViewportPosition.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
 import Vector3 from "../../../core/geom/Vector3.js";
 

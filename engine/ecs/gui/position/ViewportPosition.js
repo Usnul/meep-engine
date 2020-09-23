@@ -2,10 +2,10 @@
  * Created by Alex on 28/01/2015.
  */
 
-import Vector2 from "../../../core/geom/Vector2.js";
-import ObservedBoolean from "../../../core/model/ObservedBoolean.js";
-import { BinaryClassSerializationAdapter } from "../storage/binary/BinaryClassSerializationAdapter.js";
-import { computeHashFloat, computeHashIntegerArray } from "../../../core/math/MathUtils.js";
+import Vector2 from "../../../../core/geom/Vector2.js";
+import ObservedBoolean from "../../../../core/model/ObservedBoolean.js";
+import { BinaryClassSerializationAdapter } from "../../storage/binary/BinaryClassSerializationAdapter.js";
+import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 
 /**
  * @readonly

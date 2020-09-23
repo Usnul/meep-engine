@@ -2,7 +2,7 @@ import Vector3 from "../../../core/geom/Vector3.js";
 import { Transform } from "../../ecs/transform/Transform.js";
 import EntityBuilder from "../../ecs/EntityBuilder.js";
 import HeadsUpDisplay from "../../ecs/gui/hud/HeadsUpDisplay.js";
-import ViewportPosition from "../../ecs/gui/ViewportPosition.js";
+import ViewportPosition from "../../ecs/gui/position/ViewportPosition.js";
 import GUIElement from "../../ecs/gui/GUIElement.js";
 import LabelView from "../../../view/common/LabelView.js";
 

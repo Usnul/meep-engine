@@ -4,7 +4,7 @@ import { ReactiveAnd } from "../../core/model/reactive/model/logic/ReactiveAnd.j
 import { ReactiveReference } from "../../core/model/reactive/model/terminal/ReactiveReference.js";
 import ObservedBoolean from "../../core/model/ObservedBoolean.js";
 import { AchievementNotificationView } from "../../../view/game/achievements/AchievementNotificationView.js";
-import ViewportPosition from "../ecs/gui/ViewportPosition.js";
+import ViewportPosition from "../ecs/gui/position/ViewportPosition.js";
 import Vector2 from "../../core/geom/Vector2.js";
 import EntityBuilder from "../ecs/EntityBuilder.js";
 import GUIElement from "../ecs/gui/GUIElement.js";

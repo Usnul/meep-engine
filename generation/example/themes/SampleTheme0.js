@@ -19,7 +19,7 @@ import { CellFilterLerp } from "../../filtering/numeric/math/CellFilterLerp.js";
 import { CellFilterLiteralFloat } from "../../filtering/numeric/CellFilterLiteralFloat.js";
 import Tag from "../../../engine/ecs/components/Tag.js";
 import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
-import ViewportPosition from "../../../engine/ecs/gui/ViewportPosition.js";
+import ViewportPosition from "../../../engine/ecs/gui/position/ViewportPosition.js";
 import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
 import { MarkerNodeTransformerYRotateByFilterGradient } from "../../markers/transform/MarkerNodeTransformerYRotateByFilterGradient.js";
 import { PI_HALF } from "../../../core/math/MathUtils.js";

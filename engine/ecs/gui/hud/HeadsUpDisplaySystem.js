@@ -11,7 +11,7 @@ import { Matrix4 } from 'three';
 import { GraphicsEngine } from "../../../graphics/GraphicsEngine.js";
 import { FogOfWarVisibilityPredicate } from "../../fow/FogOfWarVisibilityPredicate.js";
 import Vector4 from "../../../../core/geom/Vector4.js";
-import ViewportPosition from "../ViewportPosition.js";
+import ViewportPosition from "../position/ViewportPosition.js";
 import GUIElement from "../GUIElement.js";
 import { HeadsUpDisplayFlag } from "./HeadsUpDisplayFlag.js";
 

@@ -1,15 +1,15 @@
 /**
  * Created by Alex on 28/01/2015.
  */
-import { System } from '../System.js';
+import { System } from '../../System.js';
 import ViewportPosition from './ViewportPosition.js';
-import GUIElement from "./GUIElement.js";
-import { assert } from "../../../core/assert.js";
-import Vector2 from "../../../core/geom/Vector2.js";
-import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
-import { EPSILON } from "../../../core/math/MathUtils.js";
-import AABB2 from "../../../core/geom/AABB2.js";
-import { GUIElementEvent } from "./GUIElementEvent.js";
+import GUIElement from "../GUIElement.js";
+import { assert } from "../../../../core/assert.js";
+import Vector2 from "../../../../core/geom/Vector2.js";
+import { SignalBinding } from "../../../../core/events/signal/SignalBinding.js";
+import { EPSILON } from "../../../../core/math/MathUtils.js";
+import AABB2 from "../../../../core/geom/AABB2.js";
+import { GUIElementEvent } from "../GUIElementEvent.js";
 
 const CSS_CLASS = 'ecs-viewport-position-component';
 
