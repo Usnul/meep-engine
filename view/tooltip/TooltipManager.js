@@ -13,6 +13,7 @@ import { PointerDevice } from "../../engine/input/devices/PointerDevice.js";
 import List from "../../core/collection/list/List.js";
 import { assert } from "../../core/assert.js";
 import { GMLEngine } from "./gml/GMLEngine.js";
+import { frameThrottle } from "../../engine/graphics/FrameThrottle.js";
 
 /**
  *
@@ -258,6 +259,13 @@ class TooltipManager {
 
         tip.view = view;
 
+        const layout = frameThrottle(() => {
+            this.positionTip(view);
+        });
+
+        view.bindSignal(tip.target.position.onChanged, layout);
+        view.bindSignal(tip.target.size.onChanged, layout);
+
         return view;
     }
 
@@ -266,6 +274,9 @@ class TooltipManager {
      * @param {VisualTip} tip
      */
     add(tip) {
+        assert.defined(tip, 'tip');
+        assert.notNull(tip, 'tip');
+
         const contextView = this.contextView;
 
         //build tip view
@@ -314,6 +325,10 @@ class TooltipManager {
         }
     }
 
+    /**
+     *
+     * @param {TooltipView} tipView
+     */
     positionTip(tipView) {
         if (tipView === null) {
             return;

@@ -284,6 +284,13 @@ function PointerDevice(domElement) {
      */
     this.isRunning = false;
 
+    /**
+     *
+     * @type {Element}
+     * @private
+     */
+    this.__target = null;
+
     const self = this;
 
     /**
@@ -294,9 +301,13 @@ function PointerDevice(domElement) {
 
     const position = this.position = new Vector2();
 
-    this.eventHandlerMouseMove = function (event) {
+    this.eventHandlerMouseMove = (event) => {
         event.preventDefault();
+
+        this.__target = event.target;
+
         readPositionFromMouseEvent(event, position);
+
         self.on.move.dispatch(position, event);
     };
     this.eventHandlerMouseUp = function (event) {
@@ -389,6 +400,14 @@ function PointerDevice(domElement) {
     observePinch(touchStart, touchEnd, touchMove, this.on.pinch, this.on.pinchStart, this.on.pinchEnd);
 }
 
+/**
+ *
+ * @return {Element}
+ */
+PointerDevice.prototype.getTargetElement = function () {
+    return this.__target;
+};
+
 PointerDevice.prototype.start = function () {
     if (this.isRunning) {
         //already running
@@ -422,7 +441,7 @@ PointerDevice.prototype.start = function () {
     domElement.addEventListener(MouseEvents.Wheel, this.eventHandlerWheel, { passive: false });
 
 
-    domElement.addEventListener('contextmenu',supressContextMenu);
+    domElement.addEventListener('contextmenu', supressContextMenu);
 };
 
 PointerDevice.prototype.stop = function () {
@@ -451,7 +470,7 @@ PointerDevice.prototype.stop = function () {
     domElement.removeEventListener(MouseEvents.Wheel, this.eventHandlerWheel);
 
 
-    domElement.removeEventListener('contextmenu',supressContextMenu);
+    domElement.removeEventListener('contextmenu', supressContextMenu);
 };
 
 export { PointerDevice };

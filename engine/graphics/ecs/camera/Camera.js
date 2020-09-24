@@ -105,9 +105,9 @@ export class Camera {
      * @param {number} x
      * @param {number} y
      * @param {Vector3} source
-     * @param {Vector3} target
+     * @param {Vector3} direction
      */
-    static projectRay(camera, x, y, source, target) {
+    static projectRay(camera, x, y, source, direction) {
         assert.notEqual(camera, undefined, "Camera must be defined");
         assert.notEqual(camera.position, undefined, "Camera.position must be defined");
 
@@ -129,7 +129,7 @@ export class Camera {
         //get direction
         v3.sub(source).normalize();
 
-        target.copy(v3);
+        direction.copy(v3);
     }
 
 }

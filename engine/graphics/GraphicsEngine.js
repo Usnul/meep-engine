@@ -394,10 +394,10 @@ GraphicsEngine.prototype.enableExtensions = function () {
  * @param {number} x
  * @param {number} y
  * @param {Vector3} source Ray source is written here
- * @param {Vector3} target Ray target is written here
+ * @param {Vector3} direction Ray target is written here
  */
-GraphicsEngine.prototype.viewportProjectionRay = function viewportProjectionRay(x, y, source, target) {
-    Camera.projectRay(this.camera, x, y, source, target);
+GraphicsEngine.prototype.viewportProjectionRay = function viewportProjectionRay(x, y, source, direction) {
+    Camera.projectRay(this.camera, x, y, source, direction);
 };
 
 GraphicsEngine.prototype.intersectObjectUnderViewportPoint = (function () {
