@@ -56,13 +56,13 @@ export class TooltipComponentSystem extends System {
         this.time_since_position_update = 0;
 
         /**
-         *
+         * Delay before tooltip appears, in seconds
          * @type {number}
          */
         this.display_delay = 0.2;
 
         /**
-         *
+         * Screen-space rectangle, used by the tooltip system as the anchor to point to
          * @type {Rectangle}
          */
         this.target = new Rectangle();
