@@ -40,7 +40,7 @@ class MinimapView extends View {
          */
         this.entityDataset = entityDataset;
 
-        const vWorld = new EmptyView();
+        const vWorld = new EmptyView({ classList: ['world'] });
         this.addChild(vWorld);
 
         /**

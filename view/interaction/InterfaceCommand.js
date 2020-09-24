@@ -8,6 +8,7 @@ class InterfaceCommand {
      * @param {string} [tooltip]
      * @param {SoundTrack} [actionSound]
      * @param {SoundTrack} [hoverSound]
+     * @param {string[]} [tags]
      * @constructor
      */
     constructor(
@@ -17,7 +18,8 @@ class InterfaceCommand {
             tooltip,
             name = "",
             actionSound = null,
-            hoverSound = null
+            hoverSound = null,
+            tags = []
         }
     ) {
         assert.defined(command, 'command');
@@ -57,6 +59,12 @@ class InterfaceCommand {
          * @type {string}
          */
         this.tooltip = tooltip;
+
+        /**
+         *
+         * @type {string[]}
+         */
+        this.tags = tags;
     }
 
     /**
@@ -66,6 +74,7 @@ class InterfaceCommand {
      * @param {SoundTrack} [actionSound]
      * @param {SoundTrack} [hoverSound]
      * @param {string} [tooltip]
+     * @param {string[]} [tags]
      */
     static form(
         {
@@ -73,7 +82,8 @@ class InterfaceCommand {
             style = {},
             actionSound = null,
             hoverSound = null,
-            tooltip
+            tooltip,
+            tags = []
         }
     ) {
 
@@ -86,6 +96,17 @@ class InterfaceCommand {
         this.hoverSound = hoverSound;
 
         this.tooltip = tooltip;
+
+        this.tags = tags;
+    }
+
+    /**
+     *
+     * @param {string} tag
+     * @return {boolean}
+     */
+    hasTag(tag) {
+        return this.tags.indexOf(tag) !== -1;
     }
 
     /**

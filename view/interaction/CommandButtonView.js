@@ -30,11 +30,17 @@ class CommandButtonView extends View {
          */
         const command = prop.command;
 
+
         const dButton = dom('button').css(prop.style).addClass('command-button-view');
 
         dButton.addClass('command-' + command.id);
 
         this.el = dButton.el;
+
+
+        prop.tags.forEach(tag => {
+            this.addClass(`tag-${tag}`);
+        });
 
         /**
          *
