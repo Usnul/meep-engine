@@ -55,6 +55,7 @@ export function writeAnimationGraphDefinitionToJSON(graph) {
         return {
             name: c.name,
             duration: c.duration,
+            tags: c.tags,
             notifications: c.notifications.map(n => {
                 return {
                     def: notifications.indexOf(n.def),

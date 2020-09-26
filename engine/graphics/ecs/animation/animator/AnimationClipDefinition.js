@@ -12,6 +12,12 @@ export class AnimationClipDefinition {
         this.name = "";
 
         /**
+         * Generic string tags
+         * @type {string[]}
+         */
+        this.tags = [];
+
+        /**
          *
          * @type {number}
          */
@@ -26,6 +32,27 @@ export class AnimationClipDefinition {
 
     /**
      *
+     * @param {string} tag
+     * @return {boolean}
+     */
+    hasTag(tag) {
+        const tags = this.tags;
+
+        const n = tags.length;
+
+        for (let i = 0; i < n; i++) {
+            const t = tags[i];
+
+            if (t === tag) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
      * @param {AnimationClipDefinition} other
      * @returns {boolean}
      */
@@ -36,6 +63,7 @@ export class AnimationClipDefinition {
 
         return this.name === other.name
             && isArrayEqual(this.notifications, other.notifications)
+            && isArrayEqual(this.tags, other.tags)
             ;
     }
 
@@ -45,7 +73,8 @@ export class AnimationClipDefinition {
     hash() {
         return computeHashIntegerArray(
             computeStringHash(this.name),
-            computeHashArray(this.notifications, invokeObjectHash)
+            computeHashArray(this.notifications, invokeObjectHash),
+            computeHashArray(this.tags, computeStringHash)
         );
     }
 }

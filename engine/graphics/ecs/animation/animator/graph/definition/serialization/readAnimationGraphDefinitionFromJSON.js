@@ -47,12 +47,14 @@ export function readAnimationGraphDefinitionFromJSON(
      * @type {AnimationClipDefinition[]}
      * @private
      */
-    const __clips = clips.map(jClip => {
+    const __clips = clips.map(({ name = "", duration, notifications = [], tags = [] }) => {
         const _c = new AnimationClipDefinition();
 
-        _c.name = jClip.name;
-        _c.duration = jClip.duration;
-        _c.notifications = jClip.notifications.map(jNotification => {
+
+        _c.name = name;
+        _c.tags = tags;
+        _c.duration = duration;
+        _c.notifications = notifications.map(jNotification => {
             const _n = new AnimationNotification();
 
             _n.def = __notifications[jNotification.def];
