@@ -71,7 +71,11 @@ class WaterSystem extends System {
     startup(entityManager, readyCallback, errorCallback) {
         this.entityManager = entityManager;
 
-        this.renderLayer = this.graphicsEngine.layers.create(WaterSystem.RENDER_LAYER_NAME);
+        const graphicsEngine = this.graphicsEngine;
+
+        this.renderLayer = graphicsEngine.layers.create(WaterSystem.RENDER_LAYER_NAME);
+
+        const viewport_size = graphicsEngine.viewport.size;
 
         this.renderLayer.extractRenderable = function (component) {
             return component.__threeObject;
@@ -129,18 +133,21 @@ class WaterSystem extends System {
             if (dataset === null) {
                 return;
             }
+
+            const pixelRatio = graphicsEngine.computeTotalPixelRatio();
+
             dataset.traverseComponents(Water, function (component, entity) {
                 const shader = component.__shader;
 
                 shader.uniforms.fCameraNear.value = camera.near;
                 shader.uniforms.fCameraFar.value = camera.far;
 
-                renderer.getSize(shader.uniforms.vScreenResolution.value);
+                shader.uniforms.vScreenResolution.value.set(viewport_size.x * pixelRatio, viewport_size.y * pixelRatio);
 
             });
         }
 
-        this.graphicsEngine.on.preRender.add(preRenderHook);
+        graphicsEngine.on.preRender.add(preRenderHook);
 
         readyCallback();
     }
