@@ -21,7 +21,7 @@ class Timer {
 
         /**
          *
-         * @type {function[]}
+         * @type {Function[]}
          */
         this.actions = options.actions || [];
 
@@ -42,6 +42,37 @@ class Timer {
          * @type {number}
          */
         this.counter = 0;
+    }
+
+    /**
+     *
+     * @param {EntityComponentDataset} ecd
+     * @param {number} timeout
+     * @returns {Promise}
+     */
+    static createTimeoutPromise(ecd, timeout) {
+
+
+        return new Promise((resolve, reject) => {
+
+            const entity = ecd.createEntity();
+
+            const timer = new Timer();
+
+            timer.repeat = 0;
+
+            timer.actions.push(() => {
+                ecd.removeEntity(entity);
+
+                resolve();
+            });
+
+            timer.timeout = timeout;
+
+            ecd.addComponentToEntity(entity, timer);
+        });
+
+
     }
 }
 

@@ -342,6 +342,22 @@ export class SoundEmitter {
         }
     }
 
+    /**
+     *
+     * @param {number} [duration] fade duration in seconds
+     */
+    fadeOutAllTracks(duration = 1) {
+
+        const tracks = this.tracks;
+        const n = tracks.length;
+
+        for (let i = 0; i < n; i++) {
+            const soundTrack = tracks.get(i);
+
+            soundTrack.setVolumeOverTime(0, duration);
+        }
+    }
+
     stopAllTracks() {
         const tracks = this.tracks;
         const n = tracks.length;
