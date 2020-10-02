@@ -11,6 +11,7 @@ import Vector3 from "../../../core/geom/Vector3.js";
 import { noop } from "../../../core/function/Functions.js";
 
 const v3 = new Vector3();
+const v3_up = new Vector3();
 
 class Context {
     constructor() {
@@ -47,9 +48,14 @@ class Context {
 
     updateRotation() {
 
-        v3.copy(Vector3.forward);
+        const rotation = this.transform.rotation;
 
-        v3.applyQuaternion(this.transform.rotation);
+        v3.copy(Vector3.forward);
+        v3.applyQuaternion(rotation);
+
+        v3_up.copy(Vector3.up);
+        v3_up.applyQuaternion(rotation);
+
 
         /**
          *
@@ -57,7 +63,7 @@ class Context {
          */
         const listener = this.audioContext.listener;
 
-        setListenerOrientation(listener, v3);
+        setListenerOrientation(listener, v3, v3_up);
     }
 
     updatePosition() {
@@ -203,22 +209,47 @@ if (setListenerPosition === setListenerPositionNOOP) {
     console.warn("No support for AudioListener position detected");
 }
 
+/**
+ *
+ * @param {AudioListener} listener
+ * @param {Vector3} forward
+ * @param {Vector3} up
+ */
+function setListenerOrientation1(listener, forward, up) {
+
+    listener.forwardX.value = forward.x;
+    listener.forwardY.value = forward.y;
+    listener.forwardZ.value = forward.z;
+
+    listener.upX.value = up.x;
+    listener.upY.value = up.y;
+    listener.upZ.value = up.z;
+
+}
+
+/**
+ *
+ * @param {AudioListener} listener
+ * @param {Vector3} forward
+ * @param {Vector3} up
+ * @deprecated
+ */
+function setListenerOrientation2(listener, forward, up) {
+    listener.setOrientation(
+        forward.x, forward.y, forward.z,
+        up.x, up.y, up.z
+    );
+}
+
 
 let setListenerOrientation = noop;
 
 if (navigator !== undefined) {
     const info = browserInfo();
     if (info.name === "Chrome") {
-        setListenerOrientation = (listener, forward) => {
-            listener.forwardX.value = forward.x;
-            listener.forwardY.value = forward.y;
-            listener.forwardZ.value = forward.z;
-
-        };
+        setListenerOrientation = setListenerOrientation1;
     } else if (info.name === "Firefox") {
-        setListenerOrientation = (listener, forward) => {
-            listener.setOrientation(forward.x, forward.y, forward.z, 0, 1, 0);
-        };
+        setListenerOrientation = setListenerOrientation2;
     }
 }
 
