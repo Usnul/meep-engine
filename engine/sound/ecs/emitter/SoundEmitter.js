@@ -13,6 +13,7 @@ import { attenuateSoundLogarithmic } from "./attenuateSoundLogarithmic.js";
 import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math/MathUtils.js";
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
 import { objectKeyByValue } from "../../../../core/model/ObjectUtils.js";
+import { SoundPanningModelType } from "./SoundPanningModelType.js";
 
 /**
  * Convert decibel to percentage volume
@@ -71,6 +72,12 @@ export class SoundEmitter {
          * @private
          */
         this.__distanceRolloff = 1;
+
+        /**
+         * TODO add to binary serialization
+         * @type {SoundPanningModelType}
+         */
+        this.panningModel = SoundPanningModelType.HRTF;
 
         /**
          * Type of attenuation used for sound fall-off, this is only used if Attenuation flag is set
@@ -230,7 +237,15 @@ export class SoundEmitter {
 
 
             //
-            nodes.panner.panningModel = 'HRTF';
+            if (this.panningModel === SoundPanningModelType.HRTF) {
+                nodes.panner.panningModel = 'HRTF';
+            } else if (this.panningModel === SoundPanningModelType.EqualPower) {
+                nodes.panner.panningModel = 'equalpower';
+            } else {
+                console.error('Invalid value of panning model type:', this.panningModel);
+
+                nodes.panner.panningModel = 'equalpower';
+            }
 
             // we set up distance model in the most efficient way, since we are ignoring it anyway and use custom distance model via a GainNode instead
             nodes.panner.distanceModel = 'linear';
@@ -378,7 +393,8 @@ export class SoundEmitter {
             tracks: this.tracks.toJSON(),
             distanceMin: this.distanceMin,
             distanceMax: this.distanceMax,
-            attenuation: objectKeyByValue(SoundAttenuationFunction, this.attenuation)
+            attenuation: objectKeyByValue(SoundAttenuationFunction, this.attenuation),
+            panningModel: objectKeyByValue(SoundPanningModelType, this.panningModel)
         };
     }
 
@@ -426,6 +442,18 @@ export class SoundEmitter {
         //tracks
         if (json.tracks !== undefined) {
             this.tracks.fromJSON(json.tracks, SoundTrack);
+        }
+
+        if (json.panningModel === undefined) {
+            this.panningModel = SoundPanningModelType.HRTF;
+        } else {
+            const model = SoundPanningModelType[json.panningModel];
+
+            if (model === undefined) {
+                throw new Error(`Unknown panning model '${json.panningModel}', valid types are: ${Object.keys(SoundPanningModelType)}`);
+            }
+
+            this.panningModel = model;
         }
     }
 
