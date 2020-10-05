@@ -172,7 +172,7 @@ export function getSkeletonBoneByType(component, boneType) {
  * @param {String} name
  * @returns {Bone | null}
  */
-export function getSkeletonBoneByName(component, name) {
+export function getSkeletonBoneByName_old(component, name) {
     const skeleton = extractSkeletonFromMeshComponent(component);
 
     if (skeleton === undefined) {
@@ -201,6 +201,44 @@ export function getSkeletonBoneByName(component, name) {
     }
 
     return null
+}
+
+const stack = [];
+
+/**
+ *
+ * @param {Mesh} component
+ * @param {String} name
+ * @returns {Bone | null}
+ */
+export function getSkeletonBoneByName(component, name) {
+    if (component.mesh === null) {
+        return null;
+    }
+
+    const m = component.mesh;
+
+    let stack_top = 0;
+    stack[stack_top++] = m;
+
+    while (stack_top > 0) {
+        stack_top--;
+        const top = stack[stack_top];
+
+        if (top.isBone && top.name === name) {
+            return top;
+        }
+
+        const children = top.children;
+
+        const n = children.length;
+
+        for (let i = 0; i < n; i++) {
+            stack[stack_top++] = children[i];
+        }
+    }
+
+    return null;
 }
 
 /**

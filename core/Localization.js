@@ -1,6 +1,7 @@
 import ObservedString from "./model/ObservedString.js";
 import levenshtein from "fast-levenshtein";
 import { parseTooltipString } from "../view/tooltip/gml/parser/parseTooltipString.js";
+import { assert } from "./assert.js";
 
 const VARIABLE_REGEX = /\$\{([a-zA-Z0-9_]+)\}/gi;
 
@@ -137,6 +138,8 @@ export class Localization {
      * @returns {string}
      */
     getString(id, seed = {}) {
+        assert.typeOf(id, 'string', 'id');
+
         const value = this.json[id];
 
         if (value === undefined) {

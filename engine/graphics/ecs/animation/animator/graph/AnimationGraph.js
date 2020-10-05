@@ -139,14 +139,31 @@ export class AnimationGraph {
         };
     }
 
-    fromJSON({ def, state, debtTime, flags }) {
+    fromJSON({ def, state, debtTime = 0, flags = 0 }) {
         const graphDefinition = readAnimationGraphDefinitionFromJSON(def);
 
         this.debtTime = debtTime;
         this.flags = flags;
         this.initialize(graphDefinition);
 
+        if (state === undefined) {
+            state = graphDefinition.states.indexOf(graphDefinition.startingSate);
+        }
+
         this.state = this.states[state];
+    }
+
+    /**
+     *
+     * @param j
+     * @returns {AnimationGraph}
+     */
+    static fromJSON(j) {
+        const r = new AnimationGraph();
+
+        r.fromJSON(j);
+
+        return r;
     }
 
     /**
