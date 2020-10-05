@@ -362,7 +362,7 @@ export class EngineHarness {
         {
             engine,
             size = new Vector2(10, 10),
-            diffuse0 = "data/textures/material/terrain_township_set/512/Grass_1.png",
+            diffuse0 = "data/textures/utility/checkers_dark_grey_256x256.png",
             heightMap = "data/textures/utility/white_pixel.png",
             heightRange = 0,
             resolution = 10,

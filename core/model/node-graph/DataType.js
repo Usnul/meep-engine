@@ -12,6 +12,10 @@ export class DataType {
          */
         this.name = "";
     }
+
+    toString() {
+        return `${this.id}:'${this.name}'`;
+    }
 }
 
 /**

@@ -13,8 +13,9 @@ export class NodeGraphEditorView extends View {
      * @param {NodeRegistry} nodeRegistry
      * @param {NodeGraphVisualData} visual
      * @param {NodeGraphCamera} camera
+     * @param {InterfaceCommand[]} [actions]
      */
-    constructor({ graph, nodeRegistry, visual, camera }) {
+    constructor({ graph, nodeRegistry, visual, camera, actions = [] }) {
         super();
 
         /**
@@ -63,14 +64,36 @@ export class NodeGraphEditorView extends View {
             classList: ['user-interface']
         });
 
+        const vActionBar = new EmptyView({
+            classList:['actions']
+        });
+
+        vUserInterface.addChild(vActionBar);
+
         this.addChild(vUserInterface);
 
-        vUserInterface.addChild(new ButtonView({
+        vActionBar.addChild(new ButtonView({
             action() {
                 self.cameraContainAll()
             },
             classList: ["contain-all"]
         }));
+
+        actions.forEach(ic => {
+            const b = new ButtonView({
+                action() {
+                    ic.command.action();
+                },
+                classList: [ic.command.id]
+            });
+
+            vActionBar.addChild(b);
+        });
+
+        // ensure point events are enabled
+        this.css({
+            pointerEvents: 'auto'
+        });
     }
 
     layout() {

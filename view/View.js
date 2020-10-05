@@ -780,6 +780,33 @@ class View {
             }
         }
     }
+
+    /**
+     *
+     * @param {Vector2} size
+     * @param {Vector2} [padding]
+     */
+    followSize({ size, padding = Vector2.zero }) {
+
+        const copy = () => {
+            this.size.set(size.x - padding.x * 2, size.y - padding.y * 2);
+        };
+
+        const link = () => {
+            copy();
+
+            size.onChanged.add(copy);
+        }
+
+        const unlink = () => {
+            size.onChanged.remove(copy);
+        };
+
+        this.on.linked.add(link);
+        this.on.unlinked.add(unlink);
+
+        copy();
+    }
 }
 
 

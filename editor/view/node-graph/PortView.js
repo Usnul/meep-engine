@@ -4,6 +4,9 @@ import { PortDirection } from "../../../core/model/node-graph/node/PortDirection
 import { camelToKebab } from "../../../core/primitives/strings/StringUtils.js";
 import LabelView from "../../../view/common/LabelView.js";
 import EmptyView from "../../../view/elements/EmptyView.js";
+import { Color } from "../../../core/color/Color.js";
+
+const DEFAULT_TYPE_COLOR = new Color(1, 1, 1);
 
 export class PortView extends View {
     /**
@@ -41,7 +44,13 @@ export class PortView extends View {
 
         this.addChild(vName);
 
-        const color = visualData.getDataColor(port.dataType.id);
+        let color = visualData.getDataColor(port.dataType.id);
+
+        if (color === undefined) {
+            console.warn(`No color for data type ${port.dataType}, using default`);
+
+            color = DEFAULT_TYPE_COLOR;
+        }
 
         this.addChild(new EmptyView({
             classList: ['marker'],

@@ -1,4 +1,6 @@
 import { PortDirection } from "./PortDirection.js";
+import { computeStringHash } from "../../../primitives/strings/StringUtils.js";
+import { computeHashIntegerArray } from "../../../math/MathUtils.js";
 
 export class Port {
     constructor() {
@@ -25,5 +27,29 @@ export class Port {
          * @type {DataType}
          */
         this.dataType = null;
+    }
+
+    hash() {
+        return computeHashIntegerArray(
+            computeStringHash(this.name),
+            this.id,
+            this.direction,
+            this.dataType.id
+        );
+    }
+
+    /**
+     *
+     * @param {Port} other
+     * @returns {boolean}
+     */
+    equals(other) {
+
+        return this.name === other.name
+            && this.id === other.id
+            && this.direction === other.direction
+            && this.dataType === other.dataType
+            ;
+
     }
 }

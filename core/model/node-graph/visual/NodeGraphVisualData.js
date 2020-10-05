@@ -1,8 +1,9 @@
 import { NodeVisualData } from "./NodeVisualData.js";
 import { Color } from "../../../color/Color.js";
-import { forceLayout } from "../../../../../model/diagram/graph/BoxLayouter.js";
+import { forceLayout } from "../../../graph/layout/BoxLayouter.js";
 import AABB2 from "../../../geom/AABB2.js";
 import Graph from "../../../graph/Graph.js";
+import { assert } from "../../../assert.js";
 
 export class NodeGraphVisualData {
     constructor() {
@@ -115,6 +116,8 @@ export class NodeGraphVisualData {
      * @param {Color} color
      */
     addDataColor(id, color) {
+        assert.isNumber(id, 'id');
+
         this.dataColors.set(id, color);
     }
 

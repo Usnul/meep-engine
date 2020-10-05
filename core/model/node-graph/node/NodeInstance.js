@@ -1,6 +1,7 @@
 import { ConnectionEndpoint } from "../ConnectionEndpoint.js";
 import List from "../../../collection/list/List.js";
 import { PortDirection } from "./PortDirection.js";
+import { isArrayEqual } from "../../../collection/ArrayUtils.js";
 
 export class NodeInstance {
     constructor() {
@@ -150,5 +151,22 @@ export class NodeInstance {
 
         //not found
         return null;
+    }
+
+    hash() {
+        return this.id;
+    }
+
+    /**
+     *
+     * @param {NodeInstance} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.id === other.id
+            && this.description === other.description
+            && isArrayEqual(this.endpoints, other.endpoints)
+            && isArrayEqual(this.parameters, other.parameters)
+            ;
     }
 }

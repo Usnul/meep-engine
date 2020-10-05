@@ -1,6 +1,10 @@
 /**
  * @template K,V
  */
+import { invokeObjectHash } from "../model/ObjectUtils.js";
+import { invokeObjectEquals } from "../function/Functions.js";
+import { assert } from "../assert.js";
+
 class MapEntry {
     /**
      *
@@ -29,10 +33,13 @@ class MapEntry {
 export class HashMap {
     /**
      * @template K, V
-     * @param {function(K):number} keyHashFunction
-     * @param {function(K,K):boolean} keyEqualityFunction
+     * @param {function(K):number} [keyHashFunction]
+     * @param {function(K,K):boolean} [keyEqualityFunction]
      */
-    constructor({ keyHashFunction, keyEqualityFunction }) {
+    constructor({ keyHashFunction = invokeObjectHash, keyEqualityFunction = invokeObjectEquals } = {}) {
+        assert.typeOf(keyHashFunction, 'function', 'keyHashFunction');
+        assert.typeOf(keyEqualityFunction, 'function', 'keyEqualityFunction');
+
         /**
          *
          * @type {function(K): number}

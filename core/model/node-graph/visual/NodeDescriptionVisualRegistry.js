@@ -2,7 +2,7 @@ import { NodeVisualData } from "./NodeVisualData.js";
 import { PortVisualData } from "./PortVisualData.js";
 import { PortDirection } from "../node/PortDirection.js";
 import { assert } from "../../../assert.js";
-import { max3 } from "../../../math/MathUtils.js";
+import { max2, max3 } from "../../../math/MathUtils.js";
 
 export class NodeDescriptionVisualRegistry {
     constructor() {
@@ -51,6 +51,9 @@ export class NodeDescriptionVisualRegistry {
         if (outputs.length > 0) {
             width += 65;
         }
+
+        // fit name
+        width = max2(width, node.name.length * 8);
 
         const headerOffset = 20;
 
