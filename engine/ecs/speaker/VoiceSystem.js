@@ -1,4 +1,3 @@
-import { System } from "../System.js";
 import { Voice } from "./Voice.js";
 import EntityBuilder from "../EntityBuilder.js";
 import GUIElement from "../gui/GUIElement.js";
@@ -14,8 +13,9 @@ import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js
 import Vector2 from "../../../core/geom/Vector2.js";
 import EmptyView from "../../../view/elements/EmptyView.js";
 import { max2 } from "../../../core/math/MathUtils.js";
-
-const EVENT_NAME = 'speak-line';
+import { VoiceEvents } from "./VoiceEvents.js";
+import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
+import { SystemEntityContext } from "../system/SystemEntityContext.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -29,31 +29,7 @@ const TIMING_NOTICE_DELAY = 0.2;
  */
 const TIMING_MINIMUM_READ_TIME = 0.5;
 
-class Context {
-    constructor() {
-        /**
-         *
-         * @type {Voice}
-         */
-        this.speaker = null;
-        /**
-         *
-         * @type {number}
-         */
-        this.entity = 0;
-
-        /**
-         *
-         * @type {EntityComponentDataset}
-         */
-        this.dataset = null;
-
-        /**
-         * Link back to the system
-         * @type {VoiceSystem}
-         */
-        this.system = null;
-    }
+class Context extends SystemEntityContext{
 
 
     handle(line) {
@@ -61,29 +37,27 @@ class Context {
     }
 
     link() {
-        const dataset = this.system.entityManager.dataset;
+        const dataset = this.getDataset();
 
-        dataset.addEntityEventListener(this.entity, EVENT_NAME, this.handle, this);
+        dataset.addEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handle, this);
     }
 
     unlink() {
-        const dataset = this.system.entityManager.dataset;
+        const dataset = this.getDataset();
 
-        dataset.removeComponentFromEntity(this.entity, EVENT_NAME, this.handle, this);
+        dataset.removeComponentFromEntity(this.entity, VoiceEvents.SpeakLine, this.handle, this);
     }
 }
 
-export class VoiceSystem extends System {
+export class VoiceSystem extends AbstractContextSystem {
     /**
      *
      * @param {Engine} engine
      */
     constructor(engine) {
-        super();
+        super(Context);
 
         this.dependencies = [Voice];
-
-        this.contexts = [];
 
         /**
          *
@@ -172,39 +146,5 @@ export class VoiceSystem extends System {
                 DieBehavior.create()
             ])))
             .build(ecd);
-    }
-
-    /**
-     *
-     * @param {Voice} speaker
-     * @param {number} entity
-     */
-    link(speaker, entity) {
-        const context = new Context();
-
-        context.speaker = speaker;
-        context.entity = entity;
-        context.system = this;
-
-        context.link();
-
-        this.contexts[entity] = context;
-    }
-
-    /**
-     *
-     * @param {Voice} component
-     * @param {number} entity
-     */
-    unlink(component, entity) {
-
-        const context = this.contexts[entity];
-
-        if (context === undefined) {
-            console.warn(`Context not found for '${entity}'`);
-            return;
-        }
-
-        context.unlink();
     }
 }

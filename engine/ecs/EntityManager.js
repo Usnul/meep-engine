@@ -480,11 +480,11 @@ function validateSystem(system) {
 
     const linkArgumentCount = numDependencies + 1;
 
-    if (system.link !== System.prototype.link && system.link.length !== linkArgumentCount) {
+    if (system.link !== System.prototype.link && system.link.length !== linkArgumentCount && system.__validation_ignore_link_argument_count !== true) {
         throw new Error(`'link' method declares ${system.link.length} instead of expected ${linkArgumentCount} based on it's ${numDependencies} dependencies`);
     }
 
-    if (system.unlink !== System.prototype.unlink && system.unlink.length !== linkArgumentCount) {
+    if (system.unlink !== System.prototype.unlink && system.unlink.length !== linkArgumentCount && system.__validation_ignore_link_argument_count !== true) {
         throw new Error(`'unlink' method declares ${system.unlink.length} instead of expected ${linkArgumentCount} based on it's ${numDependencies} dependencies`);
     }
 }

@@ -138,6 +138,13 @@ export class EntityComponentDataset {
         this.__entityEventListeners = [];
 
         /**
+         *
+         * @type {Array<SignalHandler>[]}
+         * @private
+         */
+        this.__entityAnyEventListeners = [];
+
+        /**
          * @private
          * @type {Array<Array<EntityObserver>>}
          */
@@ -693,6 +700,7 @@ export class EntityComponentDataset {
 
         //purge all event listeners
         delete this.__entityEventListeners[entityIndex];
+        delete this.__entityAnyEventListeners[entityIndex];
 
         this.entityOccupancy.set(entityIndex, false);
 
@@ -1173,6 +1181,67 @@ export class EntityComponentDataset {
     }
 
     /**
+     * Captures all events for a given entity
+     * @param {number} entity
+     * @param {function} listener
+     * @param {*} [thisArg]
+     */
+    addEntityAnyEventListener(entity, listener, thisArg) {
+
+        if (!this.entityExists(entity)) {
+            throw new Error(`Entity '${entity}' does not exist`);
+        }
+
+        const evl = this.__entityAnyEventListeners;
+
+        let handlers = evl[entity];
+
+        if (handlers === void 0) {
+            handlers = [];
+            evl[entity] = handlers;
+        }
+
+        const handler = new SignalHandler(listener, thisArg);
+
+        handlers.push(handler);
+    }
+
+    /**
+     * Removed listener attached via {@link #addEntityAnyEventListener}
+     * @param {number} entity
+     * @param {function} listener
+     * @param {*} [thisArg]
+     * @returns {boolean}
+     */
+    removeAnyEventListener(entity, listener, thisArg) {
+        const evl = this.__entityAnyEventListeners;
+
+        let handlers = evl[entity];
+
+        if (handlers === void 0) {
+            return false;
+        }
+
+        let index;
+
+        if (thisArg === undefined) {
+            index = findSignalHandlerIndexByHandle(handlers, listener);
+        } else {
+            index = findSignalHandlerIndexByHandleAndContext(handlers, listener, thisArg);
+        }
+
+        if (index < 0) {
+            //listener was not found
+            return false;
+        }
+
+        //remove the listener
+        handlers.splice(index, 1);
+
+        return true;
+    }
+
+    /**
      * Registers an event listener to a specific entity and event type, specified by eventName string.
      * @param {number} entity
      * @param {string} eventName
@@ -1268,6 +1337,15 @@ export class EntityComponentDataset {
         assert.typeOf(name, 'string', 'name');
 
         dispatchEntityEventListeners(this.__entityEventListeners, entity, name, event);
+
+
+        // handle "any" event listeners on entities
+        const anyEventListeners = this.__entityAnyEventListeners;
+
+        const handlers = anyEventListeners[entity];
+        if (handlers !== undefined) {
+            dispatchAnyEventListenersByHash(handlers, entity, name, event);
+        }
     }
 
     /**
@@ -1514,10 +1592,11 @@ function computeComponentClassName(klass) {
  */
 function dispatchEntityEventListeners(evl, entity, name, event) {
     const hash = evl[entity];
-    if (hash === void 0) {
-        return;
+    if (hash !== void 0) {
+        dispatchEventListenersByHash(hash, entity, name, event);
     }
-    dispatchEventListenersByHash(hash, entity, name, event);
+
+
 }
 
 /**
@@ -1573,6 +1652,48 @@ function dispatchEventListenersByHash(hash, entity, name, event) {
         const handler = entityListenersProxy[i + pointerOffset];
 
         handler.handle.call(handler.context, event, entity);
+    }
+
+    //reset proxy
+    entityListenersProxyPointer = pointerOffset;
+}
+
+/**
+ *
+ * @param {SignalHandler[]} listeners
+ * @param {number} entity
+ * @param {string} name
+ * @param {*} event
+ */
+function dispatchAnyEventListenersByHash(listeners, entity, name, event) {
+
+    const numListeners = listeners.length;
+
+    if (numListeners === 0) {
+        //no listeners, nothing to do
+        return;
+    }
+
+    const pointerOffset = entityListenersProxyPointer;
+
+    // reserve space on the stack
+    entityListenersProxyPointer += numListeners;
+
+    let i;
+
+    //copy listeners to prevent possible modification errors
+    for (i = 0; i < numListeners; i++) {
+        const signalHandler = listeners[i];
+
+        entityListenersProxy[i + pointerOffset] = signalHandler;
+    }
+
+
+    //invoke handlers
+    for (let i = 0; i < numListeners; i++) {
+        const handler = entityListenersProxy[i + pointerOffset];
+
+        handler.handle.call(handler.context, name, event, entity);
     }
 
     //reset proxy
