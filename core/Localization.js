@@ -131,6 +131,9 @@ export class Localization {
 
                 const { reading_speed = 10 } = languages_metadata[locale];
 
+                assert.isNumber(reading_speed, 'reading_speed');
+                assert.greaterThan(reading_speed, 0, 'reading_speed');
+
                 this.reading_speed = reading_speed;
             });
 

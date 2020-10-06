@@ -13,8 +13,21 @@ import { DelayBehavior } from "../../../../model/game/util/behavior/DelayBehavio
 import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import EmptyView from "../../../view/elements/EmptyView.js";
+import { max2 } from "../../../core/math/MathUtils.js";
 
 const EVENT_NAME = 'speak-line';
+
+/**
+ * Delay before the user notices the text and begins to read
+ * @type {number}
+ */
+const TIMING_NOTICE_DELAY = 0.2;
+
+/**
+ * Minimum time to read something
+ * @type {number}
+ */
+const TIMING_MINIMUM_READ_TIME = 0.5;
 
 class Context {
     constructor() {
@@ -122,13 +135,26 @@ export class VoiceSystem extends System {
          */
         const line = this.lines.get(line_id);
 
-        const localized_line = this.localiation.getString(line.text);
+        const localiation = this.localiation;
+
+        const localized_line = localiation.getString(line.text);
 
         const view = new EmptyView({
             classList: ['gui-voice-speech-bubble']
         });
 
-        this.gml.compile(localized_line, view);
+        const gml = this.gml;
+
+        gml.compile(localized_line, view);
+
+        // localized line may contain reference tags, the user will not see/read those, so we also compile line as pure text for estimating reading time
+        const line_pure_text = gml.compileAsText(localized_line);
+
+        const display_time_raw = localiation.computeReadingTime(line_pure_text);
+
+        const display_time = max2(TIMING_MINIMUM_READ_TIME, display_time_raw * line.displayDuration) + TIMING_NOTICE_DELAY;
+
+        console.log('Display time:', display_time, line_pure_text);
 
         new EntityBuilder()
             .add(GUIElement.fromView(view))
@@ -142,7 +168,7 @@ export class VoiceSystem extends System {
             }))
             .add(SerializationMetadata.Transient)
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
-                DelayBehavior.from(line.displayDuration),
+                DelayBehavior.from(display_time),
                 DieBehavior.create()
             ])))
             .build(ecd);

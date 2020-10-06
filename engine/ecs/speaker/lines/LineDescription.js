@@ -19,21 +19,22 @@ export class LineDescription {
         this.text = "";
 
         /**
-         * Time the line should be displayed on the screen before being removed
+         * Time the line should be displayed on the screen before being removed, normalized value, 1 means standard, 1.5 means 50% longer
          * @type {number}
          */
-        this.displayDuration = 3.7;
+        this.displayDuration = 1;
     }
 
     fromJSON({
                  id,
                  text,
                  comment = "",
-                 displayDuration = 3.7
+                 displayDuration = 1
              }) {
         this.id = id;
         this.text = text;
         this.comment = comment;
-        this.displayDuration = displayDuration
+
+        this.displayDuration = displayDuration;
     }
 }
