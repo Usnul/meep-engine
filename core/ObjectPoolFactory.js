@@ -35,7 +35,7 @@ function ObjectPoolFactory(creator, destroyer, resetter) {
      * @private
      * @type {number}
      */
-    this.maxSize = 1000;
+    this.maxSize = 256;
 }
 
 /**
