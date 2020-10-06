@@ -2,6 +2,7 @@ import ObservedString from "./model/ObservedString.js";
 import levenshtein from "fast-levenshtein";
 import { parseTooltipString } from "../view/tooltip/gml/parser/parseTooltipString.js";
 import { assert } from "./assert.js";
+import { GameAssetType } from "../engine/asset/GameAssetType.js";
 
 const VARIABLE_REGEX = /\$\{([a-zA-Z0-9_]+)\}/gi;
 
@@ -53,10 +54,27 @@ export class Localization {
         this.json = {};
 
         /**
+         * Measured in characters per second
+         * @type {number}
+         */
+        this.reading_speed = 10;
+
+        /**
          *
          * @type {ObservedString}
          */
         this.locale = new ObservedString('');
+    }
+
+    /**
+     *
+     * @param {string} text
+     * @returns {number}
+     */
+    computeReadingTime(text) {
+        assert.typeOf(text, 'string', 'text');
+
+        return text.length / this.reading_speed;
     }
 
     /**
@@ -96,19 +114,27 @@ export class Localization {
      * @returns {Promise}
      */
     loadLocale(locale) {
-        const assetManager = this.assetManager;
+        const am = this.assetManager;
 
-        return new Promise((resolve, reject) => {
-            assetManager.get(`data/database/text/${locale}.json`, 'json', (asset) => {
+        const pLoadData = am.promise(`data/database/text/${locale}.json`, GameAssetType.JSON)
+            .then(asset => {
                 const json = asset.create();
 
                 this.json = json;
 
                 this.locale.set(locale);
+            });
 
-                resolve();
-            }, reject);
-        });
+        const pLoadMetadata = am.promise(`data/database/text/languages.json`, GameAssetType.JSON)
+            .then(asset => {
+                const languages_metadata = asset.create();
+
+                const { reading_speed = 10 } = languages_metadata[locale];
+
+                this.reading_speed = reading_speed;
+            });
+
+        return Promise.all([pLoadData, pLoadMetadata]);
     }
 
     /**
