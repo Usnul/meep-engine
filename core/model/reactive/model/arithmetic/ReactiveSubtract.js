@@ -23,6 +23,7 @@ export class ReactiveSubtract extends ReactiveBinaryExpression {
 
         return r;
     }
+
     equals(other) {
         return other.isReactiveSubtract && super.equals(other);
     }

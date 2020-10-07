@@ -58,6 +58,12 @@ export class ReactiveUnaryExpression extends ReactiveExpression {
         throw new Error('ReactiveUnaryExpression.transform is not overridden');
     }
 
+    evaluate(scope) {
+        const source_value = this.source.evaluate(scope);
+
+        return transform(source_value);
+    }
+
     /**
      *
      * @param {ReactiveExpression} other

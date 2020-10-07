@@ -100,6 +100,11 @@ export class ReactiveReference extends ReactiveExpression {
         );
     }
 
+    evaluate(scope) {
+        const v = scope[this.name];
+        return v;
+    }
+
     getValue() {
         return this.source.getValue();
     }

@@ -1,7 +1,7 @@
 import { inferReactiveExpressionTypes } from "../transform/ReactiveTypeInferrence.js";
 import DataType from "../../../parser/simple/DataType.js";
-import { compileReactiveExpression } from "../../../land/reactive/compiler/ReactiveNearlyCompiler.js";
 import { assert } from "../../../assert.js";
+import { compileReactiveExpression } from "../../../land/reactive/compileReactiveExpression.js";
 
 export class ReactiveTrigger {
     /**

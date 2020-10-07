@@ -56,6 +56,10 @@ export class ReactiveLiteralBoolean extends ReactiveExpression {
         return this.value ? 1 : 0;
     }
 
+    evaluate(scope) {
+        return this.value;
+    }
+
     getValue() {
         return this.value;
     }

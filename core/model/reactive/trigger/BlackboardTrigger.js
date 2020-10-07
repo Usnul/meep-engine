@@ -19,6 +19,12 @@ export class BlackboardTrigger {
          * @type {Blackboard}
          */
         this.blackboard = null;
+
+        /**
+         *
+         * @type {ReactiveTrigger}
+         */
+        this.trigger = null;
     }
 
     /**

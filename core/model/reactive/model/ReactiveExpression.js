@@ -64,6 +64,15 @@ export class ReactiveExpression {
 
         this.onChanged.add(handler);
     }
+
+    /**
+     *
+     * @param {Object} scope
+     * @returns {boolean|number|string}
+     */
+    evaluate(scope) {
+        return 0;
+    }
 }
 
 ReactiveExpression.prototype.dataType = DataType.Any;

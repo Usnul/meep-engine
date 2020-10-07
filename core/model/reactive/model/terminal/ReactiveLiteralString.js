@@ -38,6 +38,10 @@ export class ReactiveLiteralString extends ReactiveExpression {
         return computeStringHash(this.value);
     }
 
+    evaluate(scope) {
+        return this.value;
+    }
+
     getValue() {
         return this.value;
     }

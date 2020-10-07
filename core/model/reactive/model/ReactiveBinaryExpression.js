@@ -63,6 +63,16 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
         );
     }
 
+    evaluate(scope) {
+        const left = this.left.evaluate(scope);
+        const right = this.right.evaluate(scope);
+
+        return this.transform(
+            left,
+            right
+        );
+    }
+
     update() {
         const result = this.getValue();
 

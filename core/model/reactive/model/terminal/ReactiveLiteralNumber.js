@@ -55,6 +55,10 @@ export class ReactiveLiteralNumber extends ReactiveExpression {
         return computeHashFloat(this.value);
     }
 
+    evaluate(scope) {
+        return this.value;
+    }
+
     getValue() {
         return this.value;
     }
