@@ -1,5 +1,6 @@
 import { ReactiveExpression } from "./ReactiveExpression.js";
 import { assert } from "../../../assert.js";
+import { computeStringHash } from "../../../primitives/strings/StringUtils.js";
 
 /**
  * @template T,R
@@ -55,6 +56,26 @@ export class ReactiveUnaryExpression extends ReactiveExpression {
      */
     transform(v) {
         throw new Error('ReactiveUnaryExpression.transform is not overridden');
+    }
+
+    /**
+     *
+     * @param {ReactiveExpression} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return other.isUnaryExpression
+            && this.source.equals(other.source)
+            && super.equals(other)
+            ;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    hash() {
+        return computeStringHash(this.dataType);
     }
 
     getValue() {

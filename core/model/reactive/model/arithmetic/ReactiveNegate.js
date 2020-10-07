@@ -22,6 +22,9 @@ export class ReactiveNegate extends ReactiveUnaryExpression {
 
         return r;
     }
+    equals(other) {
+        return other.isReactiveNegate && super.equals(other);
+    }
 }
 
 /**

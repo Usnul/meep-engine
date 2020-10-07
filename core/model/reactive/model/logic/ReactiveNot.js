@@ -22,6 +22,9 @@ export class ReactiveNot extends ReactiveUnaryExpression {
 
         return r;
     }
+    equals(other) {
+        return other.isReactiveNot && super.equals(other);
+    }
 }
 
 ReactiveNot.prototype.dataType = DataType.Boolean;

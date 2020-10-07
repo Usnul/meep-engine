@@ -1,15 +1,26 @@
 import { ReactiveExpression } from "../ReactiveExpression.js";
 import { assert } from "../../../../assert.js";
 import DataType from "../../../../parser/simple/DataType.js";
+import { computeStringHash } from "../../../../primitives/strings/StringUtils.js";
+import { computeHashIntegerArray } from "../../../../math/MathUtils.js";
 
 
 /**
  * @extends ReactiveExpression
  */
 export class ReactiveReference extends ReactiveExpression {
+
+    /**
+     *
+     * @param {string} name
+     */
     constructor(name) {
         super();
 
+        /**
+         *
+         * @type {string}
+         */
         this.name = name;
 
         /**
@@ -72,6 +83,21 @@ export class ReactiveReference extends ReactiveExpression {
         this.source.onChanged.remove(this.update, this);
 
         this.source = null;
+    }
+
+    equals(other) {
+        return other.isReference
+            && this.name === other.name
+            && super.equals(other)
+            ;
+    }
+
+
+    hash() {
+        return computeHashIntegerArray(
+            computeStringHash(this.name),
+            super.hash()
+        );
     }
 
     getValue() {

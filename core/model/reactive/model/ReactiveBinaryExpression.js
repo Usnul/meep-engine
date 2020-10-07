@@ -1,5 +1,6 @@
 import { ReactiveExpression } from "./ReactiveExpression.js";
 import { assert } from "../../../assert.js";
+import { computeHashIntegerArray } from "../../../math/MathUtils.js";
 
 /**
  * @extends {ReactiveExpression}
@@ -36,6 +37,30 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
         if (other.left !== null && other.right !== null) {
             this.connect(other.left.clone(), other.right.clone());
         }
+    }
+
+    equals(other) {
+        if (other.isBinaryExpression !== true) {
+            return false;
+        }
+
+        if (!this.left.equals(other.left)) {
+            return false;
+        }
+
+        if (!this.right.equals(other.right)) {
+            return false;
+        }
+
+        return super.equals(other);
+    }
+
+    hash() {
+        return computeHashIntegerArray(
+            this.left.hash(),
+            this.right.hash(),
+            super.hash()
+        );
     }
 
     update() {

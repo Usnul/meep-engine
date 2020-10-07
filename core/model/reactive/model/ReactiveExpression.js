@@ -1,5 +1,6 @@
 import Signal from "../../../events/signal/Signal.js";
 import DataType from "../../../parser/simple/DataType.js";
+import { computeStringHash } from "../../../primitives/strings/StringUtils.js";
 
 /**
  * @template T
@@ -15,6 +16,27 @@ export class ReactiveExpression {
 
     clone() {
         throw new Error('Not Implemented');
+    }
+
+    /**
+     *
+     * @param {ReactiveExpression} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        if (this.dataType !== other.dataType) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    hash() {
+        return computeStringHash(this.dataType);
     }
 
     /**

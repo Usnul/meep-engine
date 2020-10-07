@@ -43,6 +43,19 @@ export class ReactiveLiteralBoolean extends ReactiveExpression {
         return new ReactiveLiteralBoolean(this.value);
     }
 
+    equals(other) {
+
+        if (other.isReactiveLiteralBoolean !== true) {
+            return false;
+        }
+
+        return this.value === other.value;
+    }
+
+    hash() {
+        return this.value ? 1 : 0;
+    }
+
     getValue() {
         return this.value;
     }

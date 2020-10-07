@@ -23,6 +23,9 @@ export class ReactiveLessThanOrEqual extends ReactiveBinaryExpression {
 
         return r;
     }
+    equals(other) {
+        return other.isReactiveLessThanOrEqual && super.equals(other);
+    }
 }
 
 /**
@@ -36,6 +39,7 @@ ReactiveLessThanOrEqual.prototype.dataType = DataType.Boolean;
  * @type {boolean}
  */
 ReactiveLessThanOrEqual.prototype.isComparativeExpression = true;
+ReactiveLessThanOrEqual.prototype.isReactiveLessThanOrEqual = true;
 
 /**
  *

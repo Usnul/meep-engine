@@ -2,6 +2,7 @@ import { ReactiveExpression } from "../ReactiveExpression.js";
 import DataType from "../../../../parser/simple/DataType.js";
 import { assert } from "../../../../assert.js";
 import Signal from "../../../../events/signal/Signal.js";
+import { computeStringHash } from "../../../../primitives/strings/StringUtils.js";
 
 const dummySignal = new Signal();
 
@@ -23,6 +24,18 @@ export class ReactiveLiteralString extends ReactiveExpression {
 
     clone() {
         return new ReactiveLiteralString(this.value);
+    }
+
+    equals(other) {
+        if (other.isReactiveLiteralString !== true) {
+            return false;
+        }
+
+        return this.value === other.value;
+    }
+
+    hash() {
+        return computeStringHash(this.value);
     }
 
     getValue() {

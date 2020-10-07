@@ -23,6 +23,9 @@ export class ReactiveMultiply extends ReactiveBinaryExpression {
 
         return r;
     }
+    equals(other) {
+        return other.isReactiveMultiply && super.equals(other);
+    }
 }
 
 /**

@@ -23,6 +23,9 @@ export class ReactiveNotEquals extends ReactiveBinaryExpression {
 
         return r;
     }
+    equals(other) {
+        return other.isReactiveNotEquals && super.equals(other);
+    }
 }
 
 /**
