@@ -15,7 +15,6 @@ import { ReactiveLiteralBoolean } from "../../../model/reactive/model/terminal/R
 import { ReactiveNot } from "../../../model/reactive/model/logic/ReactiveNot.js";
 import { ReactiveNegate } from "../../../model/reactive/model/arithmetic/ReactiveNegate.js";
 import { ReactiveGreaterThanOrEqual } from "../../../model/reactive/model/comparative/ReactiveGreaterThanOrEqual.js";
-import { ReactiveParser } from "./ReactiveParser.js";
 import { ReactiveLiteralString } from "../../../model/reactive/model/terminal/ReactiveLiteralString.js";
 
 const compilers = {
@@ -130,8 +129,8 @@ const compilers = {
  * @param right
  */
 function compileBinaryExpression(result, left, right) {
-    const lExp = compile(left);
-    const rExp = compile(right);
+    const lExp = compileReactiveExpressionNearly(left);
+    const rExp = compileReactiveExpressionNearly(right);
 
     result.connect(lExp, rExp);
 }
@@ -142,7 +141,7 @@ function compileBinaryExpression(result, left, right) {
  * @param value
  */
 function compileUnaryExpression(result, value) {
-    const exp = compile(value);
+    const exp = compileReactiveExpressionNearly(value);
 
     result.connect(exp);
 }
@@ -152,7 +151,7 @@ function compileUnaryExpression(result, value) {
  * @param node
  * @return {ReactiveExpression}
  */
-function compile(node) {
+export function compileReactiveExpressionNearly(node) {
     const type = node.type;
 
     const compiler = compilers[type];
@@ -165,15 +164,3 @@ function compile(node) {
 }
 
 
-/**
- *
- * @param {String} code
- * @returns {ReactiveExpression}
- */
-export function compileReactiveExpression(code) {
-    const parseTree = ReactiveParser.INSTANCE.parse(code);
-
-    const expression = compile(parseTree);
-
-    return expression;
-}

@@ -5,7 +5,6 @@ import { ReactiveSubtract } from "../../../model/reactive/model/arithmetic/React
 import { ReactiveNot } from "../../../model/reactive/model/logic/ReactiveNot.js";
 import { ReactiveGreaterThan } from "../../../model/reactive/model/comparative/ReactiveGreaterThan.js";
 import { ReactiveAdd } from "../../../model/reactive/model/arithmetic/ReactiveAdd.js";
-import { compileReactiveExpression } from "./ReactiveNearlyCompiler.js";
 import { ReactiveOr } from "../../../model/reactive/model/logic/ReactiveOr.js";
 import { ReactiveAnd } from "../../../model/reactive/model/logic/ReactiveAnd.js";
 import { ReactiveLessThan } from "../../../model/reactive/model/comparative/ReactiveLessThan.js";
@@ -15,6 +14,7 @@ import { ReactiveNotEquals } from "../../../model/reactive/model/comparative/Rea
 import { ReactiveMultiply } from "../../../model/reactive/model/arithmetic/ReactiveMultiply.js";
 import { ReactiveDivide } from "../../../model/reactive/model/arithmetic/ReactiveDivide.js";
 import { ReactiveGreaterThanOrEqual } from "../../../model/reactive/model/comparative/ReactiveGreaterThanOrEqual.js";
+import { compileReactiveExpression } from "../compileReactiveExpression.js";
 
 test('compile: REFERENCE', () => {
     const expression = compileReactiveExpression('a');
