@@ -63,6 +63,10 @@ export class ReactiveLiteralBoolean extends ReactiveExpression {
     getValue() {
         return this.value;
     }
+
+    toCode() {
+        return this.value ? "true" : "false";
+    }
 }
 
 /**

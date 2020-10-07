@@ -33,6 +33,13 @@ export class ReactiveExpression {
 
     /**
      *
+     * @returns {string}
+     */
+    toCode() {
+        return "";
+    }
+    /**
+     *
      * @returns {number}
      */
     hash() {

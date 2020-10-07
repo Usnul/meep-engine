@@ -45,6 +45,11 @@ export class ReactiveLiteralString extends ReactiveExpression {
     getValue() {
         return this.value;
     }
+
+    toCode() {
+        // TODO add escaping
+        return `"${this.value}"`;
+    }
 }
 
 /**

@@ -27,6 +27,10 @@ export class ReactiveSubtract extends ReactiveBinaryExpression {
     equals(other) {
         return other.isReactiveSubtract && super.equals(other);
     }
+
+    toCode() {
+        return `( ${this.left.toCode()} - ${this.right.toCode()} )`
+    }
 }
 
 /**

@@ -92,6 +92,10 @@ export class ReactiveReference extends ReactiveExpression {
             ;
     }
 
+    toCode() {
+        return this.name;
+    }
+
 
     hash() {
         return computeHashIntegerArray(

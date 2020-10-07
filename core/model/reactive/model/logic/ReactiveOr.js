@@ -26,6 +26,9 @@ export class ReactiveOr extends ReactiveBinaryExpression {
     equals(other) {
         return other.isReactiveOr && super.equals(other);
     }
+    toCode() {
+        return `( ${this.left.toCode()} || ${this.right.toCode()} )`
+    }
 }
 
 /**

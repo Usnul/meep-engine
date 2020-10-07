@@ -26,6 +26,9 @@ export class ReactiveLessThan extends ReactiveBinaryExpression {
     equals(other) {
         return other.isReactiveLessThan && super.equals(other);
     }
+    toCode() {
+        return `( ${this.left.toCode()} < ${this.right.toCode()} )`
+    }
 }
 
 /**

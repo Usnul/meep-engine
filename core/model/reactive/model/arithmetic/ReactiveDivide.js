@@ -26,6 +26,9 @@ export class ReactiveDivide extends ReactiveBinaryExpression {
     equals(other) {
         return other.isReactiveDivide && super.equals(other);
     }
+    toCode() {
+        return `( ${this.left.toCode()} / ${this.right.toCode()} )`
+    }
 }
 
 /**

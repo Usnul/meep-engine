@@ -26,6 +26,9 @@ export class ReactiveEquals extends ReactiveBinaryExpression {
     equals(other) {
         return other.isReactiveEquals && super.equals(other);
     }
+    toCode() {
+        return `( ${this.left.toCode()} == ${this.right.toCode()} )`
+    }
 }
 
 /**

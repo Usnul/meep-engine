@@ -28,6 +28,9 @@ export class ReactiveAnd extends ReactiveBinaryExpression {
         return other.isReactiveAnd && super.equals(other);
     }
 
+    toCode() {
+        return `( ${this.left.toCode()} && ${this.right.toCode()} )`
+    }
 }
 
 /**

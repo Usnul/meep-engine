@@ -25,6 +25,9 @@ export class ReactiveNegate extends ReactiveUnaryExpression {
     equals(other) {
         return other.isReactiveNegate && super.equals(other);
     }
+    toCode() {
+        return `-${this.source.toCode()}`
+    }
 }
 
 /**

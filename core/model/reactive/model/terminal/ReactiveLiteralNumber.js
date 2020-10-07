@@ -62,6 +62,10 @@ export class ReactiveLiteralNumber extends ReactiveExpression {
     getValue() {
         return this.value;
     }
+
+    toCode() {
+        return this.value.toString(10);
+    }
 }
 
 /**
