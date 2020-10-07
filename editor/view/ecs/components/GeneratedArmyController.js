@@ -1,9 +1,7 @@
 import DatGuiController from "./DatGuiController.js";
 import { clear } from "../../../../view/controller/dat/DatGuiUtils.js";
-import {
-    buildCombatUnitsValidator,
-    extractFunctionBody
-} from "../../../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
+import { buildCombatUnitsValidator } from "../../../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
+import { extractFunctionBody } from "../../../../core/function/extractFunctionBody.js";
 
 export class GeneratedArmyController extends DatGuiController {
     /**

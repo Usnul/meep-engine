@@ -8,8 +8,8 @@ import { assert } from "../assert.js";
 import { compareStrings } from "../primitives/strings/compareStrings.js";
 import { compareNumbers } from "../primitives/numbers/compareNumbers.js";
 import { compareBooleans } from "../primitives/boolean/compareBooleans.js";
-import { extractFunctionBody } from "../../../model/game/ecs/component/generator/army/GeneratedArmy.js";
 import { compareArrays } from "../primitives/array/compareArrays.js";
+import { extractFunctionBody } from "../function/extractFunctionBody.js";
 
 /**
  *
