@@ -59,6 +59,40 @@ export class Blackboard {
          * @type {Object<string,BlackboardValue>}
          */
         this.data = {};
+
+        const self = this;
+
+        /**
+         * @private
+         */
+        this.proxy = new Proxy({}, {
+            /**
+             *
+             * @param target
+             * @param {string} p
+             * @param receiver
+             * @returns {*}
+             */
+            get(target, p, receiver) {
+                const blackboardValue = self.data[p];
+
+                if (blackboardValue === undefined) {
+                    return undefined;
+                }
+
+                const resolved_value = blackboardValue.value.getValue();
+
+                return resolved_value;
+            }
+        });
+    }
+
+    /**
+     *
+     * @returns {Object}
+     */
+    getValueProxy() {
+        return this.proxy;
     }
 
     /**
