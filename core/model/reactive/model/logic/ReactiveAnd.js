@@ -51,6 +51,8 @@ ReactiveAnd.prototype.isLogicExpression = true;
  */
 ReactiveAnd.prototype.isReactiveAnd = true;
 
+ReactiveAnd.prototype.isCommutative = true;
+
 /**
  *
  * @param {ReactiveExpression} left

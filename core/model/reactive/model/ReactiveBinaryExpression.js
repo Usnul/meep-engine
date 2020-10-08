@@ -164,6 +164,15 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
 }
 
 /**
+ * Binary expression is commutative if changing the order of operands does not change the result
+ * This property should be overridden in subclasses as necessary
+ * Property is used to guide expression transformation
+ * @readonly
+ * @type {boolean}
+ */
+ReactiveBinaryExpression.prototype.isCommutative = false;
+
+/**
  * @readonly
  * @type {boolean}
  */

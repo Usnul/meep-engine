@@ -23,9 +23,11 @@ export class ReactiveAdd extends ReactiveBinaryExpression {
 
         return r;
     }
+
     equals(other) {
         return other.isReactiveAdd && super.equals(other);
     }
+
     toCode() {
         return `( ${this.left.toCode()} + ${this.right.toCode()} )`
     }
@@ -48,6 +50,8 @@ ReactiveAdd.prototype.isArithmeticExpression = true;
  * @type {boolean}
  */
 ReactiveAdd.prototype.isReactiveAdd = true;
+
+ReactiveAdd.prototype.isCommutative = true;
 
 /**
  *

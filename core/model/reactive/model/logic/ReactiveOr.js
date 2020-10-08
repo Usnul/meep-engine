@@ -23,9 +23,11 @@ export class ReactiveOr extends ReactiveBinaryExpression {
 
         return r;
     }
+
     equals(other) {
         return other.isReactiveOr && super.equals(other);
     }
+
     toCode() {
         return `( ${this.left.toCode()} || ${this.right.toCode()} )`
     }
@@ -48,6 +50,8 @@ ReactiveOr.prototype.isLogicExpression = true;
  * @type {boolean}
  */
 ReactiveOr.prototype.isReactiveOr = true;
+
+ReactiveOr.prototype.isCommutative = true;
 
 /**
  *

@@ -23,9 +23,11 @@ export class ReactiveEquals extends ReactiveBinaryExpression {
 
         return r;
     }
+
     equals(other) {
         return other.isReactiveEquals && super.equals(other);
     }
+
     toCode() {
         return `( ${this.left.toCode()} == ${this.right.toCode()} )`
     }
@@ -48,6 +50,8 @@ ReactiveEquals.prototype.isComparativeExpression = true;
  * @type {boolean}
  */
 ReactiveEquals.prototype.isReactiveEquals = true;
+
+ReactiveEquals.prototype.isCommutative = true;
 
 /**
  *

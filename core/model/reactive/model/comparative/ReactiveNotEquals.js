@@ -51,6 +51,7 @@ ReactiveNotEquals.prototype.isComparativeExpression = true;
  */
 ReactiveNotEquals.prototype.isReactiveNotEquals = true;
 
+ReactiveNotEquals.prototype.isCommutative = true;
 
 /**
  *
