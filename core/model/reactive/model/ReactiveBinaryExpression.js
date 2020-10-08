@@ -96,8 +96,8 @@ export class ReactiveBinaryExpression extends ReactiveExpression {
     traverse(visitor, thisArg) {
         super.traverse(visitor, thisArg);
 
-        this.left.traverse(visitor);
-        this.right.traverse(visitor);
+        this.left.traverse(visitor, thisArg);
+        this.right.traverse(visitor, thisArg);
     }
 
     /**

@@ -34,7 +34,7 @@ export class ReactiveUnaryExpression extends ReactiveExpression {
     traverse(visitor, thisArg) {
         super.traverse(visitor, thisArg);
 
-        this.source.traverse(visitor);
+        this.source.traverse(visitor, thisArg);
     }
 
     connect(source) {
