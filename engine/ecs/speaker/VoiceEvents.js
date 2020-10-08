@@ -3,5 +3,6 @@
  * @enum {string}
  */
 export const VoiceEvents = {
-    SpeakLine: 'speak-line'
+    SpeakLine: 'speak-line',
+    FinishedSpeakingLine:'speak-line-finished'
 };

@@ -16,6 +16,7 @@ import { max2 } from "../../../core/math/MathUtils.js";
 import { VoiceEvents } from "./VoiceEvents.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
+import { ActionBehavior } from "../../intelligence/behavior/primitive/ActionBehavior.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -29,7 +30,7 @@ const TIMING_NOTICE_DELAY = 0.2;
  */
 const TIMING_MINIMUM_READ_TIME = 0.5;
 
-class Context extends SystemEntityContext{
+class Context extends SystemEntityContext {
 
 
     handle(line) {
@@ -143,6 +144,10 @@ export class VoiceSystem extends AbstractContextSystem {
             .add(SerializationMetadata.Transient)
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
                 DelayBehavior.from(display_time),
+                new ActionBehavior(() => {
+                    // notify that the line has ended
+                    ecd.sendEvent(entity, VoiceEvents.FinishedSpeakingLine, line_id);
+                }),
                 DieBehavior.create()
             ])))
             .build(ecd);
