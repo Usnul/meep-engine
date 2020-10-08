@@ -24,6 +24,16 @@ export class ReactiveOr extends ReactiveBinaryExpression {
         return r;
     }
 
+    evaluate(scope) {
+        const left = this.left.evaluate(scope);
+
+        if (left) {
+            return true;
+        }
+
+        return this.right.evaluate(scope);
+    }
+
     equals(other) {
         return other.isReactiveOr && super.equals(other);
     }
