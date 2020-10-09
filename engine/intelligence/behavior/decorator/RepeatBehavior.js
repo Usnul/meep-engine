@@ -62,7 +62,7 @@ export class RepeatBehavior extends AbstractDecoratorBehavior {
     tick(timeDelta) {
         const s = this.__source.tick(timeDelta);
 
-        assert.notEqual(Object.values(BehaviorStatus).indexOf(s), -1, `${s} is not a valid status`);
+        assert.enum(s, BehaviorStatus, 'status');
 
         if (s !== BehaviorStatus.Succeeded && s !== BehaviorStatus.Failed) {
             this.__status = s;

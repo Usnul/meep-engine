@@ -1,4 +1,5 @@
 import { Behavior } from "../Behavior.js";
+import { assert } from "../../../../core/assert.js";
 
 export class AbstractDecoratorBehavior extends Behavior {
     constructor() {
@@ -22,10 +23,14 @@ export class AbstractDecoratorBehavior extends Behavior {
 
     /**
      *
-     * @param {Behavior} v
+     * @param {Behavior} source
      */
-    setSource(v) {
-        this.__source = v;
+    setSource(source) {
+        assert.defined(source, 'source');
+
+        assert.equal(source.isBehavior, true, 'source.isBehavior');
+
+        this.__source = source;
     }
 
     initialize(context) {

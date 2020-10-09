@@ -137,7 +137,9 @@ function typeOf(value, type, valueName = 'value') {
 
     const typeofValue = typeof value;
 
-    assert.equal(typeofValue, type, `expected ${valueName} to be ${type}, instead was '${typeofValue}'(=${value})`);
+    if (typeofValue !== type) {
+        throw new Error(`expected ${valueName} to be ${type}, instead was '${typeofValue}'(=${value})`);
+    }
 }
 
 /**

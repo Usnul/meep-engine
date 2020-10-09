@@ -1,4 +1,4 @@
-import { StaticKnowledgeDataTable } from "../../../../model/game/database/StaticKnowledgeDataTable.js";
+import { StaticKnowledgeDataTable } from "../../../../../model/game/database/StaticKnowledgeDataTable.js";
 import { DynamicRuleDescription } from "./DynamicRuleDescription.js";
 
 

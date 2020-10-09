@@ -1,4 +1,4 @@
-import { DynamicRuleDescriptionTable } from "./DynamicRuleDescriptionTable.js";
+import { DynamicRuleDescriptionTable } from "./rules/DynamicRuleDescriptionTable.js";
 import { createRandomReactiveExpression } from "../../../core/model/reactive/model/util/createRandomReactiveExpression.js";
 import { ReactiveReference } from "../../../core/model/reactive/model/terminal/ReactiveReference.js";
 import { ReactiveLiteralNumber } from "../../../core/model/reactive/model/terminal/ReactiveLiteralNumber.js";
@@ -10,7 +10,7 @@ import {
 } from "../../../core/math/MathUtils.js";
 import { ReactiveLiteralString } from "../../../core/model/reactive/model/terminal/ReactiveLiteralString.js";
 import { ReactiveLiteralBoolean } from "../../../core/model/reactive/model/terminal/ReactiveLiteralBoolean.js";
-import { DynamicRuleDescription } from "./DynamicRuleDescription.js";
+import { DynamicRuleDescription } from "./rules/DynamicRuleDescription.js";
 import DataType from "../../../core/parser/simple/DataType.js";
 
 describe.skip('performance', ()=>{

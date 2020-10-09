@@ -97,6 +97,20 @@ function stringifyStream(json, addToOutput) {
 
 /**
  *
+ * @param {Object} obj
+ * @param {string} p
+ * @return {boolean}
+ */
+function objectHasProperty(obj, p) {
+    if (typeof obj.hasOwnProperty === "function") {
+        return obj.hasOwnProperty(p);
+    } else {
+        return obj[p] !== undefined;
+    }
+}
+
+/**
+ *
  * @param {object} object
  * @param {string} path
  * @param {function} [missingPropertyHandler] Allows custom handling of missing properties
@@ -115,7 +129,7 @@ function resolvePath(object, path, missingPropertyHandler) {
     const l = parts.length;
     for (let i = 0; i < l; i++) {
         const part = parts[i];
-        if (!current.hasOwnProperty(part)) {
+        if (!objectHasProperty(current, part)) {
             if (typeof missingPropertyHandler === "function") {
                 missingPropertyHandler(current, part, i, l);
             } else {

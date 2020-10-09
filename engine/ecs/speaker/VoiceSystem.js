@@ -17,6 +17,8 @@ import { VoiceEvents } from "./VoiceEvents.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
 import { ActionBehavior } from "../../intelligence/behavior/primitive/ActionBehavior.js";
+import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
+import { VoiceFlags } from "./VoiceFlags.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -34,7 +36,7 @@ class Context extends SystemEntityContext {
 
 
     handle(line) {
-        this.system.sayLine(this.entity, line);
+        this.system.sayLine(this.entity, line, this.components[0]);
     }
 
     link() {
@@ -100,8 +102,9 @@ export class VoiceSystem extends AbstractContextSystem {
      *
      * @param {number} entity
      * @param {string} line_id
+     * @param {Voice} voice
      */
-    sayLine(entity, line_id) {
+    sayLine(entity, line_id, voice) {
         const ecd = this.entityManager.dataset;
 
         /**
@@ -131,6 +134,8 @@ export class VoiceSystem extends AbstractContextSystem {
 
         console.log('Display time:', display_time, line_pure_text);
 
+        voice.setFlag(VoiceFlags.Speaking);
+
         new EntityBuilder()
             .add(GUIElement.fromView(view))
             .add(ViewportPosition.fromJSON({}))
@@ -145,8 +150,18 @@ export class VoiceSystem extends AbstractContextSystem {
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
                 DelayBehavior.from(display_time),
                 new ActionBehavior(() => {
+                    // clear speaking flag
+                    voice.clearFlag(VoiceFlags.Speaking);
+
                     // notify that the line has ended
                     ecd.sendEvent(entity, VoiceEvents.FinishedSpeakingLine, line_id);
+
+                    // record the fact that line was spoken
+                    const bb = ecd.getComponent(entity, Blackboard);
+
+                    if (bb !== undefined) {
+                        bb.acquireNumber(`voice.line_spoken.${line_id}.count`).increment();
+                    }
                 }),
                 DieBehavior.create()
             ])))

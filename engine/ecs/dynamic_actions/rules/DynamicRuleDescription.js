@@ -1,8 +1,9 @@
-import UUID from "../../../core/UUID.js";
-import { assert } from "../../../core/assert.js";
-import { inferReactiveExpressionTypes } from "../../../core/model/reactive/transform/ReactiveTypeInferrence.js";
-import DataType from "../../../core/parser/simple/DataType.js";
-import { compileReactiveExpression } from "../../../core/land/reactive/compileReactiveExpression.js";
+import UUID from "../../../../core/UUID.js";
+import { assert } from "../../../../core/assert.js";
+import { inferReactiveExpressionTypes } from "../../../../core/model/reactive/transform/ReactiveTypeInferrence.js";
+import DataType from "../../../../core/parser/simple/DataType.js";
+import { compileReactiveExpression } from "../../../../core/land/reactive/compileReactiveExpression.js";
+import { deserializeActionFromJSON } from "../actions/deserializeActionFromJSON.js";
 
 export class DynamicRuleDescription {
     constructor() {
@@ -73,9 +74,12 @@ export class DynamicRuleDescription {
     fromJSON({ id = UUID.generate(), condition, action }) {
         assert.typeOf(condition, 'string', 'condition');
 
+        assert.defined(action, 'action');
+        assert.notNull(action, 'action');
+
         this.condition = compileReactiveExpression(condition);
 
-        this.action = action;
+        this.action = deserializeActionFromJSON(action);
 
         this.id = id;
 

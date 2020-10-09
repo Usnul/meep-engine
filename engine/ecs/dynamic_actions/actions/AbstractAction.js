@@ -1,4 +1,6 @@
 export class AbstractAction {
+    constructor() {
+    }
 
     /**
      * Main entry point
@@ -10,3 +12,5 @@ export class AbstractAction {
 
     }
 }
+
+AbstractAction.prototype.type = '$Abstract';

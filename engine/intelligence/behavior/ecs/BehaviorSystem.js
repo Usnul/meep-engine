@@ -4,6 +4,24 @@ import { BehaviorStatus } from "../BehaviorStatus.js";
 import Clock from "../../../Clock.js";
 import { ClockChannelType } from "./ClockChannelType.js";
 
+/**
+ *
+ * @param {BehaviorStatus} behavior
+ * @param {number} timeDelta
+ */
+function updateBehavior(behavior, timeDelta) {
+
+    try {
+        behavior.tick(timeDelta);
+    } catch (e) {
+        console.error('Behavior threw an exception', e);
+
+        // Transition behavior into failed state
+        behavior.setStatus(BehaviorStatus.Failed);
+    }
+
+}
+
 export class BehaviorSystem extends System {
     /**
      *
@@ -115,8 +133,7 @@ export class BehaviorSystem extends System {
                     continue;
                 }
 
-
-                behavior.tick(td);
+                updateBehavior(behavior, td);
             }
         }
 

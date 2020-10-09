@@ -2,28 +2,45 @@ import { DynamicActor } from "./DynamicActor.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
 import { DataScope } from "../../../../model/game/unit/actions/data/DataScope.js";
+import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 
 class Context extends SystemEntityContext {
+
+    process(entity, scope) {
+
+    }
 
     /**
      *
      * @param {string} event
      * @param {*} data Event data
      */
-    handle(event, data) {
-        this.system.match(event, {});
+    handleEvent(event, data) {
+        /**
+         *
+         * @type {DynamicActorSystem}
+         */
+        const system = this.system;
+        /**
+         * @type {DynamicRuleDescription}
+         */
+        const match = system.match(
+            this.entity,
+            event,
+            data
+        );
     }
 
     link() {
         const ecd = this.getDataset();
 
-        ecd.addEntityAnyEventListener(this.entity, this.handle, this);
+        ecd.addEntityAnyEventListener(this.entity, this.handleEvent, this);
     }
 
     unlink() {
         const ecd = this.getDataset();
 
-        ecd.removeAnyEventListener(this.entity, this.handle, this);
+        ecd.removeAnyEventListener(this.entity, this.handleEvent, this);
     }
 }
 
@@ -70,32 +87,59 @@ export class DynamicActorSystem extends AbstractContextSystem {
         this.__idle_event_timer = 0;
     }
 
+    pushBlackboardToScope(entity) {
+
+        // fetch blackboard
+        const ecd = this.entityManager.dataset;
+
+        /**
+         *
+         * @type {Blackboard}
+         */
+        const blackboard = ecd.getComponent(entity, Blackboard);
+
+        if (blackboard !== undefined) {
+            this.scope.push(blackboard.getValueProxy());
+        }
+
+
+    }
+
     /**
      *
+     * @param {number} entity
      * @param {string} event
      * @param {Object} context
+     * @returns {DynamicRuleDescription|undefined}
      */
-    match(event, context) {
+    match(entity, event, context) {
+        const top = this.scope.size();
 
-        this.scope.push(context);
+        this.pushBlackboardToScope(entity)
+
+        if (typeof context === 'object') {
+            this.scope.push(context);
+        }
 
         this.scope.push({
             event: event
         });
 
+        const scopeProxy = this.scope.proxy;
+
         /**
          *
-         * @type {DynamicRuleDescription[]}
+         * @type {DynamicRuleDescription}
          */
-        const descriptions = this.database.match(this.scope.proxy);
+        const description = this.database.matchBest(scopeProxy);
 
-        this.scope.pop();
-        this.scope.pop();
-
-
-        if (descriptions.length > 0) {
-            console.log(descriptions);
+        if (description !== undefined) {
+            description.action.execute(entity, this.entityManager.dataset, scopeProxy);
         }
+
+        this.scope.unwind(top);
+
+        return description;
     }
 
     startup(entityManager, readyCallback, errorCallback) {

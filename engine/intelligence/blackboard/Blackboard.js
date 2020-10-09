@@ -74,17 +74,39 @@ export class Blackboard {
              * @returns {*}
              */
             get(target, p, receiver) {
+                const data = self.data;
+
+                if (!data.hasOwnProperty(p)) {
+                    return undefined;
+                }
+
+                const blackboardValue = data[p];
+
+                const resolved_value = blackboardValue.value.getValue();
+
+                return resolved_value;
+            },
+            set(target, p, value, receiver) {
+
+
                 const blackboardValue = self.data[p];
 
                 if (blackboardValue === undefined) {
                     return undefined;
                 }
 
-                const resolved_value = blackboardValue.value.getValue();
+                blackboardValue.value.set(value);
 
-                return resolved_value;
             }
         });
+    }
+
+    /**
+     *
+     * @return {Object}
+     */
+    get value_proxy() {
+        return this.getValueProxy();
     }
 
     /**
