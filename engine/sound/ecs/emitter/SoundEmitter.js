@@ -360,9 +360,9 @@ export class SoundEmitter {
     /**
      *
      * @param {number} [duration] fade duration in seconds
-     * @param startTime
+     * @param startAfter
      */
-    fadeOutAllTracks(duration = 1, startTime = 0) {
+    fadeOutAllTracks(duration = 1, startAfter = 0) {
 
         const tracks = this.tracks;
         const n = tracks.length;
@@ -370,7 +370,7 @@ export class SoundEmitter {
         for (let i = 0; i < n; i++) {
             const soundTrack = tracks.get(i);
 
-            soundTrack.setVolumeOverTime(0, duration, startTime);
+            soundTrack.setVolumeOverTime(0, duration, startAfter);
         }
     }
 

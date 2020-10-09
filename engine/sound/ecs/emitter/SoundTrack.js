@@ -101,9 +101,9 @@ export class SoundTrack {
      *
      * @param {number} target target volume value
      * @param {number} duration How long the transition should take, in seconds
-     * @param {number} [startTime] when fading should start, see WebAudio docs on {@link AudioContext#currentTime}
+     * @param {number} [startAfter] when fading should start, see WebAudio docs on {@link AudioContext#currentTime}
      */
-    setVolumeOverTime(target, duration, startTime = 0) {
+    setVolumeOverTime(target, duration, startAfter = 0) {
         // instantly update volume for consistency purposes wrt serialization
         this.__volume = target;
 
@@ -114,7 +114,18 @@ export class SoundTrack {
 
             const current_value = gain.value;
 
-            gain.setValueCurveAtTime([current_value, target], 0, duration);
+            let start_time = startAfter;
+
+            /**
+             * @type {AudioContext}
+             */
+            const audioContext = nodes.context;
+
+            if (audioContext !== undefined) {
+                start_time += audioContext.currentTime;
+            }
+
+            gain.setValueCurveAtTime([current_value, target], start_time, duration);
         }
     }
 
