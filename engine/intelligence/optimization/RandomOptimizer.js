@@ -104,7 +104,7 @@ export class RandomOptimizer {
             }
 
 
-            const action = randomFromArray(actions, this.random);
+            const action = randomFromArray(this.random, actions);
 
             action(tempState);
         }

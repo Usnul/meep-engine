@@ -3,7 +3,7 @@ import { assert } from "../../../../core/assert.js";
 import { inferReactiveExpressionTypes } from "../../../../core/model/reactive/transform/ReactiveTypeInferrence.js";
 import DataType from "../../../../core/parser/simple/DataType.js";
 import { compileReactiveExpression } from "../../../../core/land/reactive/compileReactiveExpression.js";
-import { deserializeActionFromJSON } from "../actions/deserializeActionFromJSON.js";
+import { deserializeActionFromJSON } from "../actions/definition/deserializeActionFromJSON.js";
 
 export class DynamicRuleDescription {
     constructor() {
@@ -17,7 +17,7 @@ export class DynamicRuleDescription {
 
         /**
          *
-         * @type {AbstractAction}
+         * @type {AbstractActionDescription}
          */
         this.action = null;
 
@@ -26,6 +26,12 @@ export class DynamicRuleDescription {
          * @type {ReactiveReference[]}
          */
         this.references = [];
+
+        /**
+         * Rules with higher priority have the right to interrupt lower priority rules
+         * @type {number}
+         */
+        this.pririty = 0;
 
         /**
          * @private

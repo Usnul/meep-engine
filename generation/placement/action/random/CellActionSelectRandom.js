@@ -60,7 +60,7 @@ export class CellActionSelectRandom extends GridCellAction {
 
     execute(data, x, y, rotation) {
 
-        const option = randomFromArray(this.options, this.__random);
+        const option = randomFromArray(this.__random, this.options);
 
         option.execute(data, x, y, rotation);
 

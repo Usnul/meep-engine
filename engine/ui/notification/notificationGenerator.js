@@ -29,9 +29,9 @@ function notificationGenerator(callback, timeout = 5) {
 
     setInterval(function () {
         const notification = new Notification({
-            title: randomFromArray(phrases, Math.random),
-            description: randomFromArray(descriptions, Math.random),
-            image: randomFromArray(icons, Math.random)
+            title: randomFromArray(Math.random, phrases),
+            description: randomFromArray(Math.random, descriptions),
+            image: randomFromArray(Math.random, icons)
         });
         callback(notification);
     }, timeout * 1000);

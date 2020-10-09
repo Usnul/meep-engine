@@ -29,7 +29,7 @@ export class ArrayIteratorRandom extends AbstractArrayIterator {
             this.__sequence[i] = i;
         }
 
-        randomizeArrayElementOrder(this.__sequence, this.__random);
+        randomizeArrayElementOrder(this.__random, this.__sequence);
 
         this.__i = 0;
     }

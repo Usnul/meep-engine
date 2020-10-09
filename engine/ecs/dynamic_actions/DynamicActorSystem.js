@@ -3,6 +3,8 @@ import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
 import { DataScope } from "../../../../model/game/unit/actions/data/DataScope.js";
 import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
+import { compareNumbersDescending, returnTrue } from "../../../core/function/Functions.js";
+import { randomMultipleFromArray } from "../../../core/collection/ArrayUtils.js";
 
 class Context extends SystemEntityContext {
 
@@ -106,6 +108,92 @@ export class DynamicActorSystem extends AbstractContextSystem {
     }
 
     /**
+     * Given a context, returns N actors that match that context best, filter is used to restrict search and reject certain actors entirely
+     * Useful for picking an actor for a response action
+     *
+     * @param {Object} context
+     * @param {function(entity:number,dataset:EntityComponentDataset):} [filter]
+     * @param {*} [filterContext]
+     * @param {number} [count]
+     * @returns {{entity:number,rule:DynamicRuleDescription, scope: DataScope}[]}
+     */
+    requestBestActors(context, filter = returnTrue, filterContext = null, count = 1) {
+        /**
+         *
+         * @type {{entity:number, rule:DynamicRuleDescription, scope: DataScope}[]}
+         */
+        const result = [];
+
+        const ecd = this.entityManager.dataset;
+
+
+        /**
+         *
+         * @type {{entity:number, rule:DynamicRuleDescription, scope: DataScope}[][]}
+         */
+        const by_score = [];
+        const scores = [];
+
+        if (ecd !== null) {
+
+            ecd.traverseComponents(DynamicActor, (actor, entity) => {
+
+
+                const accepted_by_filter = filter.call(filterContext, entity, ecd);
+
+                if (accepted_by_filter === false) {
+                    return;
+                }
+
+                const scope = new DataScope();
+
+                scope.push(context);
+
+                this.pushBlackboardToScope(entity);
+
+                const match = this.database.matchBest(scope.proxy);
+
+
+                if (match === undefined) {
+                    // no match
+                    return;
+                }
+
+                const score = match.getPredicateComplexity();
+
+                if (by_score[score] === undefined) {
+                    scores.push(score);
+                    by_score[score] = [];
+                }
+
+                const match_entry = {
+                    entity,
+                    rule: match,
+                    scope
+                };
+
+                by_score[score].push(match_entry);
+
+            });
+
+        }
+
+        scores.sort(compareNumbersDescending);
+
+        for (let i = 0; i < scores.length && result.length < count; i++) {
+            const score = scores[i];
+
+            const matches = by_score[score];
+
+            const free_slots = count - result.length;
+
+            const picked_count = randomMultipleFromArray(Math.random, matches, result, free_slots);
+        }
+
+        return result;
+    }
+
+    /**
      *
      * @param {number} entity
      * @param {string} event
@@ -134,7 +222,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const description = this.database.matchBest(scopeProxy);
 
         if (description !== undefined) {
-            description.action.execute(entity, this.entityManager.dataset, scopeProxy);
+            description.action.execute(entity, this.entityManager.dataset, scopeProxy, this).start();
         }
 
         this.scope.unwind(top);

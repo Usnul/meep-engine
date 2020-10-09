@@ -99,7 +99,7 @@ describe.skip('performance', ()=>{
         // pre-warm code
         for (let i = 0; i < 10; i++) {
 
-            const context = randomFromArray(contexts, prewarm_random);
+            const context = randomFromArray(prewarm_random, contexts);
 
             table.match(context);
         }

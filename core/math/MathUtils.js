@@ -61,11 +61,11 @@ export function randomGaussian(random, quality = 6) {
 
 /**
  * @template T
- * @param {T[]} array
  * @param {function} random
+ * @param {T[]} array
  * @returns {T}
  */
-export function randomFromArray(array, random) {
+export function randomFromArray(random, array) {
     assert.isArray(array, 'array');
     assert.typeOf(random, 'function', 'random');
 

@@ -7,15 +7,15 @@
 import { assert } from "../assert.js";
 import { HashMap } from "./HashMap.js";
 import { returnZero } from "../function/Functions.js";
-import { randomIntegerBetween } from "../math/MathUtils.js";
+import { min2, randomIntegerBetween } from "../math/MathUtils.js";
 
 
 /**
  * @template T
- * @param {T[]} array
  * @param {function} random
+ * @param {T[]} array
  */
-export function randomizeArrayElementOrder(array, random) {
+export function randomizeArrayElementOrder(random, array) {
     const n = array.length;
 
     const lastValidIndex = n - 1;
@@ -29,6 +29,38 @@ export function randomizeArrayElementOrder(array, random) {
 
         arraySwapElements(array, i, t);
     }
+}
+
+/**
+ * Pick multiple random items from an array
+ *
+ * @template T
+ * @param {function} random
+ * @param {T[]} source
+ * @param {T[]} target
+ * @param {number} count how many items to pick
+ * @returns {T}
+ */
+export function randomMultipleFromArray(random, source, target, count) {
+
+    const order = [];
+
+    const source_length = source.length;
+    for (let i = 0; i < source_length; i++) {
+        order[i] = i;
+    }
+
+    randomizeArrayElementOrder(random, order);
+
+    const target_length = min2(source_length, count);
+
+    for (let i = 0; i < target_length; i++) {
+        const index = order[i];
+        const element = source[index];
+        target.push(element);
+    }
+
+    return target_length;
 }
 
 /**

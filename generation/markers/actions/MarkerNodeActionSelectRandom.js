@@ -56,7 +56,7 @@ export class MarkerNodeActionSelectRandom extends MarkerNodeAction {
         assert.defined(node, 'node');
         assert.equal(node.isMarkerNode, true, 'node.isMarkerNode !== true');
 
-        const action = randomFromArray(this.elements, this.__random);
+        const action = randomFromArray(this.__random, this.elements);
 
         action.execute(grid, ecd, node);
 

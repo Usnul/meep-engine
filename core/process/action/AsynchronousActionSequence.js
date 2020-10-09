@@ -1,5 +1,6 @@
 import { AsynchronousAction } from "./AsynchronousAction.js";
 import TaskState from "../task/TaskState.js";
+import { assert } from "../../assert.js";
 
 export class AsynchronousActionSequence extends AsynchronousAction {
     /**
@@ -8,6 +9,8 @@ export class AsynchronousActionSequence extends AsynchronousAction {
      */
     constructor(sequence) {
         super();
+
+        assert.isArray(sequence);
 
         /**
          *

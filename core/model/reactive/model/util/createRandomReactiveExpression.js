@@ -86,7 +86,7 @@ function join(random, a, b) {
         NodeSet = [ReactiveEquals];
     }
 
-    const NodeClass = randomFromArray(NodeSet, random);
+    const NodeClass = randomFromArray(random, NodeSet);
 
     return NodeClass.from(a, b);
 }
@@ -122,11 +122,11 @@ function build_level(random, nodes) {
     }
 
     for (let i = 0; i < tuples; i++) {
-        const a = randomFromArray(terminals, random);
+        const a = randomFromArray(random, terminals);
 
         const dataType = a.dataType;
 
-        const b = randomFromArray(type_map[dataType]);
+        const b = randomFromArray(undefined, type_map[dataType]);
 
 
     }
@@ -151,11 +151,11 @@ export function createRandomReactiveExpression(random, terminals, tuples) {
     const open = [];
 
     for (let i = 0; i < tuples; i++) {
-        const a = randomFromArray(terminals, random);
+        const a = randomFromArray(random, terminals);
 
         const dataType = a.dataType;
 
-        const b = randomFromArray(type_map[dataType], random);
+        const b = randomFromArray(random, type_map[dataType]);
 
         const t = join(random, a, b);
 

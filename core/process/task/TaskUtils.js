@@ -69,7 +69,7 @@ export function randomCountTask(seed, initial, limit, callback) {
             }
 
             //shuffle
-            randomizeArrayElementOrder(sequence, random);
+            randomizeArrayElementOrder(random, sequence);
         },
         cycleFunction: cycle,
         computeProgress: function () {
