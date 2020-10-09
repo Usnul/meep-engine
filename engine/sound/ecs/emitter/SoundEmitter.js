@@ -277,7 +277,7 @@ export class SoundEmitter {
     }
 
     /**
-     *
+     * @private
      * @param {number} distance
      */
     writeAttenuationVolume(distance) {
@@ -360,8 +360,9 @@ export class SoundEmitter {
     /**
      *
      * @param {number} [duration] fade duration in seconds
+     * @param startTime
      */
-    fadeOutAllTracks(duration = 1) {
+    fadeOutAllTracks(duration = 1, startTime = 0) {
 
         const tracks = this.tracks;
         const n = tracks.length;
@@ -369,7 +370,7 @@ export class SoundEmitter {
         for (let i = 0; i < n; i++) {
             const soundTrack = tracks.get(i);
 
-            soundTrack.setVolumeOverTime(0, duration);
+            soundTrack.setVolumeOverTime(0, duration, startTime);
         }
     }
 

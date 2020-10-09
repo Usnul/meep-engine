@@ -61,6 +61,14 @@ function SoundEngine() {
 }
 
 /**
+ *
+ * @return {number}
+ */
+SoundEngine.prototype.getCurrentTime = function () {
+    return this.context.currentTime;
+}
+
+/**
  * Audio context needs to be resumed as it is created in suspended state by default
  * @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
  * @returns {Promise<void>}

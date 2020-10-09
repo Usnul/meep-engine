@@ -101,8 +101,9 @@ export class SoundTrack {
      *
      * @param {number} target target volume value
      * @param {number} duration How long the transition should take, in seconds
+     * @param {number} [startTime] when fading should start, see WebAudio docs on {@link AudioContext#currentTime}
      */
-    setVolumeOverTime(target, duration) {
+    setVolumeOverTime(target, duration, startTime = 0) {
         // instantly update volume for consistency purposes wrt serialization
         this.__volume = target;
 
