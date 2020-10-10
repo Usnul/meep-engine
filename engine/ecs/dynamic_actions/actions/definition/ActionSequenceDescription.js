@@ -1,5 +1,5 @@
 import { AbstractActionDescription } from "./AbstractActionDescription.js";
-import { AsynchronousActionSequence } from "../../../../../core/process/action/AsynchronousActionSequence.js";
+import { SequenceBehavior } from "../../../../intelligence/behavior/composite/SequenceBehavior.js";
 
 export class ActionSequenceDescription extends AbstractActionDescription {
     constructor() {
@@ -17,6 +17,6 @@ export class ActionSequenceDescription extends AbstractActionDescription {
             return e.execute(actor, dataset, context, system);
         });
 
-        return new AsynchronousActionSequence(sequence);
+        return SequenceBehavior.from(sequence);
     }
 }

@@ -20,10 +20,20 @@ export class ActionBehavior extends Behavior {
     tick(timeDelta) {
 
         if (this.__status === BehaviorStatus.Running) {
-            this.__action.call(this.__context, timeDelta);
+
+            try {
+                this.__action.call(this.__context, timeDelta);
+
+                this.setStatus(BehaviorStatus.Succeeded);
+
+            } catch (e) {
+
+                this.setStatus(BehaviorStatus.Failed);
+
+            }
+
         }
 
-        this.__status = BehaviorStatus.Succeeded;
 
         return this.__status;
     }

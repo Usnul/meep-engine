@@ -6,6 +6,13 @@ import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { compareNumbersDescending, returnTrue } from "../../../core/function/Functions.js";
 import { randomMultipleFromArray } from "../../../core/collection/ArrayUtils.js";
 import { EntityProxyScope } from "../binding/EntityProxyScope.js";
+import EntityBuilder from "../EntityBuilder.js";
+import { BehaviorComponent } from "../../intelligence/behavior/ecs/BehaviorComponent.js";
+import { SequenceBehavior } from "../../intelligence/behavior/composite/SequenceBehavior.js";
+import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
+import { SerializationMetadata } from "../components/SerializationMetadata.js";
+import Tag from "../components/Tag.js";
+import { OverrideContextBehavior } from "../../../../model/game/util/behavior/OverrideContextBehavior.js";
 
 class Context extends SystemEntityContext {
 
@@ -88,6 +95,31 @@ export class DynamicActorSystem extends AbstractContextSystem {
          * @private
          */
         this.__idle_event_timer = 0;
+    }
+
+    /**
+     *
+     * @param {number} entity
+     * @param {DynamicRuleDescription} rule
+     * @param {*} context
+     */
+    executeRule(entity, rule, context) {
+        const ecd = this.entityManager.dataset;
+        const behavior = rule.action.execute(entity, ecd, context, this);
+
+        new EntityBuilder()
+            .add(BehaviorComponent.fromOne(SequenceBehavior.from([
+                OverrideContextBehavior.from(
+                    {
+                        entity
+                    },
+                    behavior
+                ),
+                DieBehavior.create()
+            ])))
+            .add(Tag.fromJSON(['DynamicActor-RuleExecutor']))
+            .add(SerializationMetadata.Transient)
+            .build(ecd);
     }
 
     /**
@@ -232,7 +264,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const description = this.database.matchBest(scopeProxy);
 
         if (description !== undefined) {
-            description.action.execute(entity, this.entityManager.dataset, scopeProxy, this).start();
+            this.executeRule(entity, description, scopeProxy);
         }
 
         this.scope.unwind(top);

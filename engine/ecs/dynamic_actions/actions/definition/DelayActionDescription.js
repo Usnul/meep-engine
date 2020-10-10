@@ -1,5 +1,5 @@
 import { AbstractActionDescription } from "./AbstractActionDescription.js";
-import { AsynchronousDelayAction } from "../../../../../core/process/action/AsynchronousDelayAction.js";
+import { DelayBehavior } from "../../../../../../model/game/util/behavior/DelayBehavior.js";
 
 export class DelayActionDescription extends AbstractActionDescription {
     constructor() {
@@ -9,7 +9,7 @@ export class DelayActionDescription extends AbstractActionDescription {
     }
 
     execute(actor, dataset, context, system) {
-        return new AsynchronousDelayAction(dataset, this.time);
+        return DelayBehavior.from(this.time);
     }
 
     fromJSON({ time }) {

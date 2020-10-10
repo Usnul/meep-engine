@@ -35,8 +35,8 @@ const TIMING_MINIMUM_READ_TIME = 0.5;
 class Context extends SystemEntityContext {
 
 
-    handle(line) {
-        this.system.sayLine(this.entity, line, this.components[0]);
+    handle({ id }) {
+        this.system.sayLine(this.entity, id, this.components[0]);
     }
 
     link() {

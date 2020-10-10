@@ -8,7 +8,7 @@ export class AbstractActionDescription {
      * @param {EntityComponentDataset} dataset
      * @param context
      * @param {DynamicActorSystem} system
-     * @returns {AsynchronousAction}
+     * @returns {Behavior}
      */
     execute(actor, dataset, context, system) {
         throw new Error('niy');
