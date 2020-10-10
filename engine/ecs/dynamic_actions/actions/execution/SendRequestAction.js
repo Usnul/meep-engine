@@ -67,7 +67,7 @@ export class SendRequestAction extends AsynchronousAction {
 
             console.log(`Requested response from ${match.entity}, because rule matched: ${match.rule.condition.toCode()}`);
 
-            rule.action.execute(match.entity, dataset, match.scope.proxy, system);
+            rule.action.execute(match.entity, dataset, match.scope.proxy, system).start();
         });
 
         this.__succeed();

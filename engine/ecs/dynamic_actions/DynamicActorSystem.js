@@ -5,6 +5,7 @@ import { DataScope } from "../../../../model/game/unit/actions/data/DataScope.js
 import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { compareNumbersDescending, returnTrue } from "../../../core/function/Functions.js";
 import { randomMultipleFromArray } from "../../../core/collection/ArrayUtils.js";
+import { EntityProxyScope } from "../binding/EntityProxyScope.js";
 
 class Context extends SystemEntityContext {
 
@@ -89,7 +90,12 @@ export class DynamicActorSystem extends AbstractContextSystem {
         this.__idle_event_timer = 0;
     }
 
-    pushBlackboardToScope(entity) {
+    /**
+     *
+     * @param {number} entity
+     * @param {DataScope} scope
+     */
+    populateEntityScope(entity, scope) {
 
         // fetch blackboard
         const ecd = this.entityManager.dataset;
@@ -101,10 +107,14 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const blackboard = ecd.getComponent(entity, Blackboard);
 
         if (blackboard !== undefined) {
-            this.scope.push(blackboard.getValueProxy());
+            scope.push(blackboard.getValueProxy());
         }
 
+        const entityProxyScope = new EntityProxyScope();
 
+        entityProxyScope.attach(entity, ecd);
+
+        scope.push(entityProxyScope.scope);
     }
 
     /**
@@ -149,7 +159,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
 
                 scope.push(context);
 
-                this.pushBlackboardToScope(entity);
+                this.populateEntityScope(entity, scope);
 
                 const match = this.database.matchBest(scope.proxy);
 
@@ -203,7 +213,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
     match(entity, event, context) {
         const top = this.scope.size();
 
-        this.pushBlackboardToScope(entity)
+        this.populateEntityScope(entity, this.scope);
 
         if (typeof context === 'object') {
             this.scope.push(context);
