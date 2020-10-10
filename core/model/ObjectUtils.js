@@ -157,3 +157,21 @@ export function objectDeepEquals(a, b) {
         return a === b;
     }
 }
+
+/**
+ * @template S,R
+ * @param {S} source
+ * @return {R}
+ */
+export function objectShallowCopyByOwnKeys(source) {
+    const keys = Reflect.ownKeys(source);
+
+    const result = {};
+    const n = keys.length;
+    for (let i = 0; i < n; i++) {
+        const key = keys[i];
+        result[key] = source[key];
+    }
+
+    return result;
+}
