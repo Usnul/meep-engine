@@ -48,7 +48,7 @@ class Context extends SystemEntityContext {
     unlink() {
         const dataset = this.getDataset();
 
-        dataset.removeComponentFromEntity(this.entity, VoiceEvents.SpeakLine, this.handle, this);
+        dataset.removeEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handle, this);
     }
 }
 
@@ -113,9 +113,15 @@ export class VoiceSystem extends AbstractContextSystem {
          */
         const line = this.lines.get(line_id);
 
+        if (line === null) {
+            console.warn(`Line '${line_id}' not found in the database`);
+            return;
+        }
+
         const localiation = this.localiation;
 
         const localized_line = localiation.getString(line.text);
+
 
         const view = new EmptyView({
             classList: ['gui-voice-speech-bubble']

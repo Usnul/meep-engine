@@ -1,3 +1,5 @@
+import { assert } from "../../../../core/assert.js";
+
 export class LineDescription {
     constructor() {
         /**
@@ -31,6 +33,9 @@ export class LineDescription {
                  comment = "",
                  displayDuration = 1
              }) {
+
+        assert.typeOf(text, 'string', 'text');
+
         this.id = id;
         this.text = text;
         this.comment = comment;

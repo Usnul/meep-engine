@@ -49,4 +49,10 @@ export class Voice {
     }
 }
 
+/**
+ *
+ * @type {boolean}
+ */
+Voice.serializable = false;
+
 Voice.typeName = 'Voice';
