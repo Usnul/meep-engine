@@ -10,7 +10,7 @@ const weights = [];
  * @param {T[]} array
  * @param {function} random
  * @param {function(T):number} weight
- * @returns {T}
+ * @returns {T|undefined}
  */
 export function weightedRandomFromArray(array, random, weight) {
     assert.isArray(array, 'array');
@@ -18,6 +18,10 @@ export function weightedRandomFromArray(array, random, weight) {
     assert.typeOf(weight, 'function', 'weight');
 
     const n = array.length;
+
+    if (n === 0) {
+        return undefined;
+    }
 
     let weight_total = 0;
 

@@ -2,6 +2,9 @@ import { Behavior } from "../Behavior.js";
 import { BehaviorStatus } from "../BehaviorStatus.js";
 import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
 
+/**
+ * Behavior that always succeeds
+ */
 export class SucceedingBehavior extends Behavior {
     constructor(delayTicks = 0) {
         super();

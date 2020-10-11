@@ -95,6 +95,13 @@ export class DynamicActorSystem extends AbstractContextSystem {
          * @private
          */
         this.__idle_event_timer = 0;
+
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__current_time = 0;
     }
 
     /**
@@ -130,6 +137,11 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {DataScope} scope
      */
     populateEntityScope(entity, scope) {
+        // inject current time
+        scope.push({
+            now: this.__current_time
+        });
+
 
         // fetch blackboard
         const ecd = this.entityManager.dataset;
@@ -294,6 +306,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
     update(timeDelta) {
 
         this.__idle_event_timer += timeDelta;
+
+        this.__current_time += timeDelta;
 
         while (this.__idle_event_timer > IDLE_EVENT_TIMEOUT) {
             this.__idle_event_timer -= IDLE_EVENT_TIMEOUT;

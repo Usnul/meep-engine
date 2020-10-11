@@ -3,6 +3,9 @@ import { SendRequestActionDescription } from "./SendRequestActionDescription.js"
 import { assert } from "../../../../../core/assert.js";
 import { ActionSequenceDescription } from "./ActionSequenceDescription.js";
 import { DelayActionDescription } from "./DelayActionDescription.js";
+import { NoopActionDescription } from "./NoopActionDescription.js";
+import { WeightedRandomActionDescription } from "./WeightedRandomActionDescription.js";
+import { WhiteToBlackboardActionDescription } from "./WhiteToBlackboardActionDescription.js";
 
 const type_map = {
     Sequence({ elements }) {
@@ -13,6 +16,25 @@ const type_map = {
         const r = new ActionSequenceDescription();
 
         r.elements = children;
+
+        return r;
+    },
+    Random({ elements }) {
+        assert.isArray(elements);
+
+
+        const r = new WeightedRandomActionDescription();
+
+        elements.forEach(({ weight = 1, action }) => {
+
+            const child_action = deserializeActionFromJSON(action);
+
+            r.addElement(
+                child_action,
+                weight
+            );
+
+        });
 
         return r;
     }
@@ -30,12 +52,14 @@ function registerType(t) {
         action.fromJSON(j);
 
         return action;
-    }
+    };
 }
 
 registerType(SpeakLineActionDescription);
 registerType(SendRequestActionDescription);
 registerType(DelayActionDescription);
+registerType(NoopActionDescription);
+registerType(WhiteToBlackboardActionDescription);
 
 /**
  *
