@@ -38,6 +38,19 @@ export class AttachmentSockets {
         }
     }
 
+    /**
+     *
+     * @param {AttachmentSocket[]} sockets
+     */
+    addAll(sockets) {
+        const n = sockets.length;
+        for (let i = 0; i < n; i++) {
+            const socket = sockets[i];
+
+            this.add(socket);
+        }
+    }
+
     fromJSON({ elements }) {
 
         const sockets = elements.map(AttachmentSockets.fromSocketJSON);

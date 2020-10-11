@@ -14,6 +14,7 @@ export const GameAssetType = {
     Image: "image",
     ImageSvg: "image/svg",
     AnimationGraph: 'x-meep/animation-graph',
+    AttachmentSockets: 'x-meep/attachment-sockets',
     JavaScript: "text/javascript",
     Sound: 'audio'
 };

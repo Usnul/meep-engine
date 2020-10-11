@@ -17,6 +17,7 @@ import { ImageRGBADataLoader } from "./loaders/ImageRGBADataLoader.js";
 import { GLTFAssetLoader } from "./loaders/GLTFAssetLoader.js";
 import { LegacyThreeJSONAssetLoader } from "./loaders/LegacyThreeJSONAssetLoader.js";
 import { SVGAssetLoader } from "./loaders/SVGAssetLoader.js";
+import { AttachmentSocketsAssetLoader } from "../ecs/sockets/serialization/AttachmentSocketsAssetLoader.js";
 
 
 function loadDDSTexture(path, success, failure, progress) {
@@ -260,6 +261,7 @@ function initAssetManager(assetManager) {
 
 
     assetManager.registerLoader(GameAssetType.AnimationGraph, new AnimationGraphDefinitionAssetLoader());
+    assetManager.registerLoader(GameAssetType.AttachmentSockets, new AttachmentSocketsAssetLoader());
 
     assetManager.registerLoader(GameAssetType.Image, new ImageRGBADataLoader());
 

@@ -22,7 +22,7 @@ export class AnimationGraphDefinitionAssetLoader extends AssetLoader {
                 success(asset);
             },
             failure,
-            (v) => progress(v * 0.5)
+             progress
         );
 
     }

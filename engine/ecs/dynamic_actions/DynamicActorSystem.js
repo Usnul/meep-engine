@@ -104,6 +104,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {*} context
      */
     executeRule(entity, rule, context) {
+        console.log('Executing rule', rule, entity, context);
+
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
 
