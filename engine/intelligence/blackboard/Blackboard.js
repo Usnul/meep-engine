@@ -60,12 +60,10 @@ export class Blackboard {
          */
         this.data = {};
 
-        const self = this;
-
         /**
          * @private
          */
-        this.proxy = new Proxy({}, {
+        this.proxy = new Proxy(this, {
             /**
              *
              * @param target
@@ -74,7 +72,7 @@ export class Blackboard {
              * @returns {*}
              */
             get(target, p, receiver) {
-                const data = self.data;
+                const data = target.data;
 
                 if (!data.hasOwnProperty(p)) {
                     return undefined;
@@ -89,7 +87,7 @@ export class Blackboard {
             set(target, p, value, receiver) {
 
 
-                const blackboardValue = self.data[p];
+                const blackboardValue = target.data[p];
 
                 if (blackboardValue === undefined) {
                     return undefined;
@@ -97,16 +95,13 @@ export class Blackboard {
 
                 blackboardValue.value.set(value);
 
+            },
+            ownKeys(target) {
+
+                return Reflect.ownKeys(target.data);
+
             }
         });
-    }
-
-    /**
-     *
-     * @return {Object}
-     */
-    get value_proxy() {
-        return this.getValueProxy();
     }
 
     /**

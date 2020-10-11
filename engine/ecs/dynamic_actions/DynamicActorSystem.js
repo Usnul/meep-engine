@@ -13,6 +13,7 @@ import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js
 import { SerializationMetadata } from "../components/SerializationMetadata.js";
 import Tag from "../components/Tag.js";
 import { OverrideContextBehavior } from "../../../../model/game/util/behavior/OverrideContextBehavior.js";
+import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
 
 class Context extends SystemEntityContext {
 
@@ -95,13 +96,6 @@ export class DynamicActorSystem extends AbstractContextSystem {
          * @private
          */
         this.__idle_event_timer = 0;
-
-        /**
-         *
-         * @type {number}
-         * @private
-         */
-        this.__current_time = 0;
     }
 
     /**
@@ -111,7 +105,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {*} context
      */
     executeRule(entity, rule, context) {
-        console.log('Executing rule', rule, entity, context);
+        console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
 
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
@@ -137,14 +131,38 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {DataScope} scope
      */
     populateEntityScope(entity, scope) {
+        const ecd = this.entityManager.dataset;
+
+        // pull in dependency scopes
+        const actor = ecd.getComponent(entity, DynamicActor);
+
+        const context_count = actor.context.length;
+        for (let i = 0; i < context_count; i++) {
+            const ctx_entity = actor.context[i];
+
+            if (!ecd.entityExists(ctx_entity)) {
+                continue;
+            }
+
+            const ctx_bb = ecd.getComponent(ctx_entity, Blackboard);
+
+            if (ctx_bb === undefined) {
+                continue;
+            }
+
+            scope.push(ctx_bb.getValueProxy());
+        }
+
+
         // inject current time
+        const time = this.engine.ticker.clock.getElapsedTime();
+
         scope.push({
-            now: this.__current_time
+            now: time
         });
 
 
         // fetch blackboard
-        const ecd = this.entityManager.dataset;
 
         /**
          *
@@ -306,8 +324,6 @@ export class DynamicActorSystem extends AbstractContextSystem {
     update(timeDelta) {
 
         this.__idle_event_timer += timeDelta;
-
-        this.__current_time += timeDelta;
 
         while (this.__idle_event_timer > IDLE_EVENT_TIMEOUT) {
             this.__idle_event_timer -= IDLE_EVENT_TIMEOUT;

@@ -79,7 +79,7 @@ class Clock {
 
     start() {
         this.__lastMeasurement = currentTimeInSeconds();
-        this.timeAtDelta = this.getElapsedTime();
+        this.timeAtDelta = this.updateElapsedTime();
         this.__isRunning = true;
     }
 
@@ -94,7 +94,7 @@ class Clock {
      * @returns {number}
      */
     getDelta() {
-        const elapsedTime = this.getElapsedTime();
+        const elapsedTime = this.updateElapsedTime();
         const delta = elapsedTime - this.timeAtDelta;
         this.timeAtDelta = elapsedTime;
         return delta;
@@ -104,10 +104,18 @@ class Clock {
      *
      * @returns {number}
      */
-    getElapsedTime() {
+    updateElapsedTime() {
         if (this.__isRunning) {
             updateElapsedTime(this);
         }
+        return this.elapsedTime;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    getElapsedTime() {
         return this.elapsedTime;
     }
 

@@ -161,7 +161,7 @@ class TaskProgressView extends View {
 
             progressBar.value = taskProgress;
 
-            remainingTimeEstimator.update(clock.getElapsedTime(), taskProgress);
+            remainingTimeEstimator.update(clock.updateElapsedTime(), taskProgress);
 
             const computedEstimate = remainingTimeEstimator.estimate(taskProgress);
 
