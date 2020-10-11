@@ -30,7 +30,7 @@ const TIMING_NOTICE_DELAY = 0.2;
  * Minimum time to read something
  * @type {number}
  */
-const TIMING_MINIMUM_READ_TIME = 0.5;
+const TIMING_MINIMUM_READ_TIME = 1.2;
 
 class Context extends SystemEntityContext {
 
@@ -142,11 +142,20 @@ export class VoiceSystem extends AbstractContextSystem {
 
         voice.setFlag(VoiceFlags.Speaking);
 
+        const transform = new Transform();
+
+        // copy transform from source entity
+        const source_transform = ecd.getComponent(entity, Transform);
+
+        if (source_transform !== undefined) {
+            transform.copy(source_transform);
+        }
+
         new EntityBuilder()
             .add(GUIElement.fromView(view))
             .add(ViewportPosition.fromJSON({}))
             .add(HeadsUpDisplay.fromJSON({ anchor: new Vector2(0.5, 1) }))
-            .add(new Transform())
+            .add(transform)
             .add(Attachment.fromJSON({
                 socket: 'Voice',
                 parent: entity,
