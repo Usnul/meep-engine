@@ -38,6 +38,7 @@ export class ReactiveExpression {
     toCode() {
         return "";
     }
+
     /**
      *
      * @returns {number}
@@ -60,6 +61,18 @@ export class ReactiveExpression {
      */
     traverse(visitor, thisArg) {
         visitor.call(thisArg, this);
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    computeTreeSize() {
+        let result = 0;
+
+        this.traverse(() => result++);
+
+        return result;
     }
 
     /**

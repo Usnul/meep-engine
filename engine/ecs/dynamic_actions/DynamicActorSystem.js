@@ -14,6 +14,8 @@ import { SerializationMetadata } from "../components/SerializationMetadata.js";
 import Tag from "../components/Tag.js";
 import { OverrideContextBehavior } from "../../../../model/game/util/behavior/OverrideContextBehavior.js";
 import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
+import { HashMap } from "../../../core/collection/HashMap.js";
+import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
 
 class Context extends SystemEntityContext {
 
@@ -96,6 +98,28 @@ export class DynamicActorSystem extends AbstractContextSystem {
          * @private
          */
         this.__idle_event_timer = 0;
+
+        /**
+         * When precisely each rule was last used
+         * @type {HashMap<DynamicRuleDescription, number>}
+         * @private
+         */
+        this.__global_last_used_times = new HashMap({
+            keyEqualityFunction(a, b) {
+                return a.id === b.id;
+            },
+            keyHashFunction(k) {
+                return computeStringHash(k.id);
+            }
+        });
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    getCurrentTime() {
+        return this.engine.ticker.clock.getElapsedTime();
     }
 
     /**
@@ -123,6 +147,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
             .add(Tag.fromJSON(['DynamicActor-RuleExecutor']))
             .add(SerializationMetadata.Transient)
             .build(ecd);
+
+        this.__global_last_used_times.set(rule, this.getCurrentTime());
     }
 
     /**
@@ -155,7 +181,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
 
 
         // inject current time
-        const time = this.engine.ticker.clock.getElapsedTime();
+        const time = this.getCurrentTime();
 
         scope.push({
             now: time

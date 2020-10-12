@@ -28,7 +28,7 @@ class MapEntry {
 /**
  * Implements part of {@link Map} interface
  * @template K,V
- * @extends Map
+ * @extends Map<K,V>
  */
 export class HashMap {
     /**

@@ -38,6 +38,22 @@ export class DynamicRuleDescription {
          * @type {number}
          */
         this.predicate_complexity = 0;
+
+        /**
+         * How long should the rule remain inactive for after its activation
+         * In seconds
+         * @type {number}
+         */
+        this.cooldown_global = 0;
+    }
+
+    /**
+     *
+     * @param {DynamicRuleDescription} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.id === other.id;
     }
 
     /**

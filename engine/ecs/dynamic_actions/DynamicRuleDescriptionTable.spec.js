@@ -101,7 +101,7 @@ describe.skip('performance', ()=>{
 
             const context = randomFromArray(prewarm_random, contexts);
 
-            table.match(context);
+            table.matchBest(context);
         }
 
         const t0 = performance.now();
