@@ -7,7 +7,7 @@ import { ReactiveLiteralBoolean } from "../model/terminal/ReactiveLiteralBoolean
 import { createRandomReactiveExpression } from "../model/util/createRandomReactiveExpression.js";
 import { MultiPredicateEvaluator } from "./MultiPredicateEvaluator.js";
 
-test('performance', () => {
+test.skip('performance', () => {
     const random = seededRandom(12319);
 
     const names = [];
