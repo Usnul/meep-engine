@@ -13,7 +13,7 @@ import { ReactiveLiteralBoolean } from "../../../core/model/reactive/model/termi
 import { DynamicRuleDescription } from "./rules/DynamicRuleDescription.js";
 import DataType from "../../../core/parser/simple/DataType.js";
 
-describe.skip('performance', ()=>{
+describe.skip('performance', () => {
 
     test('match performance', () => {
         const random = seededRandom(12319);
@@ -56,7 +56,11 @@ describe.skip('performance', ()=>{
         const EXPRESSION_COUNT = 5000;
         for (let i = 0; i < EXPRESSION_COUNT; i++) {
 
-            const exp = createRandomReactiveExpression(random, terminals, randomIntegerBetween(random, 3, 15));
+            let exp;
+
+            do {
+                exp = createRandomReactiveExpression(random, terminals, randomIntegerBetween(random, 3, 15));
+            } while (exp.dataType !== DataType.Boolean);
 
             expressions.push(exp);
 
@@ -82,7 +86,7 @@ describe.skip('performance', ()=>{
             for (let j = 0; j < NAME_COUNT; j++) {
                 const roll = random();
 
-                if (roll < 0.5) {
+                if (roll < 0.03) {
                     continue;
                 }
 

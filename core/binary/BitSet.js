@@ -495,4 +495,46 @@ BitSet.prototype.reset = function () {
     this.__length = 0;
 };
 
+/**
+ * Copy contents of another bit set into this one
+ * @param {BitSet} other
+ */
+BitSet.prototype.copy = function (other) {
+    const length = other.__length;
+
+    const byte_size = length >> 3;
+
+    const old_length = this.__length;
+
+
+    if (old_length !== length) {
+
+        if (old_length < length) {
+            this.__resize(length);
+        } else {
+            // clear everything past the target region
+            this.__data.fill(0, byte_size);
+        }
+
+        this.__length = length;
+    }
+
+
+    for (let i = 0; i < byte_size; i++) {
+        this.__data[i] = other.__data[i];
+    }
+
+    const byte_aligned_bit_size = byte_size << 3;
+
+    const overflow_bits = length - byte_aligned_bit_size;
+
+    for (let i = 0; i < overflow_bits; i++) {
+        const bitIndex = byte_aligned_bit_size + i;
+
+        this.set(bitIndex, other.get(bitIndex));
+    }
+
+    this.__firstClearBitIndex = other.__firstClearBitIndex;
+};
+
 export { BitSet };

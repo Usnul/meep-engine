@@ -79,6 +79,12 @@ ReactiveLiteralNumber.prototype.dataType = DataType.Number;
  * @type {boolean}
  */
 ReactiveLiteralNumber.prototype.isTerminal = true;
+/**
+ * @readonly
+ * @type {boolean}
+ */
+ReactiveLiteralNumber.prototype.isLiteral = true;
+
 
 ReactiveLiteralNumber.prototype.isReactiveLiteralNumber = true;
 

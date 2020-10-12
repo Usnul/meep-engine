@@ -45,7 +45,11 @@ test('performance', () => {
     const EXPRESSION_COUNT = 5000;
     for (let i = 0; i < EXPRESSION_COUNT; i++) {
 
-        const exp = createRandomReactiveExpression(random, terminals, randomIntegerBetween(random, 3, 15));
+        let exp;
+
+        do {
+            exp = createRandomReactiveExpression(random, terminals, randomIntegerBetween(random, 3, 15));
+        } while (exp.dataType !== DataType.Boolean);
 
         expressions.push(exp);
 
@@ -60,13 +64,13 @@ test('performance', () => {
         for (let j = 0; j < NAME_COUNT; j++) {
             const roll = random();
 
-            if (roll < 0.5) {
+            if (roll < 0.03) {
                 continue;
             }
 
             const name = names[j];
 
-            v[name] = randomIntegerBetween(random, 3, 15);
+            v[name] = randomIntegerBetween(random, -10, 10);
         }
 
         contexts[i] = v;
@@ -78,7 +82,7 @@ test('performance', () => {
 
 
     function cycle(context) {
-        evaluator.initialize();
+        evaluator.initialize(context);
         evaluator.next();
         evaluator.finalize();
     }

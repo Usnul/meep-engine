@@ -65,6 +65,12 @@ ReactiveLiteralString.prototype.dataType = DataType.String;
 ReactiveLiteralString.prototype.isTerminal = true;
 
 /**
+ * @readonly
+ * @type {boolean}
+ */
+ReactiveLiteralString.prototype.isLiteral = true;
+
+/**
  *
  * @type {boolean}
  */
