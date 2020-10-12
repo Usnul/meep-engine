@@ -93,17 +93,26 @@ export class DynamicRuleDescription {
         this.condition.traverse(this.__increment_predicate_complexity, this);
     }
 
-    fromJSON({ id = UUID.generate(), condition, action }) {
+    fromJSON({
+                 id = UUID.generate(),
+                 condition,
+                 action,
+                 global_cooldown = 0
+             }) {
         assert.typeOf(condition, 'string', 'condition');
 
         assert.defined(action, 'action');
         assert.notNull(action, 'action');
+
+        assert.greaterThanOrEqual(global_cooldown, 0, 'global_cooldown');
 
         this.condition = compileReactiveExpression(condition);
 
         this.action = deserializeActionFromJSON(action);
 
         this.id = id;
+
+        this.cooldown_global = global_cooldown;
 
         this.build();
     }

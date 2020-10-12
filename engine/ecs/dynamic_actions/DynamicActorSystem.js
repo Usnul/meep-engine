@@ -16,6 +16,7 @@ import { OverrideContextBehavior } from "../../../../model/game/util/behavior/Ov
 import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
 import { HashMap } from "../../../core/collection/HashMap.js";
 import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
+import { randomFromArray } from "../../../core/math/MathUtils.js";
 
 class Context extends SystemEntityContext {
 
@@ -112,6 +113,12 @@ export class DynamicActorSystem extends AbstractContextSystem {
                 return computeStringHash(k.id);
             }
         });
+
+        /**
+         *
+         * @type {MultiPredicateEvaluator}
+         */
+        this.evaluator = null;
     }
 
     /**
@@ -208,6 +215,72 @@ export class DynamicActorSystem extends AbstractContextSystem {
     }
 
     /**
+     *
+     * @param {Object} context
+     * @return {DynamicRuleDescription|undefined}
+     */
+    matchRule(context) {
+        /**
+         *
+         * @type {DynamicRuleDescription|undefined}
+         */
+        let result = undefined;
+
+        const evaluator = this.evaluator;
+
+        evaluator.initialize(context);
+
+        while (true) {
+            const predicate = evaluator.next();
+
+            if (predicate === undefined) {
+                break;
+            }
+
+            const rules = this.database.getRulesByPredicate(predicate);
+
+
+            if (rules === undefined) {
+                // no matches, go on
+                continue;
+            }
+
+            // exclude rules that are on cooldown
+
+            const candidates = rules.slice();
+            let candidate_count = candidates.length;
+
+            for (let i = candidate_count - 1; i >= 0; i--) {
+                const rule = candidates[i];
+
+                const last_used_time = this.__global_last_used_times.get(rule);
+
+                if (last_used_time === undefined) {
+                    continue;
+                }
+
+                if (last_used_time + rule.cooldown_global > this.getCurrentTime()) {
+                    // rule is still on cooldown, exclude
+                    candidates.splice(i, 1);
+                    candidate_count--;
+                }
+            }
+
+            if (candidate_count === 0) {
+                continue;
+            }
+
+            result = randomFromArray(Math.random, candidates);
+
+            break;
+        }
+
+        evaluator.finalize();
+
+        return result;
+    }
+
+    /**
      * Given a context, returns N actors that match that context best, filter is used to restrict search and reject certain actors entirely
      * Useful for picking an actor for a response action
      *
@@ -251,7 +324,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
 
                 this.populateEntityScope(entity, scope);
 
-                const match = this.database.matchBest(scope.proxy);
+                const match = this.matchRule(scope.proxy);
 
 
                 if (match === undefined) {
@@ -319,7 +392,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
          *
          * @type {DynamicRuleDescription}
          */
-        const description = this.database.matchBest(scopeProxy);
+        const description = this.matchRule(scopeProxy);
 
         if (description !== undefined) {
             this.executeRule(entity, description, scopeProxy);
@@ -330,8 +403,15 @@ export class DynamicActorSystem extends AbstractContextSystem {
         return description;
     }
 
-    startup(entityManager, readyCallback, errorCallback) {
-        this.database = this.engine.staticKnowledge.getTable('dynamic-actions');
+    async startup(entityManager, readyCallback, errorCallback) {
+        const staticKnowledge = this.engine.staticKnowledge;
+
+
+        await staticKnowledge.promise();
+
+        this.database = staticKnowledge.getTable('dynamic-actions');
+
+        this.evaluator = this.database.buildEvaluator();
 
         super.startup(entityManager, readyCallback, errorCallback);
     }

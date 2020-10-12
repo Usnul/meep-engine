@@ -1,5 +1,7 @@
 import { StaticKnowledgeDataTable } from "../../../../../model/game/database/StaticKnowledgeDataTable.js";
 import { DynamicRuleDescription } from "./DynamicRuleDescription.js";
+import { MultiPredicateEvaluator } from "../../../../core/model/reactive/evaluation/MultiPredicateEvaluator.js";
+import { HashMap } from "../../../../core/collection/HashMap.js";
 
 
 export class DynamicRuleDescriptionTable extends StaticKnowledgeDataTable {
@@ -14,16 +16,72 @@ export class DynamicRuleDescriptionTable extends StaticKnowledgeDataTable {
          * @private
          */
         this.__sorted_by_predicate_complexity = [];
+
+        /**
+         *
+         * @type {HashMap<ReactiveExpression, DynamicRuleDescription[]>}
+         * @private
+         */
+        this.__predicate_rule_mapping = new HashMap();
+    }
+
+    /**
+     *
+     * @param {ReactiveExpression} predicate
+     * @return {DynamicRuleDescription[]|undefined}
+     */
+    getRulesByPredicate(predicate) {
+        return this.__predicate_rule_mapping.get(predicate);
+    }
+
+    /**
+     *
+     * @return {MultiPredicateEvaluator}
+     */
+    buildEvaluator() {
+        const evaluator = new MultiPredicateEvaluator(exp => exp.computeTreeSize());
+
+        /**
+         *
+         * @type {DynamicRuleDescription[]}
+         */
+        const rules = this.asArray();
+
+        evaluator.build(rules.map(r => r.condition));
+
+        return evaluator;
     }
 
     buildIndex() {
 
-        // build sorted version
+        /**
+         *
+         * @type {DynamicRuleDescription[]}
+         */
+        const rules = this.asArray();
 
-        this.__sorted_by_predicate_complexity = this.__array.slice();
+
+        // build sorted version
+        this.__sorted_by_predicate_complexity = rules.slice();
         this.__sorted_by_predicate_complexity.sort((a, b) => {
             return b.getPredicateComplexity() - a.getPredicateComplexity();
         });
+
+        // build predicate rule mapping
+        const n = rules.length;
+
+        for (let i = 0; i < n; i++) {
+            const rule = rules[i];
+
+            const bucket = this.__predicate_rule_mapping.get(rule.condition);
+
+            if (bucket === undefined) {
+                this.__predicate_rule_mapping.set(rule.condition, [rule]);
+            } else {
+                bucket.push(rule);
+            }
+
+        }
     }
 
     /**
