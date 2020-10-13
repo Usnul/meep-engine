@@ -8,6 +8,7 @@ import { ObservedMap } from "../../core/collection/ObservedMap.js";
 import { AssetDescription } from "./Asset.js";
 import { HashMap } from "../../core/collection/HashMap.js";
 import { extractAssetListFromManager } from "./preloader/extractAssetListFromManager.js";
+import { assert } from "../../core/assert.js";
 
 /**
  *
@@ -44,29 +45,25 @@ function AssetManager() {
      *
      * @type {HashMap<AssetDescription, Asset>}
      */
-    this.assets = new HashMap({
-        keyEqualityFunction(a, b) {
-            return a.equals(b);
-        },
-        keyHashFunction(key) {
-            return key.hash();
-        }
-    });
+    this.assets = new HashMap();
 
     /**
      *
      * @type {ObservedMap<AssetDescription, PendingAsset>}
      */
-    this.requestMap = new ObservedMap(new HashMap({
-        keyEqualityFunction(a, b) {
-            return a.equals(b);
-        },
-        keyHashFunction(key) {
-            return key.hash();
-        }
-    }));
+    this.requestMap = new ObservedMap(new HashMap());
 
+    /**
+     * Registered loaders
+     * @type {Object<AssetLoader>}
+     */
     this.loaders = {};
+
+    /**
+     * Named links to specific assets. Useful to later re-mapping assets and having meaningful names for them
+     * @type {Map<string, AssetDescription>}
+     */
+    this.aliases = new Map();
 
     /**
      * This will be added to asset path for actual network resolution
@@ -296,6 +293,40 @@ AssetManager.prototype.tryGet = function (path, type) {
     } else {
         return null;
     }
+};
+
+/**
+ * @template T
+ * @param {string} alias
+ * @return {Promise<Asset<T>>}
+ */
+AssetManager.prototype.promiseByAlias = function (alias) {
+    assert.typeOf(alias, 'string', 'alias');
+
+    // resolve alias
+    const assetDescription = this.aliases.get(alias);
+
+    if (assetDescription === undefined) {
+        return new Promise.reject(`Alias '${alias}' not found`);
+    }
+
+    return this.promise(assetDescription.path, assetDescription.path);
+};
+
+/**
+ *
+ * @param {string} alias
+ * @param {string} path
+ * @param {string} type
+ */
+AssetManager.prototype.assignAlias = function (alias, path, type) {
+    assert.typeOf(alias, 'string', 'alias');
+    assert.typeOf(path, 'string', 'path');
+    assert.typeOf(type, 'string', 'type');
+
+    const assetDescription = new AssetDescription(path, type);
+
+    this.aliases.set(alias, assetDescription);
 };
 
 /**
