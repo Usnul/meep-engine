@@ -4,5 +4,6 @@
  */
 export const VoiceEvents = {
     SpeakLine: 'speak-line',
-    FinishedSpeakingLine:'speak-line-finished'
+    SpeakSetLine: 'speak-set-line',
+    FinishedSpeakingLine: 'speak-line-finished'
 };

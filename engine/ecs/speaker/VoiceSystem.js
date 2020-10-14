@@ -12,13 +12,14 @@ import { DelayBehavior } from "../../../../model/game/util/behavior/DelayBehavio
 import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import EmptyView from "../../../view/elements/EmptyView.js";
-import { max2 } from "../../../core/math/MathUtils.js";
+import { max2, randomIntegerBetween } from "../../../core/math/MathUtils.js";
 import { VoiceEvents } from "./VoiceEvents.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
 import { ActionBehavior } from "../../intelligence/behavior/primitive/ActionBehavior.js";
 import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { VoiceFlags } from "./VoiceFlags.js";
+import { assert } from "../../../core/assert.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -32,23 +33,37 @@ const TIMING_NOTICE_DELAY = 0.2;
  */
 const TIMING_MINIMUM_READ_TIME = 1.2;
 
+/**
+ *
+ * @type {LineDescription[]}
+ */
+const temp_lines = [];
+
 class Context extends SystemEntityContext {
 
 
-    handle({ id }) {
+    handleSpeakLineEvent({ id }) {
         this.system.sayLine(this.entity, id, this.components[0]);
+    }
+
+    handleSpeakLineSetEvent({ id }) {
+        this.system.sayLineFromSet(this.entity, id, this.components[0]);
     }
 
     link() {
         const dataset = this.getDataset();
 
-        dataset.addEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handle, this);
+        dataset.addEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handleSpeakLineEvent, this);
+
+        dataset.addEntityEventListener(this.entity, VoiceEvents.SpeakSetLine, this.handleSpeakLineSetEvent, this);
     }
 
     unlink() {
         const dataset = this.getDataset();
 
-        dataset.removeEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handle, this);
+        dataset.removeEntityEventListener(this.entity, VoiceEvents.SpeakLine, this.handleSpeakLineEvent, this);
+
+        dataset.removeEntityEventListener(this.entity, VoiceEvents.SpeakSetLine, this.handleSpeakLineSetEvent, this);
     }
 }
 
@@ -82,6 +97,12 @@ export class VoiceSystem extends AbstractContextSystem {
 
         /**
          *
+         * @type {LineSetDescriptionTable}
+         */
+        this.sets = null;
+
+        /**
+         *
          * @type {Engine}
          */
         this.engine = engine;
@@ -93,9 +114,43 @@ export class VoiceSystem extends AbstractContextSystem {
 
         this.localiation = engine.localization
         this.gml = engine.gui.gml;
-        this.lines = engine.staticKnowledge.getTable('voice-lines');
+
+        const knowledge = engine.staticKnowledge;
+
+        this.lines = knowledge.getTable('voice-lines');
+        this.sets = knowledge.getTable('voice-line-sets');
+
+        assert.defined(this.lines, 'lines');
+        assert.defined(this.sets, 'sets');
 
         super.startup(entityManager, readyCallback, errorCallback);
+    }
+
+    /**
+     *
+     * @param {number} entity
+     * @param {string} set_id
+     * @param {Voice} voice
+     */
+    sayLineFromSet(entity, set_id, voice) {
+        /**
+         *
+         * @type {LineSetDescription}
+         */
+        const set = this.sets.get(set_id);
+
+        if (set === null) {
+            console.warn(`Line set '${set_id}' not found in the database`);
+            return;
+        }
+
+        const collected_count = set.collect(temp_lines, 0);
+
+        const line_index = randomIntegerBetween(Math.random, 0, collected_count - 1);
+
+        const selected_line = temp_lines[line_index];
+
+        this.sayLine(entity, selected_line.id, voice);
     }
 
     /**
@@ -105,7 +160,6 @@ export class VoiceSystem extends AbstractContextSystem {
      * @param {Voice} voice
      */
     sayLine(entity, line_id, voice) {
-        const ecd = this.entityManager.dataset;
 
         /**
          *
@@ -117,6 +171,8 @@ export class VoiceSystem extends AbstractContextSystem {
             console.warn(`Line '${line_id}' not found in the database`);
             return;
         }
+
+        const ecd = this.entityManager.dataset;
 
         const localiation = this.localiation;
 

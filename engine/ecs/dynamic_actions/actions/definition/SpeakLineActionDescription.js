@@ -7,6 +7,7 @@ import { SendEventBehavior } from "../../../../../../model/game/util/behavior/Se
 import { Voice } from "../../../speaker/Voice.js";
 import { VoiceFlags } from "../../../speaker/VoiceFlags.js";
 import { ActionBehavior } from "../../../../intelligence/behavior/primitive/ActionBehavior.js";
+import { assert } from "../../../../../core/assert.js";
 
 export class SpeakLineActionDescription extends AbstractActionDescription {
     constructor() {
@@ -16,7 +17,9 @@ export class SpeakLineActionDescription extends AbstractActionDescription {
          *
          * @type {string}
          */
-        this.line_id = "";
+        this.id = "";
+
+        this.isGroup = false;
 
         /**
          * If override is on, will request speaking a line even if another line is currently being spoken
@@ -26,7 +29,11 @@ export class SpeakLineActionDescription extends AbstractActionDescription {
     }
 
     execute(actor, dataset, context, system) {
-        const lineId = this.line_id;
+        const id = this.id;
+
+        const is_group = this.isGroup;
+
+        const event_type = is_group ? VoiceEvents.SpeakSetLine : VoiceEvents.SpeakLine;
 
         return SequenceBehavior.from([
             new ActionBehavior(() => {
@@ -35,7 +42,7 @@ export class SpeakLineActionDescription extends AbstractActionDescription {
 
                 if (voice !== undefined && voice.getFlag(VoiceFlags.Speaking) && !this.override) {
                     // currently speaking, give up
-                    throw new Error(`Another line is being spoken, terminating request to speak line '${lineId}' for actor '${actor}'`)
+                    throw new Error(`Another line is being spoken, terminating request to speak line '${id}' for actor '${actor}'`)
                 }
 
             }),
@@ -44,17 +51,36 @@ export class SpeakLineActionDescription extends AbstractActionDescription {
                     event: VoiceEvents.FinishedSpeakingLine
                 }),
                 SendEventBehavior.fromJSON({
-                    event: VoiceEvents.SpeakLine,
+                    event: event_type,
                     data: {
-                        id: lineId
+                        id: id
                     }
                 })
             ])
         ]);
     }
 
-    fromJSON({ line_id }) {
-        this.line_id = line_id;
+    /**
+     *
+     * @param {string} [line_id]
+     * @param {string} [set_id]
+     */
+    fromJSON({ line_id, set_id }) {
+        if (set_id !== undefined && line_id !== undefined) {
+            throw new Error(`Both line_id and group_id are set, only one is expected`);
+        }
+
+        if (line_id !== undefined) {
+            assert.typeOf(line_id, 'string', 'line_id');
+
+            this.isGroup = false;
+            this.id = line_id;
+        } else {
+            assert.typeOf(set_id, 'string', 'set_id');
+
+            this.isGroup = true;
+            this.id = set_id;
+        }
     }
 }
 

@@ -69,7 +69,9 @@ export function randomFromArray(random, array) {
     assert.isArray(array, 'array');
     assert.typeOf(random, 'function', 'random');
 
-    const i = Math.min(array.length - 1, Math.floor(random() * array.length));
+    const length = array.length;
+
+    const i = min2(length - 1, Math.floor(random() * length));
 
     return array[i];
 }
