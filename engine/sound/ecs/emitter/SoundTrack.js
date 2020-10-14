@@ -135,6 +135,9 @@ export class SoundTrack {
                 start_time += audioContext.currentTime;
             }
 
+            // cancel any scheduled values
+            gain.cancelScheduledValues(0);
+
             gain.setValueCurveAtTime([current_value, target], start_time, duration);
         }
     }
