@@ -316,6 +316,19 @@ AssetManager.prototype.promiseByAlias = function (alias) {
 /**
  *
  * @param {string} alias
+ * @return {AssetDescription}
+ */
+AssetManager.prototype.resolveAlias = function (alias) {
+
+    // todo consider cloning result to protect against mutation
+
+    return this.aliases.get(alias);
+
+};
+
+/**
+ *
+ * @param {string} alias
  * @param {string} path
  * @param {string} type
  */

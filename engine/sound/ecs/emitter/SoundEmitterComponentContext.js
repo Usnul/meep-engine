@@ -114,7 +114,17 @@ export class SoundEmitterComponentContext {
         nodes.volume.gain.setValueAtTime(soundTrack.volume, 0);
 
         //
-        assetManager.get(soundTrack.url, GameAssetType.Sound, function (asset) {
+        const track_url = soundTrack.url;
+
+        let asset_path;
+
+        if (soundTrack.getFlag(SoundTrackFlags.UsingAliasURL)) {
+            asset_path = assetManager.resolveAlias(track_url);
+        } else {
+            asset_path = track_url;
+        }
+
+        assetManager.get(asset_path, GameAssetType.Sound, function (asset) {
             /**
              *
              * @type {AudioBuffer}

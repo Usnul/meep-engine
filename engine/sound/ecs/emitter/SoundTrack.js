@@ -253,7 +253,8 @@ export class SoundTrack {
             time: this.time,
             volume: this.volume,
             playing: this.getFlag(SoundTrackFlags.Playing),
-            startWhenReady: this.getFlag(SoundTrackFlags.StartWhenReady)
+            startWhenReady: this.getFlag(SoundTrackFlags.StartWhenReady),
+            usingAssetAlias: this.getFlag(SoundTrackFlags.UsingAliasURL)
         };
     }
 
@@ -264,12 +265,15 @@ export class SoundTrack {
             time = 0,
             volume = 1,
             playing = false,
-            startWhenReady = true
+            startWhenReady = true,
+            usingAssetAlias = false
         }
     ) {
         this.url = url;
 
         this.writeFlag(SoundTrackFlags.Loop, loop);
+
+        this.writeFlag(SoundTrackFlags.UsingAliasURL, usingAssetAlias);
 
         this.time = time;
 
