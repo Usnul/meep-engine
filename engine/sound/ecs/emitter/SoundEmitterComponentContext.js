@@ -119,7 +119,18 @@ export class SoundEmitterComponentContext {
         let asset_path;
 
         if (soundTrack.getFlag(SoundTrackFlags.UsingAliasURL)) {
-            asset_path = assetManager.resolveAlias(track_url);
+            const assetDescription = assetManager.resolveAlias(track_url);
+
+            if (assetDescription === undefined) {
+
+                console.warn(`Asset alias '${track_url}' not found`);
+
+                asset_path = `# MISSING_ALIAS (${track_url})`;
+
+            } else {
+                asset_path = assetDescription.path;
+            }
+
         } else {
             asset_path = track_url;
         }
