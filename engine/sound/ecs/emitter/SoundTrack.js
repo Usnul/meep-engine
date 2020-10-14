@@ -110,7 +110,17 @@ export class SoundTrack {
         const nodes = this.nodes;
         if (nodes !== null) {
 
-            const gain = nodes.volume.gain;
+            /**
+             *
+             * @type {GainNode}
+             */
+            const volume_node = nodes.volume;
+
+            /**
+             *
+             * @type {AudioParam}
+             */
+            const gain = volume_node.gain;
 
             const current_value = gain.value;
 
@@ -119,7 +129,7 @@ export class SoundTrack {
             /**
              * @type {AudioContext}
              */
-            const audioContext = nodes.context;
+            const audioContext = volume_node.context;
 
             if (audioContext !== undefined) {
                 start_time += audioContext.currentTime;
