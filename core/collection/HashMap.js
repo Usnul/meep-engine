@@ -1,10 +1,11 @@
-/**
- * @template K,V
- */
 import { invokeObjectHash } from "../model/ObjectUtils.js";
 import { invokeObjectEquals } from "../function/Functions.js";
 import { assert } from "../assert.js";
 
+
+/**
+ * @template K,V
+ */
 class MapEntry {
     /**
      *
