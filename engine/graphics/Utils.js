@@ -181,10 +181,11 @@ export function computeSkinnedMeshBoundingVolumes(mesh) {
 
 /**
  * NOTE: the method is completely completely inlined for better performance. 0 function calls within the skinning loop
- * @param {Float32Array} vertices
+ * @param {Float32Array} destination Skinned vertex positions
  * @param {SkinnedMesh} mesh
+ * @param {number} [destination_offset=0]
  */
-export function computeSkinnedMeshVertices(vertices, mesh) {
+export function computeSkinnedMeshVertices(destination, mesh, destination_offset = 0) {
     const geometry = mesh.geometry;
     const skeleton = mesh.skeleton;
 
@@ -309,9 +310,11 @@ export function computeSkinnedMeshVertices(vertices, mesh) {
         const wy = m4_bind_inv_1 * x + m4_bind_inv_5 * y + m4_bind_inv_9 * z + m4_bind_inv_13;
         const wz = m4_bind_inv_2 * x + m4_bind_inv_6 * y + m4_bind_inv_10 * z + m4_bind_inv_14;
 
-        vertices[index3] = wx;
-        vertices[index3 + 1] = wy;
-        vertices[index3 + 2] = wz;
+        const destination_address = destination_offset + index3;
+
+        destination[destination_address] = wx;
+        destination[destination_address + 1] = wy;
+        destination[destination_address + 2] = wz;
     }
 }
 

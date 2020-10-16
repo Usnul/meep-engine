@@ -3,16 +3,17 @@
  * @param {Float32Array} result Area of individual polygons will be written here
  * @param {Float32Array} points
  * @param {Uint8Array|Uint16Array|Uint32Array} indices
+ * @param {number} [polygon_count]
  * @returns {number} total surface area
  */
-export function computeMeshSurfaceArea(result, points, indices) {
+import { assert } from "../../../core/assert.js";
+
+export function computeMeshSurfaceArea(result, points, indices, polygon_count = indices.length / 3) {
+    assert.lessThanOrEqual(polygon_count, indices.length / 3, 'index underflow');
+
     let total = 0;
 
-    const indexLength = indices.length;
-
-    const polyCount = indexLength / 3;
-
-    for (let i = 0; i < polyCount; i++) {
+    for (let i = 0; i < polygon_count; i++) {
         const index3 = i * 3;
 
         const a = indices[index3];
@@ -39,6 +40,8 @@ export function computeMeshSurfaceArea(result, points, indices) {
         const z2 = points[c3 + 2];
 
         const area = computeTriangleSurfaceArea(x0, y0, z0, x1, y1, z1, x2, y2, z2);
+
+        assert.notNaN(area, 'area');
 
         result[i] = area;
 

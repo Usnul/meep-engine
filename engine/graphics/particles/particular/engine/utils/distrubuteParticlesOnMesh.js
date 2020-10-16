@@ -62,9 +62,6 @@ export function distributeParticlesOnMesh(emitter, mesh, transform, randomSeed) 
 
     const polygonCount = aIndex.count / 3;
 
-
-    const areas = new Float32Array(polygonCount);
-
     const indices = aIndex.array;
     let points;
 
@@ -75,9 +72,14 @@ export function distributeParticlesOnMesh(emitter, mesh, transform, randomSeed) 
         points = aPosition.array;
     }
 
+    const areas = new Float32Array(polygonCount);
+
     const meshSurfaceArea = computeMeshSurfaceArea(areas, points, indices);
 
-
+    /**
+     *
+     * @type {ParticlePool}
+     */
     const particles = emitter.particles;
 
     const particleCount = particles.size();

@@ -28,6 +28,8 @@ export class ActionBehavior extends Behavior {
 
             } catch (e) {
 
+                console.warn(e);
+
                 this.setStatus(BehaviorStatus.Failed);
 
             }

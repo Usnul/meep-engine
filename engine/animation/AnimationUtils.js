@@ -12,7 +12,6 @@ import { createSound, createTimer } from "../EntityCreator.js";
 import { whenAllEntitiesDestroyed, whenEntityDestroyed } from "../ecs/EntityBuilderUtils.js";
 import { removeComponentsExcept, stopEntityAndNotifyWhenStopped } from "../../../model/game/util/AnimatedActions.js";
 import Mesh from "../graphics/ecs/mesh/Mesh.js";
-import { distributeParticlesOnMesh } from "../graphics/particles/particular/engine/utils/distrubuteParticlesOnMesh.js";
 import { SerializationMetadata } from "../ecs/components/SerializationMetadata.js";
 import { BehaviorComponent } from "../intelligence/behavior/ecs/BehaviorComponent.js";
 import { DelayBehavior } from "../../../model/game/util/behavior/DelayBehavior.js";
@@ -20,6 +19,7 @@ import Trail2D, { Trail2DFlags } from "../graphics/ecs/trail2d/Trail2D.js";
 import { SequenceBehavior } from "../intelligence/behavior/composite/SequenceBehavior.js";
 import { ActionBehavior } from "../intelligence/behavior/primitive/ActionBehavior.js";
 import { ParticleEmitterSystem2 } from "../graphics/particles/ecs/ParticleEmitterSystem2.js";
+import { distributeParticlesOnObject3D } from "../graphics/particles/particular/engine/utils/distributeParticlesOnObject3D.js";
 
 /**
  *
@@ -207,17 +207,10 @@ export function removeEntityWithMeshParticlesEffect(
     const cMesh = ecd.getComponent(entity, Mesh);
 
     if (cMesh !== undefined) {
-        let mesh = null;
-        cMesh.mesh.traverse(o => {
-            if (o.isMesh || o.isSkinnedMesh) {
-                mesh = o;
-            }
-        });
-
-        if (mesh !== null) {
+        if (cMesh.mesh !== null) {
             const randomSeed = Math.random() * 1000000;
 
-            distributeParticlesOnMesh(emitter, mesh, mesh.matrixWorld, randomSeed);
+            distributeParticlesOnObject3D(emitter, randomSeed, cMesh.mesh);
         }
     }
 
