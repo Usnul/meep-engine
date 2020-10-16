@@ -173,7 +173,7 @@ export function stopEmitterAndNotifyOnceFinished(entity, ecd) {
 
 /**
  *
- * @param {Engine} engine
+ * @param {EntityManager} entityManager
  * @param {EntityComponentDataset} ecd
  * @param {number} entity
  * @param {string} particles
@@ -181,7 +181,7 @@ export function stopEmitterAndNotifyOnceFinished(entity, ecd) {
  */
 export function removeEntityWithMeshParticlesEffect(
     {
-        engine,
+        entityManager,
         ecd,
         entity,
         particles = 'mesh-cloud-puff-0'
@@ -192,7 +192,7 @@ export function removeEntityWithMeshParticlesEffect(
      *
      * @type {ParticleEmitterSystem2}
      */
-    const sPE = engine.entityManager.getSystem(ParticleEmitterSystem2);
+    const sPE = entityManager.getSystem(ParticleEmitterSystem2);
 
     /**
      *
