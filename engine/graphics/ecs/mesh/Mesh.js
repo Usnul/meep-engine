@@ -7,6 +7,7 @@ import { computeHashFloat, computeHashIntegerArray } from "../../../../core/math
 import { computeStringHash } from "../../../../core/primitives/strings/StringUtils.js";
 import { BinaryClassSerializationAdapter } from "../../../ecs/storage/binary/BinaryClassSerializationAdapter.js";
 import { getSkeletonBoneByType } from "./SkeletonUtils.js";
+import { assert } from "../../../../core/assert.js";
 
 export const MeshFlags = {
     CastShadow: 1,
@@ -16,6 +17,8 @@ export const MeshFlags = {
 };
 
 const DEFAULT_FLAGS = 0;
+
+const stack = [];
 
 class Mesh {
     constructor() {
@@ -224,6 +227,43 @@ class Mesh {
         result.fromJSON(json);
 
         return result;
+    }
+
+    /**
+     *
+     * @param {string} name
+     * @return {Object3D|undefined}
+     */
+    getDescendantObjectByName(name) {
+        assert.typeOf(name, 'string', 'name');
+
+        const m = this.mesh;
+
+        if (m === null) {
+            return undefined;
+        }
+
+        let stack_top = 0;
+        stack[stack_top++] = m;
+
+        while (stack_top > 0) {
+            stack_top--;
+            const top = stack[stack_top];
+
+            if (top.name === name) {
+                return top;
+            }
+
+            const children = top.children;
+
+            const n = children.length;
+
+            for (let i = 0; i < n; i++) {
+                stack[stack_top++] = children[i];
+            }
+        }
+
+        return undefined;
     }
 
     /**
