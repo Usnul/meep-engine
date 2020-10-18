@@ -281,7 +281,7 @@ class Mesh {
             const skeletonBone = getSkeletonBoneByType(this, boneType);
 
             if (skeletonBone === null) {
-                console.warn("Couldn't find bone '" + boneType + "', using mesh origin instead");
+                // console.warn("Couldn't find bone '" + boneType + "', using mesh origin instead");
 
                 const mesh = this.mesh;
 

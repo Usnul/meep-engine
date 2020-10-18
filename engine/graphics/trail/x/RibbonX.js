@@ -352,6 +352,8 @@ export class RibbonX {
 
         this.__data.writeCellValue(i2, RIBBON_ATTRIBUTE_ADDRESS_ALPHA, value);
         this.__data.writeCellValue(i2 + 1, RIBBON_ATTRIBUTE_ADDRESS_ALPHA, value);
+
+        this.__ib_float32.needsUpdate = true;
     }
 
 
@@ -360,6 +362,8 @@ export class RibbonX {
 
         this.__data.writeCellValue(i2, RIBBON_ATTRIBUTE_ADDRESS_THICKNESS, value);
         this.__data.writeCellValue(i2 + 1, RIBBON_ATTRIBUTE_ADDRESS_THICKNESS, value);
+
+        this.__ib_float32.needsUpdate = true;
     }
 
     /**

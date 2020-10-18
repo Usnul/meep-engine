@@ -74,7 +74,7 @@ export function readAnimationGraphDefinitionFromJSON(
     const __states = states.map(jState => {
         const state = new AnimationStateDefinition();
 
-        const motion = jState.motion;
+        const { motion, type, name, tags = [] } = jState;
 
         const animationClip = new AnimationClip();
 
@@ -83,8 +83,9 @@ export function readAnimationGraphDefinitionFromJSON(
         animationClip.weight = motion.weight;
         animationClip.flags = motion.flags;
 
-        state.type = jState.type;
-        state.name = jState.name;
+        state.type = type;
+        state.name = name;
+        state.tags = tags;
         state.motion = animationClip;
 
         return state;

@@ -32,6 +32,28 @@ export class AnimationClipDefinition {
 
     /**
      *
+     * @param {string} name
+     * @return {number}
+     */
+    countNotificationsByName(name) {
+        let result = 0;
+
+        const notifications = this.notifications;
+        const n = notifications.length;
+        for (let i = 0; i < n; i++) {
+            const notification = notifications[i];
+
+            if (notification.def.event === name) {
+                result++;
+            }
+
+        }
+
+        return result;
+    }
+
+    /**
+     *
      * @param {string} tag
      * @return {boolean}
      */

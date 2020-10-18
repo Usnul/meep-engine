@@ -63,6 +63,34 @@ export class AnimationGraphDefinition {
 
     /**
      *
+     * @param {string[]} tags
+     * @returns {AnimationStateDefinition|undefined}
+     */
+    matchStateWithMostTags(tags) {
+
+        let best_match_count = 0;
+        let best_match = undefined;
+
+        const states = this.states;
+        const n = states.length;
+
+        for (let i = 0; i < n; i++) {
+            const definition = states[i];
+
+            const matches = definition.countMatchingTags(tags);
+
+            if (matches > best_match_count) {
+                best_match = definition;
+                best_match_count = matches;
+            }
+            
+        }
+
+        return best_match;
+    }
+
+    /**
+     *
      * @return {BlendStateMatrix}
      */
     createBlendState() {

@@ -11,7 +11,8 @@ import Vector4 from "../../../../core/geom/Vector4.js";
  * @enum {number}
  */
 export const Trail2DFlags = {
-    Spawning: 1
+    Spawning: 1,
+    Aging: 2,
 };
 
 class Trail2D {
@@ -78,7 +79,7 @@ class Trail2D {
          * @private
          * @type {Trail2DFlags|number}
          */
-        this.flags = Trail2DFlags.Spawning;
+        this.flags = Trail2DFlags.Spawning | Trail2DFlags.Aging;
     }
 
     /**

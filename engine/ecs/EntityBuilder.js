@@ -30,6 +30,10 @@ class EntityBuilder {
          */
         this.element = [];
 
+        /**
+         *
+         * @type {{name:string,listener:function, context:*}[]}
+         */
         this.deferredListeners = [];
 
         /**
@@ -183,15 +187,17 @@ class EntityBuilder {
      *
      * @param {string} eventName
      * @param {function} listener
+     * @param {*} [context]
      * @returns {EntityBuilder}
      */
-    addEventListener(eventName, listener) {
+    addEventListener(eventName, listener, context) {
         if (this.getFlag(EntityBuilderFlags.Built)) {
-            this.dataset.addEntityEventListener(this.entity, eventName, listener);
+            this.dataset.addEntityEventListener(this.entity, eventName, listener, context);
         } else {
             this.deferredListeners.push({
                 name: eventName,
-                listener: listener
+                listener: listener,
+                context
             });
         }
         return this;
@@ -201,18 +207,24 @@ class EntityBuilder {
      *
      * @param {string} eventName
      * @param {function} listener
+     * @param {*} [context]
      * @returns {EntityBuilder}
      */
-    removeEventListener(eventName, listener) {
+    removeEventListener(eventName, listener, context) {
         if (this.getFlag(EntityBuilderFlags.Built)) {
-            this.dataset.removeEntityEventListener(this.entity, eventName, listener);
+            this.dataset.removeEntityEventListener(this.entity, eventName, listener, context);
         } else {
             const listeners = this.deferredListeners;
 
             for (let i = 0, numListeners = listeners.length; i < numListeners; i++) {
                 const deferredDescriptor = listeners[i];
 
-                if (deferredDescriptor.name === eventName && deferredDescriptor.listener === listener) {
+                if (
+                    deferredDescriptor.name === eventName
+                    && deferredDescriptor.listener === listener
+                    && deferredDescriptor.context === context
+                ) {
+
                     listeners.splice(i, 1);
 
                     i--;
@@ -273,7 +285,7 @@ class EntityBuilder {
 
         for (i = 0, l = listeners.length; i < l; i++) {
             const subscription = listeners[i];
-            dataset.addEntityEventListener(entity, subscription.name, subscription.listener);
+            dataset.addEntityEventListener(entity, subscription.name, subscription.listener, subscription.context);
         }
 
         const element = this.element;

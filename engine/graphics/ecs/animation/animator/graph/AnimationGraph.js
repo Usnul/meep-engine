@@ -212,7 +212,20 @@ export class AnimationGraph {
      * @returns {AnimationState}
      */
     getStateByDefinition(stateDefinition) {
-        return this.states.find(s => s.def === stateDefinition);
+        assert.defined(stateDefinition, 'stateDefinition');
+
+        const states = this.states;
+        const n = states.length;
+        for (let i = 0; i < n; i++) {
+            const state = states[i];
+
+            if (state.def === stateDefinition) {
+                return state;
+            }
+
+        }
+
+        return undefined;
     }
 
     /**

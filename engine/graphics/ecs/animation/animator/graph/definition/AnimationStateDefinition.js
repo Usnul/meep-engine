@@ -25,9 +25,44 @@ export class AnimationStateDefinition {
 
         /**
          *
+         * @type {string[]}
+         */
+        this.tags = [];
+
+        /**
+         *
          * @type {AnimationClip|BlendSpace}
          */
         this.motion = null;
+    }
+
+    /**
+     *
+     * @param {string[]} tags
+     * @returns {number}
+     */
+    countMatchingTags(tags) {
+        let result = 0;
+
+        const m = this.tags.length;
+
+        const n = tags.length;
+
+        for (let i = 0; i < n; i++) {
+            const t0 = tags[i];
+
+            for (let j = 0; j < m; j++) {
+                const t1 = this.tags[j];
+
+                if (t0 === t1) {
+                    result++;
+                    break;
+                }
+
+            }
+        }
+
+        return result;
     }
 
     /**

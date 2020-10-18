@@ -35,6 +35,7 @@ export class BehaviorComponent {
 BehaviorComponent.fromOne = function (b) {
     assert.notEqual(b, undefined, 'behavior is undefined');
     assert.notEqual(b, null, 'behavior is null');
+    assert.equal(b.isBehavior, true, 'b.isBehavior !== true');
 
     const result = new BehaviorComponent();
 

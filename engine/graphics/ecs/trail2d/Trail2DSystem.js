@@ -290,8 +290,12 @@ class Trail2DSystem extends System {
         const ribbon = trail.ribbon;
 
         const newPosition = v3Temp1;
-        newPosition.copy(transform.position);
-        newPosition.add(trail.offset);
+
+        newPosition.copy(trail.offset);
+        newPosition.multiply(transform.scale);
+        newPosition.applyQuaternion(transform.rotation);
+
+        newPosition.add(transform.position);
 
         trail.timeSinceLastUpdate += timeDelta;
         trail.time += timeDelta;

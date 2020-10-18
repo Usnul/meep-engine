@@ -38,6 +38,10 @@ class PathFollower {
          */
         this.positionWriting = new BooleanVector3(true, true, true);
 
+        /**
+         *
+         * @type {Vector1}
+         */
         this.speed = new Vector1(1);
 
         /**
