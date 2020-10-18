@@ -3,6 +3,16 @@ import { computeHashArray, computeHashIntegerArray } from "../../../../../core/m
 import { computeStringHash } from "../../../../../core/primitives/strings/StringUtils.js";
 import { invokeObjectHash } from "../../../../../core/model/ObjectUtils.js";
 
+/**
+ *
+ * @param {AnimationNotification} a
+ * @param {AnimationNotification} b
+ * @returns {number}
+ */
+function compareByTime(a, b) {
+    return b.time - a.time;
+}
+
 export class AnimationClipDefinition {
     constructor() {
         /**
@@ -28,6 +38,10 @@ export class AnimationClipDefinition {
          * @type {AnimationNotification[]}
          */
         this.notifications = [];
+    }
+
+    sortNotification() {
+        this.notifications.sort(compareByTime);
     }
 
     /**

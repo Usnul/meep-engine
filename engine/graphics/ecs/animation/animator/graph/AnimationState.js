@@ -1,7 +1,5 @@
 import { AnimationStateType } from "./AnimationStateType.js";
 import { BlendStateMatrix } from "../blending/BlendStateMatrix.js";
-import { AnimationClipFlag } from "../AnimationClipFlag.js";
-import { AnimationEventTypes } from "../AnimationEventTypes.js";
 
 export class AnimationState {
     constructor() {
@@ -153,59 +151,13 @@ export class AnimationState {
              */
             const clip = stateDefinition.motion;
 
-            const repeating = clip.getFlag(AnimationClipFlag.Repeat);
-
-            /**
-             *
-             * @type {AnimationClipDefinition}
-             */
-            const clipDefinition = clip.def;
-
             const realTimeDelta = timeDelta * clip.timeScale * this.timeScale;
 
             const timeAfter = timeBefore + realTimeDelta;
 
+            clip.dispatchNotifications(entity, dataset, timeBefore, timeAfter);
+
             this.time = timeAfter;
-
-            const notifications = clipDefinition.notifications;
-
-            const notificationCount = notifications.length;
-
-
-            const clipDuration = clipDefinition.duration;
-
-            const wrappedTimeBefore = timeBefore % clipDuration;
-            const wrappedTimeAfter = timeAfter % clipDuration;
-
-            if (repeating || timeBefore < clipDuration) {
-
-                for (let i = 0; i < notificationCount; i++) {
-                    const animationNotification = notifications[i];
-
-                    const notificationTime = animationNotification.time;
-
-                    if (
-                        (wrappedTimeBefore < wrappedTimeAfter && notificationTime > wrappedTimeBefore && notificationTime <= wrappedTimeAfter)
-                        || (wrappedTimeBefore > wrappedTimeAfter && (notificationTime > wrappedTimeBefore || notificationTime <= wrappedTimeAfter))
-                    ) {
-                        //crossing notification boundary
-                        const notificationDefinition = animationNotification.def;
-
-                        dataset.sendEvent(entity, notificationDefinition.event, notificationDefinition.data)
-                    }
-                }
-
-            }
-
-            if (!repeating) {
-                if (timeBefore < clipDuration && timeAfter >= clipDuration) {
-
-
-                    // Dispatch end of clip event
-                    dataset.sendEvent(entity, AnimationEventTypes.ClipEnded, clip);
-                }
-
-            }
         }
     }
 

@@ -63,6 +63,8 @@ export function readAnimationGraphDefinitionFromJSON(
             return _n;
         });
 
+        _c.sortNotification();
+
         return _c;
     });
 
