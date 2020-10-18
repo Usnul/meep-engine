@@ -34,7 +34,7 @@ export class AnimationClipDefinition {
         this.duration = 0;
 
         /**
-         *
+         * Notifications sorted by time, earliest first
          * @type {AnimationNotification[]}
          */
         this.notifications = [];

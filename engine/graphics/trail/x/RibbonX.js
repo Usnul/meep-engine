@@ -376,6 +376,12 @@ export class RibbonX {
 
         const point_count = count * 2;
 
+        if (this.__data.length > point_count) {
+            // original is too large, drop some
+            this.__data.removeRows(point_count, this.__data.length - point_count);
+        }
+
+
         this.__data.setCapacity(point_count);
         this.__data.length = point_count;
 
