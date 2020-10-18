@@ -63,7 +63,7 @@ export class SerializedScene extends MirScene {
         //expand dataset to make sure it can take all components
         ecd.setComponentTypeMap(engine.entityManager.getComponentTypeMap());
 
-        loadSerializedScene(this.path, ecd, engine);
+        loadSerializedScene(this.path, ecd, engine).then(success, failure);
 
         return emptyTask();
     }

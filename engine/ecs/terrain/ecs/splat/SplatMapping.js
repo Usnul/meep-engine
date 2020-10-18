@@ -276,6 +276,7 @@ export class SplatMapping {
     }
 
     /**
+     * @deprecated
      * @returns {Uint8ClampedArray|Uint8Array}
      */
     get materialData() {
@@ -283,7 +284,7 @@ export class SplatMapping {
     }
 
     /**
-     *
+     * @deprecated
      * @return {Sampler2D}
      */
     get materialSampler() {

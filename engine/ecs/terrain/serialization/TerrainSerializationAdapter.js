@@ -174,10 +174,12 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         const weightData = value.splat.weightData;
 
-        buffer.readBytes(weightData, 0, weightData.length);
+        const cell_count = splat_size_x * splat_size_y * layer_count;
+
+        buffer.readBytes(weightData, 0, cell_count);
 
         const materialData = value.splat.materialData;
-        buffer.readBytes(materialData, 0, materialData.length);
+        buffer.readBytes(materialData, 0, cell_count);
 
         // Read layers
         const layers_resolution_x = buffer.readUint16();
