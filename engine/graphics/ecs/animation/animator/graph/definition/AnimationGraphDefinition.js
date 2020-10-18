@@ -69,6 +69,7 @@ export class AnimationGraphDefinition {
     matchStateWithMostTags(tags) {
 
         let best_match_count = 0;
+        let best_match_tag_count = 0;
         let best_match = undefined;
 
         const states = this.states;
@@ -79,11 +80,20 @@ export class AnimationGraphDefinition {
 
             const matches = definition.countMatchingTags(tags);
 
-            if (matches > best_match_count) {
+            if (matches < best_match_count) {
+                continue;
+            }
+
+            const tag_count = definition.tags.length;
+
+            if (matches > best_match_count || tag_count < best_match_tag_count) {
+
                 best_match = definition;
                 best_match_count = matches;
+                best_match_tag_count = tag_count;
+
             }
-            
+
         }
 
         return best_match;
