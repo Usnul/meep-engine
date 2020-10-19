@@ -10,7 +10,7 @@ import { invokeObjectHash } from "../../../../../core/model/ObjectUtils.js";
  * @returns {number}
  */
 function compareByTime(a, b) {
-    return b.time - a.time;
+    return a.time - b.time;
 }
 
 export class AnimationClipDefinition {

@@ -659,30 +659,6 @@ export class AnimationGraph {
             }
 
             clip.initializeThreeAnimationAction(action);
-
-
-            /**
-             *
-             * @type {AnimationNotification[]}
-             */
-            const animationNotifications = clipDefinition.notifications;
-
-            // check for 0-time events
-
-            const notification_count = animationNotifications.length;
-
-            for (let i = 0; i < notification_count; i++) {
-                const notification = animationNotifications[i];
-
-                if (notification.time !== 0) {
-                    break;
-                }
-
-
-                const notificationDefinition = notification.def;
-
-                ecd.sendEvent(entity, notificationDefinition.event, notificationDefinition.data);
-            }
         }
     }
 

@@ -1,4 +1,4 @@
-import { computeHashFloat, computeHashIntegerArray } from "../../../../../core/math/MathUtils.js";
+import { computeHashFloat, computeHashIntegerArray, min2 } from "../../../../../core/math/MathUtils.js";
 import { AnimationClipFlag } from "./AnimationClipFlag.js";
 import { LoopOnce, LoopRepeat } from "three";
 import { AnimationEventTypes } from "./AnimationEventTypes.js";
@@ -68,10 +68,10 @@ export class AnimationClip {
 
             let time_end = time1;
 
-            let dispatch_flag;
+            let event_cursor = -1;
 
             if (!repeating) {
-                time_end = clipDuration;
+                time_end = min2(clipDuration, time1);
             }
 
 
@@ -81,9 +81,17 @@ export class AnimationClip {
 
                 const cycle_start_time = cycle_index * clipDuration;
 
-                dispatch_flag = false;
+                const event_cursor_before = event_cursor;
 
                 for (let i = 0; i < notificationCount; i++) {
+
+                    const event_index = cycle_index * notificationCount + i;
+
+                    if (event_index <= event_cursor) {
+                        // event has already been processed
+                        continue;
+                    }
+
                     const animationNotification = notifications[i];
 
                     const notificationTime = animationNotification.time;
@@ -93,7 +101,7 @@ export class AnimationClip {
                     if (event_time > time_end) {
                         // event is past the end time of the interval
                         break replay;
-                    } else if (event_time <= t) {
+                    } else if (event_time < t) {
                         // event is in the past, skip
                         continue;
                     }
@@ -102,13 +110,12 @@ export class AnimationClip {
                     const notificationDefinition = animationNotification.def;
 
                     ecd.sendEvent(entity, notificationDefinition.event, notificationDefinition.data);
-
                     t = event_time;
 
-                    dispatch_flag = true;
+                    event_cursor = event_index;
                 }
 
-                if (!dispatch_flag) {
+                if (event_cursor_before === event_cursor) {
                     // nothing dispatched
                     t += clipDuration;
                 }
