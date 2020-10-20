@@ -130,6 +130,18 @@ Vector2.prototype.set = function (x, y) {
 /**
  *
  * @param {number} x
+ * @param {number} y
+ */
+Vector2.prototype.setSilent = function (x, y) {
+
+    this.x = x;
+    this.y = y;
+
+};
+
+/**
+ *
+ * @param {number} x
  * @returns {Vector2}
  */
 Vector2.prototype.setX = function (x) {
