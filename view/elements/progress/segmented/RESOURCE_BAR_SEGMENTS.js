@@ -5,6 +5,38 @@ import { SegmentDefinition } from "./SegmentDefinition.js";
  * @type {SegmentDefinition[]}
  */
 export const RESOURCE_BAR_SEGMENTS = [
+    SegmentDefinition.from(2,
+        /**
+         *
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {number} x
+         * @param {number} height
+         */
+        (ctx, x, height) => {
+
+            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            const _y0 = Math.floor(height * 0.25);
+            const _y1 = Math.ceil(height * 0.75);
+
+            ctx.moveTo(x, _y0);
+            ctx.lineTo(x, _y1);
+
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(255,255,255,0.1)";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x + 1, _y0);
+            ctx.lineTo(x + 1, _y1);
+
+            ctx.stroke();
+        }),
     SegmentDefinition.from(10,
         /**
          *
