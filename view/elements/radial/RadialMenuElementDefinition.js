@@ -209,7 +209,8 @@ export class RadialMenuElementDefinition {
             autoSizeIcon,
             name,
             nameRadiusOffset,
-            nameFill
+            nameFill,
+            cssClass
         });
 
         return r;

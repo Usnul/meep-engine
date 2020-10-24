@@ -95,6 +95,8 @@ class RadialMenuElement extends View {
         this.elPath = elPath;
         elSvg.appendChild(elArc);
         elArc.appendChild(elPath);
+
+        elPath.classList.add('backdrop');
         elPath.setAttribute("fill", this.fill);
 
         let iconSize = description.iconSize;
