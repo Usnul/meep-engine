@@ -188,6 +188,26 @@ export class SegmentedResourceBarView extends View {
 
         if (minor_spec === undefined) {
             //no minor spec, only paint major
+
+            /**
+             *
+             * @type {number}
+             */
+            const stepCount = maxValue / majorSegmentValue;
+
+            const segmentWidth = size.x / stepCount;
+
+
+            for (let i = 1; i < stepCount; i++) {
+
+                const x = i * segmentWidth;
+
+                // major notch
+
+                major_spec.draw(ctx, x, size.y);
+
+            }
+
         } else {
 
             const minorSegmentValue = minor_spec.value;
