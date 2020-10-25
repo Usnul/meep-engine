@@ -292,21 +292,24 @@ export class AttachmentSystem extends System {
 
         if (parentBindings !== undefined) {
             const bindingCount = parentBindings.length;
-            if (bindingCount === 1) {
-                this.parentBindingIndex.delete(parent);
-            } else {
 
-                for (let i = 0; i < bindingCount; i++) {
-                    const attachmentBinding = parentBindings[i];
+            for (let i = 0; i < bindingCount; i++) {
+                const attachmentBinding = parentBindings[i];
 
-                    if (attachmentBinding.attachment === attachment) {
+                if (attachmentBinding.attachment === attachment) {
 
+                    if (bindingCount === 1) {
+                        // last binding, remove bucket
+                        this.parentBindingIndex.delete(parent);
+                    } else {
+                        // remove binding from the bucket
                         parentBindings.splice(i, 1);
-                        break;
                     }
-                }
 
+                    break;
+                }
             }
+
         }
     }
 
