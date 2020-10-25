@@ -23,9 +23,7 @@ export class InverterBehavior extends AbstractDecoratorBehavior {
      * @return {InverterBehavior}
      */
     static from(source) {
-        const b = new InverterBehavior();
-
-        b.setSource(source);
+        const b = new InverterBehavior(source);
 
         return b;
     }
