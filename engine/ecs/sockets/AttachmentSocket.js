@@ -6,7 +6,7 @@ export class AttachmentSocket {
          *
          * @type {String}
          */
-        this.id = null;
+        this.id = "";
 
         /**
          * Transform of the socket relative to the entity

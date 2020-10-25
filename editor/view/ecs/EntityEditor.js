@@ -37,6 +37,7 @@ import { ComponentControlView } from "./ComponentControlView.js";
 import { HeadsUpDisplayController } from "./components/HeadsUpDisplayController.js";
 import { BlackboardController } from "./components/BlackboardController.js";
 import { GridObstacleController } from "./components/GridObstacleController.js";
+import { AttachmentSocketsController } from "./components/sockets/AttachmentSocketsController.js";
 
 /**
  *
@@ -85,6 +86,7 @@ function prepareComponentFactory(factory, editor) {
         .register('SoundEmitter', () => new SoundEmitterController(editor.engine))
         .register('GUIElement', () => new GUIElementController())
         .register('ViewportPosition', datify)
+        .register('AttachmentSockets', () => new AttachmentSocketsController())
     ;
 }
 

@@ -1,11 +1,4 @@
-import {
-    AxesHelper,
-    Group,
-    Mesh as ThreeMesh,
-    MeshBasicMaterial,
-    Quaternion as ThreeQuaternion,
-    SphereBufferGeometry
-} from "three";
+import { AxesHelper, Group, Mesh as ThreeMesh, MeshBasicMaterial, SphereBufferGeometry } from "three";
 import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { Attachment } from "../../../engine/ecs/attachment/Attachment.js";
 import { BoneAttachmentSocket } from "../../../engine/ecs/sockets/BoneAttachmentSocket.js";
@@ -16,6 +9,10 @@ import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
 import { AttachmentSockets } from "../../../engine/ecs/sockets/AttachmentSockets.js";
 import { buildThreeJSHelperEntity } from "./buildThreeJSHelperEntity.js";
 import { EventMeshSet } from "../../../engine/graphics/ecs/mesh/MeshSystem.js";
+import ViewportPosition from "../../../engine/ecs/gui/position/ViewportPosition.js";
+import LabelView from "../../../view/common/LabelView.js";
+import HeadsUpDisplay from "../../../engine/ecs/gui/hud/HeadsUpDisplay.js";
+import GUIElement from "../../../engine/ecs/gui/GUIElement.js";
 
 /**
  *
@@ -41,9 +38,6 @@ export function makeSocketsSymbolicDisplay(engine) {
      */
     function factory([sockets, transform, entity], api) {
 
-        const group = new Group();
-        group.frustumCulled = false;
-
         const ecd = engine.entityManager.dataset;
 
         const rebuild = () => {
@@ -56,8 +50,11 @@ export function makeSocketsSymbolicDisplay(engine) {
 
         ecd.addEntityEventListener(entity, EventMeshSet, rebuild);
 
-        sockets.elements.forEach(socket => {
-
+        /**
+         *
+         * @param {AttachmentSocket} socket
+         */
+        function buildGizmo(socket) {
             /**
              *
              * @type {AttachmentBinding}
@@ -94,8 +91,6 @@ export function makeSocketsSymbolicDisplay(engine) {
             const socket_group = new Group();
             socket_group.frustumCulled = false;
 
-            group.add(socket_group);
-
             const helper = new AxesHelper(2 * transform.scale.x);
             helper.frustumCulled = false;
 
@@ -105,27 +100,48 @@ export function makeSocketsSymbolicDisplay(engine) {
             socket_group.add(mesh);
             socket_group.add(helper);
 
-            const q = new ThreeQuaternion();
+
+            const builder = buildThreeJSHelperEntity(socket_group, entity);
+
+            const v = new LabelView(socket.id, { classList: ['__debug-plaque'] });
+            v.css({
+                position: 'absolute',
+                whiteSpace: 'pre',
+                left: 0,
+                top: 0
+            })
+
+            builder.add(new HeadsUpDisplay())
+                .add(new ViewportPosition())
+                .add(GUIElement.fromView(v))
 
             function update_transform() {
                 binding.update();
 
-                q.set(t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w);
+                /**
+                 *
+                 * @type {Transform}
+                 */
+                const transform = builder.getComponent(Transform);
 
-                socket_group.position.set(t.position.x, t.position.y, t.position.z);
-                socket_group.rotation.setFromQuaternion(q);
-
-                socket_group.updateWorldMatrix(true, true);
+                transform.copy(t);
             }
 
             api.onFrame(update_transform);
 
+            api.bind(sockets.elements.on.removed, (s) => {
+                if (s === socket) {
+                    builder.destroy();
+                }
+            });
 
-        });
+            api.emit(builder);
+        }
 
-        const builder = buildThreeJSHelperEntity(group, entity);
+        sockets.elements.forEach(buildGizmo);
 
-        api.emit(builder);
+        api.bind(sockets.elements.on.added, buildGizmo);
+
     }
 
     return make3DSymbolicDisplay({
