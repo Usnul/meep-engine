@@ -304,6 +304,12 @@ class EntityBuilder {
     }
 }
 
+/**
+ * @readonly
+ * @type {boolean}
+ */
+EntityBuilder.prototype.isEntityBuilder = true;
+
 
 /**
  *

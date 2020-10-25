@@ -44,6 +44,13 @@ export function makeLightSymbolicDisplay(engine) {
     return make3DSymbolicDisplay({
         engine,
 
+        /**
+         *
+         * @param light
+         * @param transform
+         * @param entity
+         * @param {SymbolicDisplayInternalAPI} api
+         */
         factory([light, transform, entity], api) {
 
             const helper = makeHelper(light);
@@ -61,7 +68,8 @@ export function makeLightSymbolicDisplay(engine) {
 
             api.bind(light.type.onChanged, api.update, api);
 
-            return entityBuilder;
+
+            api.emit(entityBuilder);
         },
 
         components: [Light, Transform]

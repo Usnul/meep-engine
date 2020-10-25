@@ -105,7 +105,9 @@ export function makeStoryTriggerSetAreaDisplay(engine) {
 
         triggerSet.elements.forEach(processTrigger);
 
-        return buildThreeJSHelperEntity(group);
+        const builder = buildThreeJSHelperEntity(group);
+
+        api.emit(builder);
     }
 
     return make3DSymbolicDisplay({ engine, components: [StoryTriggerSet], factory });

@@ -28,15 +28,10 @@ export function make3DSymbolicDisplay({
 
     /**
      *
-     * @type {EntityBuilder[]}
+     * @type {SymbolicDisplayInternalAPI[]}
      */
     const entities = [];
 
-    /**
-     *
-     * @type {SignalBinding[][]}
-     */
-    const entityBindings = [];
 
     function added(...args) {
         const entity = args[args.length - 1];
@@ -52,66 +47,42 @@ export function make3DSymbolicDisplay({
 
         const api = new SymbolicDisplayInternalAPI();
 
-        api.__engine = engine;
         api.__requestUpdate.add(() => {
             removed(...args);
             added(...args);
         });
 
-        /**
-         *
-         * @type {SignalBinding[]}
-         */
-        const bindings = api.bindings;
-
-        let helper;
+        api.initialize({
+            ecd: entityDataset,
+            engine,
+            entity
+        });
 
         try {
-            helper = factory(args, api);
+            factory(args, api);
         } catch (e) {
             console.error(`Error while creating a helper:`, e, args);
+
+            api.finalize();
+
             return;
         }
 
-        if (helper === null || helper === undefined) {
-            //no helper for this entity
-
-            //make sure to cleanup any accidental bindings
-            if (bindings.length > 0) {
-                console.warn(`Cleaning up ${bindings.length} accidental bindings`);
-
-                bindings.forEach(b => b.unlink());
-            }
-            return;
-        }
-
-        entityBindings[entity] = bindings;
-
-        bindings.forEach(b => b.link());
-
-        helper.build(entityDataset);
-
-        entities[entity] = helper;
+        entities[entity] = api;
     }
 
     function removed(...args) {
         const entity = args[args.length - 1];
 
-        const builder = entities[entity];
+        const api = entities[entity];
 
-        if (builder === undefined) {
+        if (api === undefined) {
             return;
         }
 
-        const binding = entityBindings[entity];
-
-        binding.forEach(b => b.unlink());
-
-        delete entityBindings[entity];
-
         delete entities[entity];
 
-        builder.destroy();
+        api.finalize();
     }
 
     const display = new ComponentSymbolicDisplay(components, added, removed);

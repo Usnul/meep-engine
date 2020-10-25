@@ -14,6 +14,7 @@ export function makeCameraSymbolicDisplay(engine) {
 
     return make3DSymbolicDisplay({
         engine,
+
         factory([camera, transform, entity], api) {
             const helper = new CameraHelper(camera.object);
 
@@ -23,8 +24,9 @@ export function makeCameraSymbolicDisplay(engine) {
 
             r.matrixAutoUpdate = false;
 
-            return entityBuilder;
+            api.emit(entityBuilder);
         },
+
         components: [Camera, Transform]
     });
 }

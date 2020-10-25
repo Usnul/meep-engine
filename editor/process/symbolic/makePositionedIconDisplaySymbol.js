@@ -5,7 +5,6 @@ import EntityBuilder from "../../../engine/ecs/EntityBuilder.js";
 import Renderable from "../../../engine/ecs/components/Renderable.js";
 import { Transform } from "../../../engine/ecs/transform/Transform.js";
 import { synchronizeTransform } from "./synchronizeTransform.js";
-import EditorEntity from "../../ecs/EditorEntity.js";
 
 /**
  * @template C,T
@@ -35,9 +34,15 @@ export function makePositionedIconDisplaySymbol(engine, iconURL, ComponentClass)
 
     return make3DSymbolicDisplay({
         engine,
+        /**
+         *
+         * @param component
+         * @param transform
+         * @param entity
+         * @param {SymbolicDisplayInternalAPI} api
+         * @return {EntityBuilder}
+         */
         factory([component, transform, entity], api) {
-
-            const entityDataset = entityManager.dataset;
 
             const b = new EntityBuilder();
 
@@ -59,11 +64,8 @@ export function makePositionedIconDisplaySymbol(engine, iconURL, ComponentClass)
 
             b.add(cR);
             b.add(cT);
-            b.add(new EditorEntity({ referenceEntity: entity }));
 
-            b.build(entityDataset);
-
-            return b;
+            api.emit(b);
         },
         components: [ComponentClass, Transform]
     });

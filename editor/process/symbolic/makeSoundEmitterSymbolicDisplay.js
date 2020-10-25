@@ -78,8 +78,7 @@ export function makeSoundEmitterSymbolicDisplay(engine) {
         api.bind(transform.rotation.onChanged, update);
         api.bind(transform.scale.onChanged, update);
 
-
-        return builder;
+        api.emit(builder);
     }
 
     return make3DSymbolicDisplay({

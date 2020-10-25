@@ -11,7 +11,6 @@ import { Attachment } from "../../../engine/ecs/attachment/Attachment.js";
 import { BoneAttachmentSocket } from "../../../engine/ecs/sockets/BoneAttachmentSocket.js";
 import { BoneAttachmentBinding } from "../../../engine/ecs/attachment/BoneAttachmentBinding.js";
 import Mesh from "../../../engine/graphics/ecs/mesh/Mesh.js";
-import { getSkeletonBoneByName } from "../../../engine/graphics/ecs/mesh/SkeletonUtils.js";
 import { TransformAttachmentBinding } from "../../../engine/ecs/attachment/TransformAttachmentBinding.js";
 import { make3DSymbolicDisplay } from "./make3DSymbolicDisplay.js";
 import { AttachmentSockets } from "../../../engine/ecs/sockets/AttachmentSockets.js";
@@ -38,7 +37,7 @@ export function makeSocketsSymbolicDisplay(engine) {
      * @param {AttachmentSockets} sockets
      * @param {Transform} transform
      * @param {number} entity
-     * @param api
+     * @param {SymbolicDisplayInternalAPI} api
      */
     function factory([sockets, transform, entity], api) {
 
@@ -71,9 +70,13 @@ export function makeSocketsSymbolicDisplay(engine) {
             if (socket instanceof BoneAttachmentSocket) {
                 binding = new BoneAttachmentBinding();
 
+                /**
+                 *
+                 * @type {Mesh}
+                 */
                 const mesh = engine.entityManager.dataset.getComponent(entity, Mesh);
 
-                const bone = getSkeletonBoneByName(mesh, socket.boneName);
+                const bone = mesh.getDescendantObjectByName(socket.boneName);
 
                 binding.bone = bone;
             } else {
@@ -88,32 +91,47 @@ export function makeSocketsSymbolicDisplay(engine) {
 
             binding.attachedTransform = t;
 
+            const socket_group = new Group();
+            socket_group.frustumCulled = false;
+
+            group.add(socket_group);
+
             const helper = new AxesHelper(2 * transform.scale.x);
+            helper.frustumCulled = false;
 
             const mesh = new ThreeMesh(centerGeometry, centerMaterial);
+            mesh.frustumCulled = false;
 
-            helper.add(mesh);
+            socket_group.add(mesh);
+            socket_group.add(helper);
 
             const q = new ThreeQuaternion();
 
-            api.onFrame(() => {
+            function update_transform() {
                 binding.update();
 
                 q.set(t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w);
 
-                helper.position.set(t.position.x, t.position.y, t.position.z);
-                helper.rotation.setFromQuaternion(q);
-            });
+                socket_group.position.set(t.position.x, t.position.y, t.position.z);
+                socket_group.rotation.setFromQuaternion(q);
 
-            group.add(helper);
+                socket_group.updateWorldMatrix(true, true);
+            }
+
+            api.onFrame(update_transform);
+
 
         });
 
-        const builder = buildThreeJSHelperEntity(group);
+        const builder = buildThreeJSHelperEntity(group, entity);
 
-        return builder;
+        api.emit(builder);
     }
 
-    return make3DSymbolicDisplay({ engine, components: [AttachmentSockets, Transform], factory });
+    return make3DSymbolicDisplay({
+        engine,
+        components: [AttachmentSockets, Transform],
+        factory
+    });
 }
 

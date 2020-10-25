@@ -150,8 +150,10 @@ export function makeGridPositionSymbolDisplay(engine) {
     const display = make3DSymbolicDisplay({
         engine,
         components: [GridPosition, Transform],
-        factory([gridPosition, transform, entity]) {
-            return makeHelper(gridPosition, transform);
+        factory([gridPosition, transform, entity], api) {
+
+            api.emit(makeHelper(gridPosition, transform));
+
         }
     });
 

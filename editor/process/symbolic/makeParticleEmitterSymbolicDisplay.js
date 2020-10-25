@@ -132,7 +132,8 @@ export function makeParticleEmitterSymbolicDisplay(engine) {
         api.bind(emitter.layers.on.added, addLayer, {});
         api.bind(emitter.layers.on.removed, removeLayer, {});
 
-        return builder;
+        api.emit(builder);
+
     }
 
     return make3DSymbolicDisplay({

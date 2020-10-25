@@ -1,6 +1,10 @@
 import { SignalBinding } from "../../../core/events/signal/SignalBinding.js";
 import Signal from "../../../core/events/signal/Signal.js";
 import { seededRandom } from "../../../core/math/MathUtils.js";
+import { assert } from "../../../core/assert.js";
+import { ProcessState } from "../../../core/process/ProcessState.js";
+import EditorEntity from "../../ecs/EditorEntity.js";
+import List from "../../../core/collection/list/List.js";
 
 export class SymbolicDisplayInternalAPI {
     constructor() {
@@ -20,6 +24,84 @@ export class SymbolicDisplayInternalAPI {
         this.__requestUpdate = new Signal();
 
         this.random = seededRandom(42);
+
+        /**
+         *
+         * @type {List<EntityBuilder>}
+         * @private
+         */
+        this.__managed_entities = new List();
+
+        /**
+         *
+         * @type {ProcessState}
+         * @private
+         */
+        this.__state = ProcessState.New;
+
+        /**
+         *
+         * @type {EntityComponentDataset}
+         * @private
+         */
+        this.__dataset = null;
+
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__source_entity = -1;
+    }
+
+    /**
+     *
+     * @param {EntityBuilder} entity
+     */
+    emit(entity) {
+        assert.defined(entity, 'entity');
+        assert.equal(entity.isEntityBuilder, true, 'entity.isEntityBuilder !== true');
+
+        if (entity.getComponent(EditorEntity) === null) {
+            entity.add(new EditorEntity({ referenceEntity: this.__source_entity }));
+        }
+
+        this.__managed_entities.add(entity);
+
+        if (this.__state === ProcessState.Running) {
+            entity.build(this.__dataset);
+        }
+    }
+
+    /**
+     *
+     * @param {number} entity
+     * @param {EntityComponentDataset} ecd
+     * @param {Engine} engine
+     */
+    initialize({
+                   entity,
+                   ecd,
+                   engine
+               }) {
+        this.__engine = engine;
+        this.__dataset = ecd;
+        this.__source_entity = entity;
+
+        this.__state = ProcessState.Running;
+    }
+
+    finalize() {
+        // remove all managed entities
+        this.__managed_entities.forEach(e => e.destroy());
+
+        // clear all bindings
+        this.bindings.forEach(b => b.unlink());
+
+        // clear dataset
+        this.__dataset = null;
+
+        this.__state = ProcessState.Finalized;
     }
 
     /**

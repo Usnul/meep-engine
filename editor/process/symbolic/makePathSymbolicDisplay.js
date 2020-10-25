@@ -54,7 +54,7 @@ export function makePathSymbolicDisplay(engine) {
      *
      * @param {Path} path
      * @param entity
-     * @param api
+     * @param {SymbolicDisplayInternalAPI} api
      * @return {EntityBuilder}
      */
     function factory([path, entity], api) {
@@ -97,7 +97,7 @@ export function makePathSymbolicDisplay(engine) {
 
         r.matrixAutoUpdate = false;
 
-        return b;
+        api.emit(b);
     }
 
     return make3DSymbolicDisplay({
