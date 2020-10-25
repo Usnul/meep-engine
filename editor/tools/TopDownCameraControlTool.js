@@ -2,9 +2,9 @@
  * Created by Alex on 16/01/2017.
  */
 import Tool from './engine/Tool.js';
-import TopDownCameraController from "../../engine/graphics/ecs/camera/TopDownCameraController.js";
-import { PointerDevice } from "../../engine/input/devices/PointerDevice.js";
 import TopDownCameraControllerSystem from "../../engine/graphics/ecs/camera/TopDownCameraControllerSystem.js";
+import { makeOrbitalCameraController } from "../../engine/graphics/camera/makeOrbitalCameraController.js";
+import EditorEntity from "../ecs/EditorEntity.js";
 
 class TopDownCameraControlTool extends Tool {
     constructor() {
@@ -12,7 +12,14 @@ class TopDownCameraControlTool extends Tool {
         this.name = "camera_control";
         this.system = null;
 
-        this.restore = [];
+
+        /**
+         *
+         * @type {EntityBuilder}
+         * @private
+         */
+        this.__controller = null;
+
     }
 
     initialize() {
@@ -22,40 +29,28 @@ class TopDownCameraControlTool extends Tool {
         const editor = this.editor;
 
         const em = engine.entityManager;
+
+
         this.system = em.getSystem(TopDownCameraControllerSystem);
         this.system.enabled.set(true);
 
-        function getController() {
-            return editor.cameraEntity.getComponent(TopDownCameraController);
-        }
+        const ecd = em.dataset;
 
-
-        const pointerDevice = new PointerDevice(window);
-
-        pointerDevice.on.drag.add(function (position, origin, previousPosition) {
-            const cameraController = getController();
-            TopDownCameraController.pan(previousPosition.clone().sub(position), engine.graphics.camera, engine.graphics.domElement, cameraController.distance, engine.graphics.camera.fov, cameraController.target);
+        this.__controller = makeOrbitalCameraController({
+            ecd: ecd,
+            camera_entity: editor.cameraEntity.entity,
+            dom_element: engine.graphics.domElement
         });
 
-        pointerDevice.on.wheel.add(function (delta) {
-            const cameraController = getController();
-            cameraController.distance += delta.y;
-        });
+        this.__controller.add(new EditorEntity());
 
-        this.pointerDevice = pointerDevice;
-        this.pointerDevice.start();
+        this.__controller.build(ecd);
     }
 
     shutdown() {
         this.system.enabled.set(false);
 
-        this.pointerDevice.stop();
-
-        this.restore.forEach(function (action) {
-            action();
-        });
-
-        this.restore = [];
+        this.__controller.destroy();
     }
 }
 

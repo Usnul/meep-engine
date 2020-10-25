@@ -4,7 +4,6 @@ import { Transform } from "../transform/Transform.js";
 import { AttachmentSockets } from "../sockets/AttachmentSockets.js";
 import { assert } from "../../../core/assert.js";
 import Mesh from "../../graphics/ecs/mesh/Mesh.js";
-import { getSkeletonBoneByName } from "../../graphics/ecs/mesh/SkeletonUtils.js";
 import { BoneAttachmentBinding } from "./BoneAttachmentBinding.js";
 import { TransformAttachmentBinding } from "./TransformAttachmentBinding.js";
 import { MeshSystem } from "../../graphics/ecs/mesh/MeshSystem.js";
@@ -220,7 +219,7 @@ export class AttachmentSystem extends System {
                 }
 
 
-                const skeletonBone = getSkeletonBoneByName(mesh, boneName);
+                const skeletonBone = mesh.getDescendantObjectByName(boneName);
 
                 if (skeletonBone === null) {
                     console.warn(`bone '${boneName}' not found`);

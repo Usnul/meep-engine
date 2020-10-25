@@ -9,13 +9,12 @@ import Vector3 from "../core/geom/Vector3.js";
 import Terrain from "./ecs/terrain/ecs/Terrain.js";
 import Vector2 from "../core/geom/Vector2.js";
 import Water from "./graphics/ecs/water/Water.js";
-import InputController from "./input/ecs/components/InputController.js";
-import { decodeMouseEventButtons } from "./input/devices/PointerDevice.js";
 import { loadGameClassRegistry } from "../../model/game/GameClassRegistry.js";
 import { WebEnginePlatform } from "./platform/WebEnginePlatform.js";
 import Tag from "./ecs/components/Tag.js";
 import { SerializationMetadata } from "./ecs/components/SerializationMetadata.js";
 import { TerrainLayer } from "./ecs/terrain/ecs/layers/TerrainLayer.js";
+import { makeOrbitalCameraController } from "./graphics/camera/makeOrbitalCameraController.js";
 
 /**
  *
@@ -270,75 +269,19 @@ export class EngineHarness {
 
         const domElement = engine.graphics.domElement;
 
-        const cameraController = ecd.getComponent(cameraEntity, TopDownCameraController);
-
-        const camera = ecd.getComponent(cameraEntity, Camera);
-
-        /**
-         *
-         * @param {Vector2} delta
-         */
-        function orbit(delta) {
-
-            cameraController.yaw += delta.x * sensitivity;
-            cameraController.pitch += delta.y * sensitivity;
-        }
-
-        /**
-         *
-         * @param {Vector2} delta
-         */
-        function pan(delta) {
-            const d = delta.clone();
-
-            TopDownCameraController.pan(d, camera.object, domElement, cameraController.distance, camera.object.fov, cameraController.target);
-
-        }
 
         domElement.addEventListener('contextmenu', (event) => {
             event.preventDefault();
         });
 
-        const inputController = new InputController([
-            {
-                path: 'pointer/on/tap',
-                listener(position, event) {
-                    // event.preventDefault();
-                }
-            },
-            {
-                path: 'pointer/on/down',
-                listener(position, event) {
-                    // event.preventDefault();
-                }
-            },
-            {
-                path: 'pointer/on/drag',
-                listener: function (position, origin, lastDragPosition, event) {
-                    const delta = lastDragPosition.clone().sub(position);
+        const eb = makeOrbitalCameraController({
+            camera_entity: cameraEntity,
+            ecd,
+            dom_element: domElement,
+            sensitivity
+        });
 
-                    const buttons = decodeMouseEventButtons(event.buttons);
-
-                    if (buttons[0]) {
-                        pan(delta);
-                    } else {
-                        orbit(delta);
-                    }
-
-                    event.preventDefault();
-                }
-            },
-            {
-                path: 'pointer/on/wheel',
-                listener(delta, event) {
-                    cameraController.distance += delta.y;
-                }
-            }
-        ]);
-
-        const eb = new EntityBuilder();
-        eb.add(inputController);
-        eb.add(SerializationMetadata.Transient)
+        eb.add(SerializationMetadata.Transient);
 
         eb.build(ecd);
 
