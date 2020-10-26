@@ -5,11 +5,13 @@
 import Vector3 from "../../../core/geom/Vector3.js";
 import Quaternion from "../../../core/geom/Quaternion.js";
 import { Matrix4 } from "../../../core/geom/Matrix4.js";
+import { Quaternion as ThreeQuaternion } from "three/src/math/Quaternion.js";
 
 const delta = new Vector3();
 
 const m4_0 = new Matrix4();
 const m4_1 = new Matrix4();
+const threeQuaternion = new ThreeQuaternion();
 
 export class Transform {
     /**
@@ -153,6 +155,16 @@ export class Transform {
         m4_0.multiplyMatrices(m4_0, m4_1);
 
         m4_0.decompose(this.position, this.rotation, this.scale);
+    }
+
+    /**
+     *
+     * @param {Matrix4} matrix
+     */
+    fromThreeMatrix4(matrix) {
+        matrix.decompose(this.position, threeQuaternion, this.scale);
+
+        this.rotation.copy(threeQuaternion);
     }
 }
 
