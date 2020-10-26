@@ -16,5 +16,6 @@ export const GameAssetType = {
     AnimationGraph: 'x-meep/animation-graph',
     AttachmentSockets: 'x-meep/attachment-sockets',
     JavaScript: "text/javascript",
-    Sound: 'audio'
+    Sound: 'audio',
+    Font: 'font/opentype'
 };

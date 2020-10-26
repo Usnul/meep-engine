@@ -18,6 +18,7 @@ import { GLTFAssetLoader } from "./loaders/GLTFAssetLoader.js";
 import { LegacyThreeJSONAssetLoader } from "./loaders/LegacyThreeJSONAssetLoader.js";
 import { SVGAssetLoader } from "./loaders/SVGAssetLoader.js";
 import { AttachmentSocketsAssetLoader } from "../ecs/sockets/serialization/AttachmentSocketsAssetLoader.js";
+import { FontAssetLoader } from "../../core/font/FontAssetLoader.js";
 
 
 function loadDDSTexture(path, success, failure, progress) {
@@ -258,6 +259,8 @@ function initAssetManager(assetManager) {
     assetManager.registerLoader(GameAssetType.Text, new TextAssetLoader());
 
     assetManager.registerLoader(GameAssetType.JavaScript, new JavascriptAssetLoader());
+
+    assetManager.registerLoader(GameAssetType.Font, new FontAssetLoader());
 
 
     assetManager.registerLoader(GameAssetType.AnimationGraph, new AnimationGraphDefinitionAssetLoader());
