@@ -42,6 +42,7 @@ export class GridCellPlacementRule {
      * @param {GridCellAction[]} actions
      * @param {number|CellFilter} [probability]
      * @param {Vector2} [offset]
+     * @returns {GridCellPlacementRule}
      */
     static from({ matcher, actions, probability, offset = Vector2.zero }) {
 

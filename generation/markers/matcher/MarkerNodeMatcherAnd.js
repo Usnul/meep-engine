@@ -22,6 +22,10 @@ export class MarkerNodeMatcherAnd extends MarkerNodeMatcherBinary {
     }
 
     match(node) {
-        return this.left.match(node) && this.right.match(node);
+        if (this.left.match(node)) {
+            return true;
+        }
+
+        return this.right.match(node);
     }
 }
