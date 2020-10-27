@@ -277,7 +277,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const time = this.getCurrentTime();
 
         scope.push({
-            now: time
+            now: time,
+            entity
         });
 
 
