@@ -499,10 +499,17 @@ EntityManager.prototype.addSystem = function (system) {
     assert.notEqual(system, undefined, "System must not be undefined");
     assert.ok(system instanceof System, `System must inherit from "System" class`);
 
-    if (this.systems.some(s => s === system)) {
-        //system already added, do nothing
-        return this;
+    const existing = this.getSystem(system.__proto__.constructor);
+
+    if (existing !== null) {
+        if (existing === system) {
+            //system already added, do nothing
+            return;
+        } else {
+            throw new Error(`Another instance of system '${computeSystemName(system)}' is already registered`);
+        }
     }
+
 
     try {
         validateSystem(system);

@@ -3,6 +3,7 @@ import { HashMap } from "../../../collection/HashMap.js";
 import { returnZero } from "../../../function/Functions.js";
 import DataType from "../../../parser/simple/DataType.js";
 import { assert } from "../../../assert.js";
+import { max2 } from "../../../math/MathUtils.js";
 
 class ExpressionNode {
     constructor() {

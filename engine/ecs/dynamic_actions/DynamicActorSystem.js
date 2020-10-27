@@ -17,6 +17,7 @@ import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
 import { HashMap } from "../../../core/collection/HashMap.js";
 import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
 import { randomFromArray } from "../../../core/math/MathUtils.js";
+import { assert } from "../../../core/assert.js";
 
 class Context extends SystemEntityContext {
 
@@ -54,7 +55,11 @@ class Context extends SystemEntityContext {
     unlink() {
         const ecd = this.getDataset();
 
-        ecd.removeAnyEventListener(this.entity, this.handleEvent, this);
+        const removed = ecd.removeAnyEventListener(this.entity, this.handleEvent, this);
+
+        if (!removed) {
+            console.warn('Listener not removed', this.entity);
+        }
     }
 }
 
@@ -138,6 +143,9 @@ export class DynamicActorSystem extends AbstractContextSystem {
     executeRule(entity, rule, context) {
         console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
 
+        // record rule usage time
+        this.__global_last_used_times.set(rule, this.getCurrentTime());
+
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
 
@@ -155,7 +163,6 @@ export class DynamicActorSystem extends AbstractContextSystem {
             .add(SerializationMetadata.Transient)
             .build(ecd);
 
-        this.__global_last_used_times.set(rule, this.getCurrentTime());
     }
 
     /**
@@ -164,6 +171,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {DataScope} scope
      */
     populateEntityScope(entity, scope) {
+        assert.typeOf(entity, "number", "entity");
+
         const ecd = this.entityManager.dataset;
 
         // pull in dependency scopes
