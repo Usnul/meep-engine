@@ -12,7 +12,7 @@ import { DelayBehavior } from "../../../../model/game/util/behavior/DelayBehavio
 import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
 import Vector2 from "../../../core/geom/Vector2.js";
 import EmptyView from "../../../view/elements/EmptyView.js";
-import { max2, randomIntegerBetween } from "../../../core/math/MathUtils.js";
+import { max2 } from "../../../core/math/MathUtils.js";
 import { VoiceEvents } from "./VoiceEvents.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
 import { SystemEntityContext } from "../system/SystemEntityContext.js";
@@ -20,6 +20,7 @@ import { ActionBehavior } from "../../intelligence/behavior/primitive/ActionBeha
 import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { VoiceFlags } from "./VoiceFlags.js";
 import { assert } from "../../../core/assert.js";
+import { weightedRandomFromArray } from "../../../core/collection/array/weightedRandomFromArray.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -38,6 +39,52 @@ const TIMING_MINIMUM_READ_TIME = 1.2;
  * @type {LineDescription[]}
  */
 const temp_lines = [];
+
+class LineWeigher {
+    constructor() {
+
+        /**
+         *
+         * @type {number}
+         */
+        this.entity = -1;
+        /**
+         *
+         * @type {VoiceSystem}
+         */
+        this.system = null;
+
+        /**
+         *
+         * @type {number}
+         */
+        this.time = 0;
+    }
+
+    /**
+     *
+     * @param {LineDescription} line
+     * @return {number}
+     */
+    compute(line) {
+        const entity = this.entity;
+
+        const last_spoken = this.system.__global_last_used_times.get(line.id);
+
+        let freshness_score = 0;
+
+        if (last_spoken !== undefined) {
+            const time_since_last_spoken = this.time - last_spoken;
+
+            freshness_score += time_since_last_spoken;
+        } else {
+            // no record of the line being spoken, consider very fresh
+            freshness_score = 10000;
+        }
+
+        return freshness_score;
+    }
+}
 
 class Context extends SystemEntityContext {
 
@@ -106,6 +153,29 @@ export class VoiceSystem extends AbstractContextSystem {
          * @type {Engine}
          */
         this.engine = engine;
+
+        /**
+         * When last a line was spoken
+         * @type {Map<string, number>}
+         * @private
+         */
+        this.__global_last_used_times = new Map();
+
+        /**
+         *
+         * @type {LineWeigher}
+         * @private
+         */
+        this.__weigher = new LineWeigher();
+        this.__weigher.system = this;
+    }
+
+    /**
+     *
+     * @return {number}
+     */
+    getCurrentTime() {
+        return this.engine.ticker.clock.getElapsedTime();
     }
 
     startup(entityManager, readyCallback, errorCallback) {
@@ -146,9 +216,10 @@ export class VoiceSystem extends AbstractContextSystem {
 
         const collected_count = set.collect(temp_lines, 0);
 
-        const line_index = randomIntegerBetween(Math.random, 0, collected_count - 1);
+        this.__weigher.entity = entity;
+        this.__weigher.time = this.getCurrentTime();
 
-        const selected_line = temp_lines[line_index];
+        const selected_line = weightedRandomFromArray(temp_lines, Math.random, this.__weigher.compute, this.__weigher, collected_count);
 
         this.sayLine(entity, selected_line.id, voice);
     }
@@ -171,6 +242,9 @@ export class VoiceSystem extends AbstractContextSystem {
             console.warn(`Line '${line_id}' not found in the database`);
             return;
         }
+
+        // record when the line was spoken
+        this.__global_last_used_times.set(line_id, this.getCurrentTime());
 
         const ecd = this.entityManager.dataset;
 
