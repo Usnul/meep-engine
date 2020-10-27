@@ -375,7 +375,8 @@ export class MultiPredicateEvaluator {
 
             if (
                 !(
-                    (value_type === "number" && expression.dataType === DataType.Number)
+                    expression.dataType === DataType.Any
+                    || (value_type === "number" && expression.dataType === DataType.Number)
                     || (value_type === "string" && expression.dataType === DataType.String)
                     || (value_type === "boolean" && expression.dataType === DataType.Boolean)
                 )
