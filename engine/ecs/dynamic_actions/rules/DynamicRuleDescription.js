@@ -31,7 +31,7 @@ export class DynamicRuleDescription {
          * Rules with higher priority have the right to interrupt lower priority rules
          * @type {number}
          */
-        this.pririty = 0;
+        this.priority = 0;
 
         /**
          * @private
@@ -97,7 +97,8 @@ export class DynamicRuleDescription {
                  id = UUID.generate(),
                  condition,
                  action,
-                 global_cooldown = 0
+                 global_cooldown = 0,
+                 priority = 0
              }) {
         assert.typeOf(condition, 'string', 'condition');
 
@@ -105,6 +106,7 @@ export class DynamicRuleDescription {
         assert.notNull(action, 'action');
 
         assert.greaterThanOrEqual(global_cooldown, 0, 'global_cooldown');
+        assert.isNumber(priority, 'priority');
 
         this.condition = compileReactiveExpression(condition);
 
@@ -113,6 +115,8 @@ export class DynamicRuleDescription {
         this.id = id;
 
         this.cooldown_global = global_cooldown;
+
+        this.priority = priority;
 
         this.build();
     }

@@ -3,11 +3,12 @@ import { ObjectPoolFactory } from "../../../core/ObjectPoolFactory.js";
 import { assert } from "../../../core/assert.js";
 
 /**
+ * @template T
  * Creates and tracks a separate context for each linked entity, mostly targeted at event-driven system implementations
  */
 export class AbstractContextSystem extends System {
     /**
-     *
+     * @template T
      * @param {Class<SystemEntityContext>} ContextClass
      */
     constructor(ContextClass) {
@@ -54,6 +55,16 @@ export class AbstractContextSystem extends System {
          * @private
          */
         this.__validation_ignore_link_argument_count = true;
+    }
+
+    /**
+     *
+     * @param entity
+     * @return {T}
+     * @protected
+     */
+    __getEntityContext(entity) {
+        return this.__live_contexts[entity];
     }
 
     link() {

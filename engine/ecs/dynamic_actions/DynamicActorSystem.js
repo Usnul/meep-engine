@@ -6,7 +6,7 @@ import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { compareNumbersDescending, returnTrue } from "../../../core/function/Functions.js";
 import { randomMultipleFromArray } from "../../../core/collection/ArrayUtils.js";
 import { EntityProxyScope } from "../binding/EntityProxyScope.js";
-import EntityBuilder from "../EntityBuilder.js";
+import EntityBuilder, { EntityBuilderFlags } from "../EntityBuilder.js";
 import { BehaviorComponent } from "../../intelligence/behavior/ecs/BehaviorComponent.js";
 import { SequenceBehavior } from "../../intelligence/behavior/composite/SequenceBehavior.js";
 import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
@@ -18,8 +18,15 @@ import { HashMap } from "../../../core/collection/HashMap.js";
 import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
 import { randomFromArray } from "../../../core/math/MathUtils.js";
 import { assert } from "../../../core/assert.js";
+import { RuleExecution } from "./RuleExecution.js";
 
 class Context extends SystemEntityContext {
+
+    constructor() {
+        super();
+
+        this.execution = new RuleExecution();
+    }
 
     process(entity, scope) {
 
@@ -120,6 +127,13 @@ export class DynamicActorSystem extends AbstractContextSystem {
         });
 
         /**
+         * Points to current action being executed by an actor,
+         * @type {Map<number, RuleExecution>}
+         * @private
+         */
+        this.__current_actions = new Map();
+
+        /**
          *
          * @type {MultiPredicateEvaluator}
          */
@@ -140,8 +154,64 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {DynamicRuleDescription} rule
      * @param {*} context
      */
+    attemptRuleExecution(entity, rule, context) {
+
+        /**
+         *
+         * @type {Context}
+         */
+        const ctx = this.__getEntityContext(entity);
+
+        const execution = ctx.execution;
+
+        if (execution.executor !== null && execution.executor.getFlag(EntityBuilderFlags.Built)) {
+            // there is an active rule being executed, see if this one has the right to interrupt
+
+            if (rule.priority <= execution.rule.priority) {
+                // currently running rule cannot be interrupted by new one
+                return false;
+            }
+        }
+
+        this.executeRule(entity, rule, context);
+
+    }
+
+    /**
+     *
+     * @param {number} entity
+     */
+    terminateActiveExecution(entity) {
+
+        /**
+         *
+         * @type {Context}
+         */
+        const ctx = this.__getEntityContext(entity);
+
+        const execution = ctx.execution;
+
+        if (execution.executor !== null && execution.executor.getFlag(EntityBuilderFlags.Built)) {
+            execution.executor.destroy();
+        }
+    }
+
+    /**
+     *
+     * @param {number} entity
+     * @param {DynamicRuleDescription} rule
+     * @param {*} context
+     */
     executeRule(entity, rule, context) {
         console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
+
+        /**
+         *
+         * @type {Context}
+         */
+        const ctx = this.__getEntityContext(entity);
+
+        this.terminateActiveExecution(entity);
 
         // record rule usage time
         this.__global_last_used_times.set(rule, this.getCurrentTime());
@@ -149,7 +219,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
 
-        new EntityBuilder()
+        const entity_builder = new EntityBuilder()
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
                 OverrideContextBehavior.from(
                     {
@@ -160,7 +230,14 @@ export class DynamicActorSystem extends AbstractContextSystem {
                 DieBehavior.create()
             ])))
             .add(Tag.fromJSON(['DynamicActor-RuleExecutor']))
-            .add(SerializationMetadata.Transient)
+            .add(SerializationMetadata.Transient);
+
+        const execution = ctx.execution;
+
+        execution.rule = rule;
+        execution.executor = entity_builder;
+
+        entity_builder
             .build(ecd);
 
     }
@@ -404,7 +481,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const description = this.matchRule(scopeProxy);
 
         if (description !== undefined) {
-            this.executeRule(entity, description, scopeProxy);
+            this.attemptRuleExecution(entity, description, scopeProxy);
         }
 
         this.scope.unwind(top);

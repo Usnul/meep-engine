@@ -2,6 +2,7 @@ import { AbstractActionDescription } from "./AbstractActionDescription.js";
 import { assert } from "../../../../../core/assert.js";
 import { ActionBehavior } from "../../../../intelligence/behavior/primitive/ActionBehavior.js";
 import { Transform } from "../../../transform/Transform.js";
+import { compileReactiveExpression } from "../../../../../core/land/reactive/compileReactiveExpression.js";
 
 export class SendRequestActionDescription extends AbstractActionDescription {
     constructor() {
@@ -15,7 +16,7 @@ export class SendRequestActionDescription extends AbstractActionDescription {
     fromJSON({
                  distance = Number.POSITIVE_INFINITY,
                  responders = 1,
-                 context
+                 context = {}
              }) {
 
         assert.defined(context, 'context');
@@ -28,6 +29,28 @@ export class SendRequestActionDescription extends AbstractActionDescription {
     }
 
     execute(actor, dataset, context, system) {
+        const raw_action_context = this.context;
+
+        // decode context
+        const action_context = {};
+
+        for (const key in raw_action_context) {
+            const raw_value = raw_action_context[key];
+
+            if (typeof raw_value === "string" && raw_value.startsWith('!')) {
+
+                // rewrite rule
+                const code = raw_value.slice(1);
+
+                const exp = compileReactiveExpression(code);
+
+                const evaluated_value = exp.evaluate(context);
+
+                action_context[key] = evaluated_value;
+            } else {
+                action_context[key] = raw_value;
+            }
+        }
 
         return new ActionBehavior(() => {
 
@@ -59,7 +82,7 @@ export class SendRequestActionDescription extends AbstractActionDescription {
                 return target_transform.position.distanceTo(actor_transform.position) <= distance;
             }
 
-            const bestActors = system.requestBestActors(this.context, filter, this, this.responders);
+            const bestActors = system.requestBestActors(action_context, filter, this, this.responders);
 
 
             bestActors.forEach((match) => {
@@ -71,7 +94,7 @@ export class SendRequestActionDescription extends AbstractActionDescription {
 
                 console.log(`Requested response from ${match.entity}, because rule matched: ${match.rule.condition.toCode()}`);
 
-                system.executeRule(match.entity, match.rule, match.scope);
+                system.attemptRuleExecution(match.entity, match.rule, match.scope);
 
             });
         });

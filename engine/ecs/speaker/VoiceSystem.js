@@ -1,5 +1,5 @@
 import { Voice } from "./Voice.js";
-import EntityBuilder from "../EntityBuilder.js";
+import EntityBuilder, { EntityBuilderFlags } from "../EntityBuilder.js";
 import GUIElement from "../gui/GUIElement.js";
 import { SerializationMetadata } from "../components/SerializationMetadata.js";
 import HeadsUpDisplay from "../gui/hud/HeadsUpDisplay.js";
@@ -87,7 +87,21 @@ class LineWeigher {
 }
 
 class Context extends SystemEntityContext {
+    constructor() {
+        super();
 
+        /**
+         *
+         * @type {LineDescription}
+         */
+        this.active_line = null;
+
+        /**
+         *
+         * @type {EntityBuilder}
+         */
+        this.active_executor = null;
+    }
 
     handleSpeakLineEvent({ id }) {
         this.system.sayLine(this.entity, id, this.components[0]);
@@ -232,6 +246,13 @@ export class VoiceSystem extends AbstractContextSystem {
      */
     sayLine(entity, line_id, voice) {
 
+        const ctx = this.__getEntityContext(entity);
+
+        if (ctx.active_executor !== null && ctx.active_executor.getFlag(EntityBuilderFlags.Built)) {
+            // terminate currently speech bubble
+            ctx.active_executor.destroy();
+        }
+
         /**
          *
          * @type {LineDescription}
@@ -281,7 +302,7 @@ export class VoiceSystem extends AbstractContextSystem {
             transform.copy(source_transform);
         }
 
-        new EntityBuilder()
+        const entityBuilder = new EntityBuilder()
             .add(GUIElement.fromView(view))
             .add(ViewportPosition.fromJSON({}))
             .add(HeadsUpDisplay.fromJSON({ anchor: new Vector2(0.5, 1) }))
@@ -309,7 +330,12 @@ export class VoiceSystem extends AbstractContextSystem {
                     }
                 }),
                 DieBehavior.create()
-            ])))
+            ])));
+
+        ctx.active_line = line;
+        ctx.active_executor = entityBuilder;
+
+        entityBuilder
             .build(ecd);
     }
 }
