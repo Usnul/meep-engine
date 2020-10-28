@@ -26,7 +26,7 @@ import { weightedRandomFromArray } from "../../../core/collection/array/weighted
  * Delay before the user notices the text and begins to read
  * @type {number}
  */
-const TIMING_NOTICE_DELAY = 0.2;
+const TIMING_NOTICE_DELAY = 0.5;
 
 /**
  * Minimum time to read something
