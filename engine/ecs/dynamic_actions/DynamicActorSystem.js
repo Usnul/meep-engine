@@ -13,7 +13,6 @@ import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js
 import { SerializationMetadata } from "../components/SerializationMetadata.js";
 import Tag from "../components/Tag.js";
 import { OverrideContextBehavior } from "../../../../model/game/util/behavior/OverrideContextBehavior.js";
-import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
 import { HashMap } from "../../../core/collection/HashMap.js";
 import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
 import { randomFloatBetween, randomFromArray } from "../../../core/math/MathUtils.js";
@@ -496,7 +495,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         const scopeProxy = this.scope.proxy;
 
 
-        console.log('DA event ', event, objectShallowCopyByOwnKeys(scopeProxy));
+        // console.log('DA event ', event, objectShallowCopyByOwnKeys(scopeProxy)); // DEBUG
 
         /**
          *
