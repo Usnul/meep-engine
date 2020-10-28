@@ -16,9 +16,21 @@ import { OverrideContextBehavior } from "../../../../model/game/util/behavior/Ov
 import { objectShallowCopyByOwnKeys } from "../../../core/model/ObjectUtils.js";
 import { HashMap } from "../../../core/collection/HashMap.js";
 import { computeStringHash } from "../../../core/primitives/strings/StringUtils.js";
-import { randomFromArray } from "../../../core/math/MathUtils.js";
+import { randomFloatBetween, randomFromArray } from "../../../core/math/MathUtils.js";
 import { assert } from "../../../core/assert.js";
 import { RuleExecution } from "./RuleExecution.js";
+
+/**
+ * In seconds
+ * @type {number}
+ */
+const IDLE_EVENT_TIMEOUT_MIN = 2;
+
+/**
+ * In seconds
+ * @type {number}
+ */
+const IDLE_EVENT_TIMEOUT_MAX = 5;
 
 class Context extends SystemEntityContext {
 
@@ -26,6 +38,12 @@ class Context extends SystemEntityContext {
         super();
 
         this.execution = new RuleExecution();
+
+        /**
+         *
+         * @type {number}
+         */
+        this.next_idle_event_time = 0;
     }
 
     process(entity, scope) {
@@ -58,6 +76,8 @@ class Context extends SystemEntityContext {
     link() {
         const ecd = this.getDataset();
 
+        this.next_idle_event_time = this.system.__current_time + randomFloatBetween(Math.random, IDLE_EVENT_TIMEOUT_MIN, IDLE_EVENT_TIMEOUT_MAX);
+
         ecd.addEntityAnyEventListener(this.entity, this.handleEvent, this);
     }
 
@@ -72,11 +92,6 @@ class Context extends SystemEntityContext {
     }
 }
 
-/**
- * In seconds
- * @type {number}
- */
-const IDLE_EVENT_TIMEOUT = 2;
 
 export class DynamicActorSystem extends AbstractContextSystem {
     /**
@@ -108,13 +123,6 @@ export class DynamicActorSystem extends AbstractContextSystem {
         this.scope = new DataScope();
 
         /**
-         * Used to keep track of when to send "idle" event to agents
-         * @type {number}
-         * @private
-         */
-        this.__idle_event_timer = 0;
-
-        /**
          * When precisely each rule was last used
          * @type {HashMap<DynamicRuleDescription, number>}
          * @private
@@ -140,6 +148,13 @@ export class DynamicActorSystem extends AbstractContextSystem {
          * @type {MultiPredicateEvaluator}
          */
         this.evaluator = null;
+
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__current_time = 0;
     }
 
     /**
@@ -515,27 +530,37 @@ export class DynamicActorSystem extends AbstractContextSystem {
      *
      * @param {DynamicActor} actor
      * @param {number} entity
+     * @private
      */
-    dispatchIdleEvent(actor, entity) {
+    __update_visitDynamicActor(actor, entity) {
 
-        this.entityManager.dataset.sendEvent(entity, 'idle', {});
+        /**
+         *
+         * @type {Context}
+         */
+        const ctx = this.__getEntityContext(entity);
 
+        while (ctx.next_idle_event_time < this.__current_time) {
+
+            const timeout = randomFloatBetween(Math.random, IDLE_EVENT_TIMEOUT_MIN, IDLE_EVENT_TIMEOUT_MAX);
+
+            ctx.next_idle_event_time += timeout;
+
+            this.entityManager.dataset.sendEvent(entity, 'idle', {});
+
+        }
     }
 
     update(timeDelta) {
 
-        this.__idle_event_timer += timeDelta;
+        this.__current_time += timeDelta;
 
-        while (this.__idle_event_timer > IDLE_EVENT_TIMEOUT) {
-            this.__idle_event_timer -= IDLE_EVENT_TIMEOUT;
+        const dataset = this.entityManager.dataset;
 
-            const dataset = this.entityManager.dataset;
+        if (dataset !== null) {
 
-            if (dataset !== null) {
+            dataset.traverseComponents(DynamicActor, this.__update_visitDynamicActor, this);
 
-                dataset.traverseComponents(DynamicActor, this.dispatchIdleEvent, this);
-
-            }
         }
 
     }
