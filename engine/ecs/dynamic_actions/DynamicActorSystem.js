@@ -18,6 +18,7 @@ import { computeStringHash } from "../../../core/primitives/strings/StringUtils.
 import { randomFloatBetween, randomFromArray } from "../../../core/math/MathUtils.js";
 import { assert } from "../../../core/assert.js";
 import { RuleExecution } from "./RuleExecution.js";
+import { computeContextualDynamicRuleDebugString } from "./rules/computeContextualDynamicRuleDebugString.js";
 
 /**
  * In seconds
@@ -219,7 +220,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {*} context
      */
     executeRule(entity, rule, context) {
-        // console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
+        console.warn(`Executing rule for ${entity}`, computeContextualDynamicRuleDebugString(rule, context));
 
         /**
          *
@@ -448,7 +449,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
                 const match_entry = {
                     entity,
                     rule: match,
-                    scope
+                    scope: scope.proxy
                 };
 
                 by_score[score].push(match_entry);
