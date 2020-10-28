@@ -4,6 +4,7 @@ import { inferReactiveExpressionTypes } from "../../../../core/model/reactive/tr
 import DataType from "../../../../core/parser/simple/DataType.js";
 import { compileReactiveExpression } from "../../../../core/land/reactive/compileReactiveExpression.js";
 import { deserializeActionFromJSON } from "../actions/definition/deserializeActionFromJSON.js";
+import { NumericInterval } from "../../../../core/math/interval/NumericInterval.js";
 
 export class DynamicRuleDescription {
     constructor() {
@@ -42,9 +43,9 @@ export class DynamicRuleDescription {
         /**
          * How long should the rule remain inactive for after its activation
          * In seconds
-         * @type {number}
+         * @type {NumericInterval}
          */
-        this.cooldown_global = 0;
+        this.cooldown_global = new NumericInterval(0, 0);
     }
 
     /**
@@ -97,7 +98,7 @@ export class DynamicRuleDescription {
                  id = UUID.generate(),
                  condition,
                  action,
-                 global_cooldown = 0,
+                 global_cooldown = NumericInterval.zero_zero,
                  priority = 0
              }) {
         assert.typeOf(condition, 'string', 'condition');
@@ -105,7 +106,6 @@ export class DynamicRuleDescription {
         assert.defined(action, 'action');
         assert.notNull(action, 'action');
 
-        assert.greaterThanOrEqual(global_cooldown, 0, 'global_cooldown');
         assert.isNumber(priority, 'priority');
 
         this.condition = compileReactiveExpression(condition);
@@ -114,9 +114,9 @@ export class DynamicRuleDescription {
 
         this.id = id;
 
-        this.cooldown_global = global_cooldown;
-
         this.priority = priority;
+
+        this.cooldown_global.fromJSON(global_cooldown);
 
         this.build();
     }

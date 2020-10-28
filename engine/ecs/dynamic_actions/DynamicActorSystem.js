@@ -127,11 +127,11 @@ export class DynamicActorSystem extends AbstractContextSystem {
         });
 
         /**
-         * Points to current action being executed by an actor,
-         * @type {Map<number, RuleExecution>}
+         * Time when rule will be cooled down
+         * @type {Map<string, number>}
          * @private
          */
-        this.__current_actions = new Map();
+        this.__global_cooldown_ready = new Map();
 
         /**
          *
@@ -215,6 +215,9 @@ export class DynamicActorSystem extends AbstractContextSystem {
 
         // record rule usage time
         this.__global_last_used_times.set(rule, this.getCurrentTime());
+
+        // set cooldown
+        this.__global_cooldown_ready.set(rule, this.getCurrentTime() + rule.cooldown_global.sampleRandom(Math.random));
 
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
@@ -340,13 +343,13 @@ export class DynamicActorSystem extends AbstractContextSystem {
             for (let i = candidate_count - 1; i >= 0; i--) {
                 const rule = candidates[i];
 
-                const last_used_time = this.__global_last_used_times.get(rule);
+                const cooldown_ready_time = this.__global_cooldown_ready.get(rule);
 
-                if (last_used_time === undefined) {
+                if (cooldown_ready_time === undefined) {
                     continue;
                 }
 
-                if (last_used_time + rule.cooldown_global > this.getCurrentTime()) {
+                if (cooldown_ready_time > this.getCurrentTime()) {
                     // rule is still on cooldown, exclude
                     candidates.splice(i, 1);
                     candidate_count--;
