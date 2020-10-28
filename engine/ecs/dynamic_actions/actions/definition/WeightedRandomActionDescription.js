@@ -1,6 +1,7 @@
 import { AbstractActionDescription } from "./AbstractActionDescription.js";
 import { WeightedRandomBehavior } from "../../../../intelligence/behavior/selector/WeightedRandomBehavior.js";
 import { WeightedElement } from "../../../../intelligence/behavior/selector/WeightedElement.js";
+import { computeHashFloat } from "../../../../../core/math/MathUtils.js";
 
 export class WeightedRandomActionDescription extends AbstractActionDescription {
     constructor() {
@@ -28,7 +29,9 @@ export class WeightedRandomActionDescription extends AbstractActionDescription {
         const b = WeightedRandomBehavior.from(elements);
 
         // remix actor entity index to produce large difference for small entity ID differences
-        const seed = (actor >> 16) | (actor << 16);
+        const actor_seed = (actor >> 16) | (actor << 16);
+
+        const seed = actor_seed ^ computeHashFloat(Math.random());
 
         b.setRandomSeed(seed);
 
