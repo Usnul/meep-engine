@@ -38,6 +38,8 @@ class Context extends SystemEntityContext {
      * @param {*} data Event data
      */
     handleEvent(event, data) {
+
+
         /**
          *
          * @type {DynamicActorSystem}
@@ -203,7 +205,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @param {*} context
      */
     executeRule(entity, rule, context) {
-        console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
+        // console.log('Executing rule', rule, entity, objectShallowCopyByOwnKeys(context));
 
         /**
          *
@@ -477,6 +479,9 @@ export class DynamicActorSystem extends AbstractContextSystem {
         });
 
         const scopeProxy = this.scope.proxy;
+
+
+        console.log('DA event ', event, objectShallowCopyByOwnKeys(scopeProxy));
 
         /**
          *
