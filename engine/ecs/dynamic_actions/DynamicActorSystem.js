@@ -137,7 +137,7 @@ export class DynamicActorSystem extends AbstractContextSystem {
         });
 
         /**
-         * Time when rule will be cooled down
+         * Time when a group with an ID will be cooled down
          * @type {Map<string, number>}
          * @private
          */
@@ -230,11 +230,23 @@ export class DynamicActorSystem extends AbstractContextSystem {
 
         this.terminateActiveExecution(entity);
 
-        // record rule usage time
-        this.__global_last_used_times.set(rule, this.getCurrentTime());
+        const currentTime = this.getCurrentTime();
 
-        // set cooldown
-        this.__global_cooldown_ready.set(rule, this.getCurrentTime() + rule.cooldown_global.sampleRandom(Math.random));
+        // record rule usage time
+        this.__global_last_used_times.set(rule, currentTime);
+
+        // set cooldowns
+
+        const rule_global_cooldowns = rule.cooldowns_global;
+        const rule_global_cooldowns_count = rule_global_cooldowns.length;
+
+        for (let i = 0; i < rule_global_cooldowns_count; i++) {
+            const cooldown = rule_global_cooldowns[i];
+
+            const ready_time = currentTime + cooldown.value.sampleRandom(Math.random);
+
+            this.__global_cooldown_ready.set(cooldown.id, ready_time);
+        }
 
         const ecd = this.entityManager.dataset;
         const behavior = rule.action.execute(entity, ecd, context, this);
@@ -327,6 +339,8 @@ export class DynamicActorSystem extends AbstractContextSystem {
      * @return {DynamicRuleDescription|undefined}
      */
     matchRule(context) {
+        const global_cooldown_ready_map = this.__global_cooldown_ready;
+
         /**
          *
          * @type {DynamicRuleDescription|undefined}
@@ -357,20 +371,34 @@ export class DynamicActorSystem extends AbstractContextSystem {
             const candidates = rules.slice();
             let candidate_count = candidates.length;
 
-            for (let i = candidate_count - 1; i >= 0; i--) {
+            candidate_loop: for (let i = candidate_count - 1; i >= 0; i--) {
                 const rule = candidates[i];
 
-                const cooldown_ready_time = this.__global_cooldown_ready.get(rule);
+                // check cooldowns
+                const cooldowns_global = rule.cooldowns_global;
 
-                if (cooldown_ready_time === undefined) {
-                    continue;
+                const cooldowns_global_count = cooldowns_global.length;
+
+                for (let j = 0; j < cooldowns_global_count; j++) {
+                    const cooldown = cooldowns_global[j];
+
+                    const cooldown_id = cooldown.id;
+
+                    const cooldown_ready_time = global_cooldown_ready_map.get(cooldown_id);
+
+                    if (cooldown_ready_time === undefined) {
+                        continue;
+                    }
+
+                    if (cooldown_ready_time > this.getCurrentTime()) {
+                        // rule is still on cooldown, exclude
+                        candidates.splice(i, 1);
+                        candidate_count--;
+
+                        continue candidate_loop;
+                    }
                 }
 
-                if (cooldown_ready_time > this.getCurrentTime()) {
-                    // rule is still on cooldown, exclude
-                    candidates.splice(i, 1);
-                    candidate_count--;
-                }
             }
 
             if (candidate_count === 0) {

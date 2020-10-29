@@ -4,7 +4,7 @@ import { inferReactiveExpressionTypes } from "../../../../core/model/reactive/tr
 import DataType from "../../../../core/parser/simple/DataType.js";
 import { compileReactiveExpression } from "../../../../core/land/reactive/compileReactiveExpression.js";
 import { deserializeActionFromJSON } from "../actions/definition/deserializeActionFromJSON.js";
-import { NumericInterval } from "../../../../core/math/interval/NumericInterval.js";
+import { DynamicRuleCooldownDescription } from "./DynamicRuleCooldownDescription.js";
 
 export class DynamicRuleDescription {
     constructor() {
@@ -41,11 +41,10 @@ export class DynamicRuleDescription {
         this.predicate_complexity = 0;
 
         /**
-         * How long should the rule remain inactive for after its activation
-         * In seconds
-         * @type {NumericInterval}
+         * Specified which global cooldowns will be triggered and for how long
+         * @type {DynamicRuleCooldownDescription[]}
          */
-        this.cooldown_global = new NumericInterval(0, 0);
+        this.cooldowns_global = [];
     }
 
     /**
@@ -106,7 +105,7 @@ export class DynamicRuleDescription {
                  id = UUID.generate(),
                  condition,
                  action,
-                 global_cooldown = NumericInterval.zero_zero,
+                 global_cooldowns = [],
                  priority = 0
              }) {
         assert.typeOf(condition, 'string', 'condition');
@@ -116,6 +115,8 @@ export class DynamicRuleDescription {
 
         assert.isNumber(priority, 'priority');
 
+        assert.isArray(global_cooldowns, 'global_cooldowns');
+
         this.condition = compileReactiveExpression(condition);
 
         this.action = deserializeActionFromJSON(action);
@@ -124,7 +125,7 @@ export class DynamicRuleDescription {
 
         this.priority = priority;
 
-        this.cooldown_global.fromJSON(global_cooldown);
+        this.cooldowns_global = global_cooldowns.map(DynamicRuleCooldownDescription.fromJSON);
 
         this.build();
     }
