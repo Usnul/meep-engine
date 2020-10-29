@@ -371,6 +371,14 @@ export class MultiPredicateEvaluator {
 
             value = expression.evaluate(this.__context);
 
+            if(value === undefined){
+                // value not found
+
+                this.__invalidate_node(node);
+
+                return false;
+            }
+
             const value_type = typeof value;
 
             if (
