@@ -85,10 +85,18 @@ export class DynamicRuleDescription {
          */
         this.references.splice(0, this.references.length);
 
+        const included = {};
+
         this.condition.traverse((node) => {
-            if (node.isReference) {
+
+            if (node.isReference && included[node.name] === undefined) {
+
                 this.references.push(node);
+
+                included[node.name] = true;
+
             }
+
         });
 
         this.condition.traverse(this.__increment_predicate_complexity, this);
