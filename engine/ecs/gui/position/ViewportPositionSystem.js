@@ -84,8 +84,8 @@ class ViewportPositionSystem extends System {
         }
 
         // convert size of the hud view into normalized (0-1) form
-        const extentX = view.size.x / viewport_width;
-        const extentY = view.size.y / viewport_height;
+        let extentX = view.size.x / viewport_width;
+        let extentY = view.size.y / viewport_height;
 
         // convert screen-space offset from pixels to normalized (0-1) form
         const nOffsetX = vp.offset.x / viewport_width;
@@ -132,7 +132,12 @@ class ViewportPositionSystem extends System {
      * @param entity
      */
     link(vp, el, entity) {
-        this.positionComponent(el, vp, entity);
+        try {
+            this.positionComponent(el, vp, entity);
+        } catch (e) {
+            console.error(`Failed to position view (entity=${entity}):`, e);
+        }
+
 
         const eventContext = {
             vp,

@@ -1,5 +1,6 @@
 import Rectangle from "../../core/geom/Rectangle.js";
 import AABB2 from "../../core/geom/AABB2.js";
+import { assert } from "../../core/assert.js";
 
 /**
  *
@@ -109,5 +110,34 @@ export class DomSizeObserver {
 
     stop() {
         this.running = false;
+    }
+
+    /**
+     *
+     * @param {View} view
+     */
+    watchView(view) {
+        assert.defined(view, 'view');
+        assert.notNull(view, 'view');
+        assert.equal(view.isView, true, 'view.isView !== true');
+
+        this.attach(view.el);
+
+        view.on.linked.add(this.start, this);
+        view.on.unlinked.add(this.stop, this);
+    }
+
+    /**
+     *
+     * @param {View} view
+     */
+    unwatchView(view){
+        assert.defined(view, 'view');
+        assert.notNull(view, 'view');
+        assert.equal(view.isView, true, 'view.isView !== true');
+
+        view.on.linked.remove(this.start, this);
+        view.on.unlinked.remove(this.stop, this);
+
     }
 }

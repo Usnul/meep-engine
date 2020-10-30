@@ -809,5 +809,11 @@ class View {
     }
 }
 
+/**
+ * @readonly
+ * @type {boolean}
+ */
+View.prototype.isView = true;
+
 
 export default View;

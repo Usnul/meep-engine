@@ -11,7 +11,6 @@ import { SequenceBehavior } from "../../intelligence/behavior/composite/Sequence
 import { DelayBehavior } from "../../../../model/game/util/behavior/DelayBehavior.js";
 import { DieBehavior } from "../../../../model/game/util/behavior/DieBehavior.js";
 import Vector2 from "../../../core/geom/Vector2.js";
-import EmptyView from "../../../view/elements/EmptyView.js";
 import { max2 } from "../../../core/math/MathUtils.js";
 import { VoiceEvents } from "./VoiceEvents.js";
 import { AbstractContextSystem } from "../system/AbstractContextSystem.js";
@@ -21,6 +20,10 @@ import { Blackboard } from "../../intelligence/blackboard/Blackboard.js";
 import { VoiceFlags } from "./VoiceFlags.js";
 import { assert } from "../../../core/assert.js";
 import { weightedRandomFromArray } from "../../../core/collection/array/weightedRandomFromArray.js";
+import { MeepSettings } from "../../MeepSettings.js";
+import { GameAssetType } from "../../asset/GameAssetType.js";
+import { DomSizeObserver } from "../../../view/util/DomSizeObserver.js";
+import { SpeechBubbleView } from "./SpeechBubbleView.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -128,6 +131,8 @@ class Context extends SystemEntityContext {
     }
 }
 
+const VOICE_SETTINGS = MeepSettings.ecs.Voice;
+
 export class VoiceSystem extends AbstractContextSystem {
     /**
      *
@@ -182,6 +187,20 @@ export class VoiceSystem extends AbstractContextSystem {
          */
         this.__weigher = new LineWeigher();
         this.__weigher.system = this;
+
+
+        /**
+         *
+         * @type {Font}
+         * @private
+         */
+        this.__font = null;
+
+        /**
+         *
+         * @private
+         */
+        this.__font_size = VOICE_SETTINGS.font_size;
     }
 
     /**
@@ -207,7 +226,16 @@ export class VoiceSystem extends AbstractContextSystem {
         assert.defined(this.lines, 'lines');
         assert.defined(this.sets, 'sets');
 
-        super.startup(entityManager, readyCallback, errorCallback);
+        const p_font_setting = engine.assetManager.promise(VOICE_SETTINGS.font, GameAssetType.Font).then(font_asset => {
+
+            const font = font_asset.create();
+
+            this.__font = font;
+        });
+
+        p_font_setting.then(() => {
+            super.startup(entityManager, readyCallback, errorCallback);
+        }, errorCallback);
     }
 
     /**
@@ -236,6 +264,34 @@ export class VoiceSystem extends AbstractContextSystem {
         const selected_line = weightedRandomFromArray(temp_lines, Math.random, this.__weigher.compute, this.__weigher, collected_count);
 
         this.sayLine(entity, selected_line.id, voice);
+    }
+
+    /**
+     *
+     * @param {string} text
+     * @param {View} view
+     * @private
+     */
+    __setBubbleSize(text, view) {
+
+        const sizer = new DomSizeObserver();
+
+        sizer.watchView(view);
+
+        sizer.dimensions.size.onChanged.add((x, y) => {
+            if (Number.isFinite(x)) {
+                view.size.x = x;
+            }
+
+            if (Number.isFinite(y)) {
+                view.size.y = y;
+            }
+        });
+
+        const advanceWidth = this.__font.getAdvanceWidth(text, this.__font_size);
+
+        view.size.setSilent(advanceWidth, this.__font_size);
+
     }
 
     /**
@@ -273,10 +329,7 @@ export class VoiceSystem extends AbstractContextSystem {
 
         const localized_line = localiation.getString(line.text);
 
-
-        const view = new EmptyView({
-            classList: ['gui-voice-speech-bubble']
-        });
+        const view = new SpeechBubbleView();
 
         const gml = this.gml;
 
@@ -302,10 +355,12 @@ export class VoiceSystem extends AbstractContextSystem {
             transform.copy(source_transform);
         }
 
+        this.__setBubbleSize(line_pure_text, view);
+
         const entityBuilder = new EntityBuilder()
             .add(GUIElement.fromView(view))
-            .add(ViewportPosition.fromJSON({}))
-            .add(HeadsUpDisplay.fromJSON({ anchor: new Vector2(0.5, 1) }))
+            .add(ViewportPosition.fromJSON({ anchor: new Vector2(0.5, 1) }))
+            .add(HeadsUpDisplay.fromJSON({}))
             .add(transform)
             .add(Attachment.fromJSON({
                 socket: 'Voice',
