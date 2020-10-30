@@ -395,7 +395,7 @@ export class VoiceSystem extends AbstractContextSystem {
             .add(SerializationMetadata.Transient)
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
                 // play intro animation
-                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_INTRO, bubble_animation_update_function)),
+                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_INTRO, bubble_animation_update_function, view)),
                 // wait for a certain amount of time
                 DelayBehavior.from(display_time),
                 // dispatch event and record that like was spoken
@@ -414,7 +414,7 @@ export class VoiceSystem extends AbstractContextSystem {
                     }
                 }),
                 //play outro animation
-                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_OUTRO, bubble_animation_update_function)),
+                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_OUTRO, bubble_animation_update_function, view)),
                 // destroy the entity
                 DieBehavior.create()
             ])));
