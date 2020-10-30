@@ -148,6 +148,16 @@ SPEECH_BUBBLE_ANIMATION_OUTRO.addKey(0, [1]);
 SPEECH_BUBBLE_ANIMATION_OUTRO.addKey(0.2, [0]);
 SPEECH_BUBBLE_ANIMATION_OUTRO.addTransition(0, TransitionFunctions.CubicEaseIn);
 
+/**
+ * @this {View}
+ * @param {number} alpha
+ */
+function bubble_animation_update_function(alpha) {
+    this.css({
+        opacity: alpha
+    });
+}
+
 export class VoiceSystem extends AbstractContextSystem {
     /**
      *
@@ -372,18 +382,6 @@ export class VoiceSystem extends AbstractContextSystem {
 
         this.__setBubbleSize(line_pure_text, view);
 
-        const animation_intro = new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_INTRO, (alpha) => {
-            view.css({
-                opacity: alpha
-            });
-        });
-
-        const animation_outro = new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_OUTRO, (alpha) => {
-            view.css({
-                opacity: alpha
-            });
-        });
-
         const entityBuilder = new EntityBuilder()
             .add(GUIElement.fromView(view))
             .add(ViewportPosition.fromJSON({ anchor: new Vector2(0.5, 1) }))
@@ -397,9 +395,10 @@ export class VoiceSystem extends AbstractContextSystem {
             .add(SerializationMetadata.Transient)
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
                 // play intro animation
-                new AnimationBehavior(animation_intro),
+                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_INTRO, bubble_animation_update_function)),
                 // wait for a certain amount of time
                 DelayBehavior.from(display_time),
+                // dispatch event and record that like was spoken
                 new ActionBehavior(() => {
                     // clear speaking flag
                     voice.clearFlag(VoiceFlags.Speaking);
@@ -415,7 +414,8 @@ export class VoiceSystem extends AbstractContextSystem {
                     }
                 }),
                 //play outro animation
-                new AnimationBehavior(animation_outro),
+                new AnimationBehavior(new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_OUTRO, bubble_animation_update_function)),
+                // destroy the entity
                 DieBehavior.create()
             ])));
 
