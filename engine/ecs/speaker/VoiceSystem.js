@@ -24,6 +24,10 @@ import { MeepSettings } from "../../MeepSettings.js";
 import { GameAssetType } from "../../asset/GameAssetType.js";
 import { DomSizeObserver } from "../../../view/util/DomSizeObserver.js";
 import { SpeechBubbleView } from "./SpeechBubbleView.js";
+import { AnimationBehavior } from "../../../../model/game/util/behavior/AnimationBehavior.js";
+import AnimationTrack from "../../animation/keyed2/AnimationTrack.js";
+import TransitionFunctions from "../../animation/TransitionFunctions.js";
+import AnimationTrackPlayback from "../../animation/keyed2/AnimationTrackPlayback.js";
 
 /**
  * Delay before the user notices the text and begins to read
@@ -132,6 +136,17 @@ class Context extends SystemEntityContext {
 }
 
 const VOICE_SETTINGS = MeepSettings.ecs.Voice;
+
+const SPEECH_BUBBLE_ANIMATION_INTRO = new AnimationTrack(['alpha']);
+SPEECH_BUBBLE_ANIMATION_INTRO.addKey(0, [0]);
+SPEECH_BUBBLE_ANIMATION_INTRO.addKey(0.1, [1]);
+SPEECH_BUBBLE_ANIMATION_INTRO.addTransition(0, TransitionFunctions.CubicEaseIn);
+
+
+const SPEECH_BUBBLE_ANIMATION_OUTRO = new AnimationTrack(['alpha']);
+SPEECH_BUBBLE_ANIMATION_OUTRO.addKey(0, [1]);
+SPEECH_BUBBLE_ANIMATION_OUTRO.addKey(0.2, [0]);
+SPEECH_BUBBLE_ANIMATION_OUTRO.addTransition(0, TransitionFunctions.CubicEaseIn);
 
 export class VoiceSystem extends AbstractContextSystem {
     /**
@@ -357,6 +372,18 @@ export class VoiceSystem extends AbstractContextSystem {
 
         this.__setBubbleSize(line_pure_text, view);
 
+        const animation_intro = new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_INTRO, (alpha) => {
+            view.css({
+                opacity: alpha
+            });
+        });
+
+        const animation_outro = new AnimationTrackPlayback(SPEECH_BUBBLE_ANIMATION_OUTRO, (alpha) => {
+            view.css({
+                opacity: alpha
+            });
+        });
+
         const entityBuilder = new EntityBuilder()
             .add(GUIElement.fromView(view))
             .add(ViewportPosition.fromJSON({ anchor: new Vector2(0.5, 1) }))
@@ -369,6 +396,9 @@ export class VoiceSystem extends AbstractContextSystem {
             }))
             .add(SerializationMetadata.Transient)
             .add(BehaviorComponent.fromOne(SequenceBehavior.from([
+                // play intro animation
+                new AnimationBehavior(animation_intro),
+                // wait for a certain amount of time
                 DelayBehavior.from(display_time),
                 new ActionBehavior(() => {
                     // clear speaking flag
@@ -384,6 +414,8 @@ export class VoiceSystem extends AbstractContextSystem {
                         bb.acquireNumber(`voice.line_spoken.${line_id}.count`).increment();
                     }
                 }),
+                //play outro animation
+                new AnimationBehavior(animation_outro),
                 DieBehavior.create()
             ])));
 
