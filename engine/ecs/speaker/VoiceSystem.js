@@ -403,14 +403,18 @@ export class VoiceSystem extends AbstractContextSystem {
                     // clear speaking flag
                     voice.clearFlag(VoiceFlags.Speaking);
 
-                    // notify that the line has ended
-                    ecd.sendEvent(entity, VoiceEvents.FinishedSpeakingLine, line_id);
+                    if (ecd.entityExists(entity)) {
 
-                    // record the fact that line was spoken
-                    const bb = ecd.getComponent(entity, Blackboard);
+                        // notify that the line has ended
+                        ecd.sendEvent(entity, VoiceEvents.FinishedSpeakingLine, line_id);
 
-                    if (bb !== undefined) {
-                        bb.acquireNumber(`voice.line_spoken.${line_id}.count`).increment();
+                        // record the fact that line was spoken
+                        const bb = ecd.getComponent(entity, Blackboard);
+
+                        if (bb !== undefined) {
+                            bb.acquireNumber(`voice.line_spoken.${line_id}.count`).increment();
+                        }
+
                     }
                 }),
                 //play outro animation
