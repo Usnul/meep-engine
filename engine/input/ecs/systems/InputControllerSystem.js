@@ -135,7 +135,16 @@ function getOrCreateProxy(proxies, path, signal) {
      * @param {InputControllerBinding} binding
      */
     Proxy.prototype.remove = function (binding) {
-        this.bindings.splice(this.bindings.indexOf(binding), 1);
+        const i_b = this.bindings.indexOf(binding);
+
+        if (i_b !== -1) {
+            this.bindings.splice(i_b, 1);
+        } else {
+            const i_d = this.deferred.indexOf(binding);
+
+            this.deferred.splice(i_d, 1);
+        }
+
     };
 
     return getOrCreateProperty(proxies, path, function () {
