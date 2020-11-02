@@ -3,7 +3,7 @@ import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
-import { actionTask, countTask } from "../../core/process/task/TaskUtils.js";
+import { actionTask, countTask, futureTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import Task from "../../core/process/task/Task.js";
@@ -11,6 +11,7 @@ import TaskSignal from "../../core/process/task/TaskSignal.js";
 import { binarySearchLowIndex } from "../../core/collection/ArrayUtils.js";
 import { compareNumbers } from "../../core/primitives/numbers/compareNumbers.js";
 import TaskGroup from "../../core/process/task/TaskGroup.js";
+import Future from "../../core/process/Future.js";
 
 export class ThemeEngine {
     constructor() {
@@ -464,6 +465,11 @@ export class ThemeEngine {
     apply(grid, ecd) {
         const terrain = obtainTerrain(ecd);
 
+        // build terrain tiles
+        const tTerrainGeometry = futureTask(new Future((resolve, reject) => {
+            terrain.promiseAllTiles().then(resolve, reject);
+        }), 'Wait for terrain tiles');
+
         const tInitializeThemes = this.initializeThemes(this.random(), ecd, grid);
 
         const tTerrain = this.applyTerrainThemes(grid, terrain);
@@ -471,6 +477,8 @@ export class ThemeEngine {
         const tNodes = this.applyNodes(grid, ecd);
 
         const tCells = this.applyCellRules(grid, ecd);
+
+        tInitializeThemes.addDependency(tTerrainGeometry);
 
         tTerrain.addDependency(tInitializeThemes);
         tNodes.addDependency(tInitializeThemes);
@@ -483,7 +491,8 @@ export class ThemeEngine {
         tUpdateTerrain.addDependencies([
             tTerrain,
             tNodes,
-            tCells
+            tCells,
+            tTerrainGeometry
         ]);
 
         tOptimize.addDependencies([
@@ -494,6 +503,6 @@ export class ThemeEngine {
             tInitializeThemes
         ]);
 
-        return new TaskGroup([tInitializeThemes, tTerrain, tNodes, tCells, tUpdateTerrain, tOptimize]);
+        return new TaskGroup([tTerrainGeometry, tInitializeThemes, tTerrain, tNodes, tCells, tUpdateTerrain, tOptimize]);
     }
 }
