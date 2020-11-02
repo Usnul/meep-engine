@@ -681,28 +681,23 @@ class Terrain {
     promiseAllTiles() {
         /**
          *
-         * @param {TerrainTileManager} tiles
-         * @returns {Promise}
+         * @type {TerrainTileManager}
          */
-        function visitTiles(tiles) {
-            const promisedTiles = [];
+        const tiles = this.tiles;
 
-            tiles.traverse(function (tile) {
-                const x = tile.gridPosition.x;
-                const y = tile.gridPosition.y;
+        const promisedTiles = [];
 
-                const tilePromise = new Promise(function (resolve, reject) {
-                    tiles.obtain(x, y, resolve);
-                });
-                promisedTiles.push(tilePromise);
-            });
+        tiles.traverse(function (tile) {
+            const x = tile.gridPosition.x;
+            const y = tile.gridPosition.y;
 
-            //promise all tiles
-            return Promise.all(promisedTiles);
-        }
+            const tilePromise = tiles.obtain(x, y);
 
-        return this.pTiles
-            .then(visitTiles)
+            promisedTiles.push(tilePromise);
+        });
+
+        //promise all tiles
+        return Promise.all(promisedTiles);
     }
 
     /**
