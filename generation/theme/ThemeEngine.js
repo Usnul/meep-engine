@@ -449,9 +449,9 @@ export class ThemeEngine {
 
         const terrain = obtainTerrain(ecd);
 
-        const tLightMap = actionTask(() => {
-            terrain.buildLightMap();
-        });
+        const tLightMap = futureTask(new Future((resolve, reject) => {
+            terrain.buildLightMap().then(resolve, reject);
+        }));
 
         return new TaskGroup([tLightMap]);
     }
@@ -478,10 +478,11 @@ export class ThemeEngine {
 
         const tCells = this.applyCellRules(grid, ecd);
 
-        tInitializeThemes.addDependency(tTerrainGeometry);
-
         tTerrain.addDependency(tInitializeThemes);
-        tNodes.addDependency(tInitializeThemes);
+        tNodes.addDependencies([
+            tInitializeThemes,
+            tTerrainGeometry
+        ]);
         tCells.addDependency(tInitializeThemes);
 
         const tOptimize = this.optimize(ecd);

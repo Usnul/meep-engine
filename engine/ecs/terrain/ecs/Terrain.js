@@ -906,14 +906,18 @@ class Terrain {
             heightSampler: this.samplerHeight
         });
 
-        promise.then(() => {
+        const result = promise.then(() => {
 
             this.material.aoMap = true;
             this.material.needsUpdate = true;
 
             this.material.uniforms.aoMap.value = texture;
             this.material.uniforms.aoMapIntensity.value = 0.7;
+
+            return texture;
         });
+
+        return result;
     }
 
     toJSON() {
