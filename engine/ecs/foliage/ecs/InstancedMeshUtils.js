@@ -6,10 +6,8 @@ import { Foliage2, FoliageLayer } from "./Foliage2.js";
 import { InstancedFoliage } from "../InstancedFoliage.js";
 import { buildTreeOptimizationTask } from "../../../../core/bvh2/BVHTasks.js";
 import Task from "../../../../core/process/task/Task.js";
-import { BinaryBuffer } from "../../../../core/binary/BinaryBuffer.js";
 import TaskSignal from "../../../../core/process/task/TaskSignal.js";
-import { countTask, futureTask, promiseTask } from "../../../../core/process/task/TaskUtils.js";
-import Future from "../../../../core/process/Future.js";
+import { countTask, promiseTask } from "../../../../core/process/task/TaskUtils.js";
 import { assert } from "../../../../core/assert.js";
 
 /**
@@ -205,35 +203,9 @@ export function optimizeIndividualMeshesEntitiesToInstances(dataset, threshold =
 
         tasks.push(tOptimization);
 
-        let blob;
-        const tSerialization = new Task({
+        const tGenerateLayer = new Task({
             name: "Serialize data",
             cycleFunction: function () {
-                const buffer = new BinaryBuffer();
-
-                instancedFoliage.serialize(buffer);
-
-                buffer.trim();
-
-                blob = new Blob([new Uint8Array(buffer.data)]);
-
-
-                return TaskSignal.EndSuccess;
-            },
-            computeProgress: function () {
-                return 1;
-            }
-        });
-
-        tSerialization.addDependency(tOptimization);
-
-        tasks.push(tSerialization);
-
-        const tConvertToURL = futureTask(new Future(function (resolve, reject) {
-            const a = new FileReader();
-            a.addEventListener('load', function (e) {
-
-                const dataURL = e.target.result;
 
                 //create foliage layer
                 const layer = new FoliageLayer();
@@ -250,21 +222,19 @@ export function optimizeIndividualMeshesEntitiesToInstances(dataset, threshold =
 
                 foliage2.layers.add(layer);
 
-                resolve();
-            });
+                return TaskSignal.EndSuccess;
+            },
+            computeProgress: function () {
+                return 1;
+            }
+        });
 
-            a.addEventListener('error', function (e) {
-                reject(e);
-            });
+        tGenerateLayer.addDependency(tOptimization);
 
-            a.readAsDataURL(blob);
-        }), 'Create dataURL');
-
-        tConvertToURL.addDependency(tSerialization);
-        tasks.push(tConvertToURL);
+        tasks.push(tGenerateLayer);
 
         //make layer building task a dependency to the main task
-        tBuild.addDependency(tConvertToURL);
+        tBuild.addDependency(tGenerateLayer);
 
         //make a task to destroy original entities
         const tCleanup = countTask(0, numInstances, function (i) {
