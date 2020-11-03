@@ -16,7 +16,8 @@ import { objectKeyByValue } from "../../model/ObjectUtils.js";
  * @constructor
  */
 function TaskGroup(subtasks, name = 'Unnamed') {
-    assert.ok(Array.isArray(subtasks));
+    assert.isArray(subtasks, 'subtasks');
+    assert.typeOf(name, 'string', 'name');
 
     /**
      *

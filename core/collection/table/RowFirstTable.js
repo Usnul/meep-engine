@@ -7,6 +7,7 @@ import Signal from "../../events/signal/Signal.js";
 import { DataTypeIndices } from "./DataTypeIndices.js";
 import { assert } from "../../assert.js";
 import { RowFirstTableSpec } from "./RowFirstTableSpec.js";
+import { max2 } from "../../math/MathUtils.js";
 
 
 /**
@@ -55,6 +56,12 @@ function RowFirstTable(spec) {
      */
     this.capacity = 0;
 
+    /**
+     *
+     * @type {DataView}
+     */
+    this.dataView = null;
+
     this.on = {
         added: new Signal()
     };
@@ -73,6 +80,34 @@ RowFirstTable.prototype.initialize = function () {
 
     this.readRowMethod = spec.readRowMethod;
     this.writeRowMethod = spec.writeRowMethod;
+};
+
+RowFirstTable.prototype.hash = function () {
+    // to keep hash calculation fast, do a fixed number evenly spaced taps inside the data table
+
+    const byteLength = this.data.byteLength;
+
+    const tap_count = 32;
+
+    const step_size = max2(
+        Math.floor(byteLength / (tap_count * 4)),
+        1
+    );
+
+    const step_count = Math.floor(byteLength / step_size);
+
+    const dataView = this.dataView;
+
+    let result = 0;
+
+    for (let i = 0; i < step_count; i++) {
+        const address = i * step_size * 4;
+
+        result = ((result << 5) - result) + dataView.getUint32(address);
+        result |= 0; // Convert to 32bit integer
+    }
+
+    return result;
 };
 
 /**

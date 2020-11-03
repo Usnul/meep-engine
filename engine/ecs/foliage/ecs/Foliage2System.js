@@ -177,25 +177,40 @@ export class Foliage2System extends System {
         data[entity] = layers;
 
         for (let i = 0; i < foliage.layers.length; i++) {
-            const layer = foliage.layers.get(i);
+            /**
+             *
+             * @type {FoliageLayer}
+             */
+            const foliage_layer = foliage.layers.get(i);
 
-            const promise = obtainLayer(layer, this.layerCache, this.assetManager);
+            if (foliage_layer.data.geometry == null) {
 
-            const layerData = {
-                instances: null,
-                state: FoliageLayerState.Loading
-            };
+                const promise = obtainLayer(foliage_layer, this.layerCache, this.assetManager);
 
-            layers.push(layerData);
+                const layerData = {
+                    instances: null,
+                    state: FoliageLayerState.Loading
+                };
 
-            promise.then(function (instances) {
-                layerData.instances = instances;
+                layers.push(layerData);
 
-                if (layerData.state !== FoliageLayerState.Removed) {
-                    //add to render layer
-                    layerData.state = FoliageLayerState.Live;
-                }
-            });
+                promise.then(function (instances) {
+                    layerData.instances = instances;
+
+                    if (layerData.state !== FoliageLayerState.Removed) {
+                        //add to render layer
+                        layerData.state = FoliageLayerState.Live;
+                    }
+                });
+
+            } else {
+
+                layers.push({
+                    instances: foliage_layer.data,
+                    state: FoliageLayerState.Live
+                });
+
+            }
         }
 
         //TODO need to expose InstancedMesh BVH to let camera frustum calculation work correctly

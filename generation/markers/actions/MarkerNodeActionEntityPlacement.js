@@ -69,7 +69,9 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
     }
 
     initialize(grid, ecd, seed) {
-        this.processor.initialize(grid, ecd);
+        if (this.processor !== null) {
+            this.processor.initialize(grid, ecd);
+        }
     }
 
     execute(grid, ecd, node) {

@@ -1,7 +1,6 @@
 import { MarkerNodeEntityProcessor } from "./MarkerNodeEntityProcessor.js";
 import { obtainTerrain } from "../../../../../model/game/scenes/SceneUtils.js";
 import { SurfacePoint3 } from "../../../../core/geom/3d/SurfacePoint3.js";
-import { Transform } from "../../../../engine/ecs/transform/Transform.js";
 import { alignToVector } from "../../../../engine/ecs/terrain/ecs/ClingToTerrainSystem.js";
 
 const p = new SurfacePoint3();
@@ -41,7 +40,7 @@ export class MarkerNodeEntityProcessorClingToTerrain extends MarkerNodeEntityPro
     }
 
     execute(entity, node, data, ecd) {
-        const transform = entity.getComponent(Transform);
+        const transform = node.transform;
 
         const contact_found = this.terrain.raycastVerticalFirstSync(p, transform.position.x, transform.position.z);
 

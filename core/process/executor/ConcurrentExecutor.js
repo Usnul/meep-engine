@@ -470,7 +470,7 @@ function runTaskForTime2(task, time, completionCallback, failureCallback) {
         } else if (signal === TaskSignal.EndFailure) {
             break;
         } else {
-            throw new Error("Task produced unknown signal: " + signal);
+            throw new Error(`Task '${task.name}' produced unknown signal: ` + signal);
         }
     }
 

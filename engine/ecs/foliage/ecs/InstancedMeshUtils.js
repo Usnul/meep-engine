@@ -1,6 +1,6 @@
 import EntityBuilder from "../../EntityBuilder.js";
 import { loadFoliageLayer } from "./Foliage2System.js";
-import Mesh from "../../../graphics/ecs/mesh/Mesh.js";
+import Mesh, { MeshFlags } from "../../../graphics/ecs/mesh/Mesh.js";
 import { Transform } from "../../transform/Transform.js";
 import { Foliage2, FoliageLayer } from "./Foliage2.js";
 import { InstancedFoliage } from "../InstancedFoliage.js";
@@ -86,22 +86,27 @@ export function optimizeIndividualMeshesEntitiesToInstances(dataset, threshold =
      * @param {int} entity
      */
     function visitMeshTransformEntity(mesh, transform, entity) {
-        const modelURL = mesh.url;
+        const model_url = mesh.url;
 
-        if (modelURL === undefined || modelURL === null || modelURL.trim().length === 0) {
+        if (model_url === undefined || model_url === null || model_url.trim().length === 0) {
             //not a valid URL
             return;
         }
 
+        if (mesh.getFlag(MeshFlags.Loaded) && (mesh.mesh.isMesh !== true || mesh.mesh.isSkinnedMesh === true)) {
+            // mesh is not compatible with instancing
+            return;
+        }
+
         let list;
-        if (!candidates.hasOwnProperty(modelURL)) {
+        if (!candidates.hasOwnProperty(model_url)) {
             list = [];
-            candidates[modelURL] = {
+            candidates[model_url] = {
                 mesh,
                 list
             };
         } else {
-            list = candidates[modelURL].list;
+            list = candidates[model_url].list;
         }
 
         list.push({
@@ -112,11 +117,10 @@ export function optimizeIndividualMeshesEntitiesToInstances(dataset, threshold =
         });
     }
 
+    // traverse entities that have only Mesh and a Transform
     dataset.traverseEntitiesExact([Mesh, Transform], visitMeshTransformEntity);
 
-
     const tasks = [];
-
 
     const foliage2 = new Foliage2();
 
@@ -236,11 +240,13 @@ export function optimizeIndividualMeshesEntitiesToInstances(dataset, threshold =
 
                 layer.data = instancedFoliage;
                 layer.modelURL.set(modelURL);
-                layer.dataURL.set(dataURL);
 
                 //TODO shadow settings are just assumptions
                 layer.castShadow.set(true);
                 layer.receiveShadow.set(true);
+
+                instancedFoliage.instances.mesh.castShadow = layer.castShadow.getValue();
+                instancedFoliage.instances.mesh.receiveShadow = layer.receiveShadow.getValue();
 
                 foliage2.layers.add(layer);
 

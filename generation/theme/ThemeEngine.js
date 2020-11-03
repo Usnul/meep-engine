@@ -3,7 +3,7 @@ import { assert } from "../../core/assert.js";
 import { obtainTerrain } from "../../../model/game/scenes/SceneUtils.js";
 import { randomFloatBetween, seededRandom } from "../../core/math/MathUtils.js";
 import { TerrainLayerRuleAggregator } from "./TerrainLayerRuleAggregator.js";
-import { actionTask, countTask, futureTask } from "../../core/process/task/TaskUtils.js";
+import { actionTask, countTask, emptyTask, futureTask } from "../../core/process/task/TaskUtils.js";
 import { SplatMapOptimizer } from "../../engine/ecs/terrain/ecs/splat/SplatMapOptimizer.js";
 import { Sampler2D } from "../../engine/graphics/texture/sampler/Sampler2D.js";
 import Task from "../../core/process/task/Task.js";
@@ -12,6 +12,8 @@ import { binarySearchLowIndex } from "../../core/collection/ArrayUtils.js";
 import { compareNumbers } from "../../core/primitives/numbers/compareNumbers.js";
 import TaskGroup from "../../core/process/task/TaskGroup.js";
 import Future from "../../core/process/Future.js";
+import { optimizeIndividualMeshesEntitiesToInstances } from "../../engine/ecs/foliage/ecs/InstancedMeshUtils.js";
+import TaskState from "../../core/process/task/TaskState.js";
 
 export class ThemeEngine {
     constructor() {
@@ -422,22 +424,7 @@ export class ThemeEngine {
      * @returns {Task}
      */
     updateTerrain(terrain) {
-
-        const optimizer = new SplatMapOptimizer();
-        optimizer.mapping = terrain.splat;
-
-        const tasks = optimizer.optimize();
-
-        const tOptimizeSplats = new TaskGroup(tasks, 'optimize splat maps');
-
-        const tUpdateHeights = actionTask(() => {
-
-            terrain.updateWorkerHeights();
-            terrain.tiles.rebuild();
-
-        }, 'update terrain');
-
-        return new TaskGroup([tUpdateHeights, tOptimizeSplats]);
+        return emptyTask();
     }
 
     /**
@@ -451,9 +438,41 @@ export class ThemeEngine {
 
         const tLightMap = futureTask(new Future((resolve, reject) => {
             terrain.buildLightMap().then(resolve, reject);
-        }));
+        }), 'Building Lightmap');
 
-        return new TaskGroup([tLightMap]);
+        const optimization_task = new TaskGroup([]);
+
+        const tOptimizeMeshes = new Task({
+            name: 'Mesh optimization',
+            initializer(task, executor) {
+
+                const o = optimizeIndividualMeshesEntitiesToInstances(ecd, 10);
+
+                optimization_task.addChildren(o.tasks);
+
+                executor.runGroup(optimization_task);
+            },
+            cycleFunction() {
+                const state = optimization_task.state.getValue();
+
+                if (state === TaskState.RUNNING) {
+                    return TaskSignal.Yield;
+                } else if (state === TaskState.FAILED) {
+                    return TaskSignal.EndFailure;
+                } else if (state === TaskState.SUCCEEDED) {
+                    return TaskSignal.EndSuccess;
+                } else {
+                    return TaskSignal.Continue;
+                }
+            },
+            computeProgress() {
+                return optimization_task.computeProgress();
+            }
+        });
+
+        tOptimizeMeshes.estimatedDuration = 5;
+
+        return new TaskGroup([tLightMap, tOptimizeMeshes]);
     }
 
     /**
@@ -467,6 +486,10 @@ export class ThemeEngine {
 
         // build terrain tiles
         const tTerrainGeometry = futureTask(new Future((resolve, reject) => {
+
+            terrain.updateWorkerHeights();
+            terrain.tiles.rebuild();
+
             terrain.promiseAllTiles().then(resolve, reject);
         }), 'Wait for terrain tiles');
 
@@ -484,6 +507,7 @@ export class ThemeEngine {
             tTerrainGeometry
         ]);
         tCells.addDependency(tInitializeThemes);
+        tTerrainGeometry.addDependency(tCells);
 
         const tOptimize = this.optimize(ecd);
 

@@ -21,11 +21,12 @@ export function buildTreeOptimizationTask(bvh, iterationLength) {
     const task = new Task({
         name: "Optimization of Bounding Volume Hierarchy",
 
-        initializer() {
+        initializer(task, executor) {
             cycles = 0;
             sameChangeCountCycles = 0;
             buffer.clear();
         },
+
         cycleFunction() {
             const optimizationsDone = optimize(bvh, iterationLength);
             if (optimizationsDone > 0) {
@@ -52,7 +53,11 @@ export function buildTreeOptimizationTask(bvh, iterationLength) {
             }
         },
         computeProgress: function () {
-            return cycles / iterationLength;
+            if (iterationLength <= 0) {
+                return 0;
+            } else {
+                return cycles / iterationLength;
+            }
         }
     });
 

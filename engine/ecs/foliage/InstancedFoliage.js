@@ -84,6 +84,17 @@ function InstancedFoliage() {
     this.__garbagePointer = 0;
 }
 
+InstancedFoliage.prototype.hash = function () {
+    return this.data.hash();
+};
+
+InstancedFoliage.prototype.clear = function () {
+
+    this.data.clear();
+    this.bvh.reset();
+
+};
+
 InstancedFoliage.prototype.initialize = function () {
 
 };

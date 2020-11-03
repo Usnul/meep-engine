@@ -15,7 +15,7 @@ class Task {
     /**
      *
      * @param {string} name
-     * @param {function(Task, executor:*)} [initializer]
+     * @param {function(Task, executor:ConcurrentExecutor)} [initializer]
      * @param {function():TaskSignal} cycleFunction
      * @param {function():number} [computeProgress]
      * @param {Task[]} [dependencies=[]]
