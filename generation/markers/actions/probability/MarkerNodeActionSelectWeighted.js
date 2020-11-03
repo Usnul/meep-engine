@@ -38,7 +38,7 @@ export class MarkerNodeActionSelectWeighted extends MarkerNodeAction {
         return r;
     }
 
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
         this.__random.setCurrentSeed(seed);
 
         const elements = this.elements;
@@ -51,10 +51,10 @@ export class MarkerNodeActionSelectWeighted extends MarkerNodeAction {
              */
             const element = elements[i];
 
-            element.initialize(grid, seed + i);
+            element.initialize(grid, ecd, seed + i);
         }
 
-        super.initialize(grid, seed);
+        super.initialize(grid, ecd, seed);
     }
 
     execute(grid, ecd, node) {

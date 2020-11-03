@@ -29,7 +29,7 @@ export class MarkerNodeActionSelectRandom extends MarkerNodeAction {
         return r
     }
 
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
         const actions = this.elements;
         const n = actions.length;
 
@@ -38,7 +38,7 @@ export class MarkerNodeActionSelectRandom extends MarkerNodeAction {
         for (let i = 0; i < n; i++) {
             const action = actions[i];
 
-            action.initialize(grid, seed + i);
+            action.initialize(grid, ecd, seed + i);
         }
 
         this.__random.setCurrentSeed(seed);

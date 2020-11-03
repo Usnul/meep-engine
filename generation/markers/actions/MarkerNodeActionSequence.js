@@ -25,14 +25,14 @@ export class MarkerNodeActionSequence extends MarkerNodeAction {
         return r;
     }
 
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
         const actions = this.elements;
         const n = actions.length;
 
         for (let i = 0; i < n; i++) {
             const action = actions[i];
 
-            action.initialize(grid, seed + i);
+            action.initialize(grid, ecd, seed + i);
         }
     }
 

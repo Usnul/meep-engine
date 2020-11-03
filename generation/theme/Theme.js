@@ -33,10 +33,13 @@ export class Theme {
      */
     initialize(seed, ecd, grid) {
         assert.defined(ecd, 'ecd');
+        assert.notNull(ecd, 'ecd');
+        assert.equal(ecd.isEntityComponentDataset, true, 'ecd.isEntityComponentDataset !== true');
+
         assert.defined(grid, 'grid');
 
         this.terrain.initialize(grid, seed);
-        this.nodes.initialize(grid, seed);
+        this.nodes.initialize(grid, ecd, seed);
         this.cells.initialize(seed, ecd, grid);
     }
 }

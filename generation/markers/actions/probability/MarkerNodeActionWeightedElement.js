@@ -18,11 +18,12 @@ export class MarkerNodeActionWeightedElement {
     /**
      *
      * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @param {number} seed
      */
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
 
-        this.action.initialize(grid, seed);
+        this.action.initialize(grid, ecd, seed);
 
         if (!this.weight.initialized) {
             this.weight.initialize(grid, seed);

@@ -368,7 +368,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }
                     ]
                 })
-            ]), transform: Transform.fromJSON({
+            ]),
+            transform: Transform.fromJSON({
                 scale: { x: 0.5, y: 0.5, z: 0.5 },
                 position: { x: 0, y: 0, z: 0 }
             })
@@ -388,7 +389,8 @@ ebpStartingPoint.add(GridPosition.fromJSON({}));
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from(MirMarkerTypes.StartingPoint),
     action: MarkerNodeActionEntityPlacement.from({
-        blueprint: ebpStartingPoint, transform: Transform.fromJSON({
+        blueprint: ebpStartingPoint,
+        transform: Transform.fromJSON({
             scale: { x: 0.5, y: 0.5, z: 0.5 },
             position: { x: 0, y: 0.5, z: 0 }
         })
@@ -546,7 +548,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
     ],
     action: MarkerNodeActionEntityPlacement.from(
         {
-            blueprint: bpEnemy, transform: Transform.fromJSON({
+            blueprint: bpEnemy,
+            transform: Transform.fromJSON({
                 scale: { x: 0.3, y: 0.5, z: 0.3 },
                 position: { x: 0, y: 0.5, z: 0 }
             })
@@ -578,7 +581,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                     }
                 ]
             })
-        ]), transform: Transform.fromJSON({
+        ]),
+        transform: Transform.fromJSON({
             scale: { x: 2.2, y: 2.2, z: 2.2 },
             position: { x: 0, y: 0, z: 0 }
         })
@@ -597,7 +601,8 @@ ebpRoadJunction90.add(GridPosition.fromJSON({}));
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Road Junction Decorator 90'),
     action: MarkerNodeActionEntityPlacement.from({
-        blueprint: ebpRoadJunction90, transform: Transform.fromJSON({
+        blueprint: ebpRoadJunction90,
+        transform: Transform.fromJSON({
             scale: { x: 0.1, y: 1, z: 0.1 },
             position: { x: 0, y: 1, z: 0 }
         })
@@ -626,7 +631,8 @@ ebpBuffObject0.add(GridPosition.fromJSON({}));
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Attack Power Increase'),
     action: MarkerNodeActionEntityPlacement.from({
-        blueprint: ebpBuffObject0, transform: Transform.fromJSON({
+        blueprint: ebpBuffObject0,
+        transform: Transform.fromJSON({
             scale: { x: 0.4, y: 1, z: 0.4 },
             position: { x: 0, y: 1, z: 0 }
         })
@@ -655,7 +661,8 @@ ebpBuffObjectDefense.add(GridPosition.fromJSON({}));
 SampleTheme0.nodes.add(MarkerProcessingRule.from({
     matcher: MarkerNodeMatcherByType.from('Buff Object :: Defense Increase'),
     action: MarkerNodeActionEntityPlacement.from({
-        blueprint: ebpBuffObjectDefense, transform: Transform.fromJSON({
+        blueprint: ebpBuffObjectDefense,
+        transform: Transform.fromJSON({
             scale: { x: 0.4, y: 1, z: 0.4 },
             position: { x: 0, y: 1, z: 0 }
         })
@@ -832,7 +839,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }
                     ]
                 })
-            ]), transform: Transform.fromJSON({
+            ]),
+            transform: Transform.fromJSON({
                 scale: { x: 0.005, y: 0.005, z: 0.005 },
                 position: { x: 0, y: 0, z: 0 }
             })
@@ -1014,7 +1022,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }
                     ]
                 })
-            ]), transform: Transform.fromJSON({
+            ]),
+            transform: Transform.fromJSON({
                 scale: { x: 1, y: 1, z: 1 },
                 position: { x: 0, y: 0, z: 0 }
             })
@@ -1045,7 +1054,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 23, y: 23, z: 23 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1063,7 +1073,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 21, y: 21, z: 21 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1081,7 +1092,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 20, y: 20, z: 20 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1102,7 +1114,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 27, y: 27, z: 27 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1120,7 +1133,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 24, y: 24, z: 24 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1141,7 +1155,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 20, y: 20, z: 20 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1159,7 +1174,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 22, y: 22, z: 22 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1180,7 +1196,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 23, y: 23, z: 23 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1198,7 +1215,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 26, y: 26, z: 26 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1222,7 +1240,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 32, y: 32, z: 32 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1240,7 +1259,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 31, y: 31, z: 31 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1258,7 +1278,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 31, y: 31, z: 31 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1279,7 +1300,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 27, y: 27, z: 27 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1297,7 +1319,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 24, y: 24, z: 24 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1319,7 +1342,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                 }),
                 Transform.fromJSON({}),
                 new ClingToTerrain()
-            ]), transform: Transform.fromJSON({
+            ]),
+            transform: Transform.fromJSON({
                 scale: { x: 1, y: 1, z: 1 },
                 position: { x: 0, y: 0, z: 0 }
             })
@@ -1340,7 +1364,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 1.41, y: 1.41, z: 1.41 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1361,7 +1386,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 2.2, y: 2.2, z: 2.2 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1388,7 +1414,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 1, y: 1, z: 1 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1409,7 +1436,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         }),
                         Transform.fromJSON({}),
                         new ClingToTerrain()
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 1.3, y: 1.3, z: 1.3 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1438,7 +1466,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         ClingToTerrain.fromJSON({
                             normalAlign: true
                         })
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 10, y: 10, z: 10 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1458,7 +1487,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         ClingToTerrain.fromJSON({
                             normalAlign: true
                         })
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 12, y: 12, z: 12 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1478,7 +1508,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         ClingToTerrain.fromJSON({
                             normalAlign: true
                         })
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 12, y: 12, z: 12 },
                         position: { x: 0, y: 0, z: 0 }
                     })
@@ -1498,7 +1529,8 @@ SampleTheme0.nodes.add(MarkerProcessingRule.from({
                         ClingToTerrain.fromJSON({
                             normalAlign: true
                         })
-                    ]), transform: Transform.fromJSON({
+                    ]),
+                    transform: Transform.fromJSON({
                         scale: { x: 12, y: 12, z: 12 },
                         position: { x: 0, y: 0, z: 0 }
                     })

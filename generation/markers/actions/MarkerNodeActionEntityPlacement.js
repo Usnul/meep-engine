@@ -21,9 +21,15 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
 
         /**
          *
-         * @type {Function}
+         * @type {function(EntityBuilder, MarkerNode, GridData, EntityComponentDataset)}
          */
         this.process = null;
+
+        /**
+         *
+         * @type {MarkerNodeEntityProcessor}
+         */
+        this.processor = null;
     }
 
     /**
@@ -31,15 +37,21 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
      * @param {EntityBlueprint} blueprint
      * @param {Transform} [transform]
      * @param {function(EntityBuilder, MarkerNode, GridData, EntityComponentDataset)} [process] Opportunity to mutate entity before it is added to the dataset (ecd)
+     * @param {MarkerNodeEntityProcessor} [processor]
      * @returns {MarkerNodeActionEntityPlacement}
      */
     static from(
         {
             blueprint,
             transform = undefined,
-            process = null
+            process = null,
+            processor = null
         }
     ) {
+
+        if (process !== null) {
+            throw new Error('process parameter is deprecated');
+        }
 
         const r = new MarkerNodeActionEntityPlacement();
 
@@ -51,7 +63,13 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
 
         r.process = process;
 
+        r.processor = processor;
+
         return r;
+    }
+
+    initialize(grid, ecd, seed) {
+        this.processor.initialize(grid, ecd);
     }
 
     execute(grid, ecd, node) {
@@ -60,10 +78,8 @@ export class MarkerNodeActionEntityPlacement extends MarkerNodeAction {
         const entityBuilder = blueprint.buildEntityBuilder(node.properties);
 
         // execute post-process step
-        const process = this.process;
-
-        if (process !== null) {
-            process(entityBuilder, node, grid, ecd);
+        if (this.processor !== null) {
+            this.processor.execute(entityBuilder, node, grid, ecd);
         }
 
         /**

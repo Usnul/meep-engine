@@ -3,9 +3,10 @@ export class MarkerNodeAction {
     /**
      *
      * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @param {number}seed
      */
-    initialize(grid, seed) {
+    initialize(grid,ecd, seed) {
 
     }
 

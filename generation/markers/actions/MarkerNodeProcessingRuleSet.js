@@ -13,10 +13,17 @@ export class MarkerNodeProcessingRuleSet {
 
     /**
      *
-     * @param grid
+     * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @param {number} seed
      */
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
+
+        assert.defined(grid, 'grid');
+
+        assert.defined(ecd, 'ecd');
+        assert.notNull(ecd, 'ecd');
+        assert.equal(ecd.isEntityComponentDataset, true, 'ecd.isEntityComponentDataset !== true');
 
         assert.isNumber(seed, 'seed');
 
@@ -26,7 +33,7 @@ export class MarkerNodeProcessingRuleSet {
         for (let i = 0; i < n; i++) {
             const rule = elements[i];
 
-            rule.initialize(grid, seed);
+            rule.initialize(grid, ecd, seed);
         }
     }
 

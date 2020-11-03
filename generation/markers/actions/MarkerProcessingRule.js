@@ -61,10 +61,16 @@ export class MarkerProcessingRule {
     /**
      *
      * @param {GridData} grid
+     * @param {EntityComponentDataset} ecd
      * @param {number} seed
      */
-    initialize(grid, seed) {
+    initialize(grid, ecd, seed) {
         assert.equal(grid.isGridData, true, 'grid.isGridData !== true');
+
+        assert.defined(ecd, 'ecd');
+        assert.notNull(ecd, 'ecd');
+        assert.equal(ecd.isEntityComponentDataset, true, 'ecd.isEntityComponentDataset !== true');
+
         assert.isNumber(seed, 'seed');
 
         const transformers = this.transformers;
@@ -75,6 +81,6 @@ export class MarkerProcessingRule {
             transformer.initialize(grid, seed);
         }
 
-        this.action.initialize(grid, seed);
+        this.action.initialize(grid,ecd, seed);
     }
 }
