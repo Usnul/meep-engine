@@ -32,7 +32,7 @@ import { TerrainPreview } from "../TerrainPreview.js";
 import { assert } from "../../../../core/assert.js";
 import { GameAssetType } from "../../../asset/GameAssetType.js";
 import { writeSample2DDataToDataTexture } from "../../../graphics/texture/sampler/writeSampler2DDataToDataTexture.js";
-import { loadLegacyTerrainLayers, TerrainLayers } from "./layers/TerrainLayers.js";
+import { TerrainLayers } from "./layers/TerrainLayers.js";
 import { SplatMaterial } from "../../../graphics/material/SplatMaterial.js";
 import { loadLegacyTerrainSplats, SplatMapping } from "./splat/SplatMapping.js";
 import { OffsetScaleTransform2D } from "./OffsetScaleTransform2D.js";
@@ -40,6 +40,7 @@ import { GridTransformKind } from "./GridTransformKind.js";
 import { clamp } from "../../../../core/math/MathUtils.js";
 import { makeTerrainWorkerProxy } from "./makeTerrainWorkerProxy.js";
 import { MeepSettings } from "../../../MeepSettings.js";
+import { loadLegacyTerrainLayers } from "./layers/loadLegacyTerrainLayers.js";
 
 /**
  *
