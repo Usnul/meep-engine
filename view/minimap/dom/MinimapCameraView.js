@@ -39,107 +39,151 @@ export class MinimapCameraView extends View {
 
         /**
          *
+         * @type {Rectangle}
+         * @private
+         */
+        this.__world = world;
+
+        /**
+         *
+         * @type {Vector2}
+         * @private
+         */
+        this.__world_scale = worldScale;
+
+        /**
+         *
          * @type {ObservedValue<Terrain>}
          */
         this.terrain = new ObservedValue(null);
 
-        const self = this;
 
+        this
+            .bindSignal(this.camera.projectionType.onChanged, this.__update, this)
+            .bindSignal(this.transform.position.onChanged, this.__update, this)
+            .bindSignal(worldScale.onChanged, this.__update, this)
+            .bindSignal(world.position.onChanged, this.__update, this)
+            .bindSignal(this.transform.rotation.onChanged, this.__update, this);
 
-        function castTerrainRay(result, originX, originY, originZ, directionX, directionY, directionZ) {
-            const terrain = self.terrain.getValue();
+    }
 
-            const JITTER = 0.00001;
+    /**
+     *
+     * @param {Vector3} result
+     * @param {number} originX
+     * @param {number} originY
+     * @param {number} originZ
+     * @param {number} directionX
+     * @param {number} directionY
+     * @param {number} directionZ
+     */
+     castTerrainRay(result, originX, originY, originZ, directionX, directionY, directionZ) {
+        const terrain = this.terrain.getValue();
 
-            if (terrain === null) {
-                computePlaneRayIntersection(result, originX, originY, originZ, directionX, directionY, directionZ, 0, 1, 0, 0);
-            } else {
+        const JITTER = 0.00001;
 
-                let oX = originX;
-                let oY = originY;
-                let oZ = originZ;
+        if (terrain === null) {
+            computePlaneRayIntersection(result, originX, originY, originZ, directionX, directionY, directionZ, 0, 1, 0, 0);
+        } else {
 
-                let foundHit = false;
+            let oX = originX;
+            let oY = originY;
+            let oZ = originZ;
 
-                for (let i = 0; i < 10 && !foundHit; i++) {
-                    foundHit = terrain.raycastFirstSync(rayContact, originX, originY, originZ, directionX, directionY, directionZ);
+            let foundHit = false;
 
-                    if (!foundHit) {
-                        //no hit found, try to jitter origin in case of mathematical error at polygon edges
-                        oX += (Math.random() - 0.5) * JITTER;
-                        oY += (Math.random() - 0.5) * JITTER;
-                        oZ += (Math.random() - 0.5) * JITTER;
-                    } else {
-                        result.copy(rayContact.position);
-                    }
-
-                }
+            for (let i = 0; i < 10 && !foundHit; i++) {
+                foundHit = terrain.raycastFirstSync(rayContact, originX, originY, originZ, directionX, directionY, directionZ);
 
                 if (!foundHit) {
-                    //no hit found, fall back to planar test
-                    computePlaneRayIntersection(result, originX, originY, originZ, directionX, directionY, directionZ, 0, 1, 0, 0);
+                    //no hit found, try to jitter origin in case of mathematical error at polygon edges
+                    oX += (Math.random() - 0.5) * JITTER;
+                    oY += (Math.random() - 0.5) * JITTER;
+                    oZ += (Math.random() - 0.5) * JITTER;
+                } else {
+                    result.copy(rayContact.position);
                 }
 
             }
 
+            if (!foundHit) {
+                //no hit found, fall back to planar test
+                computePlaneRayIntersection(result, originX, originY, originZ, directionX, directionY, directionZ, 0, 1, 0, 0);
+            }
+
         }
+
+    }
+
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {Vector3}
+     */
+     getPoint(x, y) {
+        const camera = this.camera;
 
         /**
          *
-         * @param {number} x
-         * @param {number} y
-         * @returns {Vector3}
+         * @type {Rectangle}
          */
-        function getPoint(x, y) {
+        const world = this.__world;
 
-            const vOrigin = new Vector3(-1, 1, 0.5);
-            const vDirection = new Vector3(1, -1, 0.5);
-            camera.projectRay(x, y, vOrigin, vDirection);
+        /**
+         *
+         * @type {Vector2}
+         */
+        const worldScale = this.__world_scale;
 
-            const vResult = new Vector3(0, 0, 0);
+        const vOrigin = new Vector3(-1, 1, 0.5);
+        const vDirection = new Vector3(1, -1, 0.5);
+        camera.projectRay(x, y, vOrigin, vDirection);
 
-            castTerrainRay(vResult, vOrigin.x, vOrigin.y, vOrigin.z, vDirection.x, vDirection.y, vDirection.z);
+        const vResult = new Vector3(0, 0, 0);
 
-            vResult.x -= world.position.x;
-            vResult.x *= worldScale.x;
+        this.castTerrainRay(vResult, vOrigin.x, vOrigin.y, vOrigin.z, vDirection.x, vDirection.y, vDirection.z);
 
-            vResult.z -= world.position.y;
-            vResult.z *= worldScale.y;
+        vResult.x -= world.position.x;
+        vResult.x *= worldScale.x;
 
-            return vResult;
+        vResult.z -= world.position.y;
+        vResult.z *= worldScale.y;
+
+        return vResult;
+    }
+
+    __update () {
+        const camera = this.camera;
+
+        /**
+         *
+         * @type {Transform}
+         */
+        const transform = this.transform;
+
+        const c = camera.object;
+
+        if (c === null) {
+            console.warn(`Camera component doesn't have three.js object built.`);
+            return;
         }
 
-        this.__update = function () {
-            const c = camera.object;
+        c.position.copy(transform.position);
+        camera.updateMatrices();
 
-            if (c === null) {
-                console.warn(`Camera component doesn't have three.js object built.`);
-                return;
-            }
+        const v0 = this.getPoint(-1, 1);
+        const v1 = this.getPoint(1, -1);
 
-            c.position.copy(transform.position);
-            camera.updateMatrices();
+        const x0 = min2(v0.x, v1.x);
+        const y0 = min2(v0.z, v1.z);
+        const x1 = max2(v0.x, v1.x);
+        const y1 = max2(v0.z, v1.z);
 
-            const v0 = getPoint(-1, 1);
-            const v1 = getPoint(1, -1);
+        this.position.set(x0, y0);
+        this.size.set(x1 - x0, y1 - y0);
+    };
 
-            const x0 = min2(v0.x, v1.x);
-            const y0 = min2(v0.z, v1.z);
-            const x1 = max2(v0.x, v1.x);
-            const y1 = max2(v0.z, v1.z);
-
-            self.position.set(x0, y0);
-            self.size.set(x1 - x0, y1 - y0);
-        };
-
-        this
-            .bindSignal(this.camera.projectionType.onChanged, this.__update)
-            .bindSignal(this.transform.position.onChanged, this.__update)
-            .bindSignal(worldScale.onChanged, this.__update)
-            .bindSignal(world.position.onChanged, this.__update)
-            .bindSignal(this.transform.rotation.onChanged, this.__update);
-
-    }
 
 
     link() {
