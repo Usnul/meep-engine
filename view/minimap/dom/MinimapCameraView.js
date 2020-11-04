@@ -1,10 +1,9 @@
 import View from "../../View.js";
-import domify from "../../DOM.js";
 import Vector3 from "../../../core/geom/Vector3.js";
 import { computePlaneRayIntersection } from "../../../core/geom/Plane.js";
 import ObservedValue from "../../../core/model/ObservedValue.js";
 import { SurfacePoint3 } from "../../../core/geom/3d/SurfacePoint3.js";
-import { max2, min2 } from "../../../core/math/MathUtils.js";
+import SVG from "../../SVG.js";
 
 
 const rayContact = new SurfacePoint3();
@@ -22,7 +21,18 @@ export class MinimapCameraView extends View {
     constructor({ camera, transform, entity, world, worldScale }) {
         super();
 
-        this.el = domify('div').addClass('ui-camera-view').el;
+        this.el = SVG.createElement('svg');
+
+        this.addClass('ui-camera-view');
+
+        /**
+         *
+         * @type {Element}
+         * @private
+         */
+        this.__el_polygon = SVG.createElement('polygon');
+
+        this.el.appendChild(this.__el_polygon);
 
         /**
          *
@@ -77,7 +87,7 @@ export class MinimapCameraView extends View {
      * @param {number} directionY
      * @param {number} directionZ
      */
-     castTerrainRay(result, originX, originY, originZ, directionX, directionY, directionZ) {
+    castTerrainRay(result, originX, originY, originZ, directionX, directionY, directionZ) {
         const terrain = this.terrain.getValue();
 
         const JITTER = 0.00001;
@@ -121,7 +131,7 @@ export class MinimapCameraView extends View {
      * @param {number} y
      * @returns {Vector3}
      */
-     getPoint(x, y) {
+    getPoint(x, y) {
         const camera = this.camera;
 
         /**
@@ -153,7 +163,7 @@ export class MinimapCameraView extends View {
         return vResult;
     }
 
-    __update () {
+    __update() {
         const camera = this.camera;
 
         /**
@@ -172,18 +182,14 @@ export class MinimapCameraView extends View {
         c.position.copy(transform.position);
         camera.updateMatrices();
 
-        const v0 = this.getPoint(-1, 1);
-        const v1 = this.getPoint(1, -1);
+        const v_tl = this.getPoint(-1, 1);
+        const v_tr = this.getPoint(1, 1);
+        const v_br = this.getPoint(1, -1);
+        const v_bl = this.getPoint(-1, -1);
 
-        const x0 = min2(v0.x, v1.x);
-        const y0 = min2(v0.z, v1.z);
-        const x1 = max2(v0.x, v1.x);
-        const y1 = max2(v0.z, v1.z);
 
-        this.position.set(x0, y0);
-        this.size.set(x1 - x0, y1 - y0);
+        this.__el_polygon.setAttribute('points', `${v_tl.x},${v_tl.z} ${v_tr.x},${v_tr.z} ${v_br.x},${v_br.z} ${v_bl.x},${v_bl.z}`);
     };
-
 
 
     link() {
