@@ -93,7 +93,7 @@ export class TooltipComponentSystem extends System {
         this.__current_tip_entity = -1;
     }
 
-    __handlePointerPositionChange() {
+    __updateActiveBounds() {
         this.time_since_position_update = 0;
 
         if (this.tip !== null) {
@@ -165,14 +165,14 @@ export class TooltipComponentSystem extends System {
 
     startup(entityManager, readyCallback, errorCallback) {
 
-        this.pointer.position.onChanged.add(this.__handlePointerPositionChange, this);
+        this.pointer.position.onChanged.add(this.__updateActiveBounds, this);
 
         super.startup(entityManager, readyCallback, errorCallback);
     }
 
     shutdown(entityManager, readyCallback, errorCallback) {
 
-        this.pointer.position.onChanged.remove(this.__handlePointerPositionChange, this);
+        this.pointer.position.onChanged.remove(this.__updateActiveBounds, this);
 
         super.shutdown(entityManager, readyCallback, errorCallback);
     }
@@ -192,6 +192,8 @@ export class TooltipComponentSystem extends System {
 
         if (this.tip !== null) {
             // already presenting a tip
+            this.__updateActiveBounds();
+
             return;
         }
 
