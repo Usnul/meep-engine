@@ -124,8 +124,8 @@ class Highlight {
      * @param {HighlightDefinition} def
      * @returns {boolean}
      */
-    remove(def){
-       return this.elements.removeOneOf(def);
+    remove(def) {
+        return this.elements.removeOneOf(def);
     }
 
     /**
@@ -146,8 +146,8 @@ class Highlight {
         };
     }
 
-    fromJSON(json) {
-        this.elements.fromJSON(json.elemenets, HighlightDefinition);
+    fromJSON({ elements = [] }) {
+        this.elements.fromJSON(elements, HighlightDefinition.fromJSON);
     }
 
     /**

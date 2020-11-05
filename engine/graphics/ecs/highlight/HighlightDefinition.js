@@ -59,4 +59,17 @@ export class HighlightDefinition {
             color: this.color.toJSON()
         };
     }
+
+    /**
+     *
+     * @param j
+     * @return {HighlightDefinition}
+     */
+    static fromJSON(j) {
+        const r = new HighlightDefinition();
+
+        r.fromJSON(j);
+
+        return r;
+    }
 }
