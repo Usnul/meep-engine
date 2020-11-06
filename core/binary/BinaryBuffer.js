@@ -625,7 +625,8 @@ BinaryBuffer.prototype.writeUint32LE = function (value) {
  * @param {number} length
  */
 BinaryBuffer.prototype.writeBytes = function (array, sourceOffset, length) {
-    assert.greaterThanOrEqual(array.length, sourceOffset + length, 'source array underflow');
+    const source_end = sourceOffset + length;
+    assert.greaterThanOrEqual(array.length, source_end, 'source array underflow');
 
     const targetAddress = this.position;
 
@@ -635,7 +636,19 @@ BinaryBuffer.prototype.writeBytes = function (array, sourceOffset, length) {
 
     const destination = new Uint8Array(this.data, targetAddress, length);
 
-    destination.set(array.subarray(sourceOffset, sourceOffset + length));
+    if (typeof array.subarray === "function") {
+        // typed array, use "subarray" method
+
+        destination.set(array.subarray(sourceOffset, source_end));
+
+    } else {
+        // not a typed array, copy byte by byte manually
+
+        for (let i = 0; i < length; i++) {
+            destination[i] = array[sourceOffset + i];
+        }
+
+    }
 
     this.position = end;
 };

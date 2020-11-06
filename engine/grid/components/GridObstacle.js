@@ -288,8 +288,10 @@ export class GridObstacleSerializationAdapter extends BinaryClassSerializationAd
 
         value.size.set(x, y);
 
-        value.data = new Uint8Array(x * y);
+        const length = x * y;
 
-        buffer.readBytes(value.data, 0, x * y);
+        value.data = new Uint8Array(length);
+
+        buffer.readBytes(value.data, 0, length);
     }
 }
