@@ -86,7 +86,12 @@ export class AsynchronousActionSequence extends AsynchronousAction {
             this.__active.on.failed.addOne(this.__handleActiveFailed, this);
             this.__active.on.cancelled.addOne(this.__handleActiveCancelled, this);
 
-            this.__active.start();
+            try {
+                this.__active.start();
+            } catch (e) {
+                // an element failed during start-up sequence
+                this.__handleActiveFailed(e);
+            }
         }
 
     }
