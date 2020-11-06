@@ -16,7 +16,7 @@ export class ThreeClippingPlaneComputingBVHVisitor extends BVHVisitor {
          * @type {Plane[]|null}
          * @private
          */
-        this.__planes = null;
+        this.__planes = [];
 
         /**
          *
@@ -50,20 +50,18 @@ export class ThreeClippingPlaneComputingBVHVisitor extends BVHVisitor {
         this.frustum = frustum;
         const planes = frustum.planes;
 
-        this.__planes = [
-            planes[0],
-            planes[1],
-            planes[2],
-            planes[3],
-            planes[4]
-        ];
+        this.__planes[0] = planes[0];
+        this.__planes[1] = planes[1];
+        this.__planes[2] = planes[2];
+        this.__planes[3] = planes[3];
+        this.__planes[4] = planes[4];
 
         const nearPlane = planes[4];
 
         this.__nearPlaneNormal = nearPlane.normal;
         this.__nearPlaneConstant = nearPlane.constant;
 
-        this.__planeCount = this.__planes.length;
+        this.__planeCount = 5;
     }
 
     /**
