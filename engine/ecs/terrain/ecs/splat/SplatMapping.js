@@ -248,7 +248,7 @@ export class SplatMapping {
      * @param {number} u
      * @param {number} v
      * @param {number} materialIndex
-     * @returns {number}
+     * @returns {number} between 0 and 255
      */
     sampleWeight(u, v, materialIndex) {
 

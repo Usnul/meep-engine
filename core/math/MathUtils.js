@@ -830,13 +830,13 @@ export function separation1D(a0, a1, b0, b1) {
 /**
  * Assuming the input is an N-dimension vector, normalizes the vector to magnitude of 1
  * @param {number[]} data
+ * @param {number} [length]
  */
-export function normalizeArrayVector(data) {
-    const n = data.length;
+export function normalizeArrayVector(data, length = data.length) {
 
     let magnitude2 = 0;
 
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < length; i++) {
         const value = data[i];
 
         const value2 = value * value;
@@ -847,7 +847,7 @@ export function normalizeArrayVector(data) {
 
     const magnitude = Math.sqrt(magnitude2);
 
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < length; i++) {
         data[i] /= magnitude;
     }
 
