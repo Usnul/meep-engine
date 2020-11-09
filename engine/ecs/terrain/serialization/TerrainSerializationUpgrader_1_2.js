@@ -59,7 +59,7 @@ export class TerrainSerializationUpgrader_1_2 extends BinaryClassUpgrader {
         BinaryBuffer.copyBytes(source, target, splat_cell_count);
 
         // skip material indices, these are no longer used
-        source.position += splat_cell_count;
+        source.position += splat_size_x * splat_size_y * 4;
 
         // read layers
 
