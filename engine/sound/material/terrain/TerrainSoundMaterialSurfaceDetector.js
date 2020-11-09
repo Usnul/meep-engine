@@ -2,14 +2,10 @@ import { SoundMaterialSurfaceDetector } from "../SoundMaterialSurfaceDetector.js
 import Vector2 from "../../../../core/geom/Vector2.js";
 import { normalizeArrayVector } from "../../../../core/math/MathUtils.js";
 import { SoundMaterialComposition } from "../SoundMaterialComposition.js";
+import { SilentSoundMaterial } from "../SilentSoundMaterial.js";
+import { SingleSoundMaterial } from "../SingleSoundMaterial.js";
 
 const v2_temp = new Vector2();
-
-/**
- *
- * @type {number[]}
- */
-const weights_temp = [];
 
 export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDetector {
     constructor() {
@@ -38,12 +34,38 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
         this.__composite = new SoundMaterialComposition();
     }
 
+    loadMaterialsFromJSON(json) {
+        assert.isArray(json, 'json');
+
+        for (let i = 0; i < json.length; i++) {
+            const jEl = json[i];
+
+            const material = SingleSoundMaterial.fromJSON(jEl);
+
+            this.materials[i] = material;
+        }
+    }
+
     /**
      *
      * @param {Terrain} terrain
      */
     initialize(terrain) {
         this.__terrain = terrain;
+
+        // initialize composite material
+
+        const layer_count = terrain.layers.count();
+
+        for (let i = 0; i < layer_count; i++) {
+
+            if (this.materials[i] === undefined) {
+                // no material set
+                this.setLayerMaterial(SilentSoundMaterial.INSTANCE);
+
+            }
+
+        }
     }
 
     /**
@@ -54,7 +76,7 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
     setLayerMaterial(layer_index, material) {
         this.materials[layer_index] = material;
 
-        this.__composite.materials[layer_index] = material;
+        this.__composite.setMaterial(layer_index, material, 1);
     }
 
     detect(thing, point, interaction) {
