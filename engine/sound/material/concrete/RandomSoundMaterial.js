@@ -1,7 +1,6 @@
 import { AbstractSoundMaterialDefinition } from "../AbstractSoundMaterialDefinition.js";
 import { randomFromArray } from "../../../../core/math/MathUtils.js";
-import { serializeSoundMaterialToJSON } from "./json/serializeSoundMaterialToJSON.js";
-import { deserializeSoundMaterialFromJSON } from "./json/deserializeSoundMaterialFromJSON.js";
+import { SoundAssetPlaybackSpec } from "../../asset/SoundAssetPlaybackSpec.js";
 
 export class RandomSoundMaterial extends AbstractSoundMaterialDefinition {
     constructor() {
@@ -24,12 +23,12 @@ export class RandomSoundMaterial extends AbstractSoundMaterialDefinition {
 
     toJSON() {
         return {
-            sounds: this.sounds.map(serializeSoundMaterialToJSON)
+            sounds: this.sounds.map(s => s.toJSON())
         };
     }
 
     fromJSON({ sounds }) {
-        this.sounds = sounds.map(deserializeSoundMaterialFromJSON);
+        this.sounds = sounds.map(SoundAssetPlaybackSpec.fromJSON);
     }
 }
 

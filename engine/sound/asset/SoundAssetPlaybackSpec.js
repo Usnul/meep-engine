@@ -106,6 +106,14 @@ export class SoundAssetPlaybackSpec {
         return r;
     }
 
+    static fromJSON(j) {
+        const r = new SoundAssetPlaybackSpec();
+
+        r.fromJSON(j);
+
+        return r;
+    }
+
     fromJSON({
                  volume = 1,
                  source,
