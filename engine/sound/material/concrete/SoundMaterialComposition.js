@@ -1,5 +1,7 @@
-import { AbstractSoundMaterialDefinition } from "./AbstractSoundMaterialDefinition.js";
-import { assert } from "../../../core/assert.js";
+import { AbstractSoundMaterialDefinition } from "../AbstractSoundMaterialDefinition.js";
+import { assert } from "../../../../core/assert.js";
+import { serializeSoundMaterialToJSON } from "./json/serializeSoundMaterialToJSON.js";
+import { deserializeSoundMaterialFromJSON } from "./json/deserializeSoundMaterialFromJSON.js";
 
 /**
  *
@@ -30,6 +32,25 @@ export class SoundMaterialComposition extends AbstractSoundMaterialDefinition {
         this.__volume_threshold = 0.01;
     }
 
+    toJSON() {
+        return {
+            materials: this.materials.map(serializeSoundMaterialToJSON),
+            weights: this.weights,
+            volumeThreshold: this.__volume_threshold
+        };
+    }
+
+    fromJSON({
+                 materials = [],
+                 weights = [],
+                 volumeThreshold = 0
+             }) {
+
+        this.materials = materials.map(deserializeSoundMaterialFromJSON);
+        this.weights = weights;
+        this.setVolumeThreshold(volumeThreshold);
+    }
+
     /**
      *
      * @param {number} index
@@ -53,7 +74,7 @@ export class SoundMaterialComposition extends AbstractSoundMaterialDefinition {
         this.__volume_threshold = v;
     }
 
-    sounds(destination, destination_offset, interaction) {
+    computeInteractionSounds(destination, destination_offset, interaction) {
 
         let offset = destination_offset;
 
@@ -61,7 +82,7 @@ export class SoundMaterialComposition extends AbstractSoundMaterialDefinition {
             const def = this.materials[i];
             const weight = this.weights[i];
 
-            const additions = def.sounds(temp, 0, interaction);
+            const additions = def.computeInteractionSounds(temp, 0, interaction);
 
             // adjust based on weights
             for (let j = 0; j < additions; j++) {
@@ -86,3 +107,5 @@ export class SoundMaterialComposition extends AbstractSoundMaterialDefinition {
         return offset - destination_offset;
     }
 }
+
+SoundMaterialComposition.typeName = "CompositeSoundMaterial";

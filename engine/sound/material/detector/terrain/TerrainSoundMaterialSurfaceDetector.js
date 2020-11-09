@@ -1,9 +1,9 @@
 import { SoundMaterialSurfaceDetector } from "../SoundMaterialSurfaceDetector.js";
-import Vector2 from "../../../../core/geom/Vector2.js";
-import { normalizeArrayVector } from "../../../../core/math/MathUtils.js";
-import { SoundMaterialComposition } from "../SoundMaterialComposition.js";
-import { SilentSoundMaterial } from "../SilentSoundMaterial.js";
-import { SingleSoundMaterial } from "../SingleSoundMaterial.js";
+import Vector2 from "../../../../../core/geom/Vector2.js";
+import { normalizeArrayVector } from "../../../../../core/math/MathUtils.js";
+import { SoundMaterialComposition } from "../../concrete/SoundMaterialComposition.js";
+import { SilentSoundMaterial } from "../../concrete/SilentSoundMaterial.js";
+import { SingleSoundMaterial } from "../../concrete/SingleSoundMaterial.js";
 
 const v2_temp = new Vector2();
 
@@ -101,7 +101,7 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
 
         normalizeArrayVector(this.__composite.weights, layer_count);
 
-        const additions = this.__composite.sounds(result, 0, interaction);
+        const additions = this.__composite.computeInteractionSounds(result, 0, interaction);
 
         return result;
     }

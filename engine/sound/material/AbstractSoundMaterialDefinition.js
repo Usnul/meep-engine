@@ -9,7 +9,7 @@ export class AbstractSoundMaterialDefinition {
      * @param {SoundMaterialInteractionType} interaction
      * @returns {number}
      */
-    sounds(destination, destination_offset, interaction) {
+    computeInteractionSounds(destination, destination_offset, interaction) {
         throw new Error('Implementation must override this method');
     }
 }

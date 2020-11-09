@@ -1,5 +1,5 @@
-import { SoundAssetPlaybackSpec } from "../asset/SoundAssetPlaybackSpec.js";
-import { AbstractSoundMaterialDefinition } from "./AbstractSoundMaterialDefinition.js";
+import { SoundAssetPlaybackSpec } from "../../asset/SoundAssetPlaybackSpec.js";
+import { AbstractSoundMaterialDefinition } from "../AbstractSoundMaterialDefinition.js";
 
 export class SingleSoundMaterial extends AbstractSoundMaterialDefinition {
     constructor() {
@@ -9,10 +9,16 @@ export class SingleSoundMaterial extends AbstractSoundMaterialDefinition {
 
     }
 
-    sounds(destination, destination_offset, interaction) {
+    computeInteractionSounds(destination, destination_offset, interaction) {
         destination[destination_offset] = this.spec;
 
         return 1;
+    }
+
+    toJSON() {
+        return {
+            spec: this.spec.toJSON()
+        }
     }
 
     fromJSON({ spec }) {
@@ -27,3 +33,5 @@ export class SingleSoundMaterial extends AbstractSoundMaterialDefinition {
         return r;
     }
 }
+
+SingleSoundMaterial.typeName = "SingleSoundMaterial";
