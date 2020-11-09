@@ -41,6 +41,12 @@ export class TerrainLayer {
          * @type {Vector2}
          */
         this.size = new Vector2(1, 1);
+
+        /**
+         * Additional free-form JSON metadata
+         * @type {Object}
+         */
+        this.extra = {};
     }
 
     /**

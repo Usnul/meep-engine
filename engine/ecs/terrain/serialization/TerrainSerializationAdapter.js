@@ -10,7 +10,7 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
         super();
 
         this.klass = Terrain;
-        this.version = 1;
+        this.version = 2;
 
         /**
          *
@@ -29,11 +29,11 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
      * @param {Terrain} value
      */
     serialize(buffer, value) {
-        buffer.writeUint32(value.size.x);
-        buffer.writeUint32(value.size.y);
+        buffer.writeUintVar(value.size.x);
+        buffer.writeUintVar(value.size.y);
 
         buffer.writeFloat32(value.gridScale);
-        buffer.writeUint16(value.resolution);
+        buffer.writeUintVar(value.resolution);
 
         buffer.writeUTF8String(value.preview.url);
         buffer.writeFloat64(value.preview.offset.x);
@@ -53,11 +53,9 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         buffer.writeUTF8String(JSON.stringify(extra));
 
-        buffer.writeFloat64(value.heightRange);
-
         //height map
-        buffer.writeUint16(value.samplerHeight.width);
-        buffer.writeUint16(value.samplerHeight.height);
+        buffer.writeUintVar(value.samplerHeight.width);
+        buffer.writeUintVar(value.samplerHeight.height);
 
         const heightBytes = new Uint8Array(value.samplerHeight.data.buffer);
 
@@ -67,26 +65,24 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         const layerCount = value.layers.count();
 
-        buffer.writeUint8(layerCount);
+        buffer.writeUintVar(layerCount);
 
 
         //splats
         const splat_size = value.splat.size;
 
-        buffer.writeUint16(splat_size.x);
-        buffer.writeUint16(splat_size.y);
+        buffer.writeUintVar(splat_size.x);
+        buffer.writeUintVar(splat_size.y);
 
         const weightData = value.splat.weightData;
-        const materialData = value.splat.materialData;
 
         const splat_cell_count = splat_size.x * splat_size.y * layerCount;
 
         buffer.writeBytes(weightData, 0, splat_cell_count);
-        buffer.writeBytes(materialData, 0, splat_cell_count);
 
         //layers
-        buffer.writeUint16(value.layers.resolution.x);
-        buffer.writeUint16(value.layers.resolution.y);
+        buffer.writeUintVar(value.layers.resolution.x);
+        buffer.writeUintVar(value.layers.resolution.y);
 
         for (let i = 0; i < layerCount; i++) {
             const terrainLayer = value.layers.get(i);
@@ -96,6 +92,7 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
             buffer.writeFloat32(terrainLayer.size.x);
             buffer.writeFloat32(terrainLayer.size.y);
 
+            buffer.writeUTF8String(JSON.stringify(terrainLayer.extra));
         }
     }
 
@@ -107,11 +104,11 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
      */
     deserialize(buffer, value) {
 
-        const size_x = buffer.readUint32();
-        const size_y = buffer.readUint32();
+        const size_x = buffer.readUintVar();
+        const size_y = buffer.readUintVar();
 
         const grid_scale = buffer.readFloat32();
-        const resolution = buffer.readUint16();
+        const resolution = buffer.readUintVar();
 
         const preview_url = buffer.readUTF8String();
 
@@ -122,8 +119,6 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
         const preview_scale_y = buffer.readFloat64();
 
         const extra = buffer.readUTF8String();
-
-        const height_range = buffer.readFloat64();
 
         value.size.set(size_x, size_y);
         value.gridScale = grid_scale;
@@ -152,11 +147,9 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
             value.gridTransformKind = GridTransformKind.Legacy;
         }
 
-        value.heightRange = height_range;
-
         // Read height map
-        const height_sampler_width = buffer.readUint16();
-        const height_sampler_height = buffer.readUint16();
+        const height_sampler_width = buffer.readUintVar();
+        const height_sampler_height = buffer.readUintVar();
 
         value.samplerHeight.resize(height_sampler_width, height_sampler_height);
 
@@ -164,11 +157,11 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         buffer.readBytes(heightUint8Array, 0, heightUint8Array.length);
 
-        const layer_count = buffer.readUint8();
+        const layer_count = buffer.readUintVar();
 
         // Read splats
-        const splat_size_x = buffer.readUint16();
-        const splat_size_y = buffer.readUint16();
+        const splat_size_x = buffer.readUintVar();
+        const splat_size_y = buffer.readUintVar();
 
         value.splat.resize(splat_size_x, splat_size_y, layer_count);
 
@@ -178,12 +171,9 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
 
         buffer.readBytes(weightData, 0, cell_count);
 
-        const materialData = value.splat.materialData;
-        buffer.readBytes(materialData, 0, cell_count);
-
         // Read layers
-        const layers_resolution_x = buffer.readUint16();
-        const layers_resolution_y = buffer.readUint16();
+        const layers_resolution_x = buffer.readUintVar();
+        const layers_resolution_y = buffer.readUintVar();
 
         value.layers.resolution.set(layers_resolution_x, layers_resolution_y);
 
@@ -200,6 +190,10 @@ export class TerrainSerializationAdapter extends BinaryClassSerializationAdapter
             const size_y = buffer.readFloat32();
 
             layer.size.set(size_x, size_y);
+
+            const layer_extra_string = buffer.readUTF8String();
+
+            layer.extra = JSON.parse(layer_extra_string);
 
             value.layers.addLayer(layer);
 
