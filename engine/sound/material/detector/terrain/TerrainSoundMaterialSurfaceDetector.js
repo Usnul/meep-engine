@@ -4,6 +4,8 @@ import { normalizeArrayVector } from "../../../../../core/math/MathUtils.js";
 import { SoundMaterialComposition } from "../../concrete/SoundMaterialComposition.js";
 import { SilentSoundMaterial } from "../../concrete/SilentSoundMaterial.js";
 import { SingleSoundMaterial } from "../../concrete/SingleSoundMaterial.js";
+import { deserializeSoundMaterialFromJSON } from "../../concrete/json/deserializeSoundMaterialFromJSON.js";
+import { assert } from "../../../../../core/assert.js";
 
 const v2_temp = new Vector2();
 
@@ -59,10 +61,17 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
 
         for (let i = 0; i < layer_count; i++) {
 
-            if (this.materials[i] === undefined) {
-                // no material set
-                this.setLayerMaterial(SilentSoundMaterial.INSTANCE);
+            const terrainLayer = terrain.layers.get(i);
 
+            // attempt to extract information from the layer
+            const soundMaterial = terrainLayer.extra.soundMaterial;
+
+
+            if (soundMaterial === undefined) {
+                // no material set
+                this.setLayerMaterial(i, SilentSoundMaterial.INSTANCE);
+            } else {
+                this.setLayerMaterial(i, deserializeSoundMaterialFromJSON(soundMaterial));
             }
 
         }
@@ -74,6 +83,9 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
      * @param {AbstractSoundMaterialDefinition} material
      */
     setLayerMaterial(layer_index, material) {
+        assert.isNumber(layer_index, 'layer_index');
+        assert.isNonNegativeInteger(layer_index, 'layer_index');
+
         this.materials[layer_index] = material;
 
         this.__composite.setMaterial(layer_index, material, 1);
