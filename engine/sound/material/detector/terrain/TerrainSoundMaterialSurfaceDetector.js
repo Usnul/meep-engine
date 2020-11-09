@@ -34,6 +34,7 @@ export class TerrainSoundMaterialSurfaceDetector extends SoundMaterialSurfaceDet
          * @private
          */
         this.__composite = new SoundMaterialComposition();
+        this.__composite.setVolumeThreshold(0.1);
     }
 
     loadMaterialsFromJSON(json) {
