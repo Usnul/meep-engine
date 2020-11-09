@@ -115,7 +115,7 @@ export class SoundAssetPlaybackSpec {
         this.volume = volume;
         this.source = source;
 
-        this.setFlag(SoundAssetPlaybackSpecFlags.UsingAlias, isSourceAlias);
+        this.writeFlag(SoundAssetPlaybackSpecFlags.UsingAlias, isSourceAlias);
     }
 
     toJSON() {
