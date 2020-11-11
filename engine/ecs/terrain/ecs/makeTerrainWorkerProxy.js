@@ -24,18 +24,19 @@ export function makeTerrainWorkerProxy() {
 
     workerBuilder.addMethod('computeHeightRange', function () {
         return new Promise(function (resolve, reject) {
-            /**
-             * @type {Sampler2D}
-             */
-            const sampler = globalScope.samplerHeight;
 
-            const min = sampler.computeMin();
-            const max = sampler.computeMax();
+            useSampler(function (sampler) {
 
-            resolve({
-                min: min.value,
-                max: max.value
+                const min = sampler.computeMin();
+                const max = sampler.computeMax();
+
+                resolve({
+                    min: min.value,
+                    max: max.value
+                });
+
             });
+
         });
     });
 

@@ -840,7 +840,6 @@ class Terrain {
         this.tiles.totalSize.copy(this.size);
         this.tiles.scale.set(this.gridScale, this.gridScale);
         this.tiles.resolution.set(this.resolution);
-        this.tiles.heightRange = this.heightRange;
 
         if (this.__legacyMaterialSpec !== null) {
             this.buildFromLegacy(assetManager);

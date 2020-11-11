@@ -133,7 +133,7 @@ class TerrainTileManager {
 
                 const bb = terrainTile.boundingBox;
 
-                bb.setBounds(
+                bb.resize(
                     bb.x0,
                     min_height,
                     bb.z0,
