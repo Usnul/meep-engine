@@ -51,12 +51,28 @@ class TerrainTile {
          */
         this.mesh.matrixWorldNeedsUpdate = false;
 
+        /**
+         *
+         * @type {THREE.BufferGeometry}
+         */
         this.geometry = null;
 
+        /**
+         *
+         * @type {boolean}
+         */
         this.enableBVH = true;
 
+        /**
+         *
+         * @type {LeafNode}
+         */
         this.boundingBox = new LeafNode(this);
 
+        /**
+         *
+         * @type {BinaryNode}
+         */
         this.bvh = null;
 
         /**
@@ -497,14 +513,22 @@ class TerrainTile {
         stitching.bottomRight = false;
     }
 
-    createInitialBounds(heightRange) {
+    /**
+     *
+     * @param {number} min_height
+     * @param {number} max_height
+     */
+    createInitialBounds(min_height, max_height) {
         const offset = this.position.clone().multiply(this.scale);
 
         const size = this.size.clone().multiply(this.scale);
 
         const max = offset.clone().add(size);
 
-        this.boundingBox.setBounds(offset.x, -heightRange / 2, offset.y, max.x, heightRange / 2, max.y);
+        this.boundingBox.setBounds(
+            offset.x, min_height, offset.y,
+            max.x, max_height, max.y
+        );
     }
 
     build(tileData) {

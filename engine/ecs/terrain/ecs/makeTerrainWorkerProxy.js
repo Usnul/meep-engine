@@ -22,6 +22,23 @@ export function makeTerrainWorkerProxy() {
 
     workerBuilder.importFunction(useSampler);
 
+    workerBuilder.addMethod('computeHeightRange', function () {
+        return new Promise(function (resolve, reject) {
+            /**
+             * @type {Sampler2D}
+             */
+            const sampler = globalScope.samplerHeight;
+
+            const min = sampler.computeMin();
+            const max = sampler.computeMax();
+
+            resolve({
+                min: min.value,
+                max: max.value
+            });
+        });
+    });
+
     workerBuilder.addMethod('setHeightSampler', function setHeightSampler(data, itemSize, width, height) {
         return new Promise(function (resolve, reject) {
             globalScope.samplerHeight = new Lib.Sampler2D(data, itemSize, width, height);

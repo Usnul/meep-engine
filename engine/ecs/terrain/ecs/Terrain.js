@@ -788,6 +788,11 @@ class Terrain {
     updateWorkerHeights() {
         const s = this.samplerHeight;
         this.buildWorker.setHeightSampler(s.data, s.itemSize, s.width, s.height);
+
+        this.buildWorker.computeHeightRange()
+            .then(({ min, max }) => {
+                this.tiles.setHeightRange(min, max);
+            });
     }
 
     stopBuildService() {

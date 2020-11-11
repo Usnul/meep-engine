@@ -23,6 +23,7 @@ import { FirstRayIntersectionTerrainBVHVisitor } from "./FirstRayIntersectionTer
 import { traverseBinaryNodeUsingVisitor } from "../../../../core/bvh2/traversal/traverseBinaryNodeUsingVisitor.js";
 import { aabb2_overlapExists } from "../../../../core/geom/AABB2.js";
 import ObservedInteger from "../../../../core/model/ObservedInteger.js";
+import { NumericInterval } from "../../../../core/math/interval/NumericInterval.js";
 
 class TerrainTileManager {
     /**
@@ -90,9 +91,9 @@ class TerrainTileManager {
 
         /**
          *
-         * @type {number}
+         * @type {NumericInterval}
          */
-        this.heightRange = 0;
+        this.heightRange = new NumericInterval(0, 0);
 
         /**
          * Debug parameter, makes all tiles have random colored material for easy visual distinction
@@ -105,6 +106,46 @@ class TerrainTileManager {
         });
 
 
+    }
+
+    /**
+     *
+     * @param {number} min_height
+     * @param {number} max_height
+     */
+    setHeightRange(min_height, max_height) {
+        assert.isNumber(min_height,'min_height');
+        assert.notNaN(min_height,'min_height');
+
+        assert.isNumber(max_height,'max_height');
+        assert.notNaN(max_height,'max_height');
+
+        this.heightRange.set(min_height, max_height);
+
+        const tiles = this.tiles;
+
+        const n = tiles.length;
+
+        for (let i = 0; i < n; i++) {
+            const terrainTile = tiles[i];
+
+            if (!terrainTile.isBuilt && !terrainTile.isBuildInProgress) {
+
+                const bb = terrainTile.boundingBox;
+
+                bb.setBounds(
+                    bb.x0,
+                    min_height,
+                    bb.z0,
+
+                    bb.x1,
+                    max_height,
+                    bb.z1
+                );
+
+            }
+
+        }
     }
 
     initialize() {
@@ -314,7 +355,7 @@ class TerrainTileManager {
                 tile.scale.copy(this.scale);
                 tile.resolution.copy(this.resolution);
 
-                tile.createInitialBounds(this.heightRange);
+                tile.createInitialBounds(this.heightRange.min, this.heightRange.max);
 
                 //hook for building
                 tile.ensureBuilt = ensureBuilt(x, y);

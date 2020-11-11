@@ -47,7 +47,10 @@ export class NumericInterval {
         assert.isNumber(min, 'min');
         assert.isNumber(max, 'max');
 
-        assert.ok(max >= min, `max(${max}) must be >= than min(${min})`);
+        assert.notNaN(min, 'min');
+        assert.notNaN(max, 'max');
+
+        assert.greaterThanOrEqual(max, min, `max [${max}] must be >= than min[${min}]`);
 
         const oldMin = this.min;
         const oldMax = this.max;
