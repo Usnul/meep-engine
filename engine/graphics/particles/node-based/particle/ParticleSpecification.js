@@ -14,4 +14,18 @@ export class ParticleSpecification {
          */
         this.model = null;
     }
+
+    /**
+     *
+     * @param {ParticleAttributeSpecification[]} attributes
+     * @param {NodeGraph} model
+     */
+    static from(attributes, model) {
+        const r = new ParticleSpecification();
+
+        r.attributes = attributes;
+        r.model = model;
+
+        return r;
+    }
 }

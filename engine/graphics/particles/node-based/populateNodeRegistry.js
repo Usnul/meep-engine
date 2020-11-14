@@ -1,11 +1,10 @@
 import { ParticleDataTypes } from "./nodes/ParticleDataTypes.js";
 import { Color } from "../../../../core/color/Color.js";
 import { AddFloatNode } from "./nodes/AddFloatNode.js";
-import { ReadVelocity } from "./nodes/ReadVelocity.js";
-import { WriteVelocity } from "./nodes/WriteVelocity.js";
 import { Vector3Split } from "./nodes/Vector3Split.js";
 import { Vector3Merge } from "./nodes/Vector3Merge.js";
 import { FloatConstant } from "./nodes/FloatConstant.js";
+import { WriteVector3Attribute } from "./nodes/WriteVector3Attribute.js";
 
 
 /**
@@ -24,9 +23,8 @@ export function populateNodeRegistry({ registry, visual }) {
 
 
     registry.addNode(new AddFloatNode());
-    registry.addNode(new ReadVelocity());
-    registry.addNode(new WriteVelocity());
     registry.addNode(new Vector3Split());
     registry.addNode(new Vector3Merge());
     registry.addNode(new FloatConstant());
+    registry.addNode(new WriteVector3Attribute());
 }

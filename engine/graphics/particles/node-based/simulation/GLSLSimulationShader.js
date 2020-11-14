@@ -1,6 +1,8 @@
 import { GLSLCodeGenerator } from "../codegen/glsl/GLSLCodeGenerator.js";
 import { genAttributeInputName } from "../codegen/glsl/genAttributeInputName.js";
 import { genAttributeOutputName } from "../codegen/glsl/genAttributeOutputName.js";
+import { getTypeByteSize } from "../codegen/glsl/getTypeByteSize.js";
+import { GLDataBuffer } from "./GLDataBuffer.js";
 
 /**
  * Fragment shader is there to satisfy requirement of 2 shaders to compile shader program in WebGL, in actuality it is unused
@@ -17,19 +19,25 @@ const FRAGMENT_SHADER = [
     '}'
 ].join('\n');
 
-function addLineNumbers( string ) {
+/**
+ *
+ * @param {string} string
+ * @return {string}
+ */
+function addLineNumbers(string) {
 
-    const lines = string.split( '\n' );
+    const lines = string.split('\n');
 
-    for ( let i = 0; i < lines.length; i ++ ) {
+    for (let i = 0; i < lines.length; i++) {
 
-        lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+        lines[i] = (i + 1) + ': ' + lines[i];
 
     }
 
-    return lines.join( '\n' );
+    return lines.join('\n');
 
 }
+
 /**
  *
  * @param {WebGLRenderingContext} gl
@@ -85,6 +93,13 @@ export class GLSLSimulationShader {
         this.attributes = [];
 
         /**
+         * How much space does a single vertex require
+         * @type {number}
+         * @private
+         */
+        this.__attribute_byte_size = 0;
+
+        /**
          *
          * @type {ParticleAttributeSpecification[]}
          */
@@ -95,6 +110,28 @@ export class GLSLSimulationShader {
          * @type {NodeGraph}
          */
         this.graph = null;
+
+        /**
+         *
+         * @type {WebGLTransformFeedback}
+         * @private
+         */
+        this.__transform_feedback = null;
+
+        /**
+         *
+         * @type {WebGLRenderingContext}
+         * @private
+         */
+        this.__context = null;
+
+
+        /**
+         *
+         * @type {GLDataBuffer}
+         * @private
+         */
+        this.__output_buffer = new GLDataBuffer();
     }
 
     /**
@@ -122,10 +159,10 @@ export class GLSLSimulationShader {
     }
 
     /**
-     * @return {GLSLSimulationShader}
      * @param {NodeGraph} graph
      * @param {ParticleAttributeSpecification[]} attributes
      * @param {ParticleAttributeSpecification[]} uniforms
+     * @returns {GLSLSimulationShader}
      */
     static from(graph, attributes = [], uniforms = []) {
         const r = new GLSLSimulationShader();
@@ -152,14 +189,36 @@ export class GLSLSimulationShader {
         const code = gen.generate(this.graph, this.attributes, this.uniforms);
 
         this.__source = code;
+
+        // compute byte size for attribute set
+
+        let offset = 0;
+        for (let i = 0; i < this.attributes.length; i++) {
+            const attribute = this.attributes[i];
+
+            offset += getTypeByteSize(attribute.type);
+        }
+
+        this.__attribute_byte_size = offset;
     }
 
     /**
      *
-     * @param {WebGLRenderingContext} gl
-     * @param {[]} uniform_values
+     * @param {EmitterAttributeData} attribute_source
+     * @private
      */
-    bind(gl, uniform_values) {
+    __prepareOutputBuffer(attribute_source) {
+        this.__output_buffer.resize(attribute_source.data.getSize());
+    }
+
+    /**
+     *
+     * @param {[]} uniform_values
+     * @param {EmitterAttributeData} attributeSource
+     */
+    execute(uniform_values, attributeSource) {
+        const gl = this.__context;
+
         gl.useProgram(this.__program);
 
         // write uniforms
@@ -172,6 +231,64 @@ export class GLSLSimulationShader {
             // TODO support other uniform types
             gl.uniform1f(location, uniform_values[i]);
         }
+
+        // bind attributes
+        const attributes = this.attributes;
+        const attribute_count = attributes.length;
+
+        let offset = 0;
+
+        for (let i = 0; i < attribute_count; i++) {
+            const attribute = attributes[i];
+
+            const size = getTypeByteSize(attribute.type);
+
+            gl.enableVertexAttribArray(i);
+            gl.bindBuffer(gl.ARRAY_BUFFER, attributeSource.data.gl_buffer_f32);
+            gl.vertexAttribPointer(i, 4, gl.FLOAT, false, this.__attribute_byte_size, offset);
+
+            offset += size;
+        }
+
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.__transform_feedback);
+
+        this.__prepareOutputBuffer(attributeSource);
+
+        // bind target buffer
+        gl.bindBufferRange(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.__output_buffer.gl_buffer_f32, 0, attributeSource.count * this.__attribute_byte_size);
+
+        //
+        gl.enable(gl.RASTERIZER_DISCARD);
+        gl.beginTransformFeedback(gl.POINTS);
+
+        gl.drawArrays(gl.POINTS, 0, attributeSource.count);
+
+        gl.endTransformFeedback();
+        gl.disable(gl.RASTERIZER_DISCARD);
+
+        // Unbind the transform feedback buffer so subsequent attempts
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
+
+        // unbind transform feedback
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+
+        this.__copyFromOutput(attributeSource);
+    }
+
+    /**
+     * GL context uses it's own internal buffers that are not shared with JS context, because of this - it is necessary to copy data out
+     * @param {EmitterAttributeData} target
+     * @private
+     */
+    __copyFromOutput(target) {
+        /**
+         *
+         * @type {WebGLRenderingContext}
+         */
+        const gl = this.__context;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.__output_buffer.gl_buffer_f32);
+        gl.getBufferSubData(gl.ARRAY_BUFFER, 0, target.data.data_f32);
     }
 
     /**
@@ -212,6 +329,17 @@ export class GLSLSimulationShader {
 
             this.__uniform_locations[uniform_index] = gl.getUniformLocation(program, name);
         }
+    }
+
+    dispose() {
+        if (this.__program !== null) {
+            this.__context.deleteProgram(this.__program);
+
+            this.__program = null;
+            this.__context = null;
+        }
+
+        this.__output_buffer.dispose();
     }
 
     /**
@@ -272,8 +400,8 @@ export class GLSLSimulationShader {
         // bind outputs
         const output_names = this.attributes.map(genAttributeOutputName);
 
-        // TODO use interleaved attributes instead for access speed
-        gl.transformFeedbackVaryings(program, output_names, gl.SEPARATE_ATTRIBS);
+        // We use interleaved attributes for cache coherence
+        gl.transformFeedbackVaryings(program, output_names, gl.INTERLEAVED_ATTRIBS);
 
         gl.linkProgram(program);
 
@@ -286,9 +414,14 @@ export class GLSLSimulationShader {
             throw new Error(error_message);
         }
 
+        this.__context = gl;
         this.__program = program;
 
 
         this.__buildUniformPointers(gl);
+
+        this.__output_buffer.initialize(gl);
+
+        this.__transform_feedback = gl.createTransformFeedback();
     }
 }

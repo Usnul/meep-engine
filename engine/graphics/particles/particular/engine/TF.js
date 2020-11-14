@@ -208,19 +208,25 @@ function stepViaTransformFeedback(renderer) {
             gl.enableVertexAttribArray(shader.attributes.position);
             gl.bindBuffer(gl.ARRAY_BUFFER, sourcePosBuffer);
             gl.vertexAttribPointer(shader.attributes.position, 4, gl.FLOAT, false, 16, 0);
+
             gl.enableVertexAttribArray(shader.attributes.velocity);
             gl.bindBuffer(gl.ARRAY_BUFFER, sourceVelBuffer);
             gl.vertexAttribPointer(shader.attributes.velocity, 4, gl.FLOAT, false, 16, 0);
+
             gl.enableVertexAttribArray(shader.attributes.origin);
             gl.bindBuffer(gl.ARRAY_BUFFER, originBuffer);
             gl.vertexAttribPointer(shader.attributes.origin, 4, gl.FLOAT, false, 16, 0);
+
             gl.enableVertexAttribArray(shader.attributes.randomSeed);
             gl.bindBuffer(gl.ARRAY_BUFFER, sourceRandomSeedBuffer);
             gl.vertexAttribIPointer(shader.attributes.randomSeed, 1, gl.UNSIGNED_INT, 0, 0);
+
             gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+
             gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, targetPosBuffer);
             gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, targetVelBuffer);
             gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, targetRandomSeedBuffer);
+
             gl.enable(gl.RASTERIZER_DISCARD);
             gl.beginTransformFeedback(gl.POINTS);
             gl.drawArrays(gl.POINTS, 0, sourcePosAttrib.count /* sourcePosAttrib.itemSize*/);
