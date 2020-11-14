@@ -100,7 +100,8 @@ const KeyCodes = {
     'open_bracket': 219,
     'backslash': 220,
     'close_bracket': 221,
-    'single_quote': 222
+    'single_quote': 222,
+    'back_quote': 223
 };
 
 export { KeyCodes };

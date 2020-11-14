@@ -196,12 +196,15 @@ export class NodeGraph {
     getConnectionsAttachedToNode(id, result) {
         let count = 0;
 
-        for (let i = 0, l = this.connections.length; i < l; i++) {
+        const connections = this.connections;
+        const connection_count = connections.length;
 
-            const connection = this.connections.get(i);
+        for (let i = 0; i < connection_count; i++) {
+
+            const connection = connections.get(i);
 
             if (connection.isAttachedToNode(id)) {
-                result.push(id);
+                result[count] = connection.id;
 
                 count++;
             }

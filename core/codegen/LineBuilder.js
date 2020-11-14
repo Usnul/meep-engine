@@ -74,6 +74,26 @@ LineBuilder.prototype.add = function (l) {
     return this;
 };
 
+/**
+ *
+ * @param {LineBuilder} lines
+ */
+LineBuilder.prototype.addLines = function (lines) {
+
+    const other_lines = lines.lines;
+
+    const other_line_count = other_lines.length;
+
+    for (let i = 0; i < other_line_count; i++) {
+        const otherLine = other_lines[i];
+
+        const line = new Line(otherLine.text, otherLine.indentation + this.indentation);
+
+        this.lines.push(line);
+    }
+
+}
+
 LineBuilder.prototype.clear = function () {
     this.lines = [];
     this.indentation = 0;

@@ -14,4 +14,13 @@ export class AddFloatNode extends AttributeNode {
         this.createPort(ParticleDataTypes.Float, 'b', PortDirection.In);
         this.createPort(ParticleDataTypes.Float, 'value', PortDirection.Out);
     }
+
+    generate_glsl(instance, output, context, port_variables) {
+        const out = context.getIdentifier(instance, this.getPortById(2));
+
+        const a = port_variables[0];
+        const b = port_variables[1];
+
+        output.add(`${out} =  ${a} + ${b};`);
+    }
 }

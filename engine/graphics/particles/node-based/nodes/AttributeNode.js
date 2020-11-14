@@ -14,12 +14,12 @@ export class AttributeNode extends ExecutableNode {
 
     /**
      *
+     * @param {NodeInstance} instance
      * @param {LineBuilder} output
      * @param {CodeContext} context
-     * @param {string[]} inputs
-     * @param {string[]} outputs
+     * @param {string[]} port_variables
      */
-    generate_glsl(output, context, inputs, outputs) {
+    generate_glsl(instance, output, context, port_variables) {
 
     }
 

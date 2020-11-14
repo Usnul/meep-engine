@@ -5,6 +5,7 @@ import { ReadVelocity } from "./nodes/ReadVelocity.js";
 import { WriteVelocity } from "./nodes/WriteVelocity.js";
 import { Vector3Split } from "./nodes/Vector3Split.js";
 import { Vector3Merge } from "./nodes/Vector3Merge.js";
+import { FloatConstant } from "./nodes/FloatConstant.js";
 
 
 /**
@@ -27,4 +28,5 @@ export function populateNodeRegistry({ registry, visual }) {
     registry.addNode(new WriteVelocity());
     registry.addNode(new Vector3Split());
     registry.addNode(new Vector3Merge());
+    registry.addNode(new FloatConstant());
 }

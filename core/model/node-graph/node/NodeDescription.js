@@ -162,6 +162,23 @@ export class NodeDescription {
 
     /**
      *
+     * @param name
+     * @return {Port|undefined}
+     */
+    getPortByName(name) {
+
+        for (const port of this.ports) {
+            if (port.name === name) {
+                return port;
+            }
+        }
+
+        //not found
+        return undefined;
+    }
+
+    /**
+     *
      * @returns {Port[]}
      */
     getPorts() {
