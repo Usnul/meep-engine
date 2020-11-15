@@ -8,7 +8,7 @@ export class Vector3Split extends AttributeNode {
 
         this.id = 30004;
 
-        this.name = 'V3 split';
+        this.name = 'V3 Split';
 
         this.createPort(ParticleDataTypes.Vector3, 'value', PortDirection.In);
 

@@ -8,7 +8,7 @@ export class Vector3Merge extends AttributeNode {
 
         this.id = 30005;
 
-        this.name = 'V3 merge';
+        this.name = 'V3 Merge';
 
         this.createPort(ParticleDataTypes.Vector3, 'value', PortDirection.Out);
 

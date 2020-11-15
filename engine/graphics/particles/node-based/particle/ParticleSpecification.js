@@ -24,13 +24,15 @@ export class ParticleSpecification {
     /**
      *
      * @param {ParticleAttributeSpecification[]} attributes
+     * @param {ParticleAttributeSpecification[]} uniforms
      * @param {NodeGraph} model
      */
-    static from(attributes, model) {
+    static from(attributes, uniforms, model) {
         const r = new ParticleSpecification();
 
         r.attributes = attributes;
         r.model = model;
+        r.uniforms = uniforms;
 
         return r;
     }
