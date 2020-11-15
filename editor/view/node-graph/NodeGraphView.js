@@ -6,9 +6,9 @@ import ListView from "../../../view/common/ListView.js";
 import { NodeView } from "./NodeView.js";
 import List from "../../../core/collection/list/List.js";
 import { DraggableAspect } from "../../../engine/ui/DraggableAspect.js";
-import { ConnectionEndpoint } from "../../../core/model/node-graph/ConnectionEndpoint.js";
 import { PortDirection } from "../../../core/model/node-graph/node/PortDirection.js";
 import { clamp, lerp, max2, min2 } from "../../../core/math/MathUtils.js";
+import { NodeInstancePortReference } from "../../../core/model/node-graph/node/NodeInstancePortReference.js";
 
 export class NodeGraphCamera {
     constructor() {
@@ -107,10 +107,9 @@ export class NodeGraphView extends View {
                             el: portView.el,
                             dragStart(p) {
 
-                                const endpoint = new ConnectionEndpoint();
+                                const endpoint = new NodeInstancePortReference();
 
-                                endpoint.instance = node;
-                                endpoint.port = port;
+                                endpoint.set(node, port);
 
                                 tempConnection.enabled = true;
                                 tempConnection.endpoint = endpoint;
@@ -138,7 +137,7 @@ export class NodeGraphView extends View {
                             if (tempConnection.enabled) {
                                 /**
                                  *
-                                 * @type {ConnectionEndpoint}
+                                 * @type {NodeInstancePortReference}
                                  */
                                 const endpoint = tempConnection.endpoint;
 
@@ -225,7 +224,7 @@ export class NodeGraphView extends View {
             if (tempConnection.enabled) {
                 /**
                  *
-                 * @type {ConnectionEndpoint}
+                 * @type {NodeInstancePortReference}
                  */
                 const endpoint = tempConnection.endpoint;
 
@@ -399,7 +398,7 @@ export class NodeGraphView extends View {
 
     /**
      *
-     * @param {ConnectionEndpoint} endpoint
+     * @param {NodeInstancePortReference} endpoint
      * @param {Vector2} output
      */
     getEndpointGraphPosition(endpoint, output) {

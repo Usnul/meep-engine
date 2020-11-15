@@ -7,6 +7,12 @@ export class ParticleSpecification {
          */
         this.attributes = [];
 
+        /**
+         *
+         * @type {ParticleAttributeSpecification[]}
+         */
+        this.uniforms = [];
+
 
         /**
          *

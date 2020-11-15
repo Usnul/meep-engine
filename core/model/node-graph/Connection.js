@@ -1,4 +1,3 @@
-import { ConnectionEndpoint } from "./ConnectionEndpoint.js";
 import { noop } from "../../function/Functions.js";
 import { PortDirection } from "./node/PortDirection.js";
 import { objectKeyByValue } from "../ObjectUtils.js";
@@ -8,12 +7,12 @@ export class Connection {
     constructor() {
         /**
          *
-         * @type {ConnectionEndpoint}
+         * @type {NodeInstancePortReference}
          */
         this.source = null;
         /**
          *
-         * @type {ConnectionEndpoint}
+         * @type {NodeInstancePortReference}
          */
         this.target = null;
     }
@@ -63,7 +62,7 @@ export class Connection {
 
     /**
      *
-     * @param {ConnectionEndpoint} endpoint
+     * @param {NodeInstancePortReference} endpoint
      */
     setSource(endpoint) {
         assert.notEqual(endpoint, undefined, 'endpoint is undefined');
@@ -74,7 +73,7 @@ export class Connection {
 
     /**
      *
-     * @param {ConnectionEndpoint} endpoint
+     * @param {NodeInstancePortReference} endpoint
      */
     setTarget(endpoint) {
         assert.notEqual(endpoint, undefined, 'endpoint is undefined');

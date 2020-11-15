@@ -1,7 +1,8 @@
-import { ConnectionEndpoint } from "../ConnectionEndpoint.js";
 import List from "../../../collection/list/List.js";
 import { PortDirection } from "./PortDirection.js";
 import { isArrayEqual } from "../../../collection/ArrayUtils.js";
+import { assert } from "../../../assert.js";
+import { NodeInstancePortReference } from "./NodeInstancePortReference.js";
 
 export class NodeInstance {
     constructor() {
@@ -19,7 +20,7 @@ export class NodeInstance {
 
         /**
          *
-         * @type {ConnectionEndpoint[]}
+         * @type {NodeInstancePortReference[]}
          */
         this.endpoints = [];
 
@@ -32,7 +33,7 @@ export class NodeInstance {
 
 
         /**
-         *
+         * @transient
          * @type {[]}
          */
         this.outputsValues = [];
@@ -111,6 +112,16 @@ export class NodeInstance {
 
     /**
      *
+     * @param {[]} parameters
+     */
+    setParameters(parameters) {
+        assert.isArray(parameters, 'parameters');
+
+        this.parameters = parameters;
+    }
+
+    /**
+     *
      * @param {NodeDescription} node
      */
     setDescription(node) {
@@ -118,7 +129,7 @@ export class NodeInstance {
 
         //generate endpoints
         this.endpoints = node.getPorts().map(port => {
-            const endpoint = new ConnectionEndpoint();
+            const endpoint = new NodeInstancePortReference();
 
             endpoint.port = port;
             endpoint.instance = this;
@@ -170,3 +181,10 @@ export class NodeInstance {
             ;
     }
 }
+
+
+/**
+ * @readonly
+ * @type {boolean}
+ */
+NodeInstance.prototype.isNodeInstance = true;

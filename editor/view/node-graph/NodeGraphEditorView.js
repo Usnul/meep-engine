@@ -65,7 +65,7 @@ export class NodeGraphEditorView extends View {
         });
 
         const vActionBar = new EmptyView({
-            classList:['actions']
+            classList: ['actions']
         });
 
         vUserInterface.addChild(vActionBar);
@@ -137,21 +137,32 @@ export class NodeGraphEditorView extends View {
         const boundsWidth = bounds.getWidth();
         const boundsHeight = bounds.getHeight();
 
-        const xScale = this.size.x / boundsWidth;
-        const yScale = this.size.y / boundsHeight;
+        const canvas_width = this.size.x;
+        const canvas_height = this.size.y;
+
+        const xScale = canvas_width / boundsWidth;
+        const yScale = canvas_height / boundsHeight;
 
         const scale = min2(
             xScale,
             yScale
         );
 
-        const xOffset = (boundsWidth - (this.size.x / scale)) / 2;
-        const yOffset = (boundsHeight - (this.size.y / scale)) / 2;
+        if (scale === 0) {
+            camera.position.set(bounds.x0, bounds.y0);
 
-        camera.position.set(bounds.x0 + xOffset, bounds.y0 + yOffset);
+            camera.scale.set(1);
 
+        } else {
 
-        camera.scale.set(scale);
+            const xOffset = (boundsWidth - (canvas_width / scale)) / 2;
+            const yOffset = (boundsHeight - (canvas_height / scale)) / 2;
+
+            camera.position.set(bounds.x0 + xOffset, bounds.y0 + yOffset);
+
+            camera.scale.set(scale);
+        }
+
 
     }
 }

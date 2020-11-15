@@ -7,6 +7,8 @@ export class WriteVector3Attribute extends AttributeNode {
     constructor() {
         super();
 
+        this.name = "Write V3 Attribute";
+
         this.createPort(ParticleDataTypes.Vector3, 'value', PortDirection.In);
 
         this.createParameter('name', NodeParameterDataType.String, '');

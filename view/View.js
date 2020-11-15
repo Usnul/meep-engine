@@ -788,6 +788,12 @@ class View {
      */
     followSize({ size, padding = Vector2.zero }) {
 
+        assert.defined(size,'size');
+        assert.equal(size.isVector2, true,'size.isVector2 !== true');
+
+        assert.defined(padding,'padding');
+        assert.equal(padding.isVector2, true,'padding.isVector2 !== true');
+
         const copy = () => {
             this.size.set(size.x - padding.x * 2, size.y - padding.y * 2);
         };

@@ -41,6 +41,22 @@ export class NodeInstancePortReference {
         return r;
     }
 
+    /**
+     *
+     * @param {NodeInstance} instance
+     * @param {Port} port
+     */
+    set(instance, port) {
+        assert.defined(instance, 'instance');
+        assert.notNull(instance, 'instance');
+
+        assert.defined(port, 'port');
+        assert.notNull(port, 'port');
+
+        this.instance = instance;
+        this.port = port;
+    }
+
     hash() {
         return computeHashIntegerArray(
             this.instance.hash(),

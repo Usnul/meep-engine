@@ -1,4 +1,5 @@
 import { assert } from "../../core/assert.js";
+import { InteractionCommand } from "./InteractionCommand.js";
 
 class InterfaceCommand {
     /**
@@ -75,6 +76,7 @@ class InterfaceCommand {
      * @param {SoundTrack} [hoverSound]
      * @param {string} [tooltip]
      * @param {string[]} [tags]
+     * @returns {InterfaceCommand}
      */
     static form(
         {
@@ -87,17 +89,16 @@ class InterfaceCommand {
         }
     ) {
 
-        this.command = command;
+        const r = new InterfaceCommand({
+            command,
+            style,
+            actionSound,
+            hoverSound,
+            tooltip,
+            tags
+        });
 
-        this.style = style;
-
-        this.actionSound = actionSound;
-
-        this.hoverSound = hoverSound;
-
-        this.tooltip = tooltip;
-
-        this.tags = tags;
+        return r;
     }
 
     /**

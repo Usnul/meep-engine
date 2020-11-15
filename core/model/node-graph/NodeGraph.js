@@ -2,6 +2,7 @@ import { NodeInstance } from "./node/NodeInstance.js";
 import IdPool from "../../IdPool.js";
 import { Connection } from "./Connection.js";
 import List from "../../collection/list/List.js";
+import { assert } from "../../assert.js";
 
 export class NodeGraph {
     constructor() {
@@ -30,6 +31,14 @@ export class NodeGraph {
          * @private
          */
         this.__idpConnections = new IdPool();
+    }
+
+    reset() {
+        this.nodes.reset();
+        this.connections.reset();
+
+        this.__idpNodes.reset();
+        this.__idpConnections.reset();
     }
 
     /**
@@ -70,6 +79,21 @@ export class NodeGraph {
 
     /**
      *
+     * @param {number} node_id
+     * @param {number} port_id
+     * @returns {NodeInstancePortReference}
+     */
+    getConnectionEndpoint(node_id, port_id) {
+
+        const nodeInstance = this.getNode(node_id);
+
+        const endpoint = nodeInstance.getEndpoint(port_id);
+
+        return endpoint;
+    }
+
+    /**
+     *
      * @param {NodeDescription} node
      * @returns {number} ID of the new node
      */
@@ -85,6 +109,26 @@ export class NodeGraph {
         this.nodes.add(nodeInstance);
 
         return id;
+    }
+
+    /**
+     *
+     * @param {NodeInstance} node
+     */
+    addNode(node) {
+
+        assert.defined(node, 'node');
+        assert.notNull(node, 'node');
+        assert.equal(node.isNodeInstance, true, 'node.isNodeInstance !== true');
+
+        const id_obtained = this.__idpNodes.getSpecific(node.id);
+
+        if (!id_obtained) {
+            throw new Error(`Node with id '${node.id}' already exists`);
+        }
+
+        //record the node
+        this.nodes.add(node);
     }
 
     /**
@@ -129,6 +173,11 @@ export class NodeGraph {
      * @returns {number} ID of created or already existing connection
      */
     createConnection(sourceNode, sourcePort, targetNode, targetPort) {
+        assert.isNonNegativeInteger(sourceNode, 'sourceNode');
+        assert.isNonNegativeInteger(sourcePort, 'sourcePort');
+        assert.isNonNegativeInteger(targetNode, 'targetNode');
+        assert.isNonNegativeInteger(targetPort, 'targetPort');
+
         //TODO validate if connection already exists
 
         const sourceNodeInstance = this.getNode(sourceNode);

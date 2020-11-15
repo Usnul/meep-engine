@@ -471,6 +471,8 @@ BitSet.prototype.and = function (set) {
  * @returns {boolean}
  */
 BitSet.prototype.get = function (bitIndex) {
+    assert.isNonNegativeInteger(bitIndex, 'bitIndex');
+
     if (bitIndex >= this.__length) {
         //bit is outside of the recorded region
         return false;

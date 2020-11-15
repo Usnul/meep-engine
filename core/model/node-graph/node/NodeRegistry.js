@@ -3,6 +3,7 @@ import { NodeDescription } from "./NodeDescription.js";
 import { Port } from "./Port.js";
 import { BitSet } from "../../../binary/BitSet.js";
 import { assert } from "../../../assert.js";
+import { collectIteratorValueToArray } from "../../../collection/IteratorUtils.js";
 
 export class NodeRegistry {
     constructor() {
@@ -17,6 +18,17 @@ export class NodeRegistry {
          * @type {Map<number, DataType>}
          */
         this.types = new Map();
+    }
+
+    /**
+     * @returns {NodeDescription[]}
+     */
+    getNodesAsArray() {
+        const result = [];
+
+        collectIteratorValueToArray(result, this.nodes.values());
+
+        return result;
     }
 
     /**
