@@ -2,7 +2,6 @@ import { GLSLCodeGenerator } from "../codegen/glsl/GLSLCodeGenerator.js";
 import { genAttributeInputName } from "../codegen/glsl/genAttributeInputName.js";
 import { genAttributeOutputName } from "../codegen/glsl/genAttributeOutputName.js";
 import { getTypeByteSize } from "../codegen/glsl/getTypeByteSize.js";
-import { GLDataBuffer } from "./GLDataBuffer.js";
 
 /**
  * Fragment shader is there to satisfy requirement of 2 shaders to compile shader program in WebGL, in actuality it is unused
@@ -128,10 +127,16 @@ export class GLSLSimulationShader {
 
         /**
          *
-         * @type {GLDataBuffer}
+         * @type {number}
          * @private
          */
-        this.__output_buffer = new GLDataBuffer();
+        this.__output_buffer_handle = null;
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__output_buffer_size = 0;
     }
 
     /**
@@ -208,7 +213,22 @@ export class GLSLSimulationShader {
      * @private
      */
     __prepareOutputBuffer(attribute_source) {
-        this.__output_buffer.resize(attribute_source.data.getSize());
+        const min_size = attribute_source.data.getSize();
+
+        if (this.__output_buffer_size < min_size) {
+            this.__output_buffer_size = min_size;
+            /**
+             *
+             * @type {WebGLRenderingContext}
+             */
+            const gl = this.__context;
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.__output_buffer_handle);
+            gl.bufferData(gl.ARRAY_BUFFER, min_size * 4, gl.DYNAMIC_DRAW);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
+
     }
 
     /**
@@ -238,14 +258,20 @@ export class GLSLSimulationShader {
 
         let offset = 0;
 
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, attributeSource.data.gl_buffer_f32);
+        //flush data to buffer
+        gl.bufferData(gl.ARRAY_BUFFER, attributeSource.data.data_f32, gl.DYNAMIC_DRAW);
+
         for (let i = 0; i < attribute_count; i++) {
             const attribute = attributes[i];
 
             const size = getTypeByteSize(attribute.type);
 
+            const componentCount = attribute.computeComponentCount();
+
             gl.enableVertexAttribArray(i);
-            gl.bindBuffer(gl.ARRAY_BUFFER, attributeSource.data.gl_buffer_f32);
-            gl.vertexAttribPointer(i, 4, gl.FLOAT, false, this.__attribute_byte_size, offset);
+            gl.vertexAttribPointer(i, componentCount, gl.FLOAT, false, this.__attribute_byte_size, offset);
 
             offset += size;
         }
@@ -255,7 +281,7 @@ export class GLSLSimulationShader {
         this.__prepareOutputBuffer(attributeSource);
 
         // bind target buffer
-        gl.bindBufferRange(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.__output_buffer.gl_buffer_f32, 0, attributeSource.count * this.__attribute_byte_size);
+        gl.bindBufferRange(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.__output_buffer_handle, 0, attributeSource.count * this.__attribute_byte_size);
 
         //
         gl.enable(gl.RASTERIZER_DISCARD);
@@ -287,7 +313,7 @@ export class GLSLSimulationShader {
          */
         const gl = this.__context;
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.__output_buffer.gl_buffer_f32);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.__output_buffer_handle);
         gl.getBufferSubData(gl.ARRAY_BUFFER, 0, target.data.data_f32);
     }
 
@@ -333,13 +359,16 @@ export class GLSLSimulationShader {
 
     dispose() {
         if (this.__program !== null) {
-            this.__context.deleteProgram(this.__program);
+
+
+            const gl = this.__context;
+            gl.deleteBuffer(this.__output_buffer_handle);
+            gl.deleteProgram(this.__program);
 
             this.__program = null;
             this.__context = null;
+            this.__outpub_buffer_handle = null;
         }
-
-        this.__output_buffer.dispose();
     }
 
     /**
@@ -355,10 +384,13 @@ export class GLSLSimulationShader {
         const vertex_shader = gl.createShader(gl.VERTEX_SHADER);
         const fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
 
+
         gl.shaderSource(vertex_shader, this.__source);
         gl.shaderSource(fragment_shader, FRAGMENT_SHADER);
 
+        // Compile vertex shader
         gl.compileShader(vertex_shader);
+
         if (!gl.getShaderParameter(vertex_shader, gl.COMPILE_STATUS)) {
             const error_message = getShaderErrors(gl, vertex_shader, 'VERTEX');
 
@@ -368,6 +400,7 @@ export class GLSLSimulationShader {
             throw new Error(error_message);
         }
 
+        // Compile fragment shader
         gl.compileShader(fragment_shader);
 
         if (!gl.getShaderParameter(fragment_shader, gl.COMPILE_STATUS)) {
@@ -394,7 +427,9 @@ export class GLSLSimulationShader {
         for (let i = 0; i < this.attributes.length; i++) {
             const attribute = this.attributes[i];
 
-            gl.bindAttribLocation(program, i, genAttributeInputName(attribute));
+            const input_name = genAttributeInputName(attribute);
+
+            gl.bindAttribLocation(program, i, input_name);
         }
 
         // bind outputs
@@ -420,7 +455,7 @@ export class GLSLSimulationShader {
 
         this.__buildUniformPointers(gl);
 
-        this.__output_buffer.initialize(gl);
+        this.__output_buffer_handle = gl.createBuffer();
 
         this.__transform_feedback = gl.createTransformFeedback();
     }

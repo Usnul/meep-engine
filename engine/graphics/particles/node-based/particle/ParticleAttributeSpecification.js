@@ -20,6 +20,26 @@ export class ParticleAttributeSpecification {
 
     /**
      *
+     * @return {number}
+     */
+    computeComponentCount() {
+        switch (this.type) {
+            case ParticleDataTypes.Float:
+                return 1;
+            case ParticleDataTypes.Vector2:
+                return 2;
+            case ParticleDataTypes.Vector3:
+                return 3;
+            case ParticleDataTypes.Vector4:
+                return 4;
+
+            default:
+                throw new Error(`Unsupported data type '${this.type}'`);
+        }
+    }
+
+    /**
+     *
      * @param {string} name
      * @param {ParticleDataTypes} type
      * @returns {ParticleAttributeSpecification}

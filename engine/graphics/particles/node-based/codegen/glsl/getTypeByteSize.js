@@ -10,11 +10,11 @@ export function getTypeByteSize(type) {
         case ParticleDataTypes.Float:
             return 4;
         case ParticleDataTypes.Vector2:
-            return 16;
+            return 8;
         case ParticleDataTypes.Vector3:
-            return 24;
+            return 12;
         case ParticleDataTypes.Vector4:
-            return 32;
+            return 16;
         default:
             throw  new Error(`Unsupported data type '${type}'`);
     }
