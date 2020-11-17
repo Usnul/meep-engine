@@ -250,6 +250,10 @@ export function alignToVector(rotation, direction, angularLimit, up = Vector3.up
  * @param {number} timeDelta
  */
 function processRaycastHit(point, t, normal, cling, timeDelta) {
+    assert.defined(point, 'point');
+    assert.equal(point.isVector3, true, 'point.isVector3 !== true');
+    assert.isNumber(timeDelta, 'timeDelta');
+
     const position = t.position;
 
     const rotation = t.rotation;
@@ -315,7 +319,7 @@ function doCling(el, terrain, timeDelta) {
     const hit_found = terrain.raycastVerticalFirstSync(temp_sp, position.x, position.z);
 
     if (hit_found) {
-        processRaycastHit(temp_sp.position, temp_sp.normal, cling, timeDelta);
+        processRaycastHit(temp_sp.position, t, temp_sp.normal, cling, timeDelta);
     }
 }
 
