@@ -172,7 +172,12 @@ class ClingToTerrainSystem extends System {
                     continue;
                 }
 
-                doCling(c, terrain, timeDelta);
+                const position_updated = doCling(c, terrain, timeDelta);
+
+                if (!position_updated) {
+                    // no change, move back to update candidates
+                    this.requestUpdate(entity);
+                }
             }
         }
     }
@@ -287,6 +292,7 @@ function processRaycastHit(point, t, normal, cling, timeDelta) {
  * @param {{component:ClingToTerrain,transform:Transform}} el
  * @param {Terrain} terrain
  * @param {number} timeDelta
+ * @returns {boolean} whether position was updated or not
  */
 function doCling(el, terrain, timeDelta) {
     /**
@@ -321,6 +327,8 @@ function doCling(el, terrain, timeDelta) {
     if (hit_found) {
         processRaycastHit(temp_sp.position, t, temp_sp.normal, cling, timeDelta);
     }
+
+    return hit_found;
 }
 
 export default ClingToTerrainSystem;
