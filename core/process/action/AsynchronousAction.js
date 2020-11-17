@@ -37,7 +37,7 @@ export class AsynchronousAction {
         if (this.status === TaskState.SUCCEEDED) {
             return Promise.resolve();
         } else if (this.status === TaskState.FAILED || this.status === TaskState.CANCELLED) {
-            return Promise.reject();
+            return Promise.reject(`Action is currently in '${this.status}' state`);
         } else {
             return new Promise((resolve, reject) => {
 
