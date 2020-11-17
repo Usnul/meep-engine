@@ -501,9 +501,7 @@ class Terrain {
         assert.typeOf(missCallback, 'function', 'missCallback');
         assert.typeOf(errorCallback, 'function', 'errorCallback');
 
-        this.pTiles.then(function (tiles) {
-            tiles.raycastVertical(x, y, callback, missCallback);
-        }, errorCallback);
+        this.tiles.raycastVertical(x, y, callback, missCallback);
     }
 
     /**

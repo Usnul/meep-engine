@@ -12,9 +12,15 @@ import { obtainTerrain } from "../../../../../model/game/scenes/SceneUtils.js";
 import Quaternion from "../../../../core/geom/Quaternion.js";
 import { clamp, EPSILON, min2 } from "../../../../core/math/MathUtils.js";
 import { Matrix4 } from "three";
-import { noop } from "../../../../core/function/Functions.js";
 import { assert } from "../../../../core/assert.js";
+import { SurfacePoint3 } from "../../../../core/geom/3d/SurfacePoint3.js";
 
+
+/**
+ *
+ * @type {SurfacePoint3}
+ */
+const temp_sp = new SurfacePoint3();
 
 function deregister(datum) {
     const update = datum.update;
@@ -306,16 +312,11 @@ function doCling(el, terrain, timeDelta) {
         return;
     }
 
-    function failed(e) {
-        console.log("Failed terrain raycast", e);
+    const hit_found = terrain.raycastVerticalFirstSync(temp_sp, position.x, position.z);
+
+    if (hit_found) {
+        processRaycastHit(temp_sp.position, temp_sp.normal, cling, timeDelta);
     }
-
-
-    terrain.raycastVertical(position.x, position.z, function (point, normal) {
-        processRaycastHit(point, t, normal, cling, timeDelta);
-    }, noop, failed);
-
-
 }
 
 export default ClingToTerrainSystem;
