@@ -55,12 +55,12 @@ export class Cache {
                     keyEqualityFunction = strictEquals
                 } = {}) {
 
-        assert.isNumber(maxWeight,'maxWeight');
-        assert.typeOf(keyWeigher,'function','keyWeigher');
-        assert.typeOf(valueWeigher,'function','valueWeigher');
-        assert.typeOf(removeListener,'function','removeListener');
-        assert.typeOf(keyHashFunction,'function','keyHashFunction');
-        assert.typeOf(keyEqualityFunction,'function','keyEqualityFunction');
+        assert.isNumber(maxWeight, 'maxWeight');
+        assert.typeOf(keyWeigher, 'function', 'keyWeigher');
+        assert.typeOf(valueWeigher, 'function', 'valueWeigher');
+        assert.typeOf(removeListener, 'function', 'removeListener');
+        assert.typeOf(keyHashFunction, 'function', 'keyHashFunction');
+        assert.typeOf(keyEqualityFunction, 'function', 'keyEqualityFunction');
 
         /**
          *
@@ -331,9 +331,9 @@ export class Cache {
      */
     clear() {
         const keys = [];
-        const cacheElements = this.data.values();
+        const key_iterator = this.data.keys();
 
-        collectIteratorValueToArray(keys, cacheElements);
+        collectIteratorValueToArray(keys, key_iterator);
 
         const n = keys.length;
         for (let i = 0; i < n; i++) {

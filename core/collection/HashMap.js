@@ -69,6 +69,8 @@ export class HashMap {
     set(key, value) {
         const hash = this.keyHashFunction(key);
 
+        assert.isFiniteNumber(hash, 'hash');
+
         let bucket = this.records[hash];
 
         if (bucket === undefined) {
