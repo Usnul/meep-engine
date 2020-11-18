@@ -112,6 +112,13 @@ export class GLSLSimulationShader {
 
         /**
          *
+         * @type {FunctionModuleRegistry}
+         * @private
+         */
+        this.__function_registry = null;
+
+        /**
+         *
          * @type {WebGLTransformFeedback}
          * @private
          */
@@ -137,6 +144,14 @@ export class GLSLSimulationShader {
          * @private
          */
         this.__output_buffer_size = 0;
+    }
+
+    /**
+     *
+     * @param {FunctionModuleRegistry} function_registry
+     */
+    setFunctionRegistry(function_registry) {
+        this.__function_registry = function_registry;
     }
 
     /**
@@ -191,7 +206,12 @@ export class GLSLSimulationShader {
 
         const gen = new GLSLCodeGenerator();
 
-        const code = gen.generate(this.graph, this.attributes, this.uniforms);
+        const code = gen.generate({
+            graph: this.graph,
+            modules: this.__function_registry,
+            attributes: this.attributes,
+            uniforms: this.uniforms
+        });
 
         this.__source = code;
 

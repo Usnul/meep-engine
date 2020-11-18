@@ -1,9 +1,9 @@
-import { AttributeNode } from "./AttributeNode.js";
+import { ShaderNode } from "./ShaderNode.js";
 import { ParticleDataTypes } from "./ParticleDataTypes.js";
 import { PortDirection } from "../../../../../core/model/node-graph/node/PortDirection.js";
 import { NodeParameterDataType } from "../../../../../core/model/node-graph/node/parameter/NodeParameterDataType.js";
 
-export class Vector3Constant extends AttributeNode {
+export class Vector3Constant extends ShaderNode {
     constructor() {
         super();
 
@@ -18,7 +18,7 @@ export class Vector3Constant extends AttributeNode {
         this.createParameter('z', NodeParameterDataType.Number, 0);
     }
 
-    generate_glsl(instance, output, context, port_variables) {
+    generate_code(instance, output, context, port_variables) {
         const out = context.getIdentifier(instance, this.getPortById(0));
 
         const x = instance.getParameterValue(0);

@@ -65,7 +65,53 @@ function initializeDefaultValue(context, output, type) {
 const temp_connections = [];
 
 export class GLSLCodeGenerator extends CodeGenerator {
-    generate(graph, attributes, uniforms) {
+
+    /**
+     *
+     * @param {LineBuilder} output
+     * @param {NodeGraph} graph
+     * @param {FunctionModuleRegistry} module_registry
+     */
+    includeDependencies(output, graph, module_registry) {
+        const references = [];
+
+        graph.traverseNodes(node => {
+            const nodeDescription = node.description;
+
+            if (!nodeDescription.isShaderNode) {
+                return;
+            }
+
+            /**
+             * @type {FunctionModuleReference[]}
+             */
+            const dependencies = nodeDescription.dependencies;
+
+            Array.prototype.push.apply(references, dependencies);
+        });
+
+        const complete_references = module_registry.resolveDependencyTreeForReferences(references);
+
+        const module_list = complete_references.map(module_registry.getModuleByReference, module_registry);
+
+        const n = module_list.length;
+        for (let i = 0; i < n; i++) {
+            /**
+             *
+             * @type {FunctionModule}
+             */
+            const module = module_list[i];
+
+            module.generate(output);
+        }
+    }
+
+    generate({
+                 graph,
+                 modules,
+                 attributes,
+                 uniforms
+             }) {
 
         /**
          *
@@ -81,6 +127,9 @@ export class GLSLCodeGenerator extends CodeGenerator {
         const out_preamble = new LineBuilder();
         out_preamble.add('#version 300 es');
         out_preamble.add('precision highp float;');
+
+        // include dependency modules
+        this.includeDependencies(out_preamble, graph, modules);
 
         // declare attributes
         attributes.forEach(attribute => {
@@ -171,7 +220,7 @@ export class GLSLCodeGenerator extends CodeGenerator {
                 closed_set.set(instance.id, true);
 
                 //
-                nodeDescription.generate_glsl(instance, out_main_body, context, port_variables);
+                nodeDescription.generate_code(instance, out_main_body, context, port_variables);
             }
 
             if (trash.length === 0) {

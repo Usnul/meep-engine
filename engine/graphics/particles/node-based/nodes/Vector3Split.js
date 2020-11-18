@@ -1,8 +1,8 @@
-import { AttributeNode } from "./AttributeNode.js";
+import { ShaderNode } from "./ShaderNode.js";
 import { ParticleDataTypes } from "./ParticleDataTypes.js";
 import { PortDirection } from "../../../../../core/model/node-graph/node/PortDirection.js";
 
-export class Vector3Split extends AttributeNode {
+export class Vector3Split extends ShaderNode {
     constructor() {
         super();
 
@@ -17,7 +17,7 @@ export class Vector3Split extends AttributeNode {
         this.createPort(ParticleDataTypes.Float, 'z', PortDirection.Out);
     }
 
-    generate_glsl(instance, output, context, port_variables) {
+    generate_code(instance, output, context, port_variables) {
 
         const out_x = context.getIdentifier(instance, this.getPortById(1));
         const out_y = context.getIdentifier(instance, this.getPortById(2));

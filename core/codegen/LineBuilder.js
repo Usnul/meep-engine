@@ -26,6 +26,27 @@ const LineBuilder = function () {
 
 /**
  *
+ * @param {string} text
+ * @returns {LineBuilder}
+ */
+LineBuilder.fromText = function (text) {
+    const r = new LineBuilder();
+
+    const lines = text.split('\n');
+
+    const n = lines.length;
+
+    for (let i = 0; i < n; i++) {
+
+        r.add(lines[i]);
+
+    }
+
+    return r;
+}
+
+/**
+ *
  * @return {boolean}
  * @param {string} term
  */

@@ -1,5 +1,5 @@
-import { AttributeNode } from "./AttributeNode.js";
+import { ShaderNode } from "./ShaderNode.js";
 
-export class ReadPosition extends AttributeNode {
+export class ReadPosition extends ShaderNode {
 
 }

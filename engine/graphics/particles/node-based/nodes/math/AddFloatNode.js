@@ -1,9 +1,9 @@
-import { AttributeNode } from "./AttributeNode.js";
-import { PortDirection } from "../../../../../core/model/node-graph/node/PortDirection.js";
-import { ParticleDataTypes } from "./ParticleDataTypes.js";
+import { ShaderNode } from "../ShaderNode.js";
+import { PortDirection } from "../../../../../../core/model/node-graph/node/PortDirection.js";
+import { ParticleDataTypes } from "../ParticleDataTypes.js";
 
 
-export class AddFloatNode extends AttributeNode {
+export class AddFloatNode extends ShaderNode {
     constructor() {
         super();
 
@@ -15,7 +15,7 @@ export class AddFloatNode extends AttributeNode {
         this.createPort(ParticleDataTypes.Float, 'value', PortDirection.Out);
     }
 
-    generate_glsl(instance, output, context, port_variables) {
+    generate_code(instance, output, context, port_variables) {
         const out = context.getIdentifier(instance, this.getPortById(2));
 
         const a = port_variables[0];

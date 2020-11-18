@@ -1,9 +1,9 @@
-import { AttributeNode } from "./AttributeNode.js";
+import { ShaderNode } from "./ShaderNode.js";
 import { PortDirection } from "../../../../../core/model/node-graph/node/PortDirection.js";
 import { ParticleDataTypes } from "./ParticleDataTypes.js";
 
 
-export class WriteVelocity extends AttributeNode {
+export class WriteVelocity extends ShaderNode {
     constructor() {
         super();
         this.id = 30003;

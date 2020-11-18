@@ -16,6 +16,15 @@ export class DataType {
     toString() {
         return `${this.id}:'${this.name}'`;
     }
+
+    /**
+     *
+     * @param {DataType} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        return this.id === other.id && this.name === other.name;
+    }
 }
 
 /**

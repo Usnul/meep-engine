@@ -1,9 +1,9 @@
-import { AttributeNode } from "./AttributeNode.js";
+import { ShaderNode } from "./ShaderNode.js";
 import { ParticleDataTypes } from "./ParticleDataTypes.js";
 import { PortDirection } from "../../../../../core/model/node-graph/node/PortDirection.js";
 import { NodeParameterDataType } from "../../../../../core/model/node-graph/node/parameter/NodeParameterDataType.js";
 
-export class ReadFloatUniform extends AttributeNode {
+export class ReadFloatUniform extends ShaderNode {
     constructor() {
         super();
 
@@ -16,7 +16,7 @@ export class ReadFloatUniform extends AttributeNode {
     }
 
 
-    generate_glsl(instance, output, context, port_variables) {
+    generate_code(instance, output, context, port_variables) {
         const attribute_name = instance.getParameterValue(0);
 
         const out = context.getIdentifier(instance, this.getPortById(0));
