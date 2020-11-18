@@ -6,6 +6,7 @@ import { Cache } from "../../Cache.js";
 import { FunctionCompiler } from "../../function/FunctionCompiler.js";
 import { DataType } from "./DataType.js";
 import { EndianType } from "../../binary/BinaryBuffer.js";
+import { computeStringHash } from "../../primitives/strings/StringUtils.js";
 
 /**
  * @readonly
@@ -227,7 +228,9 @@ export function RowFirstTableSpec(types, endianType = EndianType.BigEndian) {
 }
 
 
-const cache = new Cache();
+const cache = new Cache({
+    keyHashFunction: computeStringHash
+});
 
 /**
  *
