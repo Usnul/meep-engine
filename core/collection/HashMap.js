@@ -346,7 +346,7 @@ export class HashMap {
 
     /**
      *
-     * @returns {Iterator<V>}
+     * @returns {Iterator<K>}
      */
     keys() {
         const entryIterator = this[Symbol.iterator]();
