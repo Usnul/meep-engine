@@ -343,4 +343,31 @@ export class HashMap {
             }
         };
     }
+
+    /**
+     *
+     * @returns {Iterator<V>}
+     */
+    keys() {
+        const entryIterator = this[Symbol.iterator]();
+
+        return {
+            next() {
+                const n = entryIterator.next();
+
+                if (n.done) {
+                    return {
+                        done: true,
+                        value: undefined
+                    };
+                } else {
+                    return {
+                        done: false,
+                        value: n.value[1]
+                    };
+                }
+
+            }
+        };
+    }
 }

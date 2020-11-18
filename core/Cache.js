@@ -2,7 +2,7 @@
  * @template Key,Value
  * @constructor
  */
-import { noop, passThrough, returnOne, returnZero, strictEquals } from "./function/Functions.js";
+import { noop, returnOne, returnZero, strictEquals } from "./function/Functions.js";
 import { HashMap } from "./collection/HashMap.js";
 import { collectIteratorValueToArray } from "./collection/IteratorUtils.js";
 import { assert } from "./assert.js";
@@ -51,7 +51,7 @@ export class Cache {
                     keyWeigher = returnZero,
                     valueWeigher = returnOne,
                     removeListener = noop,
-                    keyHashFunction = passThrough,
+                    keyHashFunction = returnZero,
                     keyEqualityFunction = strictEquals
                 } = {}) {
 
