@@ -34,7 +34,15 @@ export class AsynchronousActionSequence extends AsynchronousAction {
      * @private
      */
     __finalizeActive() {
+        // remove listeners
+        this.__active.on.finished.remove(this.__handleActiveFinished, this);
+        this.__active.on.failed.remove(this.__handleActiveFailed, this);
+        this.__active.on.cancelled.remove(this.__handleActiveCancelled, this);
+
+        // advance sequence cursor
         this.__index++;
+
+        // clear active
         this.__active = null;
     }
 
@@ -62,7 +70,9 @@ export class AsynchronousActionSequence extends AsynchronousAction {
      */
     __handleActiveCancelled() {
         this.__finalizeActive();
-        this.__fail();
+
+        this.status = TaskState.CANCELLED;
+        this.on.cancelled.send0();
     }
 
     /**
@@ -74,6 +84,7 @@ export class AsynchronousActionSequence extends AsynchronousAction {
         }
 
         if (this.__index === this.__sequence.length) {
+            // reached end of sequence
             this.__succeed();
             return;
         }
@@ -82,15 +93,21 @@ export class AsynchronousActionSequence extends AsynchronousAction {
 
             this.__active = this.__sequence[this.__index];
 
-            this.__active.on.finished.addOne(this.__handleActiveFinished, this);
-            this.__active.on.failed.addOne(this.__handleActiveFailed, this);
-            this.__active.on.cancelled.addOne(this.__handleActiveCancelled, this);
+            if (this.__active.status === TaskState.CANCELLED) {
+                this.__handleActiveCancelled();
+            } else {
 
-            try {
-                this.__active.start();
-            } catch (e) {
-                // an element failed during start-up sequence
-                this.__handleActiveFailed(e);
+                this.__active.on.finished.addOne(this.__handleActiveFinished, this);
+                this.__active.on.failed.addOne(this.__handleActiveFailed, this);
+                this.__active.on.cancelled.addOne(this.__handleActiveCancelled, this);
+
+                try {
+                    this.__active.start();
+                } catch (e) {
+                    // an element failed during start-up sequence
+                    this.__handleActiveFailed(e);
+                }
+
             }
         }
 
