@@ -1,9 +1,12 @@
 import { NodeVisualData } from "./NodeVisualData.js";
 import { Color } from "../../../color/Color.js";
-import { forceLayout } from "../../../graph/layout/BoxLayouter.js";
 import AABB2 from "../../../geom/AABB2.js";
-import Graph from "../../../graph/Graph.js";
 import { assert } from "../../../assert.js";
+import { ConnectedBoxLayouter } from "./layout/ConnectedBoxLayouter.js";
+import { BoxLayoutSpec } from "./layout/BoxLayoutSpec.js";
+import { ConnectionLayoutSpec } from "./layout/ConnectionLayoutSpec.js";
+import { HashMap } from "../../../collection/HashMap.js";
+import { ConnectionEndpointLayoutSpec } from "./layout/ConnectionEndpointLayoutSpec.js";
 
 export class NodeGraphVisualData {
     constructor() {
@@ -60,53 +63,112 @@ export class NodeGraphVisualData {
             nodes.push(v);
         });
 
-        const PADDING = 16;
+        const PADDING = 30;
 
+        const layouter = new ConnectedBoxLayouter();
+
+        /**
+         *
+         * @type {ConnectionLayoutSpec[]}
+         */
+        const connections = [];
+
+        /**
+         *
+         * @type {Map<number, BoxLayoutSpec>}
+         */
+        const node_id_to_box_map = new Map();
+
+        /**
+         *
+         * @type {BoxLayoutSpec[]}
+         */
         const boxes = nodes.map(v => {
             const d = v.dimensions;
 
             const p = d.position;
             const s = d.size;
 
-            const aabb2 = new AABB2(
+            const box = new BoxLayoutSpec();
+
+            box.bounds.set(
                 p.x - PADDING,
                 p.y - PADDING,
                 p.x + s.x + PADDING,
                 p.y + s.y + PADDING
             );
 
-            aabb2.model = v.id;
+            node_id_to_box_map.set(v.id, box);
 
-            return aabb2;
+            return box;
         });
-
-        //build a graph structure
 
         /**
          *
-         * @type {Graph<number>}
+         * @type {HashMap<NodeInstancePortReference,ConnectionEndpointLayoutSpec>}
          */
-        const g = new Graph();
+        const endpoints = new HashMap();
 
-        graph.traverseNodes(nodeInstance => {
+        /**
+         *
+         * @param {NodeInstancePortReference} ref
+         */
+        const getEndpointLayputSpec = (ref) => {
+            const endpoint = endpoints.get(ref);
 
-            g.addNode(nodeInstance.id);
-        });
+            if (endpoint !== undefined) {
+                return endpoint;
+            } else {
+
+
+                const r = new ConnectionEndpointLayoutSpec();
+
+                const id = ref.instance.id;
+
+                const node_visual_data = this.getNode(id);
+                const port_visual_data = node_visual_data.getPort(ref.port.id);
+
+                const box = node_id_to_box_map.get(id);
+
+                r.box = box;
+                r.point = port_visual_data.position;
+
+
+                endpoints.set(ref, r);
+
+                return r;
+
+            }
+        }
 
         graph.traverseConnections(connection => {
+            const source = getEndpointLayputSpec(connection.source);
+            const target = getEndpointLayputSpec(connection.target);
 
-            g.createEdge(connection.source.instance.id, connection.target.instance.id);
+            const spec = ConnectionLayoutSpec.from(
+                source,
+                target
+            );
 
+            source.box.connections.push(spec);
+            target.box.connections.push(spec);
+
+            connections.push(spec);
         });
 
-        forceLayout(boxes, g);
+        layouter.initialize(boxes, connections);
+
+        layouter.layout();
 
 
         boxes.forEach((box, i) => {
+
+            const bounds = box.bounds;
+
             const node = nodes[i];
 
-            node.dimensions.position.set(box.x0 + PADDING, box.y0 + PADDING);
-            node.dimensions.size.set(box.getWidth() - PADDING * 2, box.getHeight() - PADDING * 2);
+            node.dimensions.position.set(bounds.x0 + PADDING, bounds.y0 + PADDING);
+            node.dimensions.size.set(bounds.getWidth() - PADDING * 2, bounds.getHeight() - PADDING * 2);
         });
     }
 

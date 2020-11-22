@@ -101,6 +101,8 @@ export class ParticleSpecificationEditorView extends View {
 
                 fr.onload = () => {
 
+                    visual.nodes.clear();
+
                     const json = JSON.parse(fr.result);
 
                     deserializeNodeGraphFromJSON(nodeGraph, json, nodeRegistry);

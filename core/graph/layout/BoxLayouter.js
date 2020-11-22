@@ -8,100 +8,8 @@ import AABB2 from "../../geom/AABB2.js";
 import Vector2 from "../../geom/Vector2.js";
 import { Connection } from "./Connection.js";
 import { computeDisconnectedSubGraphs } from "./computeDisconnectedSubGraphs.js";
+import { resolveBoxOverlapUsingForce } from "./box/resolveBoxOverlapUsingForce.js";
 
-
-/**
- *
- * @param {Array.<AABB2>} boxes
- */
-function resolveOverlapStep(boxes) {
-    const forces = boxes.map(function () {
-        return new Vector2(0, 0);
-    });
-
-    let moves = 0;
-
-    const numBoxes = boxes.length;
-    for (let i = 0; i < numBoxes - 1; i++) {
-        const b0 = boxes[i];
-
-        const r1Right = b0.x1;
-        const r1Bottom = b0.y1;
-
-        for (let j = i + 1; j < numBoxes; j++) {
-            const b1 = boxes[j];
-
-            //compute overlap
-            const left = r1Right - b1.x0;
-            if (left < 0) {
-                //no overlap
-                continue;
-            }
-
-            const right = b1.x1 - b0.x0;
-            if (right < 0) {
-                //no overlap
-                continue;
-            }
-
-            const top = r1Bottom - b1.y0;
-            if (top < 0) {
-                //no overlap
-                continue;
-            }
-
-            const bottom = b1.y1 - b0.y0;
-            if (bottom < 0) {
-                //no overlap
-                continue;
-            }
-
-            //pick the smallest overlap value
-            let dX = left < right ? -left : right;
-            let dY = top < bottom ? -top : bottom;
-
-            //pick smallest axis
-            if (Math.abs(dX) < Math.abs(dY)) {
-                dY = 0;
-            } else {
-                dX = 0;
-            }
-
-            //create separation vector
-            const d = new Vector2(dX, dY);
-            const halfD = d.multiplyScalar(0.5);
-
-            const f1 = forces[i];
-            const f2 = forces[j];
-
-            //apply separation
-            if (b0.locked === true && b1.locked === true) {
-                continue;
-            } else if (b0.locked === true) {
-                f2.sub(d);
-            } else if (b1.locked === true) {
-                f1.add(d);
-            } else {
-                f1.add(halfD);
-                f2.sub(halfD);
-            }
-
-            moves++;
-        }
-    }
-
-    //apply forces
-    for (let i = 0; i < numBoxes; i++) {
-        const box = boxes[i];
-        const force = forces[i];
-
-        const dX = force.x;
-        const dY = force.y;
-        box.move(dX, dY);
-    }
-
-    return moves;
-}
 
 /**
  *
@@ -109,10 +17,17 @@ function resolveOverlapStep(boxes) {
  * @param {number} maxSteps
  */
 export function resolveAABB2Overlap(boxes, maxSteps) {
+    const forces = [];
+
+    const n = boxes.length;
+    for (let i = 0; i < n; i++) {
+        forces.push(new Vector2(0, 0));
+    }
+
     let overlapMoves = -1;
     while (maxSteps > 0 && overlapMoves !== 0) {
         maxSteps--;
-        overlapMoves = resolveOverlapStep(boxes);
+        overlapMoves = resolveBoxOverlapUsingForce(forces, boxes);
     }
 }
 
@@ -172,37 +87,47 @@ function evaluateLayout(boxes, edges) {
 
 /**
  *
+ * @param {AABB2} box
+ * @returns {number}
+ */
+function evaluateBoxPositionCost(box) {
+    let result = 0;
+
+
+    //compute current edge cost
+
+    const connections = box.connections;
+    const n = connections.length;
+    for (let i = 0; i < n; i++) {
+        const connection = connections[i];
+
+        result += evaluateEdgeCost(connection);
+    }
+
+    return result;
+}
+
+/**
+ *
  * @param {AABB2} box0
  * @param {AABB2} box1
+ * @param {function(AABB2):number}  costFunction
  * @returns {boolean}
  */
-function trySwap(box0, box1) {
+function trySwapBoxes(box0, box1, costFunction) {
     if (box0.locked === true || box1.locked === true) {
         return false;
     }
 
-    function evaluatePositionCost() {
-        let result = 0;
 
-        function addToCost(edge) {
-            result += evaluateEdgeCost(edge);
-        }
-
-        //compute current edge cost
-        box0.connections.forEach(addToCost);
-        box1.connections.forEach(addToCost);
-
-        return result;
-    }
-
-    const costBefore = evaluatePositionCost();
+    const costBefore = costFunction(box0) + costFunction(box1);
 
     const temp = new AABB2();
     temp.copy(box0);
     box0.copy(box1);
     box1.copy(temp);
 
-    const costAfter = evaluatePositionCost();
+    const costAfter = costFunction(box0) + costFunction(box1);
 
     if (costAfter > costBefore) {
         //revert swap
@@ -230,7 +155,7 @@ function applyNodeSwapPass(boxes) {
         const b0 = boxes[i];
         for (let j = i + 1; j < numBoxes; j++) {
             const b1 = boxes[j];
-            if (trySwap(b0, b1)) {
+            if (trySwapBoxes(b0, b1, evaluateBoxPositionCost)) {
                 swaps++;
             }
         }

@@ -406,6 +406,18 @@ class AABB2 {
     }
 
     /**
+     *
+     * @param {number} x
+     * @param {number} y
+     */
+    setPosition(x, y) {
+        const width = this.getWidth();
+        const height = this.getHeight();
+
+        this.set(x, y, x + width, y + height);
+    }
+
+    /**
      * Relative displacement of the AABB by given vector described by {@param deltaX} and {@param deltaY}
      * @param {number} deltaX
      * @param {number} deltaY
