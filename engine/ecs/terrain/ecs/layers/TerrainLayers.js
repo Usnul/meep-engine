@@ -1,7 +1,7 @@
-import { DataTexture2DArray } from "three/src/textures/DataTexture2DArray.js";
 import {
     ClampToEdgeWrapping,
     DataTexture,
+    DataTexture2DArray,
     FloatType,
     LinearFilter,
     LinearMipMapLinearFilter,

@@ -5,7 +5,7 @@
 
 import { LeafNode } from "../../../core/bvh2/LeafNode.js";
 import { AABB3 } from "../../../core/bvh2/AABB3.js";
-import { Vector3 as ThreeVector3 } from "three/src/math/Vector3.js";
+import { Vector3 as ThreeVector3 } from "three";
 import { max2, min2 } from "../../../core/math/MathUtils.js";
 
 function Renderable(object) {

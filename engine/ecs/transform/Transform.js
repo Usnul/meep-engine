@@ -5,7 +5,7 @@
 import Vector3 from "../../../core/geom/Vector3.js";
 import Quaternion from "../../../core/geom/Quaternion.js";
 import { Matrix4 } from "../../../core/geom/Matrix4.js";
-import { Quaternion as ThreeQuaternion } from "three/src/math/Quaternion.js";
+import { Quaternion as ThreeQuaternion } from "three";
 
 const delta = new Vector3();
 
@@ -16,10 +16,10 @@ const threeQuaternion = new ThreeQuaternion();
 export class Transform {
     /**
      *
-     * @param options
      * @constructor
      */
-    constructor(options) {
+    constructor() {
+
         /**
          *
          * @type {Vector3}
@@ -40,12 +40,6 @@ export class Transform {
          * @readonly
          */
         this.scale = new Vector3(1, 1, 1);
-
-        if (options !== void 0) {
-            console.error('Transform parameters are deprecated');
-
-            this.fromJSON(options);
-        }
 
     }
 
