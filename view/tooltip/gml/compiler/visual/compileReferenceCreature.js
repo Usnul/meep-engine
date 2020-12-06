@@ -3,12 +3,13 @@ import { LocalizedLabelView } from "../../../../common/LocalizedLabelView.js";
 /**
  *
  * @param {string} id
+ * @param {string} team
  * @param {StaticKnowledgeDatabase} database
  * @param {Localization} localization
  * @param {GMLEngine} gml
  * @param {DomTooltipManager} tooltips
  */
-export function compileReferenceCreature({ id }, database, localization, gml, tooltips) {
+export function compileReferenceCreature({ id, team }, database, localization, gml, tooltips) {
     /**
      *
      * @type {CombatUnitDescription}
@@ -17,5 +18,13 @@ export function compileReferenceCreature({ id }, database, localization, gml, to
 
     const unitName = unitDescription.getLocalizationKeyForName();
 
-    return new LocalizedLabelView({ id: unitName, localization });
+    const result = new LocalizedLabelView({ id: unitName, localization });
+
+    if (team !== undefined) {
+        result.addClass(`team-${team}`);
+    }
+
+    result.addClass(`unit-type-${unitDescription.type}`);
+
+    return result;
 }

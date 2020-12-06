@@ -5,6 +5,7 @@ import View from '../View.js';
 import dom from '../DOM.js';
 import List from '../../core/collection/list/List.js';
 import { frameThrottle } from '../../engine/graphics/FrameThrottle.js';
+import { max2 } from "../../core/math/MathUtils.js";
 
 class VirtualListView extends View {
     /**
@@ -49,92 +50,36 @@ class VirtualListView extends View {
 
         this.renderedViews = new List();
 
-        const self = this;
+        this.__v_scroll_area = vScrollArea;
 
-        let firstVisibleLine = -1;
-        let lastVisibleLine = -1;
+        this.__first_visible_line = -1;
+        this.__last_visible_line = -1;
 
-        let isScrollBarVisible = false;
+        this.__is_scroll_bar_visible = false;
 
-        function setScrollBar(flag) {
-            if (isScrollBarVisible && !flag) {
-                dRoot.css({
-                    overflowY: "visible"
-                });
-            } else if (!isScrollBarVisible && flag) {
-                dRoot.css({
-                    overflowY: "scroll"
-                });
-            } else {
-                //no change
-                return;
-            }
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__line_size = lineSize;
 
-            isScrollBarVisible = flag;
-        }
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this.__line_spacing = lineSpacing;
 
-        function update() {
-            const numTotalElements = self.data.length;
-            const maxLength = lineSize * numTotalElements + lineSpacing * Math.max(0, numTotalElements - 1);
+        /**
+         *
+         * @type {function(T, number): View}
+         * @private
+         */
+        this.__element_factory = elementFactory;
 
-            const rowHeight = lineSize + lineSpacing;
 
-            vScrollArea.size.setY(maxLength);
-            //figure out currently visible lines
-            const scrollY = self.el.scrollTop;
-
-            const y0 = scrollY;
-            const y1 = Math.min(scrollY + self.size.y, maxLength);
-
-            const l0 = Math.floor(y0 / rowHeight);
-            const l1 = Math.min(Math.ceil(y1 / rowHeight), numTotalElements - 1);
-
-            //update cache
-            firstVisibleLine = l0;
-            lastVisibleLine = l1;
-
-            //clear existing lines
-            self.renderedViews.forEach(function (c) {
-                vScrollArea.removeChild(c);
-            });
-            self.renderedViews.reset();
-
-            let rowWidth = self.size.x;
-            if (firstVisibleLine === 0 && lastVisibleLine == numTotalElements - 1 && rowHeight * (lastVisibleLine - firstVisibleLine) < self.size.y) {
-                //entire set of data is visible, disable scroll bar
-                setScrollBar(false);
-            } else {
-                rowWidth -= 17;
-                setScrollBar(true);
-            }
-
-            let elementWidth = self.size.x;
-
-            //generate views for visible lines
-            for (let i = firstVisibleLine; i <= lastVisibleLine; i++) {
-                const elementData = self.data.get(i);
-                const lineView = elementFactory(elementData, i);
-
-                if (lineView === undefined) {
-                    console.error('Line view produced by element factory was undefined');
-                    continue;
-                }
-
-                lineView.el.style.position = "absolute";
-                //mark odd rows
-                if (i % 2 === 1) {
-                    lineView.el.classList.add('odd-row');
-                }
-
-                lineView.position.setY(i * rowHeight);
-                lineView.size.set(rowWidth, lineSize);
-
-                vScrollArea.addChild(lineView);
-                self.renderedViews.add(lineView);
-            }
-        }
-
-        const throttledUpdate = frameThrottle(update);
+        const throttledUpdate = frameThrottle(this.update, this);
 
         this.handlers = {
             addOne: function (el) {
@@ -148,6 +93,108 @@ class VirtualListView extends View {
 
         this.el.addEventListener('scroll', throttledUpdate);
         vScrollArea.el.addEventListener('scroll', throttledUpdate);
+    }
+
+
+    update() {
+        const vScrollArea = this.__v_scroll_area;
+        const lineSize = this.__line_size;
+        const lineSpacing = this.__line_spacing;
+
+        const numTotalElements = this.data.length;
+        const maxLength = lineSize * numTotalElements + lineSpacing * max2(0, numTotalElements - 1);
+
+        const rowHeight = lineSize + lineSpacing;
+
+
+        vScrollArea.size.setY(maxLength);
+        //figure out currently visible lines
+        const scrollY = this.el.scrollTop;
+
+        const y0 = scrollY;
+        const y1 = Math.min(scrollY + this.size.y, maxLength);
+
+        const l0 = Math.floor(y0 / rowHeight);
+        const l1 = Math.min(Math.ceil(y1 / rowHeight), numTotalElements - 1);
+
+        //update cache
+        this.__first_visible_line = l0;
+        this.__last_visible_line = l1;
+
+        //clear existing lines
+        this.renderedViews.forEach(function (c) {
+            vScrollArea.removeChild(c);
+        });
+        this.renderedViews.reset();
+
+        let rowWidth = this.size.x;
+        if (this.__first_visible_line === 0 && this.__last_visible_line === numTotalElements - 1 && rowHeight * (this.__last_visible_line - this.__first_visible_line) < this.size.y) {
+            //entire set of data is visible, disable scroll bar
+            this.__setScrollBar(false);
+        } else {
+            rowWidth -= 17;
+            this.__setScrollBar(true);
+        }
+
+        let elementWidth = this.size.x;
+
+        //generate views for visible lines
+        for (let i = this.__first_visible_line; i <= this.__last_visible_line; i++) {
+            const elementData = this.data.get(i);
+            const lineView = this.__element_factory(elementData, i);
+
+            if (lineView === undefined) {
+                console.error('Line view produced by element factory was undefined');
+                continue;
+            }
+
+            lineView.el.style.position = "absolute";
+            //mark odd rows
+            if (i % 2 === 1) {
+                lineView.el.classList.add('odd-row');
+            }
+
+            lineView.position.setY(i * rowHeight);
+            lineView.size.set(rowWidth, lineSize);
+
+            vScrollArea.addChild(lineView);
+            this.renderedViews.add(lineView);
+        }
+    }
+
+    /**
+     *
+     * @param {number} index
+     * @returns {number}
+     * @private
+     */
+    __computeElementYPosition(index) {
+        const rowHeight = this.__line_size + this.__line_spacing;
+
+        return rowHeight * index;
+    }
+
+    __setScrollBar(flag) {
+        if (this.__is_scroll_bar_visible && !flag) {
+            this.css({
+                overflowY: "visible"
+            });
+        } else if (!this.__is_scroll_bar_visible && flag) {
+            this.css({
+                overflowY: "scroll"
+            });
+        } else {
+            //no change
+            return;
+        }
+
+        this.__is_scroll_bar_visible = flag;
+    }
+
+    scrollToEnd() {
+        const target = this.__computeElementYPosition(this.data.length);
+
+        this.el.scrollTo(0, target);
     }
 
     link() {

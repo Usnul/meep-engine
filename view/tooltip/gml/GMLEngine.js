@@ -1,4 +1,3 @@
-import View from "../../View.js";
 import LabelView from "../../common/LabelView.js";
 import EmptyView from "../../elements/EmptyView.js";
 import { assert } from "../../../core/assert.js";
