@@ -101,11 +101,13 @@ function commonObject3DFastMatrixUpdate(object) {
 
         if (object.bindMode === 'attached') {
 
-            object.bindMatrixInverse.getInverse(object.matrixWorld);
+            object.bindMatrixInverse.copy(object.matrixWorld);
+            object.bindMatrixInverse.invert();
 
         } else if (object.bindMode === 'detached') {
 
-            object.bindMatrixInverse.getInverse(object.bindMatrix);
+            object.bindMatrixInverse.copy(object.bindMatrix);
+            object.bindMatrixInverse.invert();
 
         } else {
 

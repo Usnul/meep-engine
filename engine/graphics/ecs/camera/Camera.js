@@ -52,8 +52,10 @@ export class Camera {
         const c = this.object;
         c.updateProjectionMatrix();
         c.updateMatrixWorld(true);
+
         //update world inverse matrix
-        c.matrixWorldInverse.getInverse(c.matrixWorld);
+        c.matrixWorldInverse.copy(c.matrixWorld);
+        c.matrixWorldInverse.invert();
     }
 
     projectRay(x, y, source, target) {

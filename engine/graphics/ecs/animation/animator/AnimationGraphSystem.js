@@ -6,7 +6,6 @@ import { assert } from "../../../../../core/assert.js";
 import { max3 } from "../../../../../core/math/MathUtils.js";
 import { projectSphere } from "../../../Utils.js";
 import Vector4 from "../../../../../core/geom/Vector4.js";
-import Vector2 from "../../../../../core/geom/Vector2.js";
 import { Matrix4 } from "three";
 import { CameraSystem } from "../../camera/CameraSystem.js";
 import { AnimationGraphFlag } from "./graph/AnimationGraphFlag.js";
@@ -302,7 +301,8 @@ export class AnimationGraphSystem extends System {
          */
         const c = firstActiveCamera.object;
 
-        this.__projectionMatrix.getInverse(c.matrixWorld);
+        this.__projectionMatrix.copy(c.matrixWorld);
+        this.__projectionMatrix.invert();
 
         this.__focalLength = c.fov / 180; //convert to Radians
 

@@ -77,8 +77,10 @@ class HeadsUpDisplaySystem extends System {
          */
         const camera = this.graphics.camera;
 
+        projectionMatrix.copy(camera.matrixWorld);
+        projectionMatrix.invert();
 
-        projectionMatrix.multiplyMatrices(camera.projectionMatrix, projectionMatrix.getInverse(camera.matrixWorld));
+        projectionMatrix.multiplyMatrices(camera.projectionMatrix, projectionMatrix);
 
         const visibilityPredicate = new FogOfWarVisibilityPredicate();
         // Because of blur being applied to FOW, sometimes you can see a tile quite clearly, though be unable to interact with it, higher clearance helps with that

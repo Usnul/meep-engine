@@ -260,7 +260,8 @@ class AnimationSystem extends System {
 
         const projectionMatrix = new ThreeMatrix4();
 
-        projectionMatrix.getInverse(c.matrixWorld);
+        projectionMatrix.copy(c.matrixWorld);
+        projectionMatrix.invert();
 
         const focalLength = c.fov / 180; //convert to Radians
 
