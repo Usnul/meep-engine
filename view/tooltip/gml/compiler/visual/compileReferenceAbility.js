@@ -22,7 +22,7 @@ import { LocalizedLabelView } from "../../../../common/LocalizedLabelView.js";
 export function compileReferenceAbility(
     {
         id,
-        cooldown = 0,
+        cooldown = -1,
         showStats = true,
         showAuras = true,
         showTriggers = true,
@@ -41,11 +41,15 @@ export function compileReferenceAbility(
         console.error(`Ability '${id}' was not found`);
     }
 
+    if (cooldown < 0) {
+        cooldown = description.cooldown;
+    }
+
     const ability = new CombatAbility();
     ability.description = description;
     ability.cooldown.set(cooldown);
 
-    const view = new CombatAbilityDescriptionView({ ability: description, localization,gml });
+    const view = new CombatAbilityDescriptionView({ ability: description, localization, gml });
 
     const result = new EmptyView({ tag: 'span' });
 

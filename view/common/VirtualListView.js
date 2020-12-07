@@ -6,6 +6,9 @@ import dom from '../DOM.js';
 import List from '../../core/collection/list/List.js';
 import { frameThrottle } from '../../engine/graphics/FrameThrottle.js';
 import { max2 } from "../../core/math/MathUtils.js";
+import Signal from "../../core/events/signal/Signal.js";
+import { Cache } from "../../core/Cache.js";
+import { passThrough, strictEquals } from "../../core/function/Functions.js";
 
 class VirtualListView extends View {
     /**
@@ -15,11 +18,14 @@ class VirtualListView extends View {
      * @param {number} [lineSpacing=0]
      * @param {function(element:T, index:number):View} elementFactory
      * @param classList
+     * @param {number} [cacheSize=1000]
      * @constructor
      */
-    constructor(list, { lineSize = 20, lineSpacing = 0, elementFactory, classList = [] }) {
+    constructor(list, { lineSize = 20, lineSpacing = 0, elementFactory, classList = [], cacheSize = 1000 }) {
 
         super();
+
+        this.on.scroll_y_span_changed = new Signal();
 
         this.data = list;
 
@@ -79,20 +85,40 @@ class VirtualListView extends View {
         this.__element_factory = elementFactory;
 
 
-        const throttledUpdate = frameThrottle(this.update, this);
+        this.__index_cache = new Cache({
+            maxWeight: cacheSize,
+            keyEqualityFunction: strictEquals,
+            keyHashFunction: passThrough
+        });
 
-        this.handlers = {
-            addOne: function (el) {
-                throttledUpdate();
-            },
-            removeOne: function (el) {
-                throttledUpdate();
-            },
-            update: throttledUpdate
-        };
 
-        this.el.addEventListener('scroll', throttledUpdate);
-        vScrollArea.el.addEventListener('scroll', throttledUpdate);
+        this.__throttledUpdate = frameThrottle(this.update, this);
+
+        this.el.addEventListener('scroll', this.__throttledUpdate);
+        vScrollArea.el.addEventListener('scroll', this.__throttledUpdate);
+
+        this.bindSignal(this.data.on.added, this.__handleElementAdded, this);
+        this.bindSignal(this.data.on.removed, this.__handleElementRemoved, this);
+    }
+
+    __handleElementAdded(el, index) {
+        const last_element_index = this.data.length - 1;
+
+        if (index < last_element_index) {
+            // inserted somewhere in the middle, invalidate cache
+            this.__index_cache.clear();
+        }
+
+        this.__throttledUpdate();
+    }
+
+    __handleElementRemoved(el, index) {
+        // invalidate cache
+
+        // TODO this can be done in a smarter way
+        this.__index_cache.clear();
+
+        this.__throttledUpdate();
     }
 
 
@@ -106,8 +132,14 @@ class VirtualListView extends View {
 
         const rowHeight = lineSize + lineSpacing;
 
+        const old_scroll_span_y = vScrollArea.size.y;
 
         vScrollArea.size.setY(maxLength);
+
+        if (old_scroll_span_y !== maxLength) {
+            this.on.scroll_y_span_changed.send0();
+        }
+
         //figure out currently visible lines
         const scrollY = this.el.scrollTop;
 
@@ -136,15 +168,11 @@ class VirtualListView extends View {
             this.__setScrollBar(true);
         }
 
-        let elementWidth = this.size.x;
-
         //generate views for visible lines
         for (let i = this.__first_visible_line; i <= this.__last_visible_line; i++) {
-            const elementData = this.data.get(i);
-            const lineView = this.__element_factory(elementData, i);
+            const lineView = this.__obtainElementView(i);
 
             if (lineView === undefined) {
-                console.error('Line view produced by element factory was undefined');
                 continue;
             }
 
@@ -160,6 +188,27 @@ class VirtualListView extends View {
             vScrollArea.addChild(lineView);
             this.renderedViews.add(lineView);
         }
+    }
+
+    __obtainElementView(index) {
+        const element = this.data.get(index);
+
+        const existingView = this.__index_cache.get(index);
+
+        if (existingView !== null) {
+            return existingView;
+        }
+
+        const view = this.__element_factory(element, index);
+
+        if (view === undefined) {
+            console.error('Line view produced by element factory was undefined');
+            return undefined;
+        }
+
+        this.__index_cache.put(index, view);
+
+        return view;
     }
 
     /**
@@ -194,25 +243,21 @@ class VirtualListView extends View {
     scrollToEnd() {
         const target = this.__computeElementYPosition(this.data.length);
 
-        this.el.scrollTo(0, target);
+        this.el.scrollTop = target;
+
+        this.__throttledUpdate();
     }
 
     link() {
         super.link();
 
-        this.data.on.added.add(this.handlers.addOne);
-        this.data.on.removed.add(this.handlers.removeOne);
+        this.size.onChanged.add(this.__throttledUpdate);
 
-        this.size.onChanged.add(this.handlers.update);
-
-        this.data.forEach(this.handlers.addOne);
+        this.data.forEach(this.__handleElementAdded, this);
     }
 
     unlink() {
         super.unlink();
-
-        this.data.on.added.remove(this.handlers.addOne);
-        this.data.on.removed.remove(this.handlers.removeOne);
 
         this.size.onChanged.remove(this.handlers.update);
     }
